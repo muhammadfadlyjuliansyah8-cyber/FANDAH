@@ -5313,6 +5313,721 @@
     }
   </style>
 
+
+
+  <style id="final-gold-glossy-login-card-upgrade">
+    /* FINAL OVERRIDE — Login card area: gold glossy HD premium */
+    #loginPage .card {
+      width: min(440px, 92vw) !important;
+      border-radius: 34px !important;
+      padding: 1px !important;
+      background:
+        linear-gradient(135deg,
+          rgba(255, 245, 198, .78) 0%,
+          rgba(207, 152, 35, .82) 18%,
+          rgba(91, 59, 16, .52) 42%,
+          rgba(255, 214, 101, .84) 68%,
+          rgba(122, 82, 18, .62) 100%) !important;
+      border: 1px solid rgba(255, 221, 125, .38) !important;
+      box-shadow:
+        0 34px 92px rgba(0, 0, 0, .56),
+        0 0 0 1px rgba(255, 255, 255, .035) inset,
+        0 0 28px rgba(255, 197, 62, .16),
+        0 0 72px rgba(185, 122, 25, .10) !important;
+      overflow: hidden !important;
+      isolation: isolate !important;
+    }
+
+    #loginPage .card::before {
+      content: "" !important;
+      display: block !important;
+      position: absolute !important;
+      inset: -35% !important;
+      pointer-events: none !important;
+      z-index: 0 !important;
+      background:
+        conic-gradient(from 90deg,
+          transparent 0deg,
+          rgba(255, 226, 134, .36) 42deg,
+          transparent 82deg,
+          rgba(255, 248, 215, .24) 126deg,
+          transparent 168deg,
+          rgba(178, 112, 20, .34) 218deg,
+          transparent 276deg,
+          rgba(255, 218, 103, .30) 318deg,
+          transparent 360deg) !important;
+      filter: blur(22px) saturate(1.18) !important;
+      opacity: .76 !important;
+      animation: goldCardAuraSpin 13s linear infinite !important;
+    }
+
+    #loginPage .card::after {
+      content: "" !important;
+      display: block !important;
+      position: absolute !important;
+      inset: 1px !important;
+      pointer-events: none !important;
+      z-index: 3 !important;
+      border-radius: 33px !important;
+      background:
+        linear-gradient(120deg,
+          transparent 0%,
+          transparent 28%,
+          rgba(255, 255, 255, .22) 38%,
+          rgba(255, 232, 160, .12) 44%,
+          transparent 55%,
+          transparent 100%) !important;
+      mix-blend-mode: screen !important;
+      opacity: .72 !important;
+      transform: translateX(-120%) skewX(-14deg) !important;
+      animation: goldGlossSweep 5.6s ease-in-out infinite !important;
+    }
+
+    #loginPage .inner {
+      position: relative !important;
+      z-index: 2 !important;
+      border-radius: 32px !important;
+      background:
+        radial-gradient(360px 220px at 50% 0%, rgba(255, 211, 92, .18), transparent 68%),
+        radial-gradient(240px 180px at 16% 20%, rgba(255, 238, 180, .09), transparent 62%),
+        linear-gradient(180deg, rgba(19, 15, 8, .92) 0%, rgba(9, 9, 12, .96) 54%, rgba(8, 6, 5, .98) 100%) !important;
+      border: 1px solid rgba(255, 218, 116, .16) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .10),
+        inset 0 0 34px rgba(255, 196, 66, .055) !important;
+      backdrop-filter: blur(22px) saturate(1.16) contrast(1.06) !important;
+      -webkit-backdrop-filter: blur(22px) saturate(1.16) contrast(1.06) !important;
+    }
+
+    #loginPage .inner::before {
+      content: "" !important;
+      display: block !important;
+      position: absolute !important;
+      inset: 0 !important;
+      pointer-events: none !important;
+      z-index: 0 !important;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, .11), transparent 24%),
+        linear-gradient(315deg, rgba(255, 188, 42, .105), transparent 30%),
+        repeating-linear-gradient(90deg, rgba(255, 220, 128, .030) 0 1px, transparent 1px 18px) !important;
+      opacity: .80 !important;
+    }
+
+    #loginPage .inner::after {
+      content: "" !important;
+      display: block !important;
+      position: absolute !important;
+      inset: 14px !important;
+      pointer-events: none !important;
+      z-index: 1 !important;
+      border-radius: 25px !important;
+      border: 1px solid rgba(255, 223, 135, .13) !important;
+      box-shadow:
+        inset 0 0 34px rgba(255, 197, 64, .055),
+        0 0 24px rgba(255, 198, 58, .06) !important;
+    }
+
+    #loginPage .top,
+    #loginPage .form,
+    #loginPage .login-footnote,
+    #loginPage .spacer {
+      position: relative !important;
+      z-index: 4 !important;
+    }
+
+    #loginPage .badge {
+      width: 64px !important;
+      height: 64px !important;
+      border-radius: 21px !important;
+      background:
+        linear-gradient(180deg, rgba(255, 227, 137, .96), rgba(190, 119, 22, .78) 54%, rgba(66, 42, 13, .96)) !important;
+      border: 1px solid rgba(255, 238, 178, .45) !important;
+      box-shadow:
+        0 18px 38px rgba(0, 0, 0, .34),
+        0 0 0 1px rgba(255, 255, 255, .06) inset,
+        0 0 28px rgba(255, 201, 69, .28),
+        inset 0 1px 0 rgba(255, 255, 255, .38) !important;
+      animation: goldBadgeFloat 4.2s ease-in-out infinite !important;
+    }
+
+    #loginPage .badge svg path,
+    #loginPage .badge svg circle {
+      stroke: #fff5d6 !important;
+      filter: drop-shadow(0 0 8px rgba(255, 219, 116, .45)) !important;
+    }
+
+    #loginPage .top h1 {
+      display: block !important;
+      color: #fff7dd !important;
+      font-size: clamp(26px, 4vw, 36px) !important;
+      font-weight: 900 !important;
+      letter-spacing: .13em !important;
+      text-transform: uppercase !important;
+      text-shadow:
+        0 1px 0 rgba(92, 55, 10, .66),
+        0 0 18px rgba(255, 211, 92, .20),
+        0 0 34px rgba(255, 189, 46, .12) !important;
+      margin-bottom: 10px !important;
+    }
+
+    #loginPage .top .sub {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: fit-content !important;
+      max-width: 100% !important;
+      min-height: 28px !important;
+      margin: 0 auto !important;
+      padding: 0 15px !important;
+      border-radius: 999px !important;
+      color: rgba(255, 245, 216, .88) !important;
+      background: linear-gradient(135deg, rgba(255, 213, 104, .11), rgba(92, 57, 13, .18)) !important;
+      border: 1px solid rgba(255, 213, 104, .16) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .06),
+        0 0 18px rgba(255, 192, 51, .08) !important;
+      font-size: 12.5px !important;
+      font-weight: 750 !important;
+      letter-spacing: .035em !important;
+      line-height: 1.35 !important;
+      animation: loginSubAestheticMove 3.8s ease-in-out infinite !important;
+    }
+
+    #loginPage .top .sub::before,
+    #loginPage .top .sub::after {
+      content: "✦" !important;
+      color: rgba(255, 218, 122, .92) !important;
+      font-size: 10px !important;
+      margin: 0 8px !important;
+      text-shadow: 0 0 12px rgba(255, 199, 53, .42) !important;
+      animation: loginTinyStarPulse 2s ease-in-out infinite !important;
+    }
+
+    #loginPage .field {
+      min-height: 50px !important;
+      border-radius: 17px !important;
+      background:
+        linear-gradient(180deg, rgba(5, 8, 14, .88), rgba(8, 7, 8, .96)) !important;
+      border: 1px solid rgba(255, 217, 121, .18) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .045),
+        0 0 0 1px rgba(255, 194, 51, .025) !important;
+    }
+
+    #loginPage .field:hover,
+    #loginPage .field:focus-within {
+      border-color: rgba(255, 222, 139, .42) !important;
+      box-shadow:
+        0 0 0 3px rgba(255, 196, 55, .075),
+        0 0 22px rgba(255, 194, 51, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .08) !important;
+    }
+
+    #loginPage .icon path,
+    #loginPage .icon circle {
+      stroke: rgba(255, 229, 161, .76) !important;
+    }
+
+    #loginPage input {
+      color: #fff7e4 !important;
+      font-weight: 650 !important;
+    }
+
+    #loginPage input::placeholder {
+      color: rgba(255, 239, 202, .52) !important;
+      font-weight: 560 !important;
+    }
+
+    #loginPage .login-helper-row,
+    #loginPage .login-helper-row a,
+    #loginPage .remember-check span,
+    #loginPage .meta {
+      color: rgba(255, 241, 210, .56) !important;
+    }
+
+    #loginPage .remember-check input {
+      accent-color: #d9a12e !important;
+    }
+
+    #loginPage .btn {
+      min-height: 48px !important;
+      border-radius: 17px !important;
+      background:
+        linear-gradient(135deg, #fff0b8 0%, #d89f2a 18%, #9b6217 52%, #f0c35b 78%, #6d4211 100%) !important;
+      border: 1px solid rgba(255, 238, 177, .48) !important;
+      color: #160f05 !important;
+      font-size: 12.5px !important;
+      font-weight: 950 !important;
+      letter-spacing: .24em !important;
+      text-transform: uppercase !important;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, .34) !important;
+      box-shadow:
+        0 18px 38px rgba(0, 0, 0, .34),
+        0 0 26px rgba(255, 197, 56, .18),
+        inset 0 1px 0 rgba(255, 255, 255, .48),
+        inset 0 -10px 22px rgba(73, 43, 9, .28) !important;
+      transition: transform .18s ease, filter .18s ease, box-shadow .18s ease !important;
+    }
+
+    #loginPage .btn::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      background: radial-gradient(220px 70px at var(--mx, 50%) 50%, rgba(255, 255, 255, .34), transparent 62%) !important;
+      opacity: 0 !important;
+      transition: opacity .18s ease !important;
+    }
+
+    #loginPage .btn::after {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .42), transparent) !important;
+      transform: translateX(-120%) skewX(-16deg) !important;
+      animation: goldButtonGloss 3.2s ease-in-out infinite !important;
+    }
+
+    #loginPage .btn:hover {
+      transform: translateY(-1px) scale(1.006) !important;
+      filter: brightness(1.08) saturate(1.08) !important;
+      box-shadow:
+        0 22px 44px rgba(0, 0, 0, .38),
+        0 0 34px rgba(255, 204, 70, .28),
+        inset 0 1px 0 rgba(255, 255, 255, .54),
+        inset 0 -10px 22px rgba(73, 43, 9, .24) !important;
+    }
+
+    #loginPage .btn:hover::before {
+      opacity: 1 !important;
+    }
+
+    #loginPage .login-footnote .info-line,
+    #loginPage .login-footnote .warning-line {
+      color: rgba(255, 239, 204, .58) !important;
+    }
+
+    #loginPage .alert {
+      color: #ffe1d5 !important;
+      background: rgba(115, 42, 15, .26) !important;
+      border-color: rgba(255, 169, 93, .28) !important;
+    }
+
+    @keyframes goldCardAuraSpin {
+      0% { transform: rotate(0deg) scale(1); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    @keyframes goldGlossSweep {
+      0%, 42% { transform: translateX(-120%) skewX(-14deg); opacity: 0; }
+      52% { opacity: .76; }
+      68%, 100% { transform: translateX(120%) skewX(-14deg); opacity: 0; }
+    }
+
+    @keyframes goldBadgeFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes loginSubAestheticMove {
+      0%, 100% { transform: translateY(0); opacity: .88; filter: drop-shadow(0 0 0 rgba(255, 205, 66, 0)); }
+      50% { transform: translateY(-4px); opacity: 1; filter: drop-shadow(0 0 10px rgba(255, 205, 66, .22)); }
+    }
+
+    @keyframes loginTinyStarPulse {
+      0%, 100% { transform: scale(.82); opacity: .56; }
+      50% { transform: scale(1.18); opacity: 1; }
+    }
+
+    @keyframes goldButtonGloss {
+      0%, 55% { transform: translateX(-120%) skewX(-16deg); opacity: 0; }
+      68% { opacity: .84; }
+      88%, 100% { transform: translateX(120%) skewX(-16deg); opacity: 0; }
+    }
+
+    @media (max-width: 680px) {
+      #loginPage .card {
+        width: min(420px, 94vw) !important;
+        border-radius: 28px !important;
+      }
+      #loginPage .inner {
+        border-radius: 27px !important;
+        padding: 28px 22px 24px !important;
+      }
+      #loginPage .card::after { border-radius: 27px !important; }
+      #loginPage .top h1 { font-size: 26px !important; letter-spacing: .10em !important; }
+      #loginPage .top .sub { font-size: 12px !important; }
+    }
+  </style>
+
+
+  <style id="portal-gold-love-upgrade">
+    /* ===== GOLD HERO HEADER + LOVE EFFECT ===== */
+    #loginPage .portal-head {
+      position: relative !important;
+      width: min(720px, 94vw) !important;
+      margin: 0 auto 14px !important;
+      padding: 18px 28px 16px !important;
+      border-radius: 26px !important;
+      background:
+        linear-gradient(180deg, rgba(26,18,8,.78), rgba(12,9,5,.92)),
+        radial-gradient(circle at 18% 18%, rgba(255,230,166,.12), transparent 34%),
+        radial-gradient(circle at 84% 22%, rgba(212,175,55,.12), transparent 30%) !important;
+      border: 1px solid rgba(225, 186, 87, .30) !important;
+      box-shadow:
+        0 28px 80px rgba(0,0,0,.34),
+        0 0 42px rgba(212,175,55,.12),
+        inset 0 1px 0 rgba(255,255,255,.08),
+        inset 0 0 0 1px rgba(225,186,87,.08) !important;
+      overflow: hidden !important;
+      isolation: isolate !important;
+      animation: portalHeadFloatGold 6.6s ease-in-out infinite !important;
+    }
+
+    #loginPage .portal-head::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      pointer-events: none !important;
+      background:
+        linear-gradient(120deg, transparent 0%, transparent 28%, rgba(255,241,198,.16) 40%, rgba(255,232,153,.26) 50%, rgba(255,241,198,.12) 58%, transparent 72%, transparent 100%) !important;
+      transform: translateX(-130%) skewX(-18deg) !important;
+      animation: portalHeadGlossSweep 5.4s ease-in-out infinite !important;
+      z-index: 0 !important;
+      mix-blend-mode: screen !important;
+    }
+
+    #loginPage .portal-head::after {
+      content: "❤   ❤   ❤" !important;
+      position: absolute !important;
+      top: 10px !important;
+      right: 18px !important;
+      font-size: 11px !important;
+      letter-spacing: 12px !important;
+      color: rgba(255, 214, 122, .55) !important;
+      text-shadow: 0 0 10px rgba(255, 214, 122, .28), 0 0 18px rgba(255, 120, 170, .16) !important;
+      animation: portalHeartPulse 2.6s ease-in-out infinite !important;
+      pointer-events: none !important;
+      z-index: 2 !important;
+    }
+
+    #loginPage .portal-head-main,
+    #loginPage .portal-subtitle {
+      position: relative !important;
+      z-index: 2 !important;
+    }
+
+    #loginPage .portal-head-main {
+      gap: 16px !important;
+      align-items: center !important;
+    }
+
+    #loginPage .portal-head-logo {
+      width: 50px !important;
+      height: 50px !important;
+      border-radius: 17px !important;
+      background:
+        linear-gradient(180deg, rgba(239, 207, 116, .96), rgba(160, 102, 19, .90)),
+        radial-gradient(circle at 30% 24%, rgba(255,255,255,.34), transparent 44%) !important;
+      border: 1px solid rgba(244, 216, 140, .56) !important;
+      box-shadow:
+        0 16px 42px rgba(0,0,0,.28),
+        0 0 26px rgba(212,175,55,.18),
+        inset 0 1px 0 rgba(255,255,255,.42),
+        inset 0 -10px 18px rgba(126, 73, 8, .18) !important;
+      animation: portalLogoBob 4.8s ease-in-out infinite !important;
+    }
+
+    #loginPage .portal-head-logo svg {
+      filter: drop-shadow(0 0 12px rgba(255, 246, 219, .22)) !important;
+    }
+
+    #loginPage .portal-head-logo path {
+      stroke: rgba(255, 249, 237, .98) !important;
+    }
+
+    #loginPage .portal-title {
+      position: relative !important;
+      display: inline-block !important;
+      color: #FFF5D9 !important;
+      background: linear-gradient(180deg, #FFF6DE 0%, #F1D38C 38%, #C18D28 100%) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      text-shadow: 0 0 22px rgba(255, 220, 132, .14), 0 0 42px rgba(212,175,55,.08) !important;
+      letter-spacing: .17em !important;
+      animation: portalTitleGlow 3.8s ease-in-out infinite !important;
+    }
+
+    #loginPage .portal-title::after {
+      content: "❤" !important;
+      position: absolute !important;
+      right: -22px !important;
+      top: -8px !important;
+      font-size: 13px !important;
+      color: rgba(255, 198, 121, .82) !important;
+      text-shadow: 0 0 14px rgba(255, 198, 121, .42), 0 0 18px rgba(255, 118, 160, .18) !important;
+      animation: portalMiniHeart 2.2s ease-in-out infinite !important;
+      -webkit-text-fill-color: initial !important;
+      background: none !important;
+    }
+
+    #loginPage .portal-subtitle {
+      position: relative !important;
+      min-height: 34px !important;
+      padding: 0 18px !important;
+      border-radius: 999px !important;
+      color: #FFF3D5 !important;
+      background:
+        linear-gradient(180deg, rgba(78, 49, 12, .86), rgba(38, 24, 8, .96)),
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.14), transparent 42%) !important;
+      border: 1px solid rgba(230, 189, 88, .30) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 0 18px rgba(212,175,55,.10) !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      letter-spacing: .16em !important;
+      text-transform: uppercase !important;
+      animation: portalSubtitleBreath 2.8s ease-in-out infinite !important;
+    }
+
+    #loginPage .portal-subtitle::before {
+      background: #f3c65d !important;
+      box-shadow: 0 0 12px rgba(243, 198, 93, .45) !important;
+    }
+
+    #loginPage .portal-subtitle::after {
+      content: "❤" !important;
+      position: relative !important;
+      margin-left: 8px !important;
+      font-size: 11px !important;
+      color: rgba(255, 208, 129, .86) !important;
+      text-shadow: 0 0 10px rgba(255, 208, 129, .36) !important;
+      animation: portalMiniHeart 2.2s ease-in-out infinite .6s !important;
+    }
+
+    @keyframes portalHeadFloatGold {
+      0%, 100% { transform: translateY(0); box-shadow: 0 28px 80px rgba(0,0,0,.34), 0 0 42px rgba(212,175,55,.12), inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(225,186,87,.08); }
+      50% { transform: translateY(-4px); box-shadow: 0 34px 92px rgba(0,0,0,.38), 0 0 56px rgba(212,175,55,.18), inset 0 1px 0 rgba(255,255,255,.11), inset 0 0 0 1px rgba(225,186,87,.10); }
+    }
+
+    @keyframes portalHeadGlossSweep {
+      0% { transform: translateX(-130%) skewX(-18deg); opacity: 0; }
+      8% { opacity: .0; }
+      20% { opacity: .95; }
+      38% { opacity: .42; }
+      55%, 100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
+    }
+
+    @keyframes portalTitleGlow {
+      0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 0 rgba(255,221,153,0)); }
+      50% { transform: translateY(-1px); filter: drop-shadow(0 0 10px rgba(255,220,132,.18)); }
+    }
+
+    @keyframes portalLogoBob {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-2px) scale(1.02); }
+    }
+
+    @keyframes portalSubtitleBreath {
+      0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 18px rgba(212,175,55,.10); }
+      50% { box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 0 28px rgba(212,175,55,.18); }
+    }
+
+    @keyframes portalHeartPulse {
+      0%, 100% { transform: translateY(0) scale(1); opacity: .55; }
+      50% { transform: translateY(-2px) scale(1.08); opacity: .9; }
+    }
+
+    @keyframes portalMiniHeart {
+      0%, 100% { transform: translateY(0) scale(1); opacity: .72; }
+      50% { transform: translateY(-4px) scale(1.16); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      #loginPage .portal-head {
+        padding: 15px 18px 14px !important;
+        border-radius: 22px !important;
+      }
+      #loginPage .portal-title {
+        font-size: clamp(24px, 6vw, 34px) !important;
+        letter-spacing: .13em !important;
+      }
+      #loginPage .portal-subtitle {
+        min-height: 30px !important;
+        padding: 0 14px !important;
+        font-size: 10px !important;
+      }
+    }
+  </style>
+
+
+  <style id="black-gold-pearl-love-bg-upgrade">
+    /* ===== BLACK + GOLD PEARL BACKGROUND (SEPARATE FROM MAIN GOLD PANEL) ===== */
+    #loginPage.wrap {
+      background:
+        radial-gradient(circle at 14% 16%, rgba(173, 134, 54, .14) 0%, transparent 24%),
+        radial-gradient(circle at 84% 14%, rgba(233, 217, 176, .09) 0%, transparent 18%),
+        radial-gradient(circle at 10% 86%, rgba(109, 74, 20, .12) 0%, transparent 22%),
+        radial-gradient(circle at 90% 82%, rgba(164, 127, 47, .11) 0%, transparent 22%),
+        radial-gradient(circle at 50% 52%, rgba(93, 66, 20, .08) 0%, transparent 28%),
+        linear-gradient(180deg, #020202 0%, #080603 42%, #030201 100%) !important;
+      overflow: hidden !important;
+      isolation: isolate !important;
+    }
+
+    #loginPage.wrap::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      pointer-events: none !important;
+      opacity: .42 !important;
+      background-image:
+        linear-gradient(to right, rgba(197, 160, 80, .06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(197, 160, 80, .045) 1px, transparent 1px) !important;
+      background-size: 72px 72px !important;
+      mask-image: radial-gradient(circle at center, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 46%, rgba(0,0,0,.22) 82%, rgba(0,0,0,0) 100%) !important;
+      z-index: 0 !important;
+    }
+
+    #loginPage.wrap::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      width: min(760px, 88vw) !important;
+      height: min(760px, 88vw) !important;
+      transform: translate(-50%, -50%) !important;
+      border-radius: 50% !important;
+      pointer-events: none !important;
+      background:
+        radial-gradient(circle at center, rgba(223, 197, 131, .10) 0%, rgba(181, 141, 57, .07) 18%, rgba(87, 61, 17, .04) 34%, transparent 62%),
+        radial-gradient(circle at 50% 50%, rgba(245, 232, 194, .06), transparent 72%) !important;
+      filter: blur(18px) !important;
+      opacity: .86 !important;
+      z-index: 0 !important;
+      animation: blackGoldPearlPulse 8.5s ease-in-out infinite !important;
+    }
+
+    #loginPage .gold-love-points {
+      position: absolute !important;
+      inset: 0 !important;
+      pointer-events: none !important;
+      z-index: 1 !important;
+      overflow: hidden !important;
+    }
+
+    #loginPage .gold-love-points span {
+      position: absolute !important;
+      left: var(--x) !important;
+      top: var(--y) !important;
+      font-size: var(--s, 12px) !important;
+      color: var(--c, rgba(255, 212, 127, .65)) !important;
+      text-shadow:
+        0 0 10px rgba(255, 208, 120, .22),
+        0 0 18px rgba(255, 169, 92, .12) !important;
+      opacity: .72 !important;
+      transform: translate(-50%, -50%) !important;
+      animation:
+        lovePointFloat var(--t, 4.8s) ease-in-out infinite,
+        lovePointBlink var(--b, 2.8s) ease-in-out infinite !important;
+      animation-delay: var(--d, 0s) !important;
+    }
+
+    #loginPage .gold-love-points span.soft {
+      color: rgba(255, 232, 188, .48) !important;
+      opacity: .56 !important;
+    }
+
+    #loginPage .portal-head,
+    #loginPage .rgb-marquee-shell,
+    #loginPage .card {
+      position: relative !important;
+      z-index: 2 !important;
+    }
+
+    @keyframes blackGoldPearlPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .82; }
+      50% { transform: translate(-50%, -50%) scale(1.04); opacity: .98; }
+    }
+
+    @keyframes lovePointFloat {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0) scale(1); }
+      50% { transform: translate(-50%, -50%) translateY(-8px) scale(1.12); }
+    }
+
+    @keyframes lovePointBlink {
+      0%, 100% { opacity: .45; filter: saturate(1); }
+      50% { opacity: .98; filter: saturate(1.15); }
+    }
+
+    @media (max-width: 768px) {
+      #loginPage.wrap::before { background-size: 52px 52px !important; }
+      #loginPage .gold-love-points span { font-size: calc(var(--s, 12px) - 1px) !important; }
+    }
+  </style>
+
+
+  <style id="final-many-moving-love-lightweight">
+    /* FINAL — Banyak efek love, bergerak simple, tetap ringan */
+    #loginPage .gold-love-points {
+      position: absolute !important;
+      inset: 0 !important;
+      pointer-events: none !important;
+      z-index: 1 !important;
+      overflow: hidden !important;
+      contain: layout paint style !important;
+    }
+
+    #loginPage .gold-love-points .love-point {
+      position: absolute !important;
+      left: var(--x) !important;
+      top: var(--y) !important;
+      font-size: var(--s, 11px) !important;
+      line-height: 1 !important;
+      color: var(--c, rgba(255, 210, 126, .62)) !important;
+      opacity: var(--o1, .38) !important;
+      text-shadow: 0 0 8px rgba(255, 207, 116, .18) !important;
+      transform: translate3d(-50%, -50%, 0) !important;
+      will-change: transform, opacity !important;
+      animation: loveMoveSimple var(--dur, 6s) ease-in-out infinite !important;
+      animation-delay: var(--delay, 0s) !important;
+    }
+
+    #loginPage .gold-love-points .love-point.soft {
+      color: rgba(255, 235, 196, .42) !important;
+      text-shadow: 0 0 7px rgba(255, 230, 180, .12) !important;
+    }
+
+    #loginPage .gold-love-points .love-point.tiny {
+      opacity: .32 !important;
+    }
+
+    @keyframes loveMoveSimple {
+      0%, 100% {
+        transform: translate3d(-50%, -50%, 0) translate3d(0, 0, 0) scale(1);
+        opacity: var(--o1, .38);
+      }
+      50% {
+        transform: translate3d(-50%, -50%, 0) translate3d(var(--dx, 4px), var(--dy, -10px), 0) scale(var(--sc, 1.08));
+        opacity: var(--o2, .82);
+      }
+    }
+
+    @media (max-width: 680px) {
+      #loginPage .gold-love-points .love-point {
+        text-shadow: 0 0 6px rgba(255, 207, 116, .14) !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #loginPage .gold-love-points .love-point {
+        animation: none !important;
+        opacity: .38 !important;
+      }
+    }
+  </style>
+
 </head>
 
 <body>
@@ -5320,6 +6035,7 @@
   <div class="fx" aria-hidden="true"><div class="grid"></div><div class="noise"></div></div>
 
   <div class="wrap" id="loginPage">
+    <div class="gold-love-points" aria-hidden="true"></div>
     <div class="portal-head">
       <div class="portal-head-main">
         <div class="portal-head-logo" aria-hidden="true">
@@ -8256,6 +8972,87 @@
         };
         wrappedSelectActiveChatRoom.__mobileDrawerWrapped = true;
         window.selectActiveChatRoom = wrappedSelectActiveChatRoom;
+      }
+    })();
+  </script>
+
+
+  <script id="final-many-moving-love-generator">
+    (() => {
+      function seedRandom(seed) {
+        let value = seed % 2147483647;
+        if (value <= 0) value += 2147483646;
+        return () => {
+          value = value * 16807 % 2147483647;
+          return (value - 1) / 2147483646;
+        };
+      }
+
+      function buildManyMovingLove() {
+        const loginPage = document.getElementById('loginPage');
+        if (!loginPage) return;
+
+        let layer = loginPage.querySelector('.gold-love-points');
+        if (!layer) {
+          layer = document.createElement('div');
+          layer.className = 'gold-love-points';
+          layer.setAttribute('aria-hidden', 'true');
+          loginPage.insertBefore(layer, loginPage.firstChild);
+        }
+
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isMobile = window.matchMedia && window.matchMedia('(max-width: 680px)').matches;
+
+        // Banyak di desktop, dikurangi di HP agar tetap ringan.
+        const totalLove = reduceMotion ? 45 : (isMobile ? 95 : 155);
+        const rand = seedRandom(20260610);
+        const frag = document.createDocumentFragment();
+
+        layer.textContent = '';
+
+        for (let i = 0; i < totalLove; i++) {
+          const heart = document.createElement('span');
+          heart.className = 'love-point';
+
+          if (i % 3 === 1) heart.classList.add('soft');
+          if (i % 5 === 0) heart.classList.add('tiny');
+
+          const x = 2 + rand() * 96;
+          const y = 3 + rand() * 94;
+          const size = isMobile ? (7 + rand() * 7) : (8 + rand() * 8);
+          const dx = (rand() * 16 - 8).toFixed(1) + 'px';
+          const dy = (-5 - rand() * 13).toFixed(1) + 'px';
+          const dur = (4.8 + rand() * 4.8).toFixed(2) + 's';
+          const delay = (-rand() * 8).toFixed(2) + 's';
+          const scale = (1.02 + rand() * 0.16).toFixed(2);
+          const o1 = (0.22 + rand() * 0.22).toFixed(2);
+          const o2 = (0.58 + rand() * 0.34).toFixed(2);
+
+          const colorPick = i % 6;
+          const color =
+            colorPick === 0 ? 'rgba(255, 213, 132, .72)' :
+            colorPick === 1 ? 'rgba(255, 235, 196, .44)' :
+            colorPick === 2 ? 'rgba(214, 166, 72, .58)' :
+            colorPick === 3 ? 'rgba(255, 198, 108, .62)' :
+            colorPick === 4 ? 'rgba(255, 226, 168, .50)' :
+                              'rgba(194, 138, 45, .48)';
+
+          heart.textContent = (i % 9 === 0) ? '♥' : '❤';
+          heart.style.cssText =
+            `--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%;--s:${size.toFixed(1)}px;` +
+            `--dx:${dx};--dy:${dy};--dur:${dur};--delay:${delay};--sc:${scale};` +
+            `--o1:${o1};--o2:${o2};--c:${color};`;
+
+          frag.appendChild(heart);
+        }
+
+        layer.appendChild(frag);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', buildManyMovingLove, { once: true });
+      } else {
+        buildManyMovingLove();
       }
     })();
   </script>
