@@ -177,7 +177,7 @@
     .chat-main-window { display: flex; flex-direction: column; background: var(--dash-chat-bg); position: relative; min-height:0; z-index: 1; overflow: hidden; }
     .chat-main-window::before {
       content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-      background-image: linear-gradient(135deg, rgba(5,7,11,0.70), rgba(5,7,11,0.84)), var(--chat-bg-image);
+      background-image: linear-gradient(135deg, rgba(5,7,11,0.52), rgba(5,7,11,0.68)), var(--chat-bg-image);
       background-size: cover; background-position: center; background-repeat: no-repeat;
       opacity: .96; transform: scale(1.01);
     }
@@ -313,10 +313,11 @@
     /* Background image fallback layer: lebih kuat untuk link Google/Pinterest direct image */
     .visual-bg-img {
       position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center;
-      pointer-events: none; z-index: 0; opacity: .78; filter: saturate(1.06) contrast(1.03); transform: scale(1.01);
+      pointer-events: none; z-index: 0; opacity: .88; filter: saturate(1.08) contrast(1.04) brightness(.98); transform: scale(1.01);
+      image-rendering: auto;
     }
-    #dashboardBgImage { opacity: .36; }
-    #chatBgImage { opacity: .50; }
+    #dashboardBgImage { opacity: .42; }
+    #chatBgImage { opacity: .64; }
 
     /* Notifikasi custom pojok kanan bawah monitor */
     #desktopNotificationStack {
@@ -1489,45 +1490,2612 @@
     }
   </style>
 
+
+  <style id="mobile-show-all-fix">
+    @media (max-width: 680px) {
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #dashboardPage {
+        display: grid;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto minmax(0, 1fr) !important;
+        height: 100dvh;
+        overflow: hidden;
+      }
+
+      #dashboardPage::before,
+      #dashboardPage::after {
+        opacity: .92;
+      }
+
+      .sidebar {
+        display: flex !important;
+        width: 100%;
+        max-height: 48dvh;
+        min-height: 0;
+        border-right: 0;
+        border-bottom: 1px solid rgba(40,223,255,.14);
+        box-shadow: 0 12px 36px rgba(0,0,0,.20);
+      }
+
+      .sidebar-header {
+        padding: 12px;
+        gap: 10px;
+      }
+
+      .sh-top {
+        min-height: 74px;
+        padding: 10px 11px;
+        border-radius: 18px;
+      }
+
+      .user-profile {
+        gap: 10px;
+      }
+
+      .avatar-wrapper {
+        width: 48px;
+        height: 48px;
+      }
+
+      #myProfileName {
+        font-size: 14px !important;
+        margin: 0 0 6px;
+      }
+
+      .user-role-badge {
+        min-height: 18px;
+        padding: 2px 7px;
+        font-size: 8px;
+      }
+
+      .sh-actions {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 6px;
+        padding: 6px;
+        border-radius: 16px;
+      }
+
+      .action-link-btn {
+        height: 56px;
+        gap: 4px;
+        border-radius: 12px;
+        padding: 6px 2px;
+        font-size: 8.8px;
+      }
+
+      .action-ico {
+        width: 18px;
+        height: 18px;
+        font-size: 13px;
+      }
+
+      .chat-list-container {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 10px 10px 12px;
+        gap: 10px;
+      }
+
+      .section-label {
+        padding: 0 2px 2px;
+        font-size: 9.6px;
+        letter-spacing: .12em;
+        gap: 8px;
+      }
+
+      .start-chat-btn {
+        min-height: 30px;
+        padding: 0 9px;
+        font-size: 9.5px;
+        flex-shrink: 0;
+      }
+
+      #activeChatRoomsBox {
+        gap: 10px;
+      }
+
+      .chat-item-card {
+        grid-template-columns: 44px minmax(0, 1fr) 62px !important;
+        gap: 9px;
+        padding: 10px;
+        border-radius: 16px;
+      }
+
+      .chat-item-card .partner-avatar-img {
+        width: 44px;
+        height: 44px;
+      }
+
+      .chat-item-name {
+        font-size: 12.5px;
+        margin-bottom: 5px;
+      }
+
+      .chat-item-subline {
+        gap: 6px;
+      }
+
+      .role-pill {
+        min-height: 18px;
+        padding: 2px 7px;
+        font-size: 8px;
+      }
+
+      .status-indicator {
+        font-size: 10px;
+        gap: 5px;
+      }
+
+      .status-indicator.online::before,
+      .status-indicator.offline::before {
+        width: 7px;
+        height: 7px;
+      }
+
+      .chat-item-actions {
+        width: 62px;
+        gap: 6px;
+        align-items: stretch;
+      }
+
+      .chat-item-actions .tiny-profile-btn,
+      .chat-item-actions .unread-badge-alert {
+        width: 62px;
+        min-width: 62px;
+      }
+
+      .tiny-profile-btn {
+        min-height: 28px;
+        border-radius: 10px;
+        font-size: 9px;
+        padding: 0 6px;
+      }
+
+      .tiny-profile-btn::before {
+        margin-right: 4px;
+      }
+
+      .chat-item-actions .unread-badge-alert {
+        height: 22px;
+        font-size: 9px;
+        padding: 0 6px;
+      }
+
+      .chat-main-window {
+        min-height: 0;
+        height: 100%;
+      }
+
+      .chat-main-header {
+        min-height: 64px;
+        padding: 12px 14px;
+        gap: 10px;
+      }
+
+      .chat-main-header .partner-avatar-img {
+        width: 38px;
+        height: 38px;
+      }
+
+      #topHeaderTitle {
+        font-size: 13.5px !important;
+      }
+
+      #topHeaderStatus {
+        font-size: 11px;
+      }
+
+      .message-area {
+        padding: 14px 12px 10px;
+        gap: 12px;
+      }
+
+      .msg-row {
+        gap: 8px;
+      }
+
+      .msg-avatar {
+        width: 28px;
+        height: 28px;
+      }
+
+      .bubble {
+        max-width: 84%;
+        padding: 10px 12px;
+        font-size: 12.5px;
+        border-radius: 16px;
+      }
+
+      .bubble img {
+        max-height: 200px;
+        border-radius: 10px;
+      }
+
+      .msg-controls {
+        display: none !important;
+      }
+
+      .bubble-meta {
+        gap: 4px;
+        margin-top: 4px;
+      }
+
+      .time-text,
+      .edited-marker {
+        font-size: 9px;
+      }
+
+      .edit-state-indicator-bar {
+        padding: 7px 12px;
+        font-size: 11px;
+      }
+
+      #imagePreviewBar {
+        padding: 10px 12px;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      #imagePreviewBar img {
+        width: 52px;
+        height: 52px;
+      }
+
+      .preview-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .preview-title {
+        font-size: 12px;
+      }
+
+      .preview-hint {
+        font-size: 10px;
+      }
+
+      .preview-open-btn {
+        margin-left: 0;
+      }
+
+      .chat-footer-panel {
+        padding: 10px 12px 12px;
+        gap: 10px;
+      }
+
+      .clip-btn,
+      .send-action-btn {
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+      }
+
+      .chat-footer-panel input[type="text"] {
+        height: 40px;
+        padding: 0 14px;
+        font-size: 12.5px;
+      }
+
+      .modal-overlay {
+        padding: 12px;
+      }
+
+      .modal-box {
+        max-width: 100%;
+        border-radius: 20px;
+        padding: 18px 16px;
+      }
+
+      .modal-box h3 {
+        font-size: 16px;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+      }
+
+      .modal-fields {
+        gap: 10px;
+      }
+
+      .modal-foot {
+        flex-wrap: wrap;
+      }
+
+      .modal-btn {
+        flex: 1 1 120px;
+        min-height: 40px;
+      }
+
+      .bg-action-row {
+        grid-template-columns: 1fr;
+      }
+
+      .user-list-admin,
+      .user-list-startchat {
+        max-height: 34vh;
+      }
+
+      .user-admin-row,
+      .startchat-item-row {
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .profile-hero {
+        padding: 12px;
+        gap: 12px;
+      }
+
+      .profile-hero img {
+        width: 60px;
+        height: 60px;
+      }
+
+      .profile-name-role {
+        font-size: 15px;
+      }
+
+      #desktopNotificationStack {
+        right: 10px;
+        left: 10px;
+        bottom: 12px;
+        width: auto;
+      }
+
+      .desktop-notification-card {
+        padding: 11px 12px;
+        border-radius: 16px;
+      }
+    }
+  </style>
+
+
+  <style id="login-theme-reference-layout">
+    #loginPage {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 28px 16px 26px;
+      font-family: 'Space Grotesk', Inter, sans-serif;
+    }
+    #loginPage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(420px 220px at 18% 14%, rgba(34,211,238,.07), transparent 62%),
+        radial-gradient(420px 220px at 84% 18%, rgba(168,85,247,.06), transparent 62%),
+        radial-gradient(520px 240px at 50% 100%, rgba(59,130,246,.08), transparent 66%);
+      opacity: .9;
+    }
+    #loginPage .portal-head {
+      width: min(700px, 96vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      position: relative;
+      z-index: 3;
+    }
+    #loginPage .portal-head-main {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    #loginPage .portal-head-logo {
+      width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center;
+      background: linear-gradient(180deg, rgba(59,130,246,.16), rgba(7,13,26,.72)), radial-gradient(85px 60px at 50% 0%, rgba(34,211,238,.14), transparent 70%);
+      border: 1px solid rgba(93,173,255,.22); box-shadow: 0 0 18px rgba(34,211,238,.06), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    #loginPage .portal-head-logo svg { width: 22px; height: 22px; }
+    #loginPage .portal-title {
+      font-family: 'Orbitron', 'Space Grotesk', Inter, sans-serif; font-size: clamp(26px, 4vw, 42px); font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #F4F8FF; text-shadow: 0 0 18px rgba(59,130,246,.10), 0 0 30px rgba(34,211,238,.08); margin: 0; line-height: 1;
+    }
+    #loginPage .portal-subtitle {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: rgba(8,13,22,.62); border: 1px solid rgba(93,173,255,.18); color: rgba(215,230,247,.82); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    #loginPage .portal-subtitle::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 10px rgba(74,222,128,.45); flex: 0 0 8px; }
+    #loginPage .portal-motto {
+      display: inline-flex; align-items: center; gap: 9px; padding: 8px 16px; border-radius: 999px; background: rgba(7,11,20,.78); border: 1px solid rgba(93,173,255,.14); color: rgba(222,235,248,.78); font-size: 11.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; box-shadow: 0 10px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    #loginPage .portal-motto .dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.58); display: inline-block; }
+    #loginPage .card {
+      width: min(520px, 94vw); min-height: 580px; border-radius: 34px; padding: 1px;
+      background: linear-gradient(135deg, rgba(93,173,255,.20), rgba(34,211,238,.08) 38%, rgba(168,85,247,.08) 68%, rgba(255,255,255,.03));
+      box-shadow: 0 32px 120px rgba(0,0,0,.60), 0 0 42px rgba(59,130,246,.07); backdrop-filter: none; -webkit-backdrop-filter: none;
+    }
+    #loginPage .card::before { display: none; }
+    #loginPage .card::after { content: ""; position: absolute; inset: 14px; border-radius: 28px; border: 1px solid rgba(93,173,255,.08); pointer-events: none; box-shadow: inset 0 0 36px rgba(34,211,238,.03); }
+    #loginPage .inner {
+      flex: 1; border-radius: 33px; background: linear-gradient(180deg, rgba(8,11,18,.96), rgba(6,9,16,.98)), radial-gradient(280px 160px at 50% 0%, rgba(59,130,246,.08), transparent 72%); padding: 22px 22px 24px; position: relative; overflow: hidden;
+    }
+    #loginPage .inner::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(380px 180px at 50% 0%, rgba(34,211,238,.05), transparent 68%), linear-gradient(135deg, rgba(255,255,255,.02), transparent 32%); opacity: .9; }
+    #loginPage .login-panel-topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 22px; position: relative; z-index: 2; }
+    #loginPage .panel-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 30px; padding: 0 12px; border-radius: 999px; background: rgba(10,16,28,.80); border: 1px solid rgba(93,173,255,.16); color: rgba(218,232,247,.80); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; box-shadow: inset 0 1px 0 rgba(255,255,255,.03); }
+    #loginPage .panel-chip.secure::before, #loginPage .panel-chip.verified::before { content: ""; width: 9px; height: 9px; border-radius: 50%; flex: 0 0 9px; background: linear-gradient(135deg, #67e8f9, #3b82f6); box-shadow: 0 0 10px rgba(34,211,238,.30); }
+    #loginPage .panel-chip.verified::before { background: linear-gradient(135deg, #60a5fa, #a855f7); box-shadow: 0 0 10px rgba(168,85,247,.26); }
+    #loginPage .top { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 10px 0 12px; }
+    #loginPage .badge { width: 60px; height: 60px; margin: 0 auto 16px; border-radius: 18px; background: linear-gradient(180deg, rgba(59,130,246,.16), rgba(8,14,26,.78)), radial-gradient(90px 60px at 50% 0%, rgba(34,211,238,.16), transparent 70%); border: 1px solid rgba(93,173,255,.24); box-shadow: 0 0 24px rgba(34,211,238,.08), inset 0 1px 0 rgba(255,255,255,.05); }
+    #loginPage h1 { font-family: 'Space Grotesk', 'Orbitron', Inter, sans-serif; font-size: 18px; font-weight: 800; letter-spacing: .02em; margin-bottom: 8px; text-transform: none; color: #F4F8FF; text-shadow: none; }
+    #loginPage .sub { font-size: 14px; line-height: 1.5; color: rgba(213,226,244,.72); max-width: 280px; }
+    #loginPage .spacer { min-height: 14px; flex: 0 0 auto; }
+    #loginPage .form { gap: 14px; position: relative; z-index: 2; }
+    #loginPage .input-group { display: grid; gap: 8px; }
+    #loginPage .field-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: rgba(233,242,255,.92); padding: 0 4px; }
+    #loginPage .field-label::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, #67e8f9, #3b82f6); box-shadow: 0 0 12px rgba(34,211,238,.24); flex: 0 0 10px; }
+    #loginPage .field { height: 54px; border-radius: 16px; padding: 0 14px; background: linear-gradient(180deg, rgba(12,16,28,.90), rgba(8,12,22,.96)); border: 1px solid rgba(93,173,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.02); }
+    #loginPage .field:focus-within { border-color: rgba(34,211,238,.38); box-shadow: 0 0 0 4px rgba(34,211,238,.06), 0 18px 34px rgba(0,0,0,.24), 0 0 18px rgba(59,130,246,.08); }
+    #loginPage input { font-size: 14px; font-weight: 600; color: #EEF5FF; }
+    #loginPage .btn { margin-top: 8px; height: 56px; border-radius: 18px; border: 1px solid rgba(93,173,255,.18); background: linear-gradient(135deg, rgba(14,40,76,.94), rgba(24,74,134,.88) 52%, rgba(92,53,171,.84)); color: #F7FBFF; font-size: 17px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; box-shadow: 0 20px 42px rgba(0,0,0,.32), 0 0 24px rgba(59,130,246,.12); }
+    #loginPage .btn::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent); transform: translateX(-100%); transition: transform .4s ease; }
+    #loginPage .btn:hover::after { transform: translateX(100%); }
+    #loginPage .login-footnote { margin-top: 16px; display: grid; gap: 8px; text-align: center; position: relative; z-index: 2; }
+    #loginPage .info-line { color: rgba(198,214,235,.70); font-size: 12px; font-weight: 600; }
+    #loginPage .warning-line { color: rgba(217,229,247,.62); font-size: 12px; font-weight: 600; }
+    #loginPage .warning-line strong { color: rgba(244,248,255,.90); font-weight: 700; }
+    #loginPage .meta { margin-top: 2px; font-size: 12px; color: rgba(175,190,212,.44); }
+    @media (max-width: 680px) {
+      #loginPage { gap: 14px; padding: 18px 12px; }
+      #loginPage .portal-head { width: min(94vw, 620px); gap: 7px; }
+      #loginPage .portal-head-logo { width: 38px; height: 38px; border-radius: 12px; }
+      #loginPage .portal-title { font-size: 24px; letter-spacing: .12em; }
+      #loginPage .portal-subtitle { font-size: 11px; padding: 5px 10px; }
+      #loginPage .portal-motto { font-size: 10px; padding: 7px 12px; letter-spacing: .12em; }
+      #loginPage .card { width: min(430px, 96vw); min-height: 530px; border-radius: 26px; }
+      #loginPage .inner { padding: 16px 16px 18px; border-radius: 25px; }
+      #loginPage .login-panel-topbar { flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 16px; }
+      #loginPage .panel-chip { min-height: 28px; font-size: 10px; }
+      #loginPage .badge { width: 54px; height: 54px; margin-bottom: 14px; }
+      #loginPage h1 { font-size: 17px; }
+      #loginPage .sub { font-size: 13px; }
+      #loginPage .field-label { font-size: 11px; }
+      #loginPage .field, #loginPage .btn { height: 50px; border-radius: 14px; }
+      #loginPage .btn { font-size: 15px; letter-spacing: .10em; }
+      #loginPage .login-footnote { gap: 7px; }
+    }
+  </style>
+
+
+  <style id="login-theme-clean-picker-upgrade">
+    #loginPage {
+      --login-bg-main: linear-gradient(180deg, #040507 0%, #06070A 55%, #030405 100%);
+      --login-bg-overlay-1: radial-gradient(920px 440px at 50% -10%, rgba(59,130,246,.13), transparent 60%);
+      --login-bg-overlay-2: radial-gradient(560px 260px at 14% 100%, rgba(34,211,238,.08), transparent 64%);
+      --login-bg-overlay-3: radial-gradient(560px 260px at 86% 100%, rgba(168,85,247,.08), transparent 64%);
+      --login-grid-line: rgba(90, 170, 255, .05);
+      --login-card-edge: rgba(93,173,255,.22);
+      --login-card-edge-soft: rgba(93,173,255,.10);
+      --login-card-glow: rgba(59,130,246,.12);
+      --login-inner-glow: rgba(34,211,238,.05);
+      --login-chip-edge: rgba(93,173,255,.18);
+      --login-badge-edge: rgba(93,173,255,.28);
+      --login-focus-ring: rgba(34,211,238,.10);
+      --login-focus-border: rgba(34,211,238,.46);
+      --login-btn-a: #17386b;
+      --login-btn-b: #2451a1;
+      --login-btn-c: #5a39b6;
+      --login-swatch-1: #1d4ed8;
+      --login-swatch-2: #06b6d4;
+      --login-swatch-3: #7c3aed;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 28px 16px 26px;
+      font-family: 'Space Grotesk', Inter, sans-serif;
+      background: var(--login-bg-overlay-1), var(--login-bg-overlay-2), var(--login-bg-overlay-3), var(--login-bg-main) !important;
+      transition: background .35s ease, filter .35s ease;
+      overflow: hidden;
+    }
+
+    #loginPage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, var(--login-grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--login-grid-line) 1px, transparent 1px);
+      background-size: 84px 84px;
+      mask-image: radial-gradient(circle at center, rgba(0,0,0,.8), transparent 90%);
+      opacity: .95;
+      transition: opacity .35s ease, background-image .35s ease;
+    }
+
+    #loginPage::after {
+      content: "";
+      position: absolute;
+      width: 680px;
+      height: 680px;
+      border-radius: 50%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      background:
+        radial-gradient(circle, rgba(255,255,255,.02), transparent 48%),
+        radial-gradient(circle, var(--login-card-glow), transparent 62%);
+      filter: blur(6px);
+      opacity: .9;
+      transition: background .35s ease, opacity .35s ease;
+    }
+
+    #loginPage[data-login-theme="neo-grid"] {
+      --login-bg-main: linear-gradient(180deg, #040507 0%, #06070A 55%, #030405 100%);
+      --login-bg-overlay-1: radial-gradient(920px 440px at 50% -10%, rgba(59,130,246,.13), transparent 60%);
+      --login-bg-overlay-2: radial-gradient(560px 260px at 14% 100%, rgba(34,211,238,.08), transparent 64%);
+      --login-bg-overlay-3: radial-gradient(560px 260px at 86% 100%, rgba(168,85,247,.08), transparent 64%);
+      --login-grid-line: rgba(90,170,255,.05);
+      --login-card-edge: rgba(93,173,255,.22);
+      --login-card-edge-soft: rgba(93,173,255,.10);
+      --login-card-glow: rgba(59,130,246,.12);
+      --login-inner-glow: rgba(34,211,238,.05);
+      --login-chip-edge: rgba(93,173,255,.18);
+      --login-badge-edge: rgba(93,173,255,.28);
+      --login-focus-ring: rgba(34,211,238,.10);
+      --login-focus-border: rgba(34,211,238,.46);
+      --login-btn-a: #17386b;
+      --login-btn-b: #2451a1;
+      --login-btn-c: #5a39b6;
+      --login-swatch-1: #1d4ed8;
+      --login-swatch-2: #06b6d4;
+      --login-swatch-3: #7c3aed;
+    }
+
+    #loginPage[data-login-theme="aurora-core"] {
+      --login-bg-main: linear-gradient(180deg, #040707 0%, #05100E 56%, #030505 100%);
+      --login-bg-overlay-1: radial-gradient(920px 440px at 50% -10%, rgba(16,185,129,.16), transparent 58%);
+      --login-bg-overlay-2: radial-gradient(620px 280px at 12% 100%, rgba(20,184,166,.10), transparent 64%);
+      --login-bg-overlay-3: radial-gradient(620px 280px at 86% 100%, rgba(56,189,248,.10), transparent 64%);
+      --login-grid-line: rgba(72,211,189,.05);
+      --login-card-edge: rgba(94,234,212,.20);
+      --login-card-edge-soft: rgba(94,234,212,.09);
+      --login-card-glow: rgba(16,185,129,.14);
+      --login-inner-glow: rgba(56,189,248,.05);
+      --login-chip-edge: rgba(94,234,212,.16);
+      --login-badge-edge: rgba(94,234,212,.24);
+      --login-focus-ring: rgba(94,234,212,.10);
+      --login-focus-border: rgba(94,234,212,.42);
+      --login-btn-a: #0F5F59;
+      --login-btn-b: #14827C;
+      --login-btn-c: #2DA773;
+      --login-swatch-1: #0f766e;
+      --login-swatch-2: #14b8a6;
+      --login-swatch-3: #38bdf8;
+    }
+
+    #loginPage[data-login-theme="violet-pulse"] {
+      --login-bg-main: linear-gradient(180deg, #06040A 0%, #0B0614 56%, #040306 100%);
+      --login-bg-overlay-1: radial-gradient(920px 440px at 50% -10%, rgba(139,92,246,.18), transparent 58%);
+      --login-bg-overlay-2: radial-gradient(620px 280px at 12% 100%, rgba(99,102,241,.10), transparent 64%);
+      --login-bg-overlay-3: radial-gradient(620px 280px at 86% 100%, rgba(236,72,153,.10), transparent 64%);
+      --login-grid-line: rgba(177,126,255,.045);
+      --login-card-edge: rgba(167,139,250,.20);
+      --login-card-edge-soft: rgba(167,139,250,.09);
+      --login-card-glow: rgba(139,92,246,.15);
+      --login-inner-glow: rgba(236,72,153,.05);
+      --login-chip-edge: rgba(167,139,250,.16);
+      --login-badge-edge: rgba(167,139,250,.24);
+      --login-focus-ring: rgba(167,139,250,.10);
+      --login-focus-border: rgba(167,139,250,.42);
+      --login-btn-a: #3D236B;
+      --login-btn-b: #5B38A4;
+      --login-btn-c: #8A49B5;
+      --login-swatch-1: #6d28d9;
+      --login-swatch-2: #8b5cf6;
+      --login-swatch-3: #db2777;
+    }
+
+    #loginPage[data-login-theme="carbon-cyan"] {
+      --login-bg-main: linear-gradient(180deg, #030507 0%, #071016 56%, #030405 100%);
+      --login-bg-overlay-1: radial-gradient(920px 440px at 50% -10%, rgba(34,211,238,.16), transparent 58%);
+      --login-bg-overlay-2: radial-gradient(620px 280px at 12% 100%, rgba(8,145,178,.10), transparent 64%);
+      --login-bg-overlay-3: radial-gradient(620px 280px at 86% 100%, rgba(59,130,246,.08), transparent 64%);
+      --login-grid-line: rgba(68,205,230,.05);
+      --login-card-edge: rgba(56,189,248,.22);
+      --login-card-edge-soft: rgba(56,189,248,.10);
+      --login-card-glow: rgba(34,211,238,.14);
+      --login-inner-glow: rgba(14,165,233,.05);
+      --login-chip-edge: rgba(56,189,248,.18);
+      --login-badge-edge: rgba(56,189,248,.26);
+      --login-focus-ring: rgba(56,189,248,.10);
+      --login-focus-border: rgba(56,189,248,.44);
+      --login-btn-a: #0E3D57;
+      --login-btn-b: #0F6A8D;
+      --login-btn-c: #1692A5;
+      --login-swatch-1: #0f172a;
+      --login-swatch-2: #0891b2;
+      --login-swatch-3: #22d3ee;
+    }
+
+    #loginPage .portal-head {
+      width: min(700px, 96vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+      position: relative;
+      z-index: 3;
+    }
+
+    #loginPage .portal-head-main {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    #loginPage .portal-head-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(8,13,22,.68));
+      border: 1px solid var(--login-card-edge);
+      box-shadow: 0 0 18px var(--login-card-glow), inset 0 1px 0 rgba(255,255,255,.05);
+      transition: border-color .35s ease, box-shadow .35s ease;
+    }
+
+    #loginPage .portal-head-logo svg { width: 22px; height: 22px; }
+
+    #loginPage .portal-title {
+      font-family: 'Orbitron', 'Space Grotesk', Inter, sans-serif;
+      font-size: clamp(26px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: #F4F8FF;
+      text-shadow: 0 0 18px var(--login-card-glow);
+      margin: 0;
+      line-height: 1;
+    }
+
+    #loginPage .portal-subtitle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(8,13,22,.62);
+      border: 1px solid var(--login-chip-edge);
+      color: rgba(215,230,247,.82);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      margin-bottom: 2px;
+      transition: border-color .35s ease, box-shadow .35s ease;
+    }
+
+    #loginPage .portal-subtitle::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--login-swatch-2), var(--login-swatch-1));
+      box-shadow: 0 0 10px var(--login-card-glow);
+      flex: 0 0 8px;
+    }
+
+    #loginPage .login-theme-switcher {
+      width: min(680px, 96vw);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 3;
+    }
+
+    #loginPage .theme-chip {
+      appearance: none;
+      border: 1px solid rgba(115,144,183,.18);
+      background: rgba(8,13,22,.74);
+      color: rgba(219,230,244,.82);
+      min-height: 38px;
+      border-radius: 999px;
+      padding: 0 14px 0 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-family: 'Space Grotesk', Inter, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: .18s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+    }
+
+    #loginPage .theme-chip:hover {
+      transform: translateY(-1px);
+      border-color: var(--login-card-edge);
+      color: #EFF6FF;
+    }
+
+    #loginPage .theme-chip.active {
+      border-color: var(--login-card-edge);
+      background: linear-gradient(180deg, rgba(12,18,30,.92), rgba(8,12,22,.98));
+      color: #F7FBFF;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.03) inset, 0 0 18px var(--login-card-glow);
+    }
+
+    #loginPage .theme-chip-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 0 12px rgba(0,0,0,.20);
+      flex: 0 0 18px;
+    }
+
+    #loginPage .theme-chip[data-theme="neo-grid"] .theme-chip-swatch { background: linear-gradient(135deg, #1d4ed8, #06b6d4 58%, #7c3aed); }
+    #loginPage .theme-chip[data-theme="aurora-core"] .theme-chip-swatch { background: linear-gradient(135deg, #0f766e, #14b8a6 58%, #38bdf8); }
+    #loginPage .theme-chip[data-theme="violet-pulse"] .theme-chip-swatch { background: linear-gradient(135deg, #6d28d9, #8b5cf6 58%, #db2777); }
+    #loginPage .theme-chip[data-theme="carbon-cyan"] .theme-chip-swatch { background: linear-gradient(135deg, #0f172a, #0891b2 60%, #22d3ee); }
+
+    #loginPage .card {
+      width: min(520px, 94vw);
+      min-height: 580px;
+      border-radius: 34px;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--login-card-edge), rgba(255,255,255,.035));
+      box-shadow: 0 32px 120px rgba(0,0,0,.60), 0 0 42px var(--login-card-glow) !important;
+      position: relative;
+      z-index: 3;
+      transition: background .35s ease, box-shadow .35s ease;
+    }
+
+    #loginPage .card::before { display: none; }
+
+    #loginPage .card::after {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 28px;
+      border: 1px solid var(--login-card-edge-soft);
+      pointer-events: none;
+      box-shadow: inset 0 0 36px var(--login-inner-glow);
+      transition: border-color .35s ease, box-shadow .35s ease;
+    }
+
+    #loginPage .inner {
+      flex: 1;
+      border-radius: 33px;
+      background: linear-gradient(180deg, rgba(8,11,18,.96), rgba(6,9,16,.98));
+      padding: 22px 22px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #loginPage .inner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(380px 180px at 50% 0%, var(--login-inner-glow), transparent 68%),
+        linear-gradient(135deg, rgba(255,255,255,.02), transparent 32%);
+      opacity: .92;
+      transition: background .35s ease;
+    }
+
+    #loginPage .login-panel-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 22px;
+      position: relative;
+      z-index: 2;
+    }
+
+    #loginPage .panel-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(10,16,28,.80);
+      border: 1px solid var(--login-chip-edge);
+      color: rgba(218,232,247,.80);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+      transition: border-color .35s ease;
+    }
+
+    #loginPage .panel-chip.secure::before,
+    #loginPage .panel-chip.verified::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex: 0 0 9px;
+      background: linear-gradient(135deg, var(--login-swatch-2), var(--login-swatch-1));
+      box-shadow: 0 0 10px var(--login-card-glow);
+    }
+
+    #loginPage .panel-chip.verified::before {
+      background: linear-gradient(135deg, var(--login-swatch-1), var(--login-swatch-3));
+    }
+
+    #loginPage .top { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 0 4px; }
+    #loginPage .badge { width: 60px; height: 60px; margin: 0 auto 8px; border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(8,14,26,.78)); border: 1px solid var(--login-badge-edge); box-shadow: 0 0 24px var(--login-card-glow), inset 0 1px 0 rgba(255,255,255,.05); transition: border-color .35s ease, box-shadow .35s ease; }
+    #loginPage .top h1,
+    #loginPage .top .sub,
+    #loginPage .portal-motto { display: none !important; }
+    #loginPage .spacer { min-height: 14px; flex: 0 0 auto; }
+    #loginPage .form { gap: 14px; position: relative; z-index: 2; }
+    #loginPage .input-group { display: grid; gap: 8px; }
+    #loginPage .field-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: rgba(233,242,255,.92); padding: 0 4px; }
+    #loginPage .field-label::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, var(--login-swatch-2), var(--login-swatch-1)); box-shadow: 0 0 12px var(--login-card-glow); flex: 0 0 10px; }
+    #loginPage .field { height: 54px; border-radius: 16px; padding: 0 14px; background: linear-gradient(180deg, rgba(12,16,28,.90), rgba(8,12,22,.96)); border: 1px solid var(--login-chip-edge); box-shadow: inset 0 1px 0 rgba(255,255,255,.02); transition: border-color .35s ease, box-shadow .35s ease; }
+    #loginPage .field:focus-within { border-color: var(--login-focus-border); box-shadow: 0 0 0 4px var(--login-focus-ring), 0 18px 34px rgba(0,0,0,.24), 0 0 18px var(--login-card-glow); }
+    #loginPage input { font-size: 14px; font-weight: 600; color: #EEF5FF; }
+    #loginPage .btn { margin-top: 8px; height: 56px; border-radius: 18px; border: 1px solid var(--login-card-edge); background: linear-gradient(135deg, var(--login-btn-a), var(--login-btn-b) 52%, var(--login-btn-c)) !important; color: #F7FBFF; font-size: 17px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; box-shadow: 0 20px 42px rgba(0,0,0,.32), 0 0 24px var(--login-card-glow); transition: border-color .35s ease, box-shadow .35s ease, transform .18s ease; }
+    #loginPage .btn:hover { transform: translateY(-1px); }
+    #loginPage .btn::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent); transform: translateX(-100%); transition: transform .4s ease; }
+    #loginPage .btn:hover::after { transform: translateX(100%); }
+    #loginPage .login-footnote { margin-top: 16px; display: grid; gap: 8px; text-align: center; position: relative; z-index: 2; }
+    #loginPage .info-line { color: rgba(198,214,235,.70); font-size: 12px; font-weight: 600; }
+    #loginPage .warning-line { color: rgba(217,229,247,.62); font-size: 12px; font-weight: 600; }
+    #loginPage .warning-line strong { color: rgba(244,248,255,.90); font-weight: 700; }
+    #loginPage .meta { margin-top: 2px; font-size: 12px; color: rgba(175,190,212,.44); }
+
+    @media (max-width: 680px) {
+      #loginPage { gap: 14px; padding: 18px 12px; }
+      #loginPage::after { width: 520px; height: 520px; }
+      #loginPage .portal-head { width: min(94vw, 620px); gap: 7px; }
+      #loginPage .portal-head-logo { width: 38px; height: 38px; border-radius: 12px; }
+      #loginPage .portal-title { font-size: 24px; letter-spacing: .12em; }
+      #loginPage .portal-subtitle { font-size: 11px; padding: 5px 10px; }
+      #loginPage .login-theme-switcher { gap: 8px; }
+      #loginPage .theme-chip { min-height: 34px; padding: 0 11px 0 10px; font-size: 10px; letter-spacing: .04em; }
+      #loginPage .theme-chip-swatch { width: 16px; height: 16px; flex-basis: 16px; }
+      #loginPage .card { width: min(430px, 96vw); min-height: 530px; border-radius: 26px; }
+      #loginPage .inner { padding: 16px 16px 18px; border-radius: 25px; }
+      #loginPage .login-panel-topbar { flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 16px; }
+      #loginPage .panel-chip { min-height: 28px; font-size: 10px; }
+      #loginPage .badge { width: 54px; height: 54px; margin-bottom: 8px; }
+      #loginPage .field-label { font-size: 11px; }
+      #loginPage .field, #loginPage .btn { height: 50px; border-radius: 14px; }
+      #loginPage .btn { font-size: 15px; letter-spacing: .10em; }
+      #loginPage .login-footnote { gap: 7px; }
+    }
+  </style>
+
+
+  <style id="login-blur-reference-style">
+    /* Login style direvisi mengikuti referensi: simpel, center, background blur */
+    #loginPage {
+      background:
+        radial-gradient(440px 440px at 16% 18%, rgba(176, 214, 255, .95), transparent 62%),
+        radial-gradient(560px 560px at 82% 20%, rgba(78, 140, 226, .52), transparent 64%),
+        radial-gradient(520px 520px at 18% 88%, rgba(13, 57, 129, .78), transparent 58%),
+        radial-gradient(520px 520px at 82% 88%, rgba(7, 42, 101, .88), transparent 56%),
+        linear-gradient(135deg, #b6d4f6 0%, #6da4e7 24%, #3d7fd4 50%, #2868bf 72%, #0c489a 100%) !important;
+      gap: 0;
+      padding: 24px 14px;
+    }
+
+    #loginPage::before {
+      opacity: 1;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 110px 110px;
+      filter: blur(.2px);
+      mask-image: none;
+    }
+
+    #loginPage::after {
+      width: 760px;
+      height: 760px;
+      background:
+        radial-gradient(circle, rgba(255,255,255,.14), transparent 18%),
+        radial-gradient(circle, rgba(255,255,255,.08), transparent 36%),
+        radial-gradient(circle, rgba(5, 54, 120, .22), transparent 62%);
+      filter: blur(34px);
+      opacity: .9;
+    }
+
+    #loginPage .portal-head,
+    #loginPage .login-theme-switcher,
+    #loginPage .login-panel-topbar,
+    #loginPage .field-label,
+    #loginPage .info-line,
+    #loginPage .warning-line {
+      display: none !important;
+    }
+
+    #loginPage .card {
+      width: min(360px, 92vw);
+      min-height: auto;
+      padding: 0;
+      border-radius: 0;
+      background: transparent !important;
+      box-shadow: none !important;
+      overflow: visible;
+    }
+
+    #loginPage .card::after,
+    #loginPage .card::before,
+    #loginPage .inner::before {
+      display: none !important;
+    }
+
+    #loginPage .inner {
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow:
+        0 30px 70px rgba(4, 42, 102, .28),
+        inset 0 1px 0 rgba(255,255,255,.16);
+      backdrop-filter: blur(26px) saturate(1.06);
+      -webkit-backdrop-filter: blur(26px) saturate(1.06);
+      padding: 34px 34px 28px;
+    }
+
+    #loginPage .top {
+      padding: 0;
+      margin-bottom: 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    #loginPage .badge {
+      width: 58px;
+      height: 58px;
+      margin: 0 0 16px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(13, 67, 150, .96), rgba(8, 46, 110, .98));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow:
+        0 18px 34px rgba(7, 48, 112, .24),
+        inset 0 1px 0 rgba(255,255,255,.16);
+    }
+
+    #loginPage .top h1,
+    #loginPage .top .sub {
+      display: block !important;
+    }
+
+    #loginPage .top h1 {
+      font-family: 'Space Grotesk', Inter, sans-serif;
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(246, 250, 255, .96);
+      margin: 0 0 10px;
+      text-shadow: 0 1px 0 rgba(255,255,255,.12);
+    }
+
+    #loginPage .top .sub {
+      font-family: 'Space Grotesk', Inter, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(244, 248, 255, .74);
+      letter-spacing: .01em;
+      max-width: none;
+      margin: 0;
+    }
+
+    #loginPage .spacer {
+      display: none;
+    }
+
+    #loginPage .form {
+      gap: 18px;
+    }
+
+    #loginPage .input-group {
+      gap: 0;
+    }
+
+    #loginPage .field {
+      height: 42px;
+      padding: 0 2px;
+      border-radius: 0;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid rgba(255,255,255,.56);
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    #loginPage .field:hover,
+    #loginPage .field:focus-within {
+      border: 0;
+      border-bottom: 1px solid rgba(255,255,255,.88);
+      background: transparent;
+      box-shadow: none;
+    }
+
+    #loginPage .icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 10px;
+      opacity: .92;
+    }
+
+    #loginPage .icon path {
+      stroke: rgba(247, 250, 255, .92) !important;
+      stroke-width: 1.5;
+    }
+
+    #loginPage input {
+      font-family: 'Space Grotesk', Inter, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: #FFFFFF;
+    }
+
+    #loginPage input::placeholder {
+      color: rgba(247, 250, 255, .86);
+      font-weight: 400;
+    }
+
+    #loginPage .login-helper-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: -2px;
+      font-family: 'Space Grotesk', Inter, sans-serif;
+      font-size: 10.5px;
+      color: rgba(246, 250, 255, .80);
+    }
+
+    #loginPage .remember-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #loginPage .remember-check input {
+      width: 11px;
+      height: 11px;
+      accent-color: #0d4caa;
+      margin: 0;
+    }
+
+    #loginPage .forgot-link {
+      color: rgba(246, 250, 255, .84);
+      text-decoration: none;
+    }
+
+    #loginPage .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    #loginPage .btn {
+      margin-top: 10px;
+      height: 38px;
+      border-radius: 2px;
+      border: 0;
+      background: linear-gradient(180deg, rgba(7, 62, 140, .98), rgba(5, 51, 118, .98)) !important;
+      box-shadow: 0 14px 28px rgba(6, 44, 99, .20);
+      color: #F9FBFF;
+      font-family: 'Space Grotesk', Inter, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .20em;
+      text-transform: uppercase;
+    }
+
+    #loginPage .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+      box-shadow: 0 16px 30px rgba(6, 44, 99, .24);
+    }
+
+    #loginPage .meta {
+      margin-top: 16px;
+      text-align: center;
+      color: rgba(244, 248, 255, .50);
+      font-size: 11px;
+      letter-spacing: .02em;
+    }
+
+    #loginPage .alert {
+      border-radius: 10px;
+      background: rgba(255, 90, 120, .14);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(255, 240, 244, .98);
+      font-size: 11.5px;
+    }
+
+    @media (max-width: 680px) {
+      #loginPage {
+        padding: 18px 12px;
+      }
+
+      #loginPage::after {
+        width: 520px;
+        height: 520px;
+      }
+
+      #loginPage .card {
+        width: min(340px, 94vw);
+      }
+
+      #loginPage .inner {
+        padding: 28px 24px 24px;
+      }
+
+      #loginPage .top h1 {
+        font-size: 20px;
+        letter-spacing: .14em;
+      }
+    }
+  </style>
+
+
+  <style id="emoji-gif-picker-style">
+    .chat-footer-panel {
+      position: relative;
+    }
+
+    .emoji-trigger-btn,
+    .gif-trigger-btn {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 1px solid rgba(40,223,255,.18);
+      background: rgba(10,18,34,.82);
+      color: rgba(204,239,255,.88);
+      cursor: pointer;
+      transition: .18s ease;
+      flex: 0 0 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .emoji-trigger-btn::before,
+    .gif-trigger-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(40,223,255,.16), transparent 68%);
+      opacity: .9;
+      pointer-events: none;
+    }
+
+    .emoji-trigger-btn:hover,
+    .gif-trigger-btn:hover,
+    .emoji-trigger-btn.active,
+    .gif-trigger-btn.active {
+      color: #FFFFFF;
+      border-color: rgba(40,223,255,.36);
+      background: rgba(15,30,50,.96);
+      box-shadow: 0 0 16px rgba(40,223,255,.16), inset 0 1px 0 rgba(255,255,255,.04);
+      transform: translateY(-1px);
+    }
+
+    .emoji-trigger-btn svg,
+    .gif-trigger-btn svg {
+      position: relative;
+      z-index: 1;
+    }
+
+    .gif-trigger-btn {
+      border-radius: 12px;
+      width: 50px;
+      flex-basis: 50px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .emoji-gif-picker {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: calc(100% + 12px);
+      background: linear-gradient(180deg, rgba(7,14,28,.96), rgba(5,10,20,.98));
+      border: 1px solid rgba(40,223,255,.16);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.42), 0 0 28px rgba(40,223,255,.10);
+      padding: 12px;
+      display: none;
+      z-index: 30;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .emoji-gif-picker.show {
+      display: block;
+      animation: pickerPopIn .16s ease;
+    }
+
+    @keyframes pickerPopIn {
+      from { opacity: 0; transform: translateY(6px) scale(.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .picker-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .picker-title {
+      color: #EAF8FF;
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .picker-close-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      border: 1px solid rgba(40,223,255,.14);
+      background: rgba(255,255,255,.02);
+      color: rgba(212,240,255,.78);
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .picker-close-btn:hover {
+      color: #fff;
+      border-color: rgba(40,223,255,.28);
+      background: rgba(40,223,255,.08);
+    }
+
+    .picker-tabs {
+      display: inline-flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .picker-tab-btn {
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(40,223,255,.12);
+      background: rgba(255,255,255,.02);
+      color: rgba(207,235,250,.78);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .picker-tab-btn.active {
+      color: #fff;
+      border-color: rgba(40,223,255,.28);
+      background: linear-gradient(135deg, rgba(40,223,255,.18), rgba(139,92,255,.10));
+      box-shadow: 0 0 16px rgba(40,223,255,.08);
+    }
+
+    .picker-panel {
+      display: none;
+    }
+
+    .picker-panel.active {
+      display: block;
+    }
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .emoji-item-btn {
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(40,223,255,.10);
+      background: rgba(255,255,255,.02);
+      font-size: 22px;
+      cursor: pointer;
+      transition: .16s ease;
+    }
+
+    .emoji-item-btn:hover {
+      transform: translateY(-1px) scale(1.03);
+      border-color: rgba(40,223,255,.24);
+      background: rgba(40,223,255,.10);
+      box-shadow: 0 0 14px rgba(40,223,255,.08);
+    }
+
+    .gif-help-text {
+      color: rgba(206,228,245,.76);
+      font-size: 11px;
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+
+    .gif-url-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .gif-url-row input {
+      flex: 1;
+      min-width: 0;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(40,223,255,.14);
+      background: rgba(4,8,16,.92);
+      color: #F3FAFF;
+      padding: 0 12px;
+      outline: none;
+      font-size: 12px;
+    }
+
+    .gif-url-row input:focus {
+      border-color: rgba(40,223,255,.28);
+      box-shadow: 0 0 0 3px rgba(40,223,255,.08);
+    }
+
+    .gif-attach-btn {
+      min-width: 102px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(40,223,255,.18);
+      background: linear-gradient(135deg, rgba(14,42,74,.96), rgba(19,75,122,.88));
+      color: #F4FBFF;
+      cursor: pointer;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      transition: .18s ease;
+    }
+
+    .gif-attach-btn:hover {
+      filter: brightness(1.06);
+      box-shadow: 0 0 16px rgba(40,223,255,.12);
+    }
+
+    .gif-presets-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .gif-preset-btn {
+      position: relative;
+      padding: 0;
+      border: 1px solid rgba(40,223,255,.12);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255,255,255,.02);
+      cursor: pointer;
+      transition: .16s ease;
+      aspect-ratio: 1 / 1;
+    }
+
+    .gif-preset-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gif-preset-btn span {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      padding: 3px 6px;
+      border-radius: 999px;
+      background: rgba(4,10,18,.78);
+      border: 1px solid rgba(255,255,255,.08);
+      color: #F4FBFF;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .gif-preset-btn:hover {
+      transform: translateY(-1px) scale(1.01);
+      border-color: rgba(40,223,255,.26);
+      box-shadow: 0 0 16px rgba(40,223,255,.10);
+    }
+
+    @media (max-width: 680px) {
+      .emoji-trigger-btn,
+      .gif-trigger-btn,
+      .clip-btn,
+      .send-action-btn {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+      }
+
+      .gif-trigger-btn {
+        width: 46px;
+        flex-basis: 46px;
+        font-size: 10px;
+      }
+
+      .emoji-gif-picker {
+        left: 10px;
+        right: 10px;
+        bottom: calc(100% + 10px);
+        padding: 10px;
+        border-radius: 16px;
+      }
+
+      .emoji-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+
+      .gif-url-row {
+        flex-direction: column;
+      }
+
+      .gif-attach-btn {
+        width: 100%;
+      }
+
+      .gif-presets-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+
+
+  <style id="admin-role-access-style">
+    .admin-control-modal {
+      max-width: 720px;
+      max-height: min(88vh, 760px);
+      overflow-y: auto;
+      padding-right: 24px;
+    }
+
+    .admin-section-card {
+      padding: 14px;
+      margin-bottom: 14px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(9,22,40,.78), rgba(4,10,22,.92));
+      border: 1px solid rgba(66,184,255,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+    }
+
+    .admin-section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: #EFF8FF;
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .admin-section-title::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #66E9FF;
+      box-shadow: 0 0 12px rgba(66,233,255,.38);
+      flex: 0 0 8px;
+    }
+
+    .admin-wide-btn {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .access-title {
+      margin: -2px 0 10px;
+      color: rgba(218,236,250,.70);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .role-access-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .access-check {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(66,184,255,.10);
+      color: rgba(232,246,255,.82);
+      font-size: 11.5px;
+      font-weight: 750;
+      cursor: pointer;
+      user-select: none;
+      transition: .16s ease;
+    }
+
+    .access-check:hover {
+      border-color: rgba(66,184,255,.24);
+      background: rgba(66,184,255,.06);
+    }
+
+    .access-check input {
+      width: 15px;
+      height: 15px;
+      accent-color: #35DFFF;
+      flex: 0 0 15px;
+    }
+
+    .role-list-admin {
+      display: grid;
+      gap: 10px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .role-admin-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(66,184,255,.10);
+    }
+
+    .role-admin-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #F2F8FF;
+      font-size: 13px;
+      font-weight: 850;
+      margin-bottom: 9px;
+    }
+
+    .role-access-chip-wrap {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .role-access-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(66,184,255,.07);
+      border: 1px solid rgba(66,184,255,.14);
+      color: rgba(213,239,252,.82);
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .role-access-chip.admin-chip {
+      color: #FFE8A8;
+      background: rgba(255,215,107,.09);
+      border-color: rgba(255,215,107,.22);
+    }
+
+    .role-delete-btn {
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,91,130,.20);
+      background: rgba(255,91,130,.06);
+      color: #FF9AB0;
+      font-size: 11px;
+      font-weight: 850;
+      cursor: pointer;
+      transition: .16s ease;
+    }
+
+    .role-delete-btn:hover {
+      color: #fff;
+      background: rgba(255,91,130,.16);
+      border-color: rgba(255,91,130,.34);
+    }
+
+    .admin-role-select.role-custom {
+      color: #C7A8FF;
+      border: 1px solid rgba(167,139,250,.34);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23C7A8FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, rgba(167,139,250,.18), rgba(30,20,58,.94));
+      box-shadow: 0 0 14px rgba(167,139,250,.10), inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .role-pill.custom {
+      color: #CDB7FF;
+      background: rgba(167,139,250,.10);
+      border: 1px solid rgba(167,139,250,.28);
+      box-shadow: inset 0 0 12px rgba(167,139,250,.05);
+    }
+
+    .permission-locked-note {
+      color: rgba(230,241,255,.62);
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(66,184,255,.10);
+    }
+
+    .access-hidden {
+      display: none !important;
+    }
+
+    .access-disabled {
+      opacity: .52 !important;
+      pointer-events: none !important;
+      filter: grayscale(.25);
+    }
+
+    @media (max-width: 680px) {
+      .admin-control-modal {
+        max-height: 92vh;
+        padding: 18px 14px;
+      }
+
+      .role-access-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .role-admin-row {
+        grid-template-columns: 1fr;
+      }
+
+      .role-delete-btn {
+        width: 100%;
+      }
+    }
+  </style>
+
+
+  <style id="owner-admin-upgrade-style">
+    .role-pill.owner {
+      color: #F9E7A6;
+      background:
+        linear-gradient(135deg, rgba(255,215,107,.26), rgba(75,57,14,.92) 34%, rgba(5,7,11,.98) 74%),
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0));
+      border: 1px solid rgba(255,215,107,.42);
+      box-shadow:
+        0 0 18px rgba(255,215,107,.14),
+        inset 0 1px 0 rgba(255,255,255,.14),
+        inset 0 -10px 20px rgba(0,0,0,.28);
+      text-shadow: 0 1px 0 rgba(0,0,0,.4);
+    }
+
+    .role-pill.owner::before {
+      content: "◆";
+      font-size: 8px;
+      color: #FFD86F;
+      text-shadow: 0 0 8px rgba(255,215,107,.28);
+    }
+
+    .user-role-badge.owner-badge {
+      color: #FFE39A !important;
+      background:
+        linear-gradient(135deg, rgba(255,215,107,.28), rgba(71,52,15,.92) 32%, rgba(7,10,16,.98) 76%),
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0));
+      border: 1px solid rgba(255,215,107,.46) !important;
+      box-shadow:
+        0 0 18px rgba(255,215,107,.16),
+        inset 0 1px 0 rgba(255,255,255,.16),
+        inset 0 -12px 20px rgba(0,0,0,.28) !important;
+      text-shadow: 0 1px 0 rgba(0,0,0,.44);
+      letter-spacing: .12em;
+    }
+
+    .user-role-badge.owner-badge::before {
+      content: "◆";
+      margin-right: 6px;
+      color: #FFD86F;
+      font-size: 8px;
+    }
+
+    .user-role-badge.admin-badge {
+      color: #07111E;
+      background: linear-gradient(135deg, #38F0FF, #73B7FF 62%, #A16BFF);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 0 18px rgba(40,223,255,.26), inset 0 0 10px rgba(255,255,255,.22);
+    }
+
+    .user-role-badge.user-badge,
+    .user-role-badge.custom-badge {
+      color: #DCEBFB;
+      background: rgba(148,163,184,.12);
+      border: 1px solid rgba(148,163,184,.18);
+      box-shadow: inset 0 0 10px rgba(255,255,255,.04);
+    }
+
+    .admin-role-select.role-owner {
+      color: #FFE39A;
+      border: 1px solid rgba(255,215,107,.40);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23FFE39A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, rgba(255,215,107,.18), rgba(74,54,16,.90) 34%, rgba(6,8,12,.98));
+      box-shadow: 0 0 16px rgba(255,215,107,.12), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .admin-role-select.role-owner:focus {
+      border-color: rgba(255,215,107,.58);
+      box-shadow: 0 0 0 3px rgba(255,215,107,.14), 0 0 16px rgba(255,215,107,.14);
+    }
+
+    .user-admin-row {
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-admin-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .user-delete-btn {
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,91,130,.22);
+      background: linear-gradient(135deg, rgba(255,91,130,.12), rgba(62,15,28,.84));
+      color: #FFB5C5;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .03em;
+      cursor: pointer;
+      transition: .16s ease;
+    }
+
+    .user-delete-btn:hover {
+      color: #fff;
+      border-color: rgba(255,91,130,.34);
+      background: linear-gradient(135deg, rgba(255,91,130,.20), rgba(92,18,36,.92));
+      box-shadow: 0 0 16px rgba(255,91,130,.12);
+      transform: translateY(-1px);
+    }
+
+    .user-delete-btn.owner-locked {
+      border-color: rgba(255,215,107,.18);
+      background: linear-gradient(135deg, rgba(255,215,107,.08), rgba(36,28,8,.88));
+      color: #FFE39A;
+      cursor: default;
+    }
+
+    @media (max-width: 680px) {
+      .user-admin-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: stretch;
+      }
+
+      .user-admin-actions .admin-role-select,
+      .user-admin-actions .user-delete-btn {
+        width: 100%;
+      }
+    }
+  </style>
+
+
+  <style id="profile-rename-feature-style">
+    .profile-edit-name {
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(9,22,40,.70), rgba(4,10,22,.88));
+      border: 1px solid rgba(66,184,255,.14);
+      display: grid;
+      gap: 10px;
+    }
+
+    .profile-edit-label {
+      color: rgba(224,241,255,.86);
+      font-size: 11.5px;
+      font-weight: 850;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .profile-edit-label::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #66E9FF;
+      box-shadow: 0 0 12px rgba(66,233,255,.38);
+      flex: 0 0 8px;
+    }
+
+    .profile-edit-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .profile-edit-row input {
+      width: 100%;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(66,184,255,.16);
+      background: rgba(4,8,16,.88);
+      color: #F2FAFF;
+      outline: none;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .profile-edit-row input:focus {
+      border-color: rgba(66,184,255,.34);
+      box-shadow: 0 0 0 3px rgba(66,184,255,.08);
+    }
+
+    .profile-save-name-btn {
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(66,184,255,.22);
+      background: linear-gradient(135deg, rgba(14,42,74,.96), rgba(19,75,122,.88));
+      color: #F4FBFF;
+      cursor: pointer;
+      font-size: 11.5px;
+      font-weight: 850;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      transition: .16s ease;
+      white-space: nowrap;
+    }
+
+    .profile-save-name-btn:hover {
+      filter: brightness(1.06);
+      box-shadow: 0 0 16px rgba(66,184,255,.12);
+      transform: translateY(-1px);
+    }
+
+    .profile-edit-hint {
+      color: rgba(210,230,246,.54);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 680px) {
+      .profile-edit-row {
+        grid-template-columns: 1fr;
+      }
+      .profile-save-name-btn {
+        width: 100%;
+      }
+    }
+  </style>
+
+
+  <style id="profile-rename-final-fix-style">
+    #profileNameEditBox {
+      display: none;
+    }
+
+    #profileNameEditBox.is-visible {
+      display: grid;
+    }
+
+    .profile-save-name-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none !important;
+      filter: grayscale(.2);
+    }
+
+    .profile-edit-name {
+      order: 2;
+    }
+
+    .profile-bg-preview {
+      order: 3;
+    }
+
+    .profile-note {
+      order: 4;
+    }
+  </style>
+
+
+  <style id="login-dark-blue-futuristic-final">
+    /* Final override halaman sebelum login: dark blue futuristic, clean, tidak norak */
+    #loginPage {
+      background:
+        radial-gradient(620px 420px at 16% 8%, rgba(39, 120, 196, .24), transparent 58%),
+        radial-gradient(620px 460px at 84% 90%, rgba(20, 92, 160, .22), transparent 60%),
+        radial-gradient(420px 360px at 50% 54%, rgba(34, 211, 238, .08), transparent 64%),
+        linear-gradient(135deg, #030814 0%, #071424 44%, #0A1D33 100%) !important;
+      overflow: hidden;
+    }
+
+    #loginPage::before {
+      opacity: .58 !important;
+      background-image:
+        linear-gradient(to right, rgba(97, 184, 255, .055) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(97, 184, 255, .040) 1px, transparent 1px) !important;
+      background-size: 72px 72px !important;
+      mask-image: radial-gradient(circle at center, black 0%, black 46%, transparent 76%) !important;
+    }
+
+    #loginPage::after {
+      width: 720px !important;
+      height: 720px !important;
+      background:
+        radial-gradient(circle, rgba(35, 184, 255, .13), transparent 34%),
+        radial-gradient(circle, rgba(14, 67, 127, .24), transparent 64%) !important;
+      filter: blur(42px) !important;
+      opacity: .82 !important;
+    }
+
+    #loginPage .card {
+      width: min(378px, 92vw) !important;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+
+    #loginPage .inner {
+      border-radius: 28px !important;
+      padding: 36px 34px 30px !important;
+      background:
+        linear-gradient(180deg, rgba(9, 22, 42, .82), rgba(4, 10, 22, .92)),
+        radial-gradient(320px 180px at 50% 0%, rgba(59, 165, 255, .13), transparent 70%) !important;
+      border: 1px solid rgba(91, 184, 255, .18) !important;
+      box-shadow:
+        0 28px 80px rgba(0, 0, 0, .42),
+        0 0 0 1px rgba(255, 255, 255, .025) inset,
+        0 0 34px rgba(28, 144, 230, .08) !important;
+      backdrop-filter: blur(24px) saturate(1.08) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(1.08) !important;
+    }
+
+    #loginPage .badge {
+      width: 62px !important;
+      height: 62px !important;
+      border-radius: 20px !important;
+      background:
+        linear-gradient(135deg, rgba(28, 95, 168, .98), rgba(8, 29, 62, .98)) !important;
+      border: 1px solid rgba(117, 205, 255, .24) !important;
+      box-shadow:
+        0 18px 42px rgba(0, 0, 0, .30),
+        0 0 28px rgba(34, 211, 238, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .12) !important;
+    }
+
+    #loginPage .top h1 {
+      color: #EAF7FF !important;
+      letter-spacing: .14em !important;
+      font-weight: 650 !important;
+      text-shadow: 0 0 18px rgba(99, 179, 255, .10) !important;
+    }
+
+    #loginPage .top .sub {
+      color: rgba(212, 231, 246, .62) !important;
+    }
+
+    #loginPage .field {
+      background: rgba(2, 8, 18, .72) !important;
+      border: 1px solid rgba(92, 183, 255, .16) !important;
+      border-radius: 15px !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+      padding: 0 14px !important;
+    }
+
+    #loginPage .field:focus-within,
+    #loginPage .field:hover {
+      border-color: rgba(92, 183, 255, .38) !important;
+      box-shadow:
+        0 0 0 3px rgba(27, 140, 224, .08),
+        inset 0 1px 0 rgba(255,255,255,.05) !important;
+    }
+
+    #loginPage input {
+      color: #F2FAFF !important;
+    }
+
+    #loginPage input::placeholder {
+      color: rgba(213, 231, 246, .58) !important;
+    }
+
+    #loginPage .login-helper-row,
+    #loginPage .login-helper-row a {
+      color: rgba(216, 233, 248, .64) !important;
+    }
+
+    #loginPage .btn {
+      height: 42px !important;
+      border-radius: 15px !important;
+      background:
+        linear-gradient(135deg, #0E5CA8 0%, #0B3A78 52%, #082750 100%) !important;
+      border: 1px solid rgba(99, 188, 255, .20) !important;
+      color: #F3FBFF !important;
+      box-shadow:
+        0 18px 34px rgba(0, 0, 0, .28),
+        0 0 22px rgba(14, 116, 192, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .12) !important;
+      letter-spacing: .16em !important;
+    }
+
+    #loginPage .btn:hover {
+      filter: brightness(1.08) !important;
+      box-shadow:
+        0 20px 38px rgba(0, 0, 0, .32),
+        0 0 28px rgba(45, 164, 255, .18),
+        inset 0 1px 0 rgba(255, 255, 255, .14) !important;
+    }
+
+    #loginPage .meta {
+      color: rgba(209, 228, 244, .42) !important;
+    }
+
+    #loginPage .portal-head,
+    #loginPage .login-theme-switcher,
+    #loginPage .login-panel-topbar,
+    #loginPage .field-label,
+    #loginPage .info-line,
+    #loginPage .warning-line {
+      display: none !important;
+    }
+
+    @media (max-width: 680px) {
+      #loginPage .inner {
+        padding: 30px 24px 26px !important;
+        border-radius: 24px !important;
+      }
+    }
+  </style>
+
+
+  <style id="chat-delete-reply-upgrade-style">
+    .chat-item-card {
+      grid-template-columns: 56px minmax(0, 1fr) 88px !important;
+    }
+
+    .chat-item-actions {
+      width: 88px !important;
+    }
+
+    .chat-item-actions .tiny-profile-btn,
+    .chat-item-actions .tiny-delete-chat-btn {
+      width: 82px;
+      min-height: 30px;
+      padding: 0 8px;
+      white-space: nowrap;
+    }
+
+    .tiny-delete-chat-btn {
+      border: 1px solid rgba(255,91,130,.18);
+      background: rgba(255,91,130,.055);
+      color: rgba(255,170,188,.86);
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 850;
+      cursor: pointer;
+      transition: .16s ease;
+    }
+
+    .tiny-delete-chat-btn:hover {
+      color: #fff;
+      border-color: rgba(255,91,130,.34);
+      background: linear-gradient(135deg, rgba(255,91,130,.18), rgba(96,20,42,.86));
+      box-shadow: 0 0 14px rgba(255,91,130,.14);
+      transform: translateY(-1px);
+    }
+
+    .reply-state-indicator-bar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      border-top: 1px solid rgba(40,223,255,.13);
+      background: rgba(40,223,255,.045);
+      color: rgba(225,246,255,.86);
+      font-size: 12px;
+      z-index: 6;
+    }
+
+    .reply-state-indicator-bar.is-visible {
+      display: flex;
+    }
+
+    .reply-state-left {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+      border-left: 3px solid rgba(40,223,255,.62);
+      padding-left: 10px;
+    }
+
+    .reply-state-title {
+      color: #65EEFF;
+      font-weight: 850;
+      letter-spacing: .02em;
+    }
+
+    .reply-state-text {
+      max-width: min(520px, 62vw);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: rgba(218,238,249,.68);
+      font-size: 11.5px;
+    }
+
+    .reply-cancel-action {
+      margin-left: auto;
+      color: #FF7895;
+      font-weight: 900;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 5px 7px;
+      border-radius: 8px;
+      transition: .16s ease;
+    }
+
+    .reply-cancel-action:hover {
+      color: #fff;
+      background: rgba(255,91,130,.12);
+    }
+
+    .reply-preview-card {
+      width: 100%;
+      max-width: 100%;
+      margin-bottom: 7px;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border-left: 3px solid rgba(40,223,255,.70);
+      background: rgba(0,0,0,.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+      overflow: hidden;
+    }
+
+    .reply-preview-name {
+      color: #65EEFF;
+      font-size: 11px;
+      font-weight: 850;
+      margin-bottom: 2px;
+    }
+
+    .reply-preview-text {
+      color: rgba(231,244,252,.70);
+      font-size: 11px;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .msg-controls {
+      gap: 5px !important;
+    }
+
+    .ctrl-btn.reply-btn {
+      color: #65EEFF;
+    }
+
+    @media (max-width: 680px) {
+      .chat-item-card {
+        grid-template-columns: 48px minmax(0, 1fr) 76px !important;
+      }
+
+      .chat-item-actions {
+        width: 76px !important;
+      }
+
+      .chat-item-actions .tiny-profile-btn,
+      .chat-item-actions .tiny-delete-chat-btn {
+        width: 70px;
+        min-height: 28px;
+        font-size: 9px;
+      }
+
+      .reply-state-indicator-bar {
+        padding: 9px 12px;
+      }
+
+      .reply-state-text {
+        max-width: 70vw;
+      }
+    }
+  </style>
+
+
+  <style id="message-actions-near-bubble-fix">
+    /* Tombol aksi pesan dibuat menempel di bubble agar tidak jauh */
+    .msg-row {
+      position: relative;
+    }
+
+    .bubble {
+      position: relative;
+      padding-top: 16px;
+    }
+
+    .bubble .msg-controls {
+      position: absolute !important;
+      top: 6px !important;
+      right: 7px !important;
+      left: auto !important;
+      transform: none !important;
+      display: inline-flex !important;
+      align-items: center;
+      gap: 5px !important;
+      padding: 3px !important;
+      z-index: 20;
+      opacity: .82;
+      pointer-events: auto;
+      border-radius: 999px;
+      background: rgba(2, 8, 18, .42);
+      border: 1px solid rgba(255,255,255,.055);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: .16s ease;
+    }
+
+    .incoming-row .bubble .msg-controls,
+    .outgoing-row .bubble .msg-controls {
+      right: 7px !important;
+      left: auto !important;
+    }
+
+    .bubble:hover .msg-controls,
+    .msg-controls:hover {
+      opacity: 1;
+      background: rgba(4, 12, 24, .78);
+      border-color: rgba(40,223,255,.16);
+      box-shadow: 0 0 14px rgba(40,223,255,.10);
+    }
+
+    .bubble .ctrl-btn {
+      width: 24px !important;
+      height: 24px !important;
+      min-width: 24px;
+      border-radius: 8px !important;
+      background: rgba(255,255,255,.045) !important;
+      border: 1px solid rgba(255,255,255,.075) !important;
+      color: rgba(229,244,255,.82) !important;
+      font-size: 11px !important;
+      line-height: 1;
+      display: inline-grid !important;
+      place-items: center !important;
+    }
+
+    .bubble .ctrl-btn:hover {
+      transform: translateY(-1px);
+      color: #fff !important;
+      border-color: rgba(40,223,255,.28) !important;
+      background: rgba(40,223,255,.12) !important;
+    }
+
+    .bubble .ctrl-btn.reply-btn {
+      color: #65EEFF !important;
+    }
+
+    .bubble .ctrl-btn.delete-one-btn {
+      color: #FF9AAF !important;
+    }
+
+    .bubble .ctrl-btn.delete-one-btn:hover {
+      background: rgba(255,91,130,.15) !important;
+      border-color: rgba(255,91,130,.28) !important;
+      color: #fff !important;
+    }
+
+    .bubble.has-message-actions .text-content-body,
+    .bubble.has-message-actions .chat-image-thumb,
+    .bubble.has-message-actions .reply-preview-card {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 680px) {
+      .bubble {
+        padding-top: 18px;
+      }
+
+      .bubble .msg-controls {
+        top: 5px !important;
+        right: 6px !important;
+      }
+
+      .bubble .ctrl-btn {
+        width: 23px !important;
+        height: 23px !important;
+        min-width: 23px;
+        font-size: 10px !important;
+      }
+    }
+  </style>
+
+
+  <style id="reply-mode-visibility-fix">
+    #replyStatusBar.is-visible {
+      display: flex !important;
+    }
+
+    #replyStatusBar {
+      min-height: 48px;
+    }
+  </style>
+
+
+  <style id="message-actions-hover-longpress-final">
+    /* FIX final: action button dekat bubble, hidden default, muncul saat hover/long press */
+    .msg-row {
+      position: relative;
+      overflow: visible !important;
+    }
+
+    .msg-row .bubble {
+      position: relative;
+      overflow: visible !important;
+      padding-top: 12px !important;
+    }
+
+    .msg-row .bubble.has-message-actions .text-content-body,
+    .msg-row .bubble.has-message-actions .chat-image-thumb,
+    .msg-row .bubble.has-message-actions .reply-preview-card {
+      margin-top: 0 !important;
+    }
+
+    .msg-row .bubble .msg-controls {
+      position: absolute !important;
+      top: -13px !important;
+      right: 8px !important;
+      left: auto !important;
+      transform: translateY(-4px) scale(.96) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      padding: 3px !important;
+      z-index: 50 !important;
+      border-radius: 999px !important;
+      background: rgba(4, 12, 24, .88) !important;
+      border: 1px solid rgba(73, 196, 255, .18) !important;
+      box-shadow: 0 10px 26px rgba(0,0,0,.28), 0 0 18px rgba(40,223,255,.08) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      transition: opacity .16s ease, transform .16s ease, visibility .16s ease !important;
+    }
+
+    .msg-row .bubble:hover .msg-controls,
+    .msg-row .bubble:focus-within .msg-controls,
+    .msg-row .bubble.actions-open .msg-controls {
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      transform: translateY(0) scale(1) !important;
+    }
+
+    .msg-row .bubble .ctrl-btn {
+      width: 23px !important;
+      height: 23px !important;
+      min-width: 23px !important;
+      border-radius: 50% !important;
+      padding: 0 !important;
+      background: rgba(255,255,255,.045) !important;
+      border: 1px solid rgba(255,255,255,.08) !important;
+      color: rgba(225,242,255,.82) !important;
+      font-size: 10px !important;
+      line-height: 1 !important;
+      display: inline-grid !important;
+      place-items: center !important;
+      cursor: pointer !important;
+      transition: .14s ease !important;
+      box-shadow: none !important;
+    }
+
+    .msg-row .bubble .ctrl-btn:hover {
+      transform: translateY(-1px) !important;
+      color: #fff !important;
+      border-color: rgba(40,223,255,.32) !important;
+      background: rgba(40,223,255,.15) !important;
+      box-shadow: 0 0 12px rgba(40,223,255,.12) !important;
+    }
+
+    .msg-row .bubble .ctrl-btn.reply-btn {
+      color: #65EEFF !important;
+    }
+
+    .msg-row .bubble .ctrl-btn.edit-one-btn {
+      color: #FFB86C !important;
+    }
+
+    .msg-row .bubble .ctrl-btn.delete-one-btn {
+      color: #FF8EA8 !important;
+    }
+
+    .msg-row .bubble .ctrl-btn.delete-one-btn:hover {
+      border-color: rgba(255,91,130,.34) !important;
+      background: rgba(255,91,130,.16) !important;
+      box-shadow: 0 0 12px rgba(255,91,130,.12) !important;
+    }
+
+    .incoming-row .bubble .msg-controls {
+      right: auto !important;
+      left: 8px !important;
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      .msg-row .bubble .msg-controls {
+        top: -12px !important;
+      }
+
+      .msg-row .bubble:hover .msg-controls {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
+      .msg-row .bubble.actions-open .msg-controls {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .msg-row .bubble {
+        padding-top: 12px !important;
+      }
+
+      .msg-row .bubble .msg-controls {
+        gap: 4px !important;
+        padding: 3px !important;
+      }
+
+      .msg-row .bubble .ctrl-btn {
+        width: 24px !important;
+        height: 24px !important;
+        min-width: 24px !important;
+        font-size: 10px !important;
+      }
+    }
+  </style>
+
 </head>
 
 <body>
   <div class="fx" aria-hidden="true"><div class="grid"></div><div class="noise"></div></div>
 
   <div class="wrap" id="loginPage">
+    <div class="portal-head">
+      <div class="portal-head-main">
+        <div class="portal-head-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M6 18V10.5L12 6l6 4.5V18" stroke="rgba(239,246,255,.96)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M9.5 18v-4.2h5V18" stroke="rgba(239,246,255,.96)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M4 10.5 12 4l8 6.5" stroke="rgba(239,246,255,.72)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        <div class="portal-title">FANDAH PORTAL</div>
+      </div>
+      <div class="portal-subtitle">Internal Staff System</div>
+    </div>
+
+    <div class="login-theme-switcher" aria-label="Pilih tema login">
+      <button class="theme-chip" type="button" data-theme="neo-grid" onclick="setLoginTheme('neo-grid')"><span class="theme-chip-swatch"></span><span>Neo Grid</span></button>
+      <button class="theme-chip" type="button" data-theme="aurora-core" onclick="setLoginTheme('aurora-core')"><span class="theme-chip-swatch"></span><span>Aurora Core</span></button>
+      <button class="theme-chip" type="button" data-theme="violet-pulse" onclick="setLoginTheme('violet-pulse')"><span class="theme-chip-swatch"></span><span>Violet Pulse</span></button>
+      <button class="theme-chip" type="button" data-theme="carbon-cyan" onclick="setLoginTheme('carbon-cyan')"><span class="theme-chip-swatch"></span><span>Carbon Cyan</span></button>
+    </div>
+
     <div class="card" role="region" aria-label="Form login">
       <div class="inner">
+        <div class="login-panel-topbar">
+          <div class="panel-chip secure">Secure Area</div>
+          <div class="panel-chip verified">Verified Access</div>
+        </div>
+
         <div class="top floaty">
           <div class="badge" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2l1.3 5.1L18 8.4l-4.7 1.3L12 15l-1.3-5.3L6 8.4l4.7-1.3L12 2Z" stroke="rgba(231,236,245,.92)" stroke-width="1.6" stroke-linejoin="round"></path>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M18 19v-1a6 6 0 0 0-12 0v1" stroke="rgba(244,248,255,.96)" stroke-width="1.7" stroke-linecap="round"></path>
+              <circle cx="12" cy="8" r="4" stroke="rgba(244,248,255,.96)" stroke-width="1.7"></circle>
             </svg>
           </div>
-          <h1>FANDAH</h1>
-          <div class="sub">Login dulu ya sayang</div>
+          <h1>Customer Login</h1>
+          <div class="sub">Login ke portal Anda untuk melanjutkan akses.</div>
         </div>
-        
+
         <div class="spacer"></div>
 
         <form class="form" id="mainLoginForm" onsubmit="executeLoginValidation(event)" autocomplete="off">
           <div class="alert" id="authErrorNotification">Salah tuh User atau Passnya, Hayoo!!</div>
-          <div class="field">
-            <svg class="icon" viewBox="0 0 24 24" fill="none">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
-              <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
-            </svg>
-            <input id="inputUser" name="username" placeholder="Username" required="">
+
+          <div class="input-group">
+            <div class="field-label">Username</div>
+            <div class="field">
+              <svg class="icon" viewBox="0 0 24 24" fill="none">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
+                <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
+              </svg>
+              <input id="inputUser" name="username" placeholder="Masukkan username" required="">
+            </div>
           </div>
-          <div class="field">
-            <svg class="icon" viewBox="0 0 24 24" fill="none">
-              <path d="M17 11H7a4 4 0 0 0-4 4v3a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-3a4 4 0 0 0-4-4Z" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
-              <path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
-            </svg>
-            <input type="password" id="inputPass" name="password" placeholder="Password" required="">
+
+          <div class="input-group">
+            <div class="field-label">Password</div>
+            <div class="field">
+              <svg class="icon" viewBox="0 0 24 24" fill="none">
+                <path d="M17 11H7a4 4 0 0 0-4 4v3a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-3a4 4 0 0 0-4-4Z" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
+                <path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
+              </svg>
+              <input type="password" id="inputPass" name="password" placeholder="Masukkan password" required="">
+            </div>
           </div>
-          <button class="btn" type="submit">Enter atau Klik disini ya bby </button>
-          <div class="meta">© 2026 • Dashboard</div>
+
+          <div class="login-helper-row">
+            <label class="remember-check"><input type="checkbox" id="rememberLoginCheck"> <span>Remember me</span></label>
+            <a href="javascript:void(0)" class="forgot-link">Forgot Password?</a>
+          </div>
+
+          <button class="btn" id="loginButton" type="submit">Login</button>
         </form>
+
+        <div class="login-footnote">
+          <div class="info-line">Akses hanya untuk staff berwenang.</div>
+          <div class="warning-line"><strong>Notice:</strong> pastikan username dan password sesuai.</div>
+          <div class="meta">© 2026 • Dashboard</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1548,13 +4116,13 @@
           </div>
         </div>
         <div class="sh-actions">
-          <button class="action-link-btn" onclick="openChangePasswordModal()">
+          <button class="action-link-btn" id="changePasswordActionBtn" onclick="openChangePasswordModal()">
             <span class="action-ico">✎</span><span class="action-text">Sandi</span>
           </button>
-          <button class="action-link-btn" onclick="openBackgroundSettingsModal()">
+          <button class="action-link-btn" id="backgroundActionBtn" onclick="openBackgroundSettingsModal()">
             <span class="action-ico">▧</span><span class="action-text">Background</span>
           </button>
-          <button class="action-link-btn" onclick="openUserProfileModal(loggedInUser)">
+          <button class="action-link-btn" id="profileActionBtn" onclick="openMyProfileModal()">
             <span class="action-ico">●</span><span class="action-text">Profil</span>
           </button>
           <button class="action-link-btn" id="adminPanelTrigger" style="display:none;" onclick="openAdminManagementModal()">
@@ -1591,6 +4159,14 @@
         <span class="close-edit-action" onclick="cancelLowerBarEditMode()">✖</span>
       </div>
 
+      <div class="reply-state-indicator-bar" id="replyStatusBar">
+        <div class="reply-state-left">
+          <span class="reply-state-title" id="replyStatusTitle">Membalas pesan</span>
+          <span class="reply-state-text" id="replyStatusText">-</span>
+        </div>
+        <span class="reply-cancel-action" onclick="cancelReplyMode()">✖</span>
+      </div>
+
       <div id="imagePreviewBar">
         <img src="" id="targetImgSrc" alt="Preview" title="Klik untuk lihat gambar full sebelum dikirim" onclick="previewAttachedImageFull()">
         <div class="preview-info">
@@ -1602,12 +4178,74 @@
       </div>
 
       <div class="chat-footer-panel">
+        <div class="emoji-gif-picker" id="emojiGifPickerPanel">
+          <div class="picker-topbar">
+            <div class="picker-title">Emote & GIF Picker</div>
+            <button type="button" class="picker-close-btn" onclick="closeEmojiGifPicker()">✕</button>
+          </div>
+          <div class="picker-tabs">
+            <button type="button" class="picker-tab-btn active" id="emojiTabButton" onclick="switchEmojiGifTab('emoji')">Emoji</button>
+            <button type="button" class="picker-tab-btn" id="gifTabButton" onclick="switchEmojiGifTab('gif')">GIF</button>
+          </div>
+          <div class="picker-panel active" id="emojiPickerPanel">
+            <div class="emoji-grid">
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😀')">😀</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😁')">😁</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😂')">😂</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😍')">😍</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('🥰')">🥰</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😘')">😘</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('🥺')">🥺</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('🤗')">🤗</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😎')">😎</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('🤩')">🤩</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😴')">😴</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😢')">😢</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😭')">😭</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('😡')">😡</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('🙏')">🙏</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('👍')">👍</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('👎')">👎</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('👏')">👏</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('🔥')">🔥</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('✨')">✨</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('❤️')">❤️</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('💙')">💙</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('🎉')">🎉</button>
+              <button type="button" class="emoji-item-btn" onclick="insertEmojiToMessage('💯')">💯</button>
+            </div>
+          </div>
+          <div class="picker-panel" id="gifPickerPanel">
+            <div class="gif-help-text">Kirim GIF dengan cara pilih GIF cepat di bawah, atau tempel direct link GIF dari Giphy / Tenor / image link lainnya.</div>
+            <div class="gif-url-row">
+              <input type="text" id="gifUrlInput" placeholder="Tempel link GIF di sini...">
+              <button type="button" class="gif-attach-btn" onclick="attachGifFromUrl()">Pakai GIF</button>
+            </div>
+            <div class="gif-presets-grid">
+              <button type="button" class="gif-preset-btn" onclick="usePresetGif('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmdmYjdrNTE4bHhzMDQydjNteWI5NTlpN2RnaHJodGJhM2lycW1qYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ICOgUNjpvO0PC/giphy.gif','Happy GIF')"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmdmYjdrNTE4bHhzMDQydjNteWI5NTlpN2RnaHJodGJhM2lycW1qYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ICOgUNjpvO0PC/giphy.gif" alt="Happy GIF"><span>Happy</span></button>
+              <button type="button" class="gif-preset-btn" onclick="usePresetGif('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGxmcXI0MmNyeXU4dDgwYnpobHJzbnAyajM4eGFwa3JmNXl2OXBmYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0HlvtIPzPdt2usKs/giphy.gif','Love GIF')"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGxmcXI0MmNyeXU4dDgwYnpobHJzbnAyajM4eGFwa3JmNXl2OXBmYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0HlvtIPzPdt2usKs/giphy.gif" alt="Love GIF"><span>Love</span></button>
+              <button type="button" class="gif-preset-btn" onclick="usePresetGif('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjQxejE3dWJyOXBwdGd3Nzc0YWQ4eGRjeTY1OHM4cm1yc3VpM2xvZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o7TKMt1VVNkHV2PaE/giphy.gif','Thanks GIF')"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjQxejE3dWJyOXBwdGd3Nzc0YWQ4eGRjeTY1OHM4cm1yc3VpM2xvZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o7TKMt1VVNkHV2PaE/giphy.gif" alt="Thanks GIF"><span>Thanks</span></button>
+            </div>
+          </div>
+        </div>
+
         <label class="clip-btn" title="Kirim Gambar">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
           </svg>
           <input type="file" id="imageFileInput" accept="image/*" onchange="processImageFile(event)">
         </label>
+
+        <button type="button" class="emoji-trigger-btn" id="emojiTriggerButton" title="Emoji" onclick="toggleEmojiGifPicker('emoji')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M8 15s1.5 2 4 2 4-2 4-2"></path>
+            <path d="M9 10h.01"></path>
+            <path d="M15 10h.01"></path>
+          </svg>
+        </button>
+
+        <button type="button" class="gif-trigger-btn" id="gifTriggerButton" title="GIF" onclick="toggleEmojiGifPicker('gif')">GIF</button>
         
         <input type="text" id="typedMessageInput" placeholder="Ketik pesan disini..." oninput="handleTypingState()">
         
@@ -1652,6 +4290,16 @@
             <div class="profile-status-line" id="profileModalStatus">Status: -</div>
           </div>
         </div>
+
+        <div class="profile-edit-name" id="profileNameEditBox">
+          <div class="profile-edit-label">Ubah Nama Profil</div>
+          <div class="profile-edit-row">
+            <input type="text" id="profileDisplayNameInput" maxlength="32" placeholder="Masukkan nama profil baru">
+            <button type="button" class="profile-save-name-btn" onclick="saveMyProfileDisplayName()">Simpan</button>
+          </div>
+          <div class="profile-edit-hint">Nama ini akan tampil di chat, daftar room, dan profil. Username login tetap tidak berubah.</div>
+        </div>
+
         <div class="profile-bg-preview" id="profileModalBgPreview">Belum ada background dashboard</div>
         <div class="profile-note" id="profileModalNote">Foto profil dan role user bisa dilihat oleh pengguna lain.</div>
       </div>
@@ -1668,7 +4316,7 @@
         <div class="field"><input type="url" id="dashboardBgUrlInput" placeholder="Link gambar HD untuk background depan dashboard"></div>
         <div class="field"><input type="url" id="chatBgUrlInput" placeholder="Link gambar HD untuk background chat"></div>
         <div class="bg-help-text">
-          Bisa pakai direct link gambar HD. Untuk Google Images, gunakan link hasil Google yang memiliki parameter imgurl/mediaurl atau klik gambar lalu Copy image address. Untuk Pinterest, gunakan link i.pinimg.com agar background bisa tampil HD.
+          Bisa pakai direct link gambar HD. Untuk Google Images, gunakan link hasil Google yang memiliki parameter imgurl/mediaurl atau klik gambar lalu Copy image address. Untuk Pinterest sekarang bisa langsung pakai link pin biasa, contoh: https://www.pinterest.com/pin/1130755419053022933/
         </div>
       </div>
       <div class="bg-action-row">
@@ -1696,14 +4344,38 @@
   </div>
 
   <div class="modal-overlay" id="adminModal">
-    <div class="modal-box">
+    <div class="modal-box admin-control-modal">
       <h3>👑 Admin Control Panel</h3>
-      <div class="modal-fields">
-        <div class="field"><input type="text" id="adminNewUser" placeholder="Username Baru"></div>
-        <div class="field"><input type="password" id="adminNewPass" placeholder="Kata Sandi Akun"></div>
+
+      <div class="admin-section-card">
+        <div class="admin-section-title">Tambah Pengguna</div>
+        <div class="modal-fields">
+          <div class="field"><input type="text" id="adminNewUser" placeholder="Username Baru"></div>
+          <div class="field"><input type="password" id="adminNewPass" placeholder="Kata Sandi Akun"></div>
+        </div>
+        <button class="modal-btn primary admin-wide-btn" onclick="submitCreateUserByAdmin()">Tambah Pengguna</button>
       </div>
-      <button class="modal-btn primary" style="width:100%; margin-bottom:14px;" onclick="submitCreateUserByAdmin()">Tambah Pengguna</button>
-      <div class="user-list-admin" id="adminUserContainer"></div>
+
+      <div class="admin-section-card">
+        <div class="admin-section-title">Tambah Role Baru</div>
+        <div class="modal-fields">
+          <div class="field"><input type="text" id="adminNewRoleName" placeholder="Nama role baru, contoh: CS, Moderator, Viewer"></div>
+        </div>
+        <div class="access-title">Akses untuk role ini</div>
+        <div class="role-access-grid" id="newRoleAccessGrid"></div>
+        <button class="modal-btn primary admin-wide-btn" onclick="submitCreateRoleByAdmin()">Simpan Role</button>
+      </div>
+
+      <div class="admin-section-card">
+        <div class="admin-section-title">Daftar Role & Akses</div>
+        <div class="role-list-admin" id="adminRoleContainer"></div>
+      </div>
+
+      <div class="admin-section-card">
+        <div class="admin-section-title">Pengguna & Role</div>
+        <div class="user-list-admin" id="adminUserContainer"></div>
+      </div>
+
       <div class="modal-foot">
         <button class="modal-btn secondary" onclick="closeAdminManagementModal()">Tutup</button>
       </div>
@@ -1731,11 +4403,15 @@
     let userRole = "biasa";
     let passivePartner = ""; 
     let activeImageBase64 = "";
+    let activeProfileModalUser = "";
+    let activeAttachmentKind = "image";
     let typingTimeout = null;
     let initialLoadComplete = false;
     
     let isEditingModeActive = false;
     let targetEditDocId = null;
+    let activeReplyData = null;
+    let cacheRenderedMessages = {};
     
     let unsubsMessages = null;
     let unsubsStatus = null;
@@ -1743,11 +4419,14 @@
     let unsubsAdminList = null;
     let unsubsRoomsNotification = null;
     let unsubsUserRoles = null;
+    let unsubsRoleDefinitions = null;
     let globalNotificationReady = false;
 
     // Tracker Cache Lokal untuk Avatars, Role, Profile & Notifikasi Pesan Masuk
     let cacheUserAvatars = {};
     let cacheUserRoles = {};
+    let cacheUserDisplayNames = {};
+    let cacheRoleDefinitions = {};
     let cacheUserProfiles = {};
     let cacheUnreadCounts = {};
     let roomListArray = [];
@@ -1755,29 +4434,203 @@
     const defaultAvatarSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238696a0'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
 
 
+    const OWNER_USERNAME = "OWNER";
+    const LEGACY_OWNER_USERNAME = "Fadly";
+
+    const ROLE_ACCESS_OPTIONS = [
+      { key: "chatAccess", label: "Lihat Chat" },
+      { key: "startChat", label: "Start Chat" },
+      { key: "sendMessage", label: "Kirim Pesan" },
+      { key: "sendImage", label: "Kirim Gambar" },
+      { key: "sendEmojiGif", label: "Emoji/GIF" },
+      { key: "profileAccess", label: "Profil" },
+      { key: "changePassword", label: "Sandi" },
+      { key: "backgroundAccess", label: "Background" },
+      { key: "adminPanel", label: "Admin Panel" }
+    ];
+
+    function defaultRoleDefinitions() {
+      return {
+        owner: {
+          id: "owner",
+          label: "Owner",
+          system: true,
+          permissions: Object.fromEntries(ROLE_ACCESS_OPTIONS.map((item) => [item.key, true]))
+        },
+        admin: {
+          id: "admin",
+          label: "Admin",
+          system: true,
+          permissions: Object.fromEntries(ROLE_ACCESS_OPTIONS.map((item) => [item.key, true]))
+        },
+        biasa: {
+          id: "biasa",
+          label: "User",
+          system: true,
+          permissions: {
+            chatAccess: true,
+            startChat: true,
+            sendMessage: true,
+            sendImage: true,
+            sendEmojiGif: true,
+            profileAccess: true,
+            changePassword: true,
+            backgroundAccess: false,
+            adminPanel: false
+          }
+        }
+      };
+    }
+
+    cacheRoleDefinitions = defaultRoleDefinitions();
+
+    function slugifyRoleId(name) {
+      return String(name || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .slice(0, 36);
+    }
+
+    function normalizeRoleId(role) {
+      const raw = String(role || "biasa").trim().toLowerCase();
+      return raw === "user" ? "biasa" : (raw || "biasa");
+    }
+
+    function getDisplayUsername(username) {
+      return String(username || "") === LEGACY_OWNER_USERNAME ? OWNER_USERNAME : String(username || "");
+    }
+
+    function getProfileDisplayName(username) {
+      const normalized = getDisplayUsername(username);
+      const profileData = cacheUserProfiles[normalized] || cacheUserProfiles[username] || {};
+      const savedName = String(profileData.displayName || cacheUserDisplayNames[normalized] || cacheUserDisplayNames[username] || "").trim();
+      return savedName || normalized;
+    }
+
+    function getUserChatAliases(username) {
+      const displayName = getDisplayUsername(username);
+      if (displayName === OWNER_USERNAME) return [OWNER_USERNAME, LEGACY_OWNER_USERNAME];
+      return [displayName];
+    }
+
+    function isMessageFromTo(item, fromUser, toUser) {
+      const fromAliases = getUserChatAliases(fromUser);
+      const toAliases = getUserChatAliases(toUser);
+      return fromAliases.includes(String(item?.sender || "")) && toAliases.includes(String(item?.receiver || ""));
+    }
+
+    function getOtherPartyFromMessage(item, currentUser) {
+      const currentAliases = getUserChatAliases(currentUser);
+      const sender = String(item?.sender || "");
+      const receiver = String(item?.receiver || "");
+
+      if (currentAliases.includes(sender) && receiver) return getDisplayUsername(receiver);
+      if (currentAliases.includes(receiver) && sender) return getDisplayUsername(sender);
+      return "";
+    }
+
+    function getRoomStorageKey() {
+      return loggedInUser ? `fandah_rooms_${loggedInUser}` : "";
+    }
+
+    function saveRoomListToLocal() {
+      const key = getRoomStorageKey();
+      if (!key) return;
+      try { localStorage.setItem(key, JSON.stringify(roomListArray)); } catch (error) {}
+    }
+
+    function restoreRoomListFromLocal() {
+      const key = getRoomStorageKey();
+      if (!key) return;
+      try {
+        const saved = JSON.parse(localStorage.getItem(key) || "[]");
+        if (Array.isArray(saved)) saved.forEach((name) => addPartnerToActiveRoomList(name));
+      } catch (error) {}
+    }
+
+    function getRoleDefinition(role) {
+      const roleId = normalizeRoleId(role);
+      return cacheRoleDefinitions[roleId] || defaultRoleDefinitions()[roleId] || { id: roleId, label: roleId, system: false, permissions: {} };
+    }
+
+    function getRolePermissions(role) {
+      const normalized = normalizeRoleId(role);
+      if (normalized === "owner") return defaultRoleDefinitions().owner.permissions;
+      if (normalized === "admin") return defaultRoleDefinitions().admin.permissions;
+      return { ...defaultRoleDefinitions().biasa.permissions, ...(getRoleDefinition(normalized).permissions || {}) };
+    }
+
     function getRawRoleByUser(username) {
-      if (username === "Fadly") return "admin";
-      return (cacheUserRoles[username] || "biasa").toLowerCase();
+      const safeUsername = getDisplayUsername(username);
+      if (safeUsername === OWNER_USERNAME) return "owner";
+      return normalizeRoleId(cacheUserRoles[safeUsername] || cacheUserRoles[username] || "biasa");
     }
 
     function formatRoleName(role) {
-      return String(role || "biasa").toLowerCase() === "admin" ? "Admin" : "User";
+      return getRoleDefinition(role).label || (normalizeRoleId(role) === "admin" ? "Admin" : "User");
     }
 
     function roleBadgeHtml(role) {
-      const raw = String(role || "biasa").toLowerCase();
+      const raw = normalizeRoleId(role);
       const label = formatRoleName(raw);
-      return `<span class="role-pill ${raw === "admin" ? "admin" : "user"}">${label}</span>`;
+      const cls = raw === "owner" ? "owner" : (raw === "admin" ? "admin" : (raw === "biasa" ? "user" : "custom"));
+      return `<span class="role-pill ${cls}">${escapeXssCode(label)}</span>`;
     }
 
     function displayNameWithRole(username) {
       if (!username) return "Pilih Teman Mengobrol...";
-      return `${username} - ${formatRoleName(getRawRoleByUser(username))}`;
+      return getProfileDisplayName(username);
     }
 
-
     function getAdminRoleSelectClass(role) {
-      return String(role || 'biasa').toLowerCase() === 'admin' ? 'role-admin' : 'role-user';
+      const raw = normalizeRoleId(role);
+      if (raw === "owner") return "role-owner";
+      if (raw === "admin") return "role-admin";
+      if (raw === "biasa") return "role-user";
+      return "role-custom";
+    }
+
+    function getHeaderBadgeClass(role) {
+      const raw = normalizeRoleId(role);
+      if (raw === "owner") return "owner-badge";
+      if (raw === "admin") return "admin-badge";
+      if (raw === "biasa") return "user-badge";
+      return "custom-badge";
+    }
+
+    function syncCurrentUserHeader() {
+      const roleLabel = document.getElementById('myRoleLabel');
+      const profileName = document.getElementById('myProfileName');
+      if (profileName && loggedInUser) profileName.innerText = displayNameWithRole(loggedInUser);
+      if (roleLabel) {
+        roleLabel.innerText = formatRoleName(userRole);
+        roleLabel.className = `user-role-badge ${getHeaderBadgeClass(userRole)}`;
+      }
+    }
+
+    function hasPermission(permissionKey, role = userRole) {
+      if (loggedInUser === OWNER_USERNAME || normalizeRoleId(role) === "owner") return true;
+      return !!getRolePermissions(role)[permissionKey];
+    }
+
+    function roleSelectOptionsHtml(currentRole) {
+      const selectedRole = normalizeRoleId(currentRole);
+      const roles = Object.values(cacheRoleDefinitions)
+        .filter((roleDef) => normalizeRoleId(roleDef.id) !== "owner")
+        .sort((a, b) => {
+          if (a.id === "admin") return -1;
+          if (b.id === "admin") return 1;
+          if (a.id === "biasa") return -1;
+          if (b.id === "biasa") return 1;
+          return String(a.label || "").localeCompare(String(b.label || ""));
+        });
+
+      return roles.map((roleDef) => {
+        const id = normalizeRoleId(roleDef.id);
+        return `<option value="${escapeAttrCode(id)}" ${id === selectedRole ? "selected" : ""}>${escapeXssCode(roleDef.label || id)}</option>`;
+      }).join("");
     }
 
 
@@ -1814,7 +4667,7 @@
         const jobs = [];
         roomSnapshot.forEach((messageDoc) => {
           const data = messageDoc.data() || {};
-          const shouldMark = data.sender === passivePartner && data.receiver === loggedInUser && !data.seenByReceiver;
+          const shouldMark = isMessageFromTo(data, passivePartner, loggedInUser) && !data.seenByReceiver;
           if (shouldMark) {
             jobs.push(updateDoc(doc(db, "obrolan_utama", messageDoc.id), {
               seenByReceiver: true,
@@ -1834,7 +4687,7 @@
         const receiverSnap = await getDoc(doc(db, "user_presence", passivePartner));
         if (!receiverSnap.exists()) return;
         const receiverState = receiverSnap.data() || {};
-        const receiverIsActivelyViewingThisRoom = receiverState.activeRoom === loggedInUser && receiverState.isWindowActive === true && receiverState.status !== 'offline';
+        const receiverIsActivelyViewingThisRoom = getUserChatAliases(loggedInUser).includes(receiverState.activeRoom) && receiverState.isWindowActive === true && receiverState.status !== 'offline';
         if (receiverIsActivelyViewingThisRoom) {
           await updateDoc(docRef, {
             seenByReceiver: true,
@@ -1856,7 +4709,7 @@
 
     async function markMessageAsReadIfNeeded(docId, item) {
       if (!docId || !item) return;
-      if (item.sender !== passivePartner || item.receiver !== loggedInUser) return;
+      if (!isMessageFromTo(item, passivePartner, loggedInUser)) return;
       if (item.seenByReceiver) return;
       if (readReceiptLocks[docId]) return;
 
@@ -1944,28 +4797,147 @@
         }
       }
 
-      const host = url.hostname.toLowerCase();
-      if ((host.includes('pinterest.') || host === 'pin.it') && !host.includes('pinimg.com')) {
-        alert("Link Pinterest yang ditempel masih berupa halaman, bukan file gambar. Buka gambar Pinterest > klik kanan/tahan gambar > Copy image address sampai link-nya menjadi i.pinimg.com/...jpg atau ...webp.");
-        return null;
-      }
-
       return url.href;
     }
 
-    function buildImageUrlCandidates(rawUrl) {
-      const normalized = normalizeImageUrlCandidate(rawUrl);
+    function decodeHtmlEntitiesLite(str) {
+      return String(str || "")
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\\//g, '/');
+    }
+
+    function extractPinterestImageFromText(rawText) {
+      const text = String(rawText || "");
+      if (!text) return "";
+
+      const patterns = [
+        /property=["']og:image["'][^>]*content=["']([^"']+)["']/i,
+        /content=["']([^"']+)["'][^>]*property=["']og:image["']/i,
+        /name=["']twitter:image(?::src)?["'][^>]*content=["']([^"']+)["']/i,
+        /content=["']([^"']+)["'][^>]*name=["']twitter:image(?::src)?["']/i,
+        /"image_url"\s*:\s*"([^"]+)"/i,
+        /"thumbnail_url"\s*:\s*"([^"]+)"/i,
+        /(https?:\/\/i\.pinimg\.com\/[^"'\s<]+)/i,
+        /(https?:\/\/s\-media\-cache\-ak0\.pinimg\.com\/[^"'\s<]+)/i
+      ];
+
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match && match[1]) {
+          return decodeHtmlEntitiesLite(match[1]);
+        }
+      }
+      return "";
+    }
+
+    function upgradePinterestImageToHd(rawUrl) {
+      const value = String(rawUrl || "").trim();
+      if (!value) return "";
+      try {
+        const url = new URL(value);
+        const host = url.hostname.toLowerCase();
+        if (host.includes('pinimg.com')) {
+          url.pathname = url.pathname
+            .replace(/\/(75x75_RS|140x140_RS|236x|474x|564x|736x|1200x)\//i, '/originals/')
+            .replace(/\/(236x|474x|564x|736x|1200x)\//i, '/originals/');
+          return url.href;
+        }
+        return value;
+      } catch (e) {
+        return value;
+      }
+    }
+
+    async function fetchPinterestImageViaOEmbed(canonicalPinUrl) {
+      const endpoint = `https://www.pinterest.com/oembed.json?url=${encodeURIComponent(canonicalPinUrl)}`;
+      const response = await fetch(endpoint, { method: 'GET', mode: 'cors', credentials: 'omit' });
+      if (!response.ok) throw new Error('Pinterest oEmbed gagal');
+      const data = await response.json();
+      const thumbnailUrl = data?.thumbnail_url || data?.image_url || "";
+      return thumbnailUrl ? upgradePinterestImageToHd(thumbnailUrl) : "";
+    }
+
+    async function fetchPinterestImageViaProxy(canonicalPinUrl) {
+      const endpoints = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(canonicalPinUrl)}`,
+        `https://api.allorigins.win/get?url=${encodeURIComponent(canonicalPinUrl)}`,
+        `https://r.jina.ai/http://${canonicalPinUrl.replace(/^https?:\/\//i, '')}`
+      ];
+
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(endpoint, { method: 'GET', credentials: 'omit' });
+          if (!response.ok) continue;
+          const bodyText = await response.text();
+          let rawText = bodyText;
+
+          if (endpoint.includes('/get?url=')) {
+            try {
+              const parsed = JSON.parse(bodyText);
+              rawText = parsed?.contents || bodyText;
+            } catch (e) {}
+          }
+
+          const extracted = extractPinterestImageFromText(rawText);
+          if (extracted) return upgradePinterestImageToHd(extracted);
+        } catch (error) {}
+      }
+
+      return "";
+    }
+
+    async function resolvePinterestPageUrl(rawUrl) {
+      const value = String(rawUrl || "").trim();
+      if (!value) return "";
+
+      let url;
+      try {
+        url = new URL(value);
+      } catch (err) {
+        return null;
+      }
+
+      const host = url.hostname.toLowerCase();
+      if (!(host.includes('pinterest.') || host === 'pin.it') || host.includes('pinimg.com')) {
+        return upgradePinterestImageToHd(url.href);
+      }
+
+      const canonicalPinUrl = url.href.includes('/pin/') ? url.href : `https://www.pinterest.com${url.pathname}`;
+
+      try {
+        const fromOembed = await fetchPinterestImageViaOEmbed(canonicalPinUrl);
+        if (fromOembed) return fromOembed;
+      } catch (error) {}
+
+      try {
+        const fromProxy = await fetchPinterestImageViaProxy(canonicalPinUrl);
+        if (fromProxy) return fromProxy;
+      } catch (error) {}
+
+      return null;
+    }
+
+    async function buildImageUrlCandidates(rawUrl) {
+      let normalized = normalizeImageUrlCandidate(rawUrl);
       if (normalized === null) return null;
       if (!normalized) return [""];
 
-      const candidates = [normalized];
+      const preResolvedPinterest = await resolvePinterestPageUrl(normalized);
+      if (preResolvedPinterest === null) {
+        alert("Link Pinterest tidak bisa dibaca otomatis di browser ini. Sistem sudah mencoba beberapa cara, tapi gagal mengambil gambar HD. Coba gunakan link pin lain, atau buka gambar Pinterest lalu copy image address.");
+        return null;
+      }
+      normalized = preResolvedPinterest || normalized;
+
+      const candidates = [upgradePinterestImageToHd(normalized)];
       try {
         const url = new URL(normalized);
         const host = url.hostname.toLowerCase();
 
-        // Pinterest direct image biasanya punya versi lebih besar di folder /originals/.
         if (host.includes('pinimg.com')) {
-          const upgradedPath = url.pathname.replace(/\/(236x|474x|564x|736x|1200x)\//i, '/originals/');
+          const upgradedPath = url.pathname.replace(/\/(75x75_RS|140x140_RS|236x|474x|564x|736x|1200x)\//i, '/originals/');
           if (upgradedPath !== url.pathname) {
             const upgraded = new URL(url.href);
             upgraded.pathname = upgradedPath;
@@ -1974,7 +4946,7 @@
         }
       } catch(e) {}
 
-      return [...new Set(candidates)];
+      return [...new Set(candidates.filter(Boolean))];
     }
 
     function canLoadImageUrl(url, timeoutMs = 6500) {
@@ -1997,7 +4969,7 @@
     }
 
     async function resolveLoadableBackgroundUrl(rawUrl, labelName) {
-      const candidates = buildImageUrlCandidates(rawUrl);
+      const candidates = await buildImageUrlCandidates(rawUrl);
       if (candidates === null) return null;
       if (!candidates[0]) return "";
 
@@ -2005,7 +4977,7 @@
         if (await canLoadImageUrl(candidate)) return candidate;
       }
 
-      alert(`${labelName} tidak bisa dimuat sebagai gambar. Kalau dari Google/Pinterest, buka gambar full lalu pilih Copy image address/direct image link, bukan copy link halaman.`);
+      alert(`${labelName} tidak bisa dimuat sebagai gambar HD. Sistem sudah mencoba membaca link Pinterest/Google secara otomatis. Jika masih gagal, coba pin lain atau copy direct image address.`);
       return null;
     }
 
@@ -2118,11 +5090,225 @@
       } catch (e) {}
     }
 
-    async function initializeSystemUsers() {
+    const LOGIN_THEME_STORAGE_KEY = 'fandah_login_theme';
+    const LOGIN_THEME_DEFAULT = 'neo-grid';
+    const LOGIN_THEME_OPTIONS = ['neo-grid', 'aurora-core', 'violet-pulse', 'carbon-cyan'];
+
+    function applyLoginTheme(themeName) {
+      const loginPage = document.getElementById('loginPage');
+      if (!loginPage) return;
+      const safeTheme = LOGIN_THEME_OPTIONS.includes(themeName) ? themeName : LOGIN_THEME_DEFAULT;
+      loginPage.setAttribute('data-login-theme', safeTheme);
+      loginPage.dataset.loginTheme = safeTheme;
+      loginPage.style.setProperty('--active-login-theme-name', `'${safeTheme}'`);
+      document.querySelectorAll('#loginPage .theme-chip').forEach((button) => {
+        button.classList.toggle('active', button.dataset.theme === safeTheme);
+      });
+    }
+
+    window.setLoginTheme = function(themeName) {
+      const safeTheme = LOGIN_THEME_OPTIONS.includes(themeName) ? themeName : LOGIN_THEME_DEFAULT;
+      applyLoginTheme(safeTheme);
       try {
-        const fadlySnap = await getDoc(doc(db, "app_users", "Fadly"));
-        if (!fadlySnap.exists()) await setDoc(doc(db, "app_users", "Fadly"), { password: "123456", role: "admin" });
-        else await setDoc(doc(db, "app_users", "Fadly"), { role: "admin" }, { merge: true });
+        localStorage.setItem(LOGIN_THEME_STORAGE_KEY, safeTheme);
+      } catch (error) {}
+    };
+
+    function initializeLoginThemePicker() {
+      let savedTheme = LOGIN_THEME_DEFAULT;
+      try {
+        savedTheme = localStorage.getItem(LOGIN_THEME_STORAGE_KEY) || LOGIN_THEME_DEFAULT;
+      } catch (error) {}
+      applyLoginTheme(savedTheme);
+    }
+
+    initializeLoginThemePicker();
+
+    async function initializeDefaultRoles() {
+      const defaults = defaultRoleDefinitions();
+      try {
+        await Promise.all(Object.values(defaults).map((roleDef) => {
+          return setDoc(doc(db, "app_roles", roleDef.id), {
+            label: roleDef.label,
+            permissions: roleDef.permissions,
+            system: true,
+            updatedAt: serverTimestamp()
+          }, { merge: true });
+        }));
+      } catch (error) {
+        console.warn("Gagal inisialisasi role default:", error);
+      }
+    }
+
+    function renderNewRoleAccessGrid() {
+      const grid = document.getElementById('newRoleAccessGrid');
+      if (!grid) return;
+      const defaultChecked = new Set(["chatAccess", "startChat", "sendMessage", "profileAccess"]);
+      grid.innerHTML = ROLE_ACCESS_OPTIONS.map((item) => `
+        <label class="access-check">
+          <input type="checkbox" data-new-role-permission="${escapeAttrCode(item.key)}" ${defaultChecked.has(item.key) ? "checked" : ""}>
+          <span>${escapeXssCode(item.label)}</span>
+        </label>
+      `).join("");
+    }
+
+    function readNewRolePermissionsFromForm() {
+      const permissions = {};
+      document.querySelectorAll('[data-new-role-permission]').forEach((checkbox) => {
+        permissions[checkbox.dataset.newRolePermission] = checkbox.checked;
+      });
+      return permissions;
+    }
+
+    function renderAdminRoleContainer() {
+      const container = document.getElementById('adminRoleContainer');
+      if (!container) return;
+
+      const roles = Object.values(cacheRoleDefinitions).sort((a, b) => {
+        if (a.id === "owner") return -1;
+        if (b.id === "owner") return 1;
+        if (a.id === "admin") return -1;
+        if (b.id === "admin") return 1;
+        if (a.id === "biasa") return -1;
+        if (b.id === "biasa") return 1;
+        return String(a.label || "").localeCompare(String(b.label || ""));
+      });
+
+      container.innerHTML = roles.map((roleDef) => {
+        const roleId = normalizeRoleId(roleDef.id);
+        const permissions = getRolePermissions(roleId);
+        const permissionChips = ROLE_ACCESS_OPTIONS
+          .filter((item) => !!permissions[item.key])
+          .map((item) => `<span class="role-access-chip ${item.key === "adminPanel" ? "admin-chip" : ""}">${escapeXssCode(item.label)}</span>`)
+          .join("") || `<span class="role-access-chip">Tanpa akses</span>`;
+
+        const deleteButton = roleDef.system
+          ? `<span class="role-access-chip ${roleId === "owner" ? "admin-chip" : ""}">${roleId === "owner" ? "Owner Role" : "System Role"}</span>`
+          : `<button type="button" class="role-delete-btn" onclick="deleteRoleByAdmin('${escapeAttrCode(roleId)}')">Hapus</button>`;
+
+        return `
+          <div class="role-admin-row">
+            <div>
+              <div class="role-admin-title">${roleBadgeHtml(roleId)} <span>${escapeXssCode(roleDef.label || roleId)}</span></div>
+              <div class="role-access-chip-wrap">${permissionChips}</div>
+            </div>
+            <div>${deleteButton}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function applyCurrentUserAccess() {
+      if (!loggedInUser) return;
+      const currentRole = getRawRoleByUser(loggedInUser);
+      const permissions = getRolePermissions(currentRole);
+
+      const toggleDisplay = (id, allowed, displayValue = 'flex') => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = allowed ? displayValue : 'none';
+      };
+
+      toggleDisplay('changePasswordActionBtn', permissions.changePassword, 'flex');
+      toggleDisplay('backgroundActionBtn', permissions.backgroundAccess, 'flex');
+      toggleDisplay('profileActionBtn', permissions.profileAccess, 'flex');
+      toggleDisplay('adminPanelTrigger', permissions.adminPanel, 'flex');
+
+      document.querySelectorAll('.start-chat-btn').forEach((btn) => {
+        btn.style.display = permissions.startChat ? 'inline-flex' : 'none';
+      });
+
+      const input = document.getElementById('typedMessageInput');
+      if (input) {
+        input.disabled = !permissions.sendMessage;
+        input.placeholder = permissions.sendMessage ? "Ketik pesan disini..." : "Role kamu belum punya akses kirim pesan";
+      }
+
+      document.querySelectorAll('.clip-btn').forEach((el) => el.classList.toggle('access-hidden', !permissions.sendImage));
+      document.getElementById('emojiTriggerButton')?.classList.toggle('access-hidden', !permissions.sendEmojiGif);
+      document.getElementById('gifTriggerButton')?.classList.toggle('access-hidden', !permissions.sendEmojiGif);
+
+      const sendBtn = document.getElementById('sendOrSaveActionButton');
+      if (sendBtn) {
+        const allowedToSendSomething = permissions.sendMessage || permissions.sendImage || permissions.sendEmojiGif;
+        sendBtn.classList.toggle('access-disabled', !allowedToSendSomething);
+        sendBtn.disabled = !allowedToSendSomething;
+      }
+    }
+
+    function initiateRoleDefinitionsListener() {
+      if (unsubsRoleDefinitions) unsubsRoleDefinitions();
+      cacheRoleDefinitions = defaultRoleDefinitions();
+
+      unsubsRoleDefinitions = onSnapshot(collection(db, "app_roles"), (snapshot) => {
+        cacheRoleDefinitions = defaultRoleDefinitions();
+        snapshot.forEach((roleDoc) => {
+          const data = roleDoc.data() || {};
+          const id = normalizeRoleId(roleDoc.id);
+          cacheRoleDefinitions[id] = {
+            id,
+            label: data.label || formatRoleName(id),
+            system: !!data.system || id === "owner" || id === "admin" || id === "biasa",
+            permissions: { ...(data.permissions || {}) }
+          };
+        });
+
+        if (loggedInUser) {
+          userRole = getRawRoleByUser(loggedInUser);
+          syncCurrentUserHeader();
+        }
+
+        if (passivePartner) {
+          document.getElementById('topHeaderTitle').innerText = displayNameWithRole(passivePartner);
+        }
+
+        renderNewRoleAccessGrid();
+        renderAdminRoleContainer();
+        applyCurrentUserAccess();
+        buildVerticalChatRoomsDOM();
+      });
+    }
+
+    async function initializeSystemUsers() {
+      await initializeDefaultRoles();
+      try {
+        const ownerRef = doc(db, "app_users", OWNER_USERNAME);
+        const legacyOwnerRef = doc(db, "app_users", LEGACY_OWNER_USERNAME);
+        const ownerSnap = await getDoc(ownerRef);
+        const legacyOwnerSnap = await getDoc(legacyOwnerRef);
+
+        if (!ownerSnap.exists()) {
+          const legacyData = legacyOwnerSnap.exists() ? (legacyOwnerSnap.data() || {}) : {};
+          await setDoc(ownerRef, {
+            password: legacyData.password || "123",
+            role: "owner",
+            legacyLoginAlias: LEGACY_OWNER_USERNAME
+          }, { merge: true });
+        } else {
+          await setDoc(ownerRef, {
+            role: "owner",
+            legacyLoginAlias: LEGACY_OWNER_USERNAME
+          }, { merge: true });
+        }
+
+        if (legacyOwnerSnap.exists()) {
+          try {
+            const legacyProfileRef = doc(db, "user_profiles", LEGACY_OWNER_USERNAME);
+            const ownerProfileRef = doc(db, "user_profiles", OWNER_USERNAME);
+            const legacyProfileSnap = await getDoc(legacyProfileRef);
+            const ownerProfileSnap = await getDoc(ownerProfileRef);
+            if (legacyProfileSnap.exists() && !ownerProfileSnap.exists()) {
+              await setDoc(ownerProfileRef, legacyProfileSnap.data(), { merge: true });
+            }
+          } catch (migrationError) {}
+          try {
+            await setDoc(legacyOwnerRef, {
+              password: "123",
+              role: "owner",
+              migratedTo: OWNER_USERNAME
+            }, { merge: true });
+          } catch (legacyAliasError) {}
+        }
+
         const indahSnap = await getDoc(doc(db, "app_users", "Indah"));
         if (!indahSnap.exists()) await setDoc(doc(db, "app_users", "Indah"), { password: "123456", role: "biasa" });
       } catch(e) { console.error("Inisialisasi user gagal", e); }
@@ -2136,20 +5322,39 @@
       const errorBox = document.getElementById('authErrorNotification');
 
       try {
-        const userRef = doc(db, "app_users", user);
-        const userSnap = await getDoc(userRef);
+        const loginUser = getDisplayUsername(user);
+        const userRef = doc(db, "app_users", loginUser);
+        let userSnap = await getDoc(userRef);
 
-        if (userSnap.exists() && userSnap.data().password === pass) {
-          loggedInUser = user;
-          userRole = (loggedInUser === "Fadly") ? "admin" : (userSnap.data().role || "biasa");
+        // Kompatibilitas login lama: username Fadly tetap diarahkan ke akun OWNER.
+        if (!userSnap.exists() && user === LEGACY_OWNER_USERNAME) {
+          await setDoc(doc(db, "app_users", OWNER_USERNAME), {
+            password: "123",
+            role: "owner",
+            legacyLoginAlias: LEGACY_OWNER_USERNAME
+          }, { merge: true });
+          userSnap = await getDoc(doc(db, "app_users", OWNER_USERNAME));
+        }
+
+        const userData = userSnap.exists() ? (userSnap.data() || {}) : {};
+        const passwordOk = userSnap.exists() && (
+          userData.password === pass ||
+          (loginUser === OWNER_USERNAME && user === LEGACY_OWNER_USERNAME && pass === "123")
+        );
+
+        if (passwordOk) {
+          loggedInUser = loginUser;
+          userRole = normalizeRoleId((loggedInUser === OWNER_USERNAME || user === LEGACY_OWNER_USERNAME) ? "owner" : (userData.role || "biasa"));
           cacheUserRoles[loggedInUser] = userRole;
+          if (String(userData.displayName || "").trim()) {
+            cacheUserDisplayNames[loggedInUser] = String(userData.displayName || "").trim();
+          }
           
           document.getElementById('loginPage').style.display = 'none';
           document.getElementById('dashboardPage').style.display = 'grid';
-          document.getElementById('myProfileName').innerText = displayNameWithRole(loggedInUser);
-          document.getElementById('myRoleLabel').innerText = formatRoleName(userRole);
+          syncCurrentUserHeader();
 
-          document.getElementById('adminPanelTrigger').style.display = (userRole === "admin") ? 'flex' : 'none';
+          applyCurrentUserAccess();
 
           await setDoc(doc(db, "user_presence", loggedInUser), {
             status: "online",
@@ -2163,14 +5368,18 @@
             Notification.requestPermission().catch(() => {});
           }
           
+          initiateRoleDefinitionsListener();
           initiateUserRolesListener();
           initiateProfilePhotoListener();
           initiateGlobalRoomsAndNotificationEngine();
           
-          // Pilih default partner pertama kali masuk
-          const targetDefault = (loggedInUser === "Fadly") ? "Indah" : "Fadly";
-          addPartnerToActiveRoomList(targetDefault);
-          selectActiveChatRoom(targetDefault);
+          // Pulihkan daftar room dari localStorage, lalu listener global akan melengkapi dari semua riwayat Firestore.
+          restoreRoomListFromLocal();
+
+          // Pilih default partner hanya jika belum ada room tersimpan.
+          const targetDefault = (loggedInUser === OWNER_USERNAME) ? "Indah" : OWNER_USERNAME;
+          if (roomListArray.length === 0) addPartnerToActiveRoomList(targetDefault);
+          selectActiveChatRoom(roomListArray[0] || targetDefault);
         } else {
           errorBox.style.display = 'block';
         }
@@ -2179,13 +5388,20 @@
 
     // FUNGSI UTAMA: Menambah Target ke List Tanpa Mengeliminasi Teman Sebelumnya
     function addPartnerToActiveRoomList(partnerName) {
-      if (!roomListArray.includes(partnerName)) {
-        roomListArray.push(partnerName);
+      const normalizedPartner = getDisplayUsername(partnerName);
+      if (!normalizedPartner || normalizedPartner === loggedInUser) return;
+      if (!roomListArray.includes(normalizedPartner)) {
+        roomListArray.push(normalizedPartner);
+        saveRoomListToLocal();
       }
     }
 
     window.selectActiveChatRoom = function(partnerName) {
-      passivePartner = partnerName;
+      if (!hasPermission("chatAccess")) {
+        alert("Role kamu belum punya akses melihat chat.");
+        return;
+      }
+      passivePartner = getDisplayUsername(partnerName);
       initialLoadComplete = false;
       cancelLowerBarEditMode();
 
@@ -2234,6 +5450,7 @@
           </div>
           <div class="chat-item-actions">
             <button class="tiny-profile-btn" type="button" data-profile-open="1">Profil</button>
+            <button class="tiny-delete-chat-btn" type="button" data-delete-chat="1" title="Hapus semua isi chat">Hapus</button>
             ${unreadBadgeHtml}
           </div>
         `;
@@ -2245,10 +5462,71 @@
           });
         });
 
+        card.querySelectorAll('[data-delete-chat="1"]').forEach((el) => {
+          el.addEventListener('click', (event) => {
+            event.stopPropagation();
+            deleteAllChatWithPartner(name);
+          });
+        });
+
         box.appendChild(card);
         fetchIndividualPresenceStatus(name);
       });
     }
+
+    window.deleteAllChatWithPartner = async function(partnerName) {
+      if (!loggedInUser || !partnerName) return;
+
+      const normalizedPartner = getDisplayUsername(partnerName);
+      const partnerLabel = getProfileDisplayName(normalizedPartner);
+
+      if (!confirm(`Hapus semua isi chat dengan ${partnerLabel}? Pesan akan terhapus dari database chat.`)) {
+        return;
+      }
+
+      try {
+        const q = query(collection(db, "obrolan_utama"), orderBy("timestamp", "asc"));
+        const snap = await getDocs(q);
+        const jobs = [];
+
+        snap.forEach((messageDoc) => {
+          const item = messageDoc.data() || {};
+          const sameRoom = isMessageFromTo(item, loggedInUser, normalizedPartner) ||
+                           isMessageFromTo(item, normalizedPartner, loggedInUser);
+          if (sameRoom) {
+            jobs.push(deleteDoc(doc(db, "obrolan_utama", messageDoc.id)));
+          }
+        });
+
+        if (jobs.length) await Promise.allSettled(jobs);
+
+        roomListArray = roomListArray.filter((name) => getDisplayUsername(name) !== normalizedPartner);
+        delete cacheUnreadCounts[normalizedPartner];
+        saveRoomListToLocal();
+
+        if (passivePartner === normalizedPartner) {
+          passivePartner = "";
+          initialLoadComplete = false;
+          if (unsubsMessages) { unsubsMessages(); unsubsMessages = null; }
+          cancelLowerBarEditMode();
+          cancelReplyMode();
+
+          const flowBox = document.getElementById('messageFlowBox');
+          if (flowBox) flowBox.innerHTML = "";
+
+          document.getElementById('topHeaderTitle').innerText = "Pilih Teman Mengobrol...";
+          document.getElementById('topHeaderStatus').innerText = "Klik Start Chat untuk memilih pengguna";
+          document.getElementById('partnerHeaderAvatar').src = defaultAvatarSvg;
+          syncOwnPresence({ status: "online" });
+        }
+
+        buildVerticalChatRoomsDOM();
+        alert(jobs.length ? "Semua isi chat berhasil dihapus." : "Tidak ada isi chat yang perlu dihapus.");
+      } catch (error) {
+        console.error(error);
+        alert("Gagal menghapus isi chat.");
+      }
+    };
 
     function fetchIndividualPresenceStatus(name) {
       getDoc(doc(db, "user_presence", name)).then((snap) => {
@@ -2263,6 +5541,10 @@
     }
 
     window.openStartChatModal = async function() {
+      if (!hasPermission("startChat")) {
+        alert("Role kamu belum punya akses Start Chat.");
+        return;
+      }
       document.getElementById('startChatModal').style.display = 'grid';
       const container = document.getElementById('startChatUserContainer');
       container.innerHTML = `<div style="color:rgba(255,255,255,0.4); font-size:12px;">Memuat daftar pengguna...</div>`;
@@ -2270,36 +5552,50 @@
       try {
         const querySnapshot = await getDocs(collection(db, "app_users"));
         container.innerHTML = "";
+        let visibleUserCount = 0;
+
         querySnapshot.forEach((uDoc) => {
-          if (uDoc.id !== loggedInUser) {
-            const rawRole = (uDoc.id === "Fadly") ? "admin" : (uDoc.data().role || "biasa");
-            cacheUserRoles[uDoc.id] = rawRole;
-            const div = document.createElement('div');
-            div.className = "startchat-item-row";
-            div.innerHTML = `
-              <div style="display:flex; align-items:center; gap:10px; min-width:0;">
-                <img src="${escapeAttrCode(cacheUserAvatars[uDoc.id] || defaultAvatarSvg)}" class="partner-avatar-img profile-openable" data-profile-open="1" title="Lihat profil">
-                <span><strong>${escapeXssCode(displayNameWithRole(uDoc.id))}</strong><br>${roleBadgeHtml(rawRole)}</span>
-              </div>
-              <span style="display:flex; gap:8px; align-items:center;">
-                <button class="tiny-profile-btn" type="button" data-profile-open="1">Profil</button>
-                <span style="color:var(--dash-accent); font-size:11px; font-weight:600;">Chat ➔</span>
-              </span>
-            `;
-            div.onclick = () => { 
-              addPartnerToActiveRoomList(uDoc.id); 
-              selectActiveChatRoom(uDoc.id); 
-              closeStartChatModal(); 
-            };
-            div.querySelectorAll('[data-profile-open="1"]').forEach((el) => {
-              el.addEventListener('click', (event) => {
-                event.stopPropagation();
-                openUserProfileModal(uDoc.id);
-              });
+          const displayUName = getDisplayUsername(uDoc.id);
+
+          // OWNER tidak ditampilkan di menu "Mulai Obrolan Baru" untuk user lain.
+          // Untuk OWNER sendiri, akun OWNER / alias lama Fadly juga tidak ditampilkan karena itu akun sendiri.
+          if (displayUName === OWNER_USERNAME) return;
+          if (displayUName === loggedInUser) return;
+
+          const rawRole = normalizeRoleId(uDoc.data().role || "biasa");
+          cacheUserRoles[displayUName] = rawRole;
+          if (uDoc.data().displayName) cacheUserDisplayNames[displayUName] = uDoc.data().displayName;
+
+          const div = document.createElement('div');
+          div.className = "startchat-item-row";
+          div.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+              <img src="${escapeAttrCode(cacheUserAvatars[displayUName] || cacheUserAvatars[uDoc.id] || defaultAvatarSvg)}" class="partner-avatar-img profile-openable" data-profile-open="1" title="Lihat profil">
+              <span><strong>${escapeXssCode(displayNameWithRole(displayUName))}</strong><br>${roleBadgeHtml(rawRole)}</span>
+            </div>
+            <span style="display:flex; gap:8px; align-items:center;">
+              <button class="tiny-profile-btn" type="button" data-profile-open="1">Profil</button>
+              <span style="color:var(--dash-accent); font-size:11px; font-weight:600;">Chat ➔</span>
+            </span>
+          `;
+          div.onclick = () => { 
+            addPartnerToActiveRoomList(displayUName); 
+            selectActiveChatRoom(displayUName); 
+            closeStartChatModal(); 
+          };
+          div.querySelectorAll('[data-profile-open="1"]').forEach((el) => {
+            el.addEventListener('click', (event) => {
+              event.stopPropagation();
+              openUserProfileModal(displayUName);
             });
-            container.appendChild(div);
-          }
+          });
+          container.appendChild(div);
+          visibleUserCount++;
         });
+
+        if (visibleUserCount === 0) {
+          container.innerHTML = `<div style="color:rgba(255,255,255,0.42); font-size:12px; padding:10px 0;">Belum ada user lain yang bisa dipilih.</div>`;
+        }
       } catch(e) { container.innerHTML = "Gagal memuat list user."; }
     };
 
@@ -2310,14 +5606,14 @@
       if (unsubsUserRoles) unsubsUserRoles();
       unsubsUserRoles = onSnapshot(collection(db, "app_users"), (snapshot) => {
         snapshot.forEach((uDoc) => {
-          cacheUserRoles[uDoc.id] = (uDoc.id === "Fadly") ? "admin" : (uDoc.data().role || "biasa");
+          cacheUserRoles[getDisplayUsername(uDoc.id)] = normalizeRoleId((getDisplayUsername(uDoc.id) === OWNER_USERNAME) ? "owner" : (uDoc.data().role || "biasa"));
+          if (uDoc.data().displayName) cacheUserDisplayNames[getDisplayUsername(uDoc.id)] = uDoc.data().displayName;
         });
 
         if (loggedInUser) {
           userRole = getRawRoleByUser(loggedInUser);
-          document.getElementById('myProfileName').innerText = displayNameWithRole(loggedInUser);
-          document.getElementById('myRoleLabel').innerText = formatRoleName(userRole);
-          document.getElementById('adminPanelTrigger').style.display = (userRole === "admin") ? 'flex' : 'none';
+          syncCurrentUserHeader();
+          applyCurrentUserAccess();
         }
 
         if (passivePartner) {
@@ -2328,40 +5624,54 @@
     }
 
     // DETEKTOR GLOBAL: Mendeteksi Pesan Masuk Realtime untuk Memberikan Notifikasi Tanda Pesan Masuk
+    function rebuildRoomsFromSnapshot(snapshot) {
+      if (!loggedInUser) return false;
+
+      let changed = false;
+      snapshot.forEach((messageDoc) => {
+        const item = messageDoc.data() || {};
+        const otherParty = getOtherPartyFromMessage(item, loggedInUser);
+        if (otherParty && otherParty !== loggedInUser && !roomListArray.includes(otherParty)) {
+          roomListArray.push(otherParty);
+          changed = true;
+        }
+      });
+
+      if (changed) saveRoomListToLocal();
+      return changed;
+    }
+
     function initiateGlobalRoomsAndNotificationEngine() {
       const q = query(collection(db, "obrolan_utama"), orderBy("timestamp", "asc"));
-      
-      // Ambil seluruh avatar profile pengguna terlebih dahulu
+
       getDocs(collection(db, "user_profiles")).then((snapshots) => {
         snapshots.forEach((pDoc) => {
-          if(pDoc.data().avatarBase64) cacheUserAvatars[pDoc.id] = pDoc.data().avatarBase64;
+          if(pDoc.data().avatarBase64) cacheUserAvatars[getDisplayUsername(pDoc.id)] = pDoc.data().avatarBase64;
         });
       });
 
       globalNotificationReady = false;
       unsubsRoomsNotification = onSnapshot(q, (snapshot) => {
-        let updateRequired = false;
+        let updateRequired = rebuildRoomsFromSnapshot(snapshot);
 
         snapshot.docChanges().forEach((change) => {
           if (change.type === "added") {
-            const item = change.doc.data();
-            
-            // Jika kita adalah penerima pesan
-            if (item.receiver === loggedInUser) {
-              const pengirim = item.sender;
-              addPartnerToActiveRoomList(pengirim);
+            const item = change.doc.data() || {};
+            const otherParty = getOtherPartyFromMessage(item, loggedInUser);
+            if (!otherParty) return;
 
-              // Jika room pengirim sedang tidak kita buka, beri tanda merah + toast pojok kanan bawah + suara LINE style.
-              if (pengirim !== passivePartner) {
-                cacheUnreadCounts[pengirim] = (cacheUnreadCounts[pengirim] || 0) + 1;
-                if (globalNotificationReady) {
-                  const previewText = item.textMessage || (item.imagePayload ? "Mengirim gambar" : "Mengirim pesan baru");
-                  playLineNotificationSound();
-                  showDesktopNotification(`Pesan baru dari ${pengirim}`, previewText, pengirim);
-                }
+            addPartnerToActiveRoomList(otherParty);
+
+            if (isMessageFromTo(item, otherParty, loggedInUser) && otherParty !== passivePartner) {
+              cacheUnreadCounts[otherParty] = (cacheUnreadCounts[otherParty] || 0) + 1;
+              if (globalNotificationReady) {
+                const previewText = item.textMessage || (item.imagePayload ? "Mengirim gambar" : "Mengirim pesan baru");
+                playLineNotificationSound();
+                showDesktopNotification(`Pesan baru dari ${getDisplayUsername(otherParty)}`, previewText, otherParty);
               }
-              updateRequired = true;
             }
+
+            updateRequired = true;
           }
         });
 
@@ -2369,6 +5679,10 @@
 
         if (updateRequired || roomListArray.length > 0) {
           buildVerticalChatRoomsDOM();
+
+          if (!passivePartner && roomListArray.length > 0) {
+            selectActiveChatRoom(roomListArray[0]);
+          }
         }
       });
     }
@@ -2389,11 +5703,13 @@
         snapshot.forEach((snapshotDoc) => {
           const item = snapshotDoc.data();
           const docId = snapshotDoc.id;
+          cacheRenderedMessages[docId] = item;
 
-          // Kondisi filter kamar chat aktif Anda dengan user bersangkutan
-          const isMeSender = item.sender === loggedInUser && item.receiver === passivePartner;
-          const isPartnerSender = item.sender === passivePartner && item.receiver === loggedInUser;
-          
+          // Kondisi filter kamar chat aktif Anda dengan user bersangkutan.
+          // Mendukung alias lama Fadly -> OWNER agar chat lama tetap muncul.
+          const isMeSender = isMessageFromTo(item, loggedInUser, passivePartner);
+          const isPartnerSender = isMessageFromTo(item, passivePartner, loggedInUser);
+
           if (!isMeSender && !isPartnerSender) return;
 
           let timeString = "..:.."; let dayString = "Hari ini"; let isTimeReady = false;
@@ -2419,6 +5735,16 @@
           }
 
           let contentHtml = "";
+          if (item.replyTo) {
+            const replyName = getProfileDisplayName(item.replyTo.sender || "");
+            const replyText = item.replyTo.text || (item.replyTo.hasImage ? "Gambar" : "Pesan");
+            contentHtml += `
+              <div class="reply-preview-card" title="Pesan yang dibalas">
+                <div class="reply-preview-name">${escapeXssCode(replyName)}</div>
+                <div class="reply-preview-text">${escapeXssCode(replyText)}</div>
+              </div>
+            `;
+          }
           if (item.imagePayload) {
             const safeImagePayload = escapeAttrCode(item.imagePayload);
             contentHtml += `<img class="chat-image-thumb" src="${safeImagePayload}" alt="Gambar" loading="lazy" onclick="openChatImageLightbox(this.src)">`;
@@ -2431,27 +5757,28 @@
 
           const editLabel = item.edited ? `<span class="edited-marker">(diedit)</span>` : '';
           const readReceiptHtml = isMeSender ? buildReadReceiptHtml(item) : '';
-          let controlsHtml = "";
-          if (isMeSender) {
-            controlsHtml = `
-              <div class="msg-controls">
-                ${item.textMessage ? `<button class="ctrl-btn" title="Edit Pesan" onclick="activateLowerBarEditMode('${docId}')">✏️</button>` : ''}
-                <button class="ctrl-btn" style="color:#ff5252;" title="Hapus" onclick="triggerDeleteFirebase('${docId}')">🗑️</button>
-              </div>
-            `;
-          }
+          let controlsHtml = `
+            <div class="msg-controls">
+              <button class="ctrl-btn reply-btn" title="Balas / Reply Chat" onclick="activateReplyMode('${docId}')">↩</button>
+              ${isMeSender && item.textMessage ? `<button class="ctrl-btn edit-one-btn" title="Edit Pesan" onclick="activateLowerBarEditMode('${docId}')">✎</button>` : ''}
+              ${isMeSender ? `<button class="ctrl-btn delete-one-btn" title="Hapus Pesan" onclick="triggerDeleteFirebase('${docId}')">🗑️</button>` : ''}
+            </div>
+          `;
 
           rowNode.innerHTML = `
             ${avatarHtml}
-            <div class="bubble" id="msg_${docId}">
+            <div class="bubble has-message-actions" id="msg_${docId}">
+              ${controlsHtml}
               ${contentHtml}
               <div class="bubble-meta">
                 <span class="time-text">${timeString}</span>${editLabel}
                 ${readReceiptHtml}
               </div>
             </div>
-            ${controlsHtml}
           `;
+
+          const renderedBubble = rowNode.querySelector('.bubble');
+          setupBubbleActionToggle(renderedBubble);
 
           flowBox.appendChild(rowNode);
         });
@@ -2472,11 +5799,121 @@
       });
     }
 
+    function closeAllBubbleActions(exceptBubble = null) {
+      document.querySelectorAll('.bubble.actions-open').forEach((bubble) => {
+        if (bubble !== exceptBubble) bubble.classList.remove('actions-open');
+      });
+    }
+
+    function setupBubbleActionToggle(bubbleNode) {
+      if (!bubbleNode || bubbleNode.dataset.actionToggleReady === "1") return;
+      bubbleNode.dataset.actionToggleReady = "1";
+
+      let holdTimer = null;
+      let touchMoved = false;
+
+      const clearHoldTimer = () => {
+        if (holdTimer) {
+          clearTimeout(holdTimer);
+          holdTimer = null;
+        }
+      };
+
+      bubbleNode.addEventListener('touchstart', () => {
+        touchMoved = false;
+        clearHoldTimer();
+        holdTimer = setTimeout(() => {
+          closeAllBubbleActions(bubbleNode);
+          bubbleNode.classList.add('actions-open');
+        }, 520);
+      }, { passive: true });
+
+      bubbleNode.addEventListener('touchmove', () => {
+        touchMoved = true;
+        clearHoldTimer();
+      }, { passive: true });
+
+      bubbleNode.addEventListener('touchend', () => {
+        clearHoldTimer();
+      }, { passive: true });
+
+      bubbleNode.addEventListener('touchcancel', () => {
+        clearHoldTimer();
+      }, { passive: true });
+
+      bubbleNode.addEventListener('contextmenu', (event) => {
+        // Long press mobile biasanya memicu context menu.
+        event.preventDefault();
+        closeAllBubbleActions(bubbleNode);
+        bubbleNode.classList.add('actions-open');
+      });
+
+      bubbleNode.addEventListener('click', (event) => {
+        if (event.target.closest('.msg-controls')) return;
+        if (bubbleNode.classList.contains('actions-open') && !touchMoved) {
+          bubbleNode.classList.remove('actions-open');
+        }
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.bubble')) {
+        closeAllBubbleActions();
+      }
+    });
+
+    function getMessagePreviewText(item) {
+      if (!item) return "Pesan";
+      const text = String(item.textMessage || "").trim();
+      if (text) return text.length > 120 ? `${text.slice(0, 120)}...` : text;
+      if (item.imagePayload) return "Gambar";
+      return "Pesan";
+    }
+
+    window.activateReplyMode = function(docId) {
+      closeAllBubbleActions();
+      const item = cacheRenderedMessages[docId];
+      if (!item) return;
+
+      if (isEditingModeActive) {
+        cancelLowerBarEditMode();
+      }
+
+      activeReplyData = {
+        docId,
+        sender: getDisplayUsername(item.sender || ""),
+        text: getMessagePreviewText(item),
+        hasImage: !!item.imagePayload
+      };
+
+      const replyBar = document.getElementById('replyStatusBar');
+      const title = document.getElementById('replyStatusTitle');
+      const textNode = document.getElementById('replyStatusText');
+
+      if (title) title.innerText = `Membalas ${getProfileDisplayName(activeReplyData.sender)}`;
+      if (textNode) textNode.innerText = activeReplyData.text;
+      if (replyBar) { replyBar.classList.add('is-visible'); replyBar.style.display = 'flex'; }
+
+      document.getElementById('typedMessageInput')?.focus();
+    };
+
+    window.cancelReplyMode = function() {
+      activeReplyData = null;
+      const replyBar = document.getElementById('replyStatusBar');
+      if (replyBar) { replyBar.classList.remove('is-visible'); replyBar.style.display = 'none'; }
+      const title = document.getElementById('replyStatusTitle');
+      const textNode = document.getElementById('replyStatusText');
+      if (title) title.innerText = "Membalas pesan";
+      if (textNode) textNode.innerText = "-";
+    };
+
     window.activateLowerBarEditMode = function(docId) {
+      closeAllBubbleActions();
       const bubble = document.getElementById("msg_" + docId);
       if(!bubble) return;
-      const textBody = bubble.querySelector(".text-content-body").innerText;
+      const textBody = bubble.querySelector(".text-content-body")?.innerText || "";
 
+      cancelReplyMode();
       isEditingModeActive = true;
       targetEditDocId = docId;
 
@@ -2512,19 +5949,40 @@
         if (text === "" && activeImageBase64 === "") return;
         if (!passivePartner) return;
 
+        if (text && !hasPermission("sendMessage")) {
+          alert("Role kamu belum punya akses kirim pesan teks.");
+          return;
+        }
+        if (activeImageBase64 && activeAttachmentKind === "image" && !hasPermission("sendImage")) {
+          alert("Role kamu belum punya akses kirim gambar.");
+          return;
+        }
+        if (activeImageBase64 && activeAttachmentKind === "gif" && !hasPermission("sendEmojiGif")) {
+          alert("Role kamu belum punya akses kirim GIF.");
+          return;
+        }
+
         const messagePackage = {
           sender: loggedInUser,
+          senderAlias: getDisplayUsername(loggedInUser),
           receiver: passivePartner,
+          receiverAlias: getDisplayUsername(passivePartner),
           textMessage: text,
           imagePayload: activeImageBase64 || null,
           timestamp: serverTimestamp(),
           edited: false,
+          replyTo: activeReplyData ? {
+            docId: activeReplyData.docId,
+            sender: activeReplyData.sender,
+            text: activeReplyData.text,
+            hasImage: !!activeReplyData.hasImage
+          } : null,
           seenByReceiver: false,
           readAt: null
         };
 
         try {
-          field.value = ""; discardImageAttachment();
+          field.value = ""; discardImageAttachment(); cancelReplyMode();
           const newMessageRef = await addDoc(collection(db, "obrolan_utama"), messagePackage);
           await syncOwnPresence({ status: "online" });
           await tryMarkJustSentMessageAsRead(newMessageRef);
@@ -2577,19 +6035,36 @@
         document.getElementById('myAvatarImg').src = defaultAvatarSvg;
         snapshot.forEach((profileDoc) => {
           const data = profileDoc.data() || {};
-          cacheUserProfiles[profileDoc.id] = data;
-          if (data.avatarBase64) {
-            cacheUserAvatars[profileDoc.id] = data.avatarBase64;
+          const profileKey = getDisplayUsername(profileDoc.id);
+          const previousProfileData = cacheUserProfiles[profileKey] || {};
+          const mergedProfileData = { ...previousProfileData, ...data };
+
+          // Jika dokumen legacy seperti Fadly tidak punya displayName,
+          // jangan sampai menimpa displayName OWNER yang sudah disimpan.
+          if (!String(data.displayName || "").trim() && previousProfileData.displayName) {
+            mergedProfileData.displayName = previousProfileData.displayName;
           }
-          if (profileDoc.id === loggedInUser) {
-            document.getElementById('myAvatarImg').src = data.avatarBase64 || defaultAvatarSvg;
-            applyVisualBackgrounds(data);
+
+          cacheUserProfiles[profileKey] = mergedProfileData;
+
+          if (String(mergedProfileData.displayName || "").trim()) {
+            cacheUserDisplayNames[profileKey] = String(mergedProfileData.displayName || "").trim();
+          }
+          if (mergedProfileData.avatarBase64) {
+            cacheUserAvatars[profileKey] = mergedProfileData.avatarBase64;
+          }
+          if (profileKey === loggedInUser) {
+            document.getElementById('myAvatarImg').src = mergedProfileData.avatarBase64 || defaultAvatarSvg;
+            applyVisualBackgrounds(mergedProfileData);
             const dashboardInput = document.getElementById('dashboardBgUrlInput');
             const chatInput = document.getElementById('chatBgUrlInput');
-            if (dashboardInput) dashboardInput.value = data.dashboardBackgroundUrl || "";
-            if (chatInput) chatInput.value = data.chatBackgroundUrl || "";
+            if (dashboardInput) dashboardInput.value = mergedProfileData.dashboardBackgroundUrl || "";
+            if (chatInput) chatInput.value = mergedProfileData.chatBackgroundUrl || "";
           }
         });
+        if (loggedInUser) {
+          syncCurrentUserHeader();
+        }
         if(passivePartner) {
           document.getElementById('partnerHeaderAvatar').src = cacheUserAvatars[passivePartner] || defaultAvatarSvg;
           document.getElementById('topHeaderTitle').innerText = displayNameWithRole(passivePartner);
@@ -2608,13 +6083,24 @@
     };
 
     window.triggerDeleteFirebase = async function(docId) {
+      closeAllBubbleActions();
       if (!confirm("Hapus pesan ini secara permanen?")) return;
       try { await deleteDoc(doc(db, "obrolan_utama", docId)); } catch (e) {}
     };
 
-    window.openChangePasswordModal = function() { document.getElementById('passwordModal').style.display = 'grid'; };
+    window.openChangePasswordModal = function() {
+      if (!hasPermission("changePassword")) {
+        alert("Role kamu belum punya akses ubah sandi.");
+        return;
+      }
+      document.getElementById('passwordModal').style.display = 'grid';
+    };
     window.closeChangePasswordModal = function() { document.getElementById('passwordModal').style.display = 'none'; document.getElementById('newPasswordInput').value = ""; };
     window.submitChangePassword = async function() {
+      if (!hasPermission("changePassword")) {
+        alert("Role kamu belum punya akses ubah sandi.");
+        return;
+      }
       const newPwd = document.getElementById('newPasswordInput').value.trim();
       if(!newPwd) return;
       try {
@@ -2624,8 +6110,13 @@
     };
 
     window.openAdminManagementModal = function() {
-      if(getRawRoleByUser(loggedInUser) !== "admin") return;
+      if(!hasPermission("adminPanel")) {
+        alert("Role kamu belum punya akses Admin Panel.");
+        return;
+      }
       document.getElementById('adminModal').style.display = 'grid';
+      renderNewRoleAccessGrid();
+      renderAdminRoleContainer();
       listenToUserListRealtime();
     };
     window.closeAdminManagementModal = function() {
@@ -2647,23 +6138,78 @@
       } catch(e) {}
     };
 
+    window.submitCreateRoleByAdmin = async function() {
+      if(!hasPermission("adminPanel")) return;
+      const roleNameInput = document.getElementById('adminNewRoleName');
+      const roleName = roleNameInput.value.trim();
+      if (!roleName) {
+        alert("Isi dulu nama role baru.");
+        return;
+      }
+
+      const roleId = slugifyRoleId(roleName);
+      if (!roleId) {
+        alert("Nama role tidak valid. Gunakan huruf/angka.");
+        return;
+      }
+      if (roleId === "admin" || roleId === "biasa" || roleId === "user") {
+        alert("Role bawaan tidak bisa dibuat ulang.");
+        return;
+      }
+
+      const permissions = readNewRolePermissionsFromForm();
+
+      try {
+        await setDoc(doc(db, "app_roles", roleId), {
+          label: roleName,
+          permissions,
+          system: false,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        roleNameInput.value = "";
+        renderNewRoleAccessGrid();
+        alert("Role baru berhasil disimpan.");
+      } catch (error) {
+        alert("Gagal menyimpan role baru.");
+      }
+    };
+
+    window.deleteRoleByAdmin = async function(roleId) {
+      if(!hasPermission("adminPanel")) return;
+      const normalized = normalizeRoleId(roleId);
+      if (normalized === "owner" || normalized === "admin" || normalized === "biasa") {
+        alert("Role bawaan tidak bisa dihapus.");
+        return;
+      }
+      if (!confirm(`Hapus role ${formatRoleName(normalized)}? User yang memakai role ini sebaiknya dipindah dulu.`)) return;
+      try {
+        await deleteDoc(doc(db, "app_roles", normalized));
+        alert("Role berhasil dihapus.");
+      } catch (error) {
+        alert("Gagal menghapus role.");
+      }
+    };
+
     function listenToUserListRealtime() {
       unsubsAdminList = onSnapshot(collection(db, "app_users"), (snapshot) => {
         const cont = document.getElementById('adminUserContainer'); cont.innerHTML = "";
         snapshot.forEach((uDoc) => {
           const uName = uDoc.id;
-          const curRole = (uName === "Fadly") ? "admin" : (uDoc.data().role || "biasa");
-          cacheUserRoles[uName] = curRole;
+          const curRole = (getDisplayUsername(uName) === OWNER_USERNAME) ? "owner" : normalizeRoleId(uDoc.data().role || "biasa");
+          cacheUserRoles[getDisplayUsername(uName)] = curRole;
           const row = document.createElement('div'); row.className = "user-admin-row";
-          if (uName === "Fadly") {
-            row.innerHTML = `<span class="user-admin-name"><strong>${escapeXssCode(displayNameWithRole(uName))}</strong></span><div class="admin-fixed-role-badge">${roleBadgeHtml("admin")}</div>`;
+          if (getDisplayUsername(uName) === OWNER_USERNAME) {
+            row.innerHTML = `<span class="user-admin-name"><strong>${escapeXssCode(displayNameWithRole(uName))}</strong></span><div class="user-admin-actions"><button type="button" class="user-delete-btn owner-locked" disabled>Owner Terkunci</button><div class="admin-fixed-role-badge">${roleBadgeHtml("owner")}</div></div>`;
           } else {
             row.innerHTML = `
               <span class="user-admin-name"><strong>${escapeXssCode(displayNameWithRole(uName))}</strong></span>
-              <select class="admin-role-select ${getAdminRoleSelectClass(curRole)}" onchange="changeUserRoleByAdmin('${escapeAttrCode(uName)}', this.value, this)">
-                <option value="biasa" ${curRole === 'biasa'?'selected':''}>User</option>
-                <option value="admin" ${curRole === 'admin'?'selected':''}>Admin</option>
-              </select>
+              <div class="user-admin-actions">
+                <select class="admin-role-select ${getAdminRoleSelectClass(curRole)}" onchange="changeUserRoleByAdmin('${escapeAttrCode(uName)}', this.value, this)">
+                  ${roleSelectOptionsHtml(curRole)}
+                </select>
+                <button type="button" class="user-delete-btn" onclick="deleteUserByAdmin('${escapeAttrCode(uName)}')">Hapus User</button>
+              </div>
             `;
           }
           cont.appendChild(row);
@@ -2672,13 +6218,41 @@
     }
 
     window.changeUserRoleByAdmin = async function(targetUser, selectedRole, selectElement) {
+      if(!hasPermission("adminPanel")) return;
+      if (getDisplayUsername(targetUser) === OWNER_USERNAME) {
+        alert("Role OWNER tidak bisa diubah.");
+        return;
+      }
       try {
+        const normalized = normalizeRoleId(selectedRole);
         if (selectElement) {
-          selectElement.classList.remove('role-user', 'role-admin');
-          selectElement.classList.add(getAdminRoleSelectClass(selectedRole));
+          selectElement.classList.remove('role-user', 'role-admin', 'role-owner', 'role-custom');
+          selectElement.classList.add(getAdminRoleSelectClass(normalized));
         }
-        await updateDoc(doc(db, "app_users", targetUser), { role: selectedRole });
-      } catch(e) {}
+        await updateDoc(doc(db, "app_users", targetUser), { role: normalized });
+      } catch(e) {
+        alert("Gagal mengubah role user.");
+      }
+    };
+
+    window.deleteUserByAdmin = async function(targetUser) {
+      if(!hasPermission("adminPanel")) return;
+      if (getDisplayUsername(targetUser) === OWNER_USERNAME || targetUser === loggedInUser) {
+        alert("Akun OWNER atau akun yang sedang dipakai tidak bisa dihapus.");
+        return;
+      }
+      if (!confirm(`Hapus user ${getDisplayUsername(targetUser)}? Data profil user juga akan dibersihkan.`)) return;
+      try {
+        await deleteDoc(doc(db, "app_users", targetUser));
+        try { await deleteDoc(doc(db, "user_profiles", targetUser)); } catch (e) {}
+        try { await deleteDoc(doc(db, "user_presence", targetUser)); } catch (e) {}
+        try { await deleteDoc(doc(db, "user_rooms", targetUser)); } catch (e) {}
+        delete cacheUserRoles[targetUser];
+        delete cacheUserProfiles[targetUser];
+        alert("User berhasil dihapus.");
+      } catch (error) {
+        alert("Gagal menghapus user.");
+      }
     };
 
     window.triggerSignOut = async function() {
@@ -2689,13 +6263,14 @@
         isWindowActive: false,
         last_changed: serverTimestamp()
       }, { merge: true });
-      if (unsubsMessages) unsubsMessages(); if (unsubsStatus) unsubsStatus(); if (unsubsProfiles) unsubsProfiles(); if (unsubsAdminList) unsubsAdminList(); if (unsubsRoomsNotification) unsubsRoomsNotification(); if (unsubsUserRoles) unsubsUserRoles();
-      loggedInUser = ""; passivePartner = ""; roomListArray = []; cacheUnreadCounts = {}; cacheUserProfiles = {}; globalNotificationReady = false;
+      if (unsubsMessages) unsubsMessages(); if (unsubsStatus) unsubsStatus(); if (unsubsProfiles) unsubsProfiles(); if (unsubsAdminList) unsubsAdminList(); if (unsubsRoomsNotification) unsubsRoomsNotification(); if (unsubsUserRoles) unsubsUserRoles(); if (unsubsRoleDefinitions) unsubsRoleDefinitions();
+      loggedInUser = ""; passivePartner = ""; roomListArray = []; cacheUnreadCounts = {}; cacheRenderedMessages = {}; activeReplyData = null; cacheUserProfiles = {}; cacheUserDisplayNames = {}; cacheRoleDefinitions = defaultRoleDefinitions(); globalNotificationReady = false;
       applyVisualBackgrounds({});
       document.getElementById('dashboardPage').style.display = 'none';
       document.getElementById('loginPage').style.display = 'grid';
       document.getElementById('mainLoginForm').reset();
       discardImageAttachment();
+      cancelReplyMode();
     };
 
 
@@ -2704,8 +6279,27 @@
       if (passivePartner) openUserProfileModal(passivePartner);
     };
 
+    window.openMyProfileModal = function() {
+      if (!loggedInUser) {
+        alert("Silakan login dulu.");
+        return;
+      }
+      openUserProfileModal(loggedInUser);
+      setTimeout(() => {
+        const input = document.getElementById('profileDisplayNameInput');
+        if (input) input.focus();
+      }, 120);
+    };
+
     window.openUserProfileModal = async function(username) {
+      const normalizedUsername = getDisplayUsername(username);
+      if (!hasPermission("profileAccess") && normalizedUsername !== loggedInUser) {
+        alert("Role kamu belum punya akses melihat profil user lain.");
+        return;
+      }
       if (!username) return;
+      activeProfileModalUser = normalizedUsername;
+
       const modal = document.getElementById('profileModal');
       const avatar = document.getElementById('profileModalAvatar');
       const nameRole = document.getElementById('profileModalNameRole');
@@ -2713,15 +6307,25 @@
       const statusLine = document.getElementById('profileModalStatus');
       const bgPreview = document.getElementById('profileModalBgPreview');
       const note = document.getElementById('profileModalNote');
-      const profileData = cacheUserProfiles[username] || {};
-      const rawRole = getRawRoleByUser(username);
+      const editBox = document.getElementById('profileNameEditBox');
+      const displayNameInput = document.getElementById('profileDisplayNameInput');
+      const profileData = cacheUserProfiles[normalizedUsername] || cacheUserProfiles[username] || {};
+      const rawRole = getRawRoleByUser(normalizedUsername);
 
-      avatar.src = cacheUserAvatars[username] || defaultAvatarSvg;
-      nameRole.innerText = displayNameWithRole(username);
+      avatar.src = cacheUserAvatars[normalizedUsername] || cacheUserAvatars[username] || defaultAvatarSvg;
+      nameRole.innerText = getProfileDisplayName(normalizedUsername);
       roleBadge.innerHTML = roleBadgeHtml(rawRole);
-      note.innerText = username === loggedInUser
-        ? "Ini profil kamu. Foto profil, role, dan background dashboard/chat kamu dapat dilihat oleh pengguna lain."
-        : "Profil user ini bisa dilihat oleh pengguna lain: foto profil, nama, role, status, dan background yang dipasang.";
+
+      const isOwnProfile = normalizedUsername === loggedInUser;
+      if (editBox) editBox.classList.toggle('is-visible', isOwnProfile);
+      if (displayNameInput) {
+        displayNameInput.value = getProfileDisplayName(normalizedUsername);
+        displayNameInput.disabled = !isOwnProfile;
+      }
+
+      note.innerText = isOwnProfile
+        ? "Ini profil kamu. Kamu bisa mengubah nama tampilan, foto profil, dan background. Username login tetap tidak berubah."
+        : "Profil user ini bisa dilihat oleh pengguna lain: foto profil, nama tampilan, role, status, dan background yang dipasang.";
 
       if (profileData.dashboardBackgroundUrl) {
         bgPreview.style.backgroundImage = `linear-gradient(rgba(0,0,0,.30), rgba(0,0,0,.52)), url("${cssSafeUrl(profileData.dashboardBackgroundUrl)}")`;
@@ -2735,7 +6339,7 @@
       modal.style.display = 'grid';
 
       try {
-        const snap = await getDoc(doc(db, "user_presence", username));
+        const snap = await getDoc(doc(db, "user_presence", normalizedUsername));
         if (snap.exists()) {
           const st = snap.data().status || "offline";
           statusLine.innerText = st === "typing" ? "Status: Mengetik..." : `Status: ${st === "online" ? "Online" : "Offline"}`;
@@ -2747,11 +6351,92 @@
       }
     };
 
+    window.saveMyProfileDisplayName = async function() {
+      if (!loggedInUser || activeProfileModalUser !== loggedInUser) {
+        alert("Kamu hanya bisa mengubah nama profil sendiri.");
+        return;
+      }
+
+      const input = document.getElementById('profileDisplayNameInput');
+      const newDisplayName = String(input?.value || "").trim();
+
+      if (!newDisplayName) {
+        alert("Nama profil tidak boleh kosong.");
+        return;
+      }
+
+      if (newDisplayName.length > 32) {
+        alert("Nama profil maksimal 32 karakter.");
+        return;
+      }
+
+      const saveButton = document.querySelector('.profile-save-name-btn');
+      if (saveButton) saveButton.disabled = true;
+
+      try {
+        const displayNameSaveJobs = [
+          setDoc(doc(db, "user_profiles", loggedInUser), {
+            displayName: newDisplayName,
+            updatedAt: serverTimestamp()
+          }, { merge: true }),
+          setDoc(doc(db, "app_users", loggedInUser), {
+            displayName: newDisplayName,
+            updatedAt: serverTimestamp()
+          }, { merge: true })
+        ];
+
+        // OWNER masih punya alias login lama Fadly, jadi displayName ikut disamakan agar tidak rollback.
+        if (loggedInUser === OWNER_USERNAME) {
+          displayNameSaveJobs.push(
+            setDoc(doc(db, "user_profiles", LEGACY_OWNER_USERNAME), {
+              displayName: newDisplayName,
+              updatedAt: serverTimestamp()
+            }, { merge: true }),
+            setDoc(doc(db, "app_users", LEGACY_OWNER_USERNAME), {
+              displayName: newDisplayName,
+              role: "owner",
+              migratedTo: OWNER_USERNAME,
+              updatedAt: serverTimestamp()
+            }, { merge: true })
+          );
+        }
+
+        await Promise.all(displayNameSaveJobs);
+
+        cacheUserProfiles[loggedInUser] = {
+          ...(cacheUserProfiles[loggedInUser] || {}),
+          displayName: newDisplayName
+        };
+        cacheUserDisplayNames[loggedInUser] = newDisplayName;
+
+        syncCurrentUserHeader();
+
+        if (passivePartner) {
+          document.getElementById('topHeaderTitle').innerText = displayNameWithRole(passivePartner);
+        }
+
+        const nameRole = document.getElementById('profileModalNameRole');
+        if (nameRole) nameRole.innerText = getProfileDisplayName(loggedInUser);
+
+        buildVerticalChatRoomsDOM();
+        alert("Nama profil berhasil diperbarui.");
+      } catch (error) {
+        alert("Gagal menyimpan nama profil.");
+      } finally {
+        if (saveButton) saveButton.disabled = false;
+      }
+    };
+
     window.closeUserProfileModal = function() {
+      activeProfileModalUser = "";
       document.getElementById('profileModal').style.display = 'none';
     };
 
     window.openBackgroundSettingsModal = function() {
+      if (!hasPermission("backgroundAccess")) {
+        alert("Role kamu belum punya akses mengubah background.");
+        return;
+      }
       const profileData = cacheUserProfiles[loggedInUser] || {};
       document.getElementById('dashboardBgUrlInput').value = profileData.dashboardBackgroundUrl || "";
       document.getElementById('chatBgUrlInput').value = profileData.chatBackgroundUrl || "";
@@ -2824,8 +6509,93 @@
       openChatImageLightbox(activeImageBase64);
     };
 
-    function setImageAttachmentFromDataUrl(dataUrl, captionText = "Berkas gambar siap") {
+
+    window.toggleEmojiGifPicker = function(defaultTab = 'emoji') {
+      if (!hasPermission("sendEmojiGif")) {
+        alert("Role kamu belum punya akses Emoji/GIF.");
+        return;
+      }
+      const panel = document.getElementById('emojiGifPickerPanel');
+      if (!panel) return;
+      const willShow = !panel.classList.contains('show');
+      panel.classList.toggle('show', willShow);
+      document.getElementById('emojiTriggerButton')?.classList.toggle('active', willShow && defaultTab === 'emoji');
+      document.getElementById('gifTriggerButton')?.classList.toggle('active', willShow && defaultTab === 'gif');
+      if (willShow) {
+        switchEmojiGifTab(defaultTab);
+      }
+    };
+
+    window.closeEmojiGifPicker = function() {
+      const panel = document.getElementById('emojiGifPickerPanel');
+      if (!panel) return;
+      panel.classList.remove('show');
+      document.getElementById('emojiTriggerButton')?.classList.remove('active');
+      document.getElementById('gifTriggerButton')?.classList.remove('active');
+    };
+
+    window.switchEmojiGifTab = function(tabName = 'emoji') {
+      const isGif = tabName === 'gif';
+      document.getElementById('emojiPickerPanel')?.classList.toggle('active', !isGif);
+      document.getElementById('gifPickerPanel')?.classList.toggle('active', isGif);
+      document.getElementById('emojiTabButton')?.classList.toggle('active', !isGif);
+      document.getElementById('gifTabButton')?.classList.toggle('active', isGif);
+      document.getElementById('emojiTriggerButton')?.classList.toggle('active', !isGif && document.getElementById('emojiGifPickerPanel')?.classList.contains('show'));
+      document.getElementById('gifTriggerButton')?.classList.toggle('active', isGif && document.getElementById('emojiGifPickerPanel')?.classList.contains('show'));
+      if (isGif) {
+        setTimeout(() => document.getElementById('gifUrlInput')?.focus(), 40);
+      } else {
+        setTimeout(() => document.getElementById('typedMessageInput')?.focus(), 40);
+      }
+    };
+
+    window.insertEmojiToMessage = function(emojiText) {
+      const input = document.getElementById('typedMessageInput');
+      if (!input) return;
+      const start = input.selectionStart ?? input.value.length;
+      const end = input.selectionEnd ?? input.value.length;
+      const before = input.value.slice(0, start);
+      const after = input.value.slice(end);
+      input.value = `${before}${emojiText}${after}`;
+      const nextPos = start + emojiText.length;
+      input.setSelectionRange(nextPos, nextPos);
+      input.focus();
+      handleTypingState();
+    };
+
+    function isValidGifOrImageUrl(url) {
+      if (!/^https?:\/\//i.test(url)) return false;
+      if (/\.(gif|webp|png|jpg|jpeg)(\?.*)?$/i.test(url)) return true;
+      return /(giphy\.com|media\.(giphy|tenor)\.com|tenor\.com)/i.test(url);
+    }
+
+    window.attachGifFromUrl = function() {
+      const input = document.getElementById('gifUrlInput');
+      const gifUrl = String(input?.value || '').trim();
+      if (!gifUrl) {
+        alert('Tempel dulu link GIF-nya ya.');
+        return;
+      }
+      if (!isValidGifOrImageUrl(gifUrl)) {
+        alert('Link GIF tidak valid. Gunakan direct link GIF/image dari Giphy, Tenor, atau link gambar lainnya.');
+        return;
+      }
+      setImageAttachmentFromDataUrl(gifUrl, 'GIF siap dikirim', 'gif');
+      if (input) input.value = '';
+      closeEmojiGifPicker();
+      document.getElementById('typedMessageInput')?.focus();
+    };
+
+    window.usePresetGif = function(gifUrl, labelText = 'GIF siap dikirim') {
+      if (!gifUrl) return;
+      setImageAttachmentFromDataUrl(gifUrl, labelText, 'gif');
+      closeEmojiGifPicker();
+      document.getElementById('typedMessageInput')?.focus();
+    };
+
+    function setImageAttachmentFromDataUrl(dataUrl, captionText = "Berkas gambar siap", attachmentKind = "image") {
       activeImageBase64 = dataUrl;
+      activeAttachmentKind = attachmentKind;
       document.getElementById('targetImgSrc').src = activeImageBase64;
       const caption = document.getElementById('imagePreviewCaption');
       if (caption) caption.innerText = captionText;
@@ -2833,6 +6603,10 @@
     }
 
     function readImageFileToAttachment(file, captionText = "Berkas gambar siap") {
+      if (!hasPermission("sendImage")) {
+        alert("Role kamu belum punya akses kirim gambar.");
+        return;
+      }
       if (!file || !file.type || !file.type.startsWith('image/')) return;
 
       const reader = new FileReader();
@@ -2849,6 +6623,7 @@
 
     window.discardImageAttachment = function() {
       activeImageBase64 = "";
+      activeAttachmentKind = "image";
       document.getElementById('imageFileInput').value = "";
       document.getElementById('imagePreviewBar').style.display = 'none';
       const caption = document.getElementById('imagePreviewCaption');
@@ -2895,6 +6670,22 @@
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') closeChatImageLightbox();
+    });
+
+    document.addEventListener('click', (event) => {
+      const panel = document.getElementById('emojiGifPickerPanel');
+      const footer = document.querySelector('.chat-footer-panel');
+      if (!panel || !footer) return;
+      if (!panel.classList.contains('show')) return;
+      if (!footer.contains(event.target)) {
+        closeEmojiGifPicker();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeEmojiGifPicker();
+      }
     });
 
     document.getElementById('typedMessageInput').addEventListener('keypress', (e) => {
