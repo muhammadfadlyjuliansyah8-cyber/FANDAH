@@ -4776,6 +4776,543 @@
     }
   </style>
 
+
+
+  <style id="final-mobile-drawer-access-fix">
+    /* =========================================================
+       FINAL MOBILE ACCESS FIX
+       Mobile tidak lagi memotong sidebar/room list. Semua fitur web
+       dipindahkan ke drawer yang bisa dibuka dari tombol menu.
+       ========================================================= */
+    .mobile-sidebar-toggle,
+    .mobile-sidebar-close,
+    .mobile-sidebar-backdrop {
+      display: none;
+    }
+
+    @media (max-width: 680px) {
+      html,
+      body {
+        width: 100%;
+        min-width: 0;
+        height: 100dvh !important;
+        overflow: hidden !important;
+      }
+
+      /* Login tetap bisa discroll di HP kecil, jadi tombol login/theme tidak kepotong. */
+      #loginPage.wrap {
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior-y: contain !important;
+        padding-bottom: calc(22px + env(safe-area-inset-bottom)) !important;
+      }
+
+      /* Override bug lama: beberapa CSS sebelumnya memaksa dashboard tampil di mobile. */
+      #dashboardPage {
+        display: none !important;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: minmax(0, 1fr) !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+        max-height: 100dvh !important;
+        overflow: hidden !important;
+      }
+
+      #dashboardPage[style*="display: grid"],
+      #dashboardPage[style*="display:grid"],
+      #dashboardPage.is-mobile-authenticated {
+        display: grid !important;
+      }
+
+      #dashboardPage.mobile-chat-active {
+        --mobile-sidebar-size: 0px !important;
+      }
+
+      .mobile-sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1800;
+        background: rgba(0, 0, 0, .58);
+        backdrop-filter: blur(7px);
+        -webkit-backdrop-filter: blur(7px);
+      }
+
+      #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
+        display: block !important;
+      }
+
+      .mobile-sidebar-toggle {
+        display: inline-grid !important;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        border-radius: 14px;
+        border: 1px solid rgba(66,184,255,.26);
+        background: linear-gradient(135deg, rgba(66,184,255,.14), rgba(139,92,255,.10));
+        color: #EAFBFF;
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1;
+        box-shadow: 0 0 18px rgba(66,184,255,.10), inset 0 1px 0 rgba(255,255,255,.04);
+        cursor: pointer;
+      }
+
+      .mobile-sidebar-toggle:active {
+        transform: scale(.97);
+      }
+
+      .mobile-sidebar-close {
+        display: inline-grid !important;
+        place-items: center;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 6;
+        width: 38px;
+        height: 38px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.045);
+        color: rgba(235,248,255,.86);
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .mobile-sidebar-close:active {
+        transform: scale(.96);
+      }
+
+      /* Sidebar menjadi drawer full height, bukan area atas yang pendek. */
+      .sidebar {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        z-index: 1900 !important;
+        width: min(88vw, 372px) !important;
+        max-width: 372px !important;
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+        max-height: 100dvh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        border-right: 1px solid rgba(66,184,255,.22) !important;
+        border-bottom: 0 !important;
+        transform: translateX(-106%) !important;
+        transition: transform .22s cubic-bezier(.2,.8,.2,1) !important;
+        box-shadow: 24px 0 80px rgba(0,0,0,.50), inset -1px 0 0 rgba(255,255,255,.03) !important;
+      }
+
+      #dashboardPage.mobile-sidebar-open .sidebar {
+        transform: translateX(0) !important;
+      }
+
+      .sidebar-header {
+        position: relative !important;
+        flex: 0 0 auto !important;
+        padding: 58px 14px 12px !important;
+        gap: 10px !important;
+        overflow: visible !important;
+      }
+
+      .sh-top {
+        min-height: 76px !important;
+        padding: 11px 12px !important;
+        border-radius: 18px !important;
+      }
+
+      .user-profile {
+        min-width: 0 !important;
+        padding-right: 42px !important;
+      }
+
+      .avatar-wrapper {
+        width: 48px !important;
+        height: 48px !important;
+      }
+
+      #myProfileName {
+        max-width: 190px !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        font-size: 14px !important;
+      }
+
+      .user-role-badge {
+        min-height: 18px !important;
+        padding: 2px 7px !important;
+        font-size: 8.5px !important;
+      }
+
+      .sh-actions,
+      .sh-actions:has(#adminPanelTrigger[style*="display:none"]),
+      .sh-actions:has(#adminPanelTrigger[style*="display: none"]) {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        padding: 8px !important;
+        border-radius: 18px !important;
+      }
+
+      .action-link-btn {
+        min-width: 0 !important;
+        width: 100% !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        display: inline-flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+        padding: 0 10px !important;
+        border-radius: 13px !important;
+        font-size: 10.8px !important;
+        text-align: left !important;
+      }
+
+      .action-ico {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 15px !important;
+        flex: 0 0 22px !important;
+      }
+
+      .action-text {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      .chat-list-container {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior-y: contain !important;
+        padding: 12px 12px calc(16px + env(safe-area-inset-bottom)) !important;
+        gap: 10px !important;
+      }
+
+      .section-label {
+        position: sticky;
+        top: 0;
+        z-index: 4;
+        padding: 8px 2px 10px !important;
+        background: linear-gradient(180deg, rgba(4,10,22,.98), rgba(4,10,22,.82));
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        font-size: 10px !important;
+        letter-spacing: .12em !important;
+      }
+
+      .start-chat-btn {
+        min-height: 32px !important;
+        padding: 0 10px !important;
+        border-radius: 12px !important;
+        font-size: 9.6px !important;
+      }
+
+      #activeChatRoomsBox {
+        gap: 10px !important;
+      }
+
+      .chat-item-card {
+        grid-template-columns: 48px minmax(0, 1fr) 74px !important;
+        gap: 9px !important;
+        padding: 11px !important;
+        min-height: 78px !important;
+        border-radius: 17px !important;
+      }
+
+      .chat-item-card .partner-avatar-img {
+        width: 46px !important;
+        height: 46px !important;
+      }
+
+      .chat-item-name {
+        font-size: 12.8px !important;
+        margin-bottom: 5px !important;
+      }
+
+      .chat-item-subline {
+        gap: 6px !important;
+        align-items: center !important;
+      }
+
+      .role-pill {
+        min-height: 18px !important;
+        padding: 2px 7px !important;
+        font-size: 8px !important;
+      }
+
+      .chat-item-status,
+      .status-indicator {
+        font-size: 9.7px !important;
+      }
+
+      .chat-item-actions {
+        width: 74px !important;
+        gap: 6px !important;
+        align-items: stretch !important;
+      }
+
+      .chat-item-actions .tiny-profile-btn,
+      .chat-item-actions .tiny-delete-chat-btn,
+      .chat-item-actions .unread-badge-alert {
+        width: 70px !important;
+        min-width: 70px !important;
+        min-height: 27px !important;
+        font-size: 8.8px !important;
+      }
+
+      /* Chat full screen di mobile. */
+      .chat-main-window {
+        grid-row: 1 !important;
+        height: 100dvh !important;
+        min-height: 0 !important;
+        max-height: 100dvh !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        position: relative !important;
+      }
+
+      .chat-main-header {
+        flex: 0 0 auto !important;
+        min-height: 60px !important;
+        padding: calc(8px + env(safe-area-inset-top)) 11px 8px !important;
+        gap: 10px !important;
+      }
+
+      .chat-main-header > div {
+        min-width: 0 !important;
+      }
+
+      .chat-main-header .partner-avatar-img {
+        width: 36px !important;
+        height: 36px !important;
+        flex: 0 0 36px !important;
+      }
+
+      #topHeaderTitle {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        font-size: 13px !important;
+      }
+
+      #topHeaderStatus {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        font-size: 10.5px !important;
+      }
+
+      .message-area {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding: 12px 10px calc(16px + env(safe-area-inset-bottom)) !important;
+        gap: 11px !important;
+        touch-action: pan-y !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      .msg-row {
+        gap: 7px !important;
+      }
+
+      .msg-avatar {
+        width: 26px !important;
+        height: 26px !important;
+      }
+
+      .bubble {
+        max-width: 92% !important;
+        padding: 18px 11px 10px !important;
+        font-size: 13px !important;
+        line-height: 1.45 !important;
+        border-radius: 16px !important;
+      }
+
+      .bubble img {
+        max-height: 220px !important;
+      }
+
+      /* Di HP, aksi pesan muncul saat bubble ditekan lama / actions-open. */
+      .msg-row .bubble .msg-controls {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
+      .msg-row .bubble.actions-open .msg-controls {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+      }
+
+      .reply-state-indicator-bar,
+      .edit-state-indicator-bar,
+      #imagePreviewBar {
+        flex: 0 0 auto !important;
+      }
+
+      .reply-state-text {
+        max-width: 68vw !important;
+      }
+
+      #imagePreviewBar {
+        padding: 9px 10px !important;
+        gap: 9px !important;
+      }
+
+      .chat-footer-panel {
+        flex: 0 0 auto !important;
+        position: relative !important;
+        bottom: auto !important;
+        padding: 8px 9px calc(9px + env(safe-area-inset-bottom)) !important;
+        gap: 7px !important;
+      }
+
+      .clip-btn,
+      .emoji-trigger-btn,
+      .send-action-btn {
+        width: 35px !important;
+        height: 35px !important;
+        flex: 0 0 35px !important;
+      }
+
+      .gif-trigger-btn {
+        width: 41px !important;
+        height: 35px !important;
+        flex: 0 0 41px !important;
+        font-size: 9.5px !important;
+      }
+
+      .chat-footer-panel input[type="text"] {
+        min-width: 0 !important;
+        height: 37px !important;
+        padding: 0 12px !important;
+        font-size: 16px !important;
+      }
+
+      .emoji-gif-picker {
+        position: fixed !important;
+        left: 10px !important;
+        right: 10px !important;
+        bottom: calc(58px + env(safe-area-inset-bottom)) !important;
+        max-height: min(68dvh, 430px) !important;
+        overflow-y: auto !important;
+        z-index: 2300 !important;
+      }
+
+      .emoji-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+      }
+
+      .gif-presets-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+
+      .gif-url-row {
+        flex-direction: column !important;
+      }
+
+      .gif-attach-btn {
+        width: 100% !important;
+      }
+
+      .modal-overlay {
+        z-index: 2400 !important;
+        padding: 12px !important;
+        align-items: center !important;
+      }
+
+      .modal-box,
+      .admin-control-modal {
+        width: 100% !important;
+        max-width: calc(100vw - 24px) !important;
+        max-height: calc(100dvh - 24px) !important;
+        overflow-y: auto !important;
+        border-radius: 20px !important;
+        padding: 18px 16px !important;
+      }
+
+      .modal-foot {
+        position: sticky;
+        bottom: 0;
+        padding-top: 10px;
+        background: linear-gradient(180deg, transparent, rgba(4,9,20,.96) 30%);
+      }
+
+      .user-list-admin,
+      .user-list-startchat {
+        max-height: min(52dvh, 420px) !important;
+      }
+
+      .image-lightbox-overlay {
+        z-index: 2600 !important;
+        padding: 12px !important;
+      }
+
+      #desktopNotificationStack {
+        z-index: 2700 !important;
+        right: 10px !important;
+        left: 10px !important;
+        bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+        width: auto !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .chat-main-header {
+        gap: 8px !important;
+      }
+
+      .mobile-sidebar-toggle {
+        width: 37px !important;
+        height: 37px !important;
+        flex-basis: 37px !important;
+      }
+
+      .chat-main-header .partner-avatar-img {
+        width: 32px !important;
+        height: 32px !important;
+        flex-basis: 32px !important;
+      }
+
+      .clip-btn,
+      .emoji-trigger-btn,
+      .send-action-btn {
+        width: 32px !important;
+        height: 32px !important;
+        flex-basis: 32px !important;
+      }
+
+      .gif-trigger-btn {
+        width: 37px !important;
+        flex-basis: 37px !important;
+      }
+    }
+  </style>
+
 </head>
 
 <body>
@@ -4884,8 +5421,10 @@
   </div>
 
   <div id="dashboardPage">
+    <div class="mobile-sidebar-backdrop" id="mobileSidebarBackdrop" onclick="closeMobileSidebar()" aria-hidden="true"></div>
     <div class="sidebar">
       <div class="sidebar-header">
+        <button type="button" class="mobile-sidebar-close" id="mobileSidebarClose" onclick="closeMobileSidebar()" aria-label="Tutup menu">×</button>
         <div class="sh-top">
           <div class="user-profile">
             <label class="avatar-wrapper" title="Ubah Foto Profil">
@@ -4928,6 +5467,7 @@
 
     <div class="chat-main-window">
       <div class="chat-main-header">
+        <button type="button" class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" aria-label="Buka menu">☰</button>
         <img src="" class="partner-avatar-img profile-openable" id="partnerHeaderAvatar" title="Lihat profil" onclick="openActivePartnerProfile()">
         <div>
           <div id="topHeaderTitle" style="font-weight: 700; font-size: 15px;">Pilih Teman Mengobrol...</div>
@@ -7618,5 +8158,107 @@
     });
 
 </script>
+
+
+  <script id="final-mobile-drawer-access-fix-script">
+    (() => {
+      const mobileQuery = window.matchMedia('(max-width: 680px)');
+      const dashboard = () => document.getElementById('dashboardPage');
+
+      function isMobileView() {
+        return mobileQuery.matches;
+      }
+
+      function openDrawer() {
+        const page = dashboard();
+        if (!page || !isMobileView()) return;
+        page.classList.add('mobile-sidebar-open');
+        document.body.classList.add('mobile-nav-lock');
+      }
+
+      function closeDrawer() {
+        const page = dashboard();
+        if (!page) return;
+        page.classList.remove('mobile-sidebar-open');
+        document.body.classList.remove('mobile-nav-lock');
+      }
+
+      function toggleDrawer() {
+        const page = dashboard();
+        if (!page) return;
+        if (page.classList.contains('mobile-sidebar-open')) closeDrawer();
+        else openDrawer();
+      }
+
+      window.openMobileSidebar = openDrawer;
+      window.closeMobileSidebar = closeDrawer;
+      window.toggleMobileSidebar = toggleDrawer;
+
+      /* Saat dashboard berhasil login di mobile, CSS final butuh penanda ini
+         supaya halaman tidak tampil sebelum login. */
+      const markAuthState = () => {
+        const page = dashboard();
+        if (!page) return;
+        const display = (page.getAttribute('style') || '').replace(/\s+/g, '').toLowerCase();
+        page.classList.toggle('is-mobile-authenticated', display.includes('display:grid'));
+      };
+
+      const observerTarget = dashboard();
+      if (observerTarget) {
+        markAuthState();
+        new MutationObserver(markAuthState).observe(observerTarget, { attributes: true, attributeFilter: ['style'] });
+      }
+
+      /* Pilih room / tekan fitur dari drawer langsung balikin ke layar chat,
+         tapi modal yang dibuka tetap tampil. */
+      document.addEventListener('click', (event) => {
+        if (!isMobileView()) return;
+
+        if (event.target.closest('.mobile-sidebar-backdrop')) {
+          closeDrawer();
+          return;
+        }
+
+        if (event.target.closest('.chat-item-card')) {
+          setTimeout(closeDrawer, 80);
+          return;
+        }
+
+        if (event.target.closest('.start-chat-btn, .action-link-btn')) {
+          setTimeout(closeDrawer, 120);
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeDrawer();
+      });
+
+      window.addEventListener('resize', () => {
+        if (!isMobileView()) closeDrawer();
+      }, { passive: true });
+
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+          closeDrawer();
+          const flowBox = document.getElementById('messageFlowBox');
+          if (flowBox) flowBox.scrollTop = flowBox.scrollHeight;
+        }, 260);
+      }, { passive: true });
+
+      /* Safety wrapper: kalau function selectActiveChatRoom dipanggil dari kode lain,
+         mobile drawer tetap otomatis tertutup. */
+      if (typeof window.selectActiveChatRoom === 'function' && !window.selectActiveChatRoom.__mobileDrawerWrapped) {
+        const originalSelectActiveChatRoom = window.selectActiveChatRoom;
+        const wrappedSelectActiveChatRoom = function(...args) {
+          const result = originalSelectActiveChatRoom.apply(this, args);
+          if (isMobileView()) setTimeout(closeDrawer, 80);
+          return result;
+        };
+        wrappedSelectActiveChatRoom.__mobileDrawerWrapped = true;
+        window.selectActiveChatRoom = wrappedSelectActiveChatRoom;
+      }
+    })();
+  </script>
+
 </body>
 </html>
