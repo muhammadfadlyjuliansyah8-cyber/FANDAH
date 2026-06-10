@@ -38,6 +38,8 @@
       --bubble-in-border: rgba(255, 255, 255, 0.06);
       --bubble-out: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.95));
       --bubble-out-border: rgba(255, 215, 0, 0.2);
+      --dashboard-bg-image: none;
+      --chat-bg-image: none;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -116,12 +118,24 @@
     #dashboardPage {
       display: none; position: fixed; inset: 0; z-index: 100;
       background: var(--dash-bg); grid-template-columns: 340px 1fr;
+      isolation: isolate; overflow: hidden;
     }
-    .sidebar { background: var(--dash-panel); border-right: 1px solid var(--dash-border); display: flex; flex-direction: column; z-index: 10; }
+    #dashboardPage::before {
+      content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: linear-gradient(135deg, rgba(6,9,15,0.78), rgba(6,9,15,0.88)), var(--dashboard-bg-image);
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      opacity: .92; transform: scale(1.01);
+    }
+    .sidebar { background: rgba(14, 19, 31, 0.86); border-right: 1px solid var(--dash-border); display: flex; flex-direction: column; z-index: 10; position: relative; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
     .sidebar-header { padding: 20px; border-bottom: 1px solid var(--dash-border); display: flex; flex-direction: column; gap: 14px; }
     .sh-top { display: flex; justify-content: space-between; align-items: center; }
     .user-profile { display: flex; align-items: center; gap: 12px; }
     .user-role-badge { font-size: 9px; background: rgba(255,215,0,0.12); color: var(--dash-accent); padding: 1.5px 5px; border-radius: 4px; font-weight: 700; text-transform: uppercase; border: 0.5px solid rgba(255,215,0,0.2); }
+    .role-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .02em; line-height: 1.3; text-transform: uppercase; white-space: nowrap; }
+    .role-pill.admin { color: #05070B; background: var(--dash-accent); border: 1px solid rgba(255,215,0,0.45); box-shadow: 0 0 12px rgba(255,215,0,.12); }
+    .role-pill.user { color: #BFD0E4; background: rgba(148,163,184,.10); border: 1px solid rgba(148,163,184,.16); }
+    .profile-openable { cursor: pointer; }
+    .profile-openable:hover { filter: brightness(1.12); }
     
     .avatar-wrapper { position: relative; width: 44px; height: 44px; cursor: pointer; flex-shrink: 0; }
     .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--dash-accent); }
@@ -160,8 +174,14 @@
     @keyframes pulseAlert { 0% { box-shadow: 0 0 0 0 rgba(255,59,48,0.5); } 70% { box-shadow: 0 0 0 6px rgba(255,59,48,0); } 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); } }
 
     /* REALTIME STREAM VIEWPORT */
-    .chat-main-window { display: flex; flex-direction: column; background: var(--dash-chat-bg); position: relative; min-height:0; }
-    .chat-main-header { padding: 16px 24px; background: rgba(14, 19, 31, 0.7); backdrop-filter: blur(15px); z-index: 5; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--dash-border); }
+    .chat-main-window { display: flex; flex-direction: column; background: var(--dash-chat-bg); position: relative; min-height:0; z-index: 1; overflow: hidden; }
+    .chat-main-window::before {
+      content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: linear-gradient(135deg, rgba(5,7,11,0.70), rgba(5,7,11,0.84)), var(--chat-bg-image);
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      opacity: .96; transform: scale(1.01);
+    }
+    .chat-main-header { padding: 16px 24px; background: rgba(14, 19, 31, 0.72); backdrop-filter: blur(15px); z-index: 5; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--dash-border); position: relative; }
     
     .message-area { flex: 1; padding: 24px; overflow-y: auto; overflow-x:hidden; min-height:0; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; display: flex; flex-direction: column; gap: 16px; z-index: 2; }
     .day-divider { align-self: center; background: rgba(255,255,255,0.02); border: 1px solid var(--dash-border); padding: 5px 14px; border-radius: 20px; font-size: 11px; color: rgba(240,244,248,0.4); margin: 8px 0; }
@@ -180,6 +200,28 @@
     }
     .bubble:hover { transform: translateY(-1px); }
     .bubble img { max-width: 100%; border-radius: 12px; margin: 4px 0; object-fit: cover; max-height: 250px; }
+    .bubble .chat-image-thumb { cursor: zoom-in; transition: transform .16s ease, filter .16s ease; }
+    .bubble .chat-image-thumb:hover { transform: scale(1.01); filter: brightness(1.08); }
+
+    /* FULL VIEW GAMBAR CHAT - klik gambar untuk lihat ukuran penuh */
+    .image-lightbox-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      place-items: center; padding: 24px; animation: lightboxFadeIn .16s ease;
+    }
+    @keyframes lightboxFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .image-lightbox-overlay img {
+      max-width: min(96vw, 1280px); max-height: 92vh; object-fit: contain;
+      border-radius: 16px; border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 24px 90px rgba(0,0,0,0.65); background: rgba(255,255,255,0.02);
+    }
+    .image-lightbox-close {
+      position: fixed; top: 18px; right: 18px; width: 42px; height: 42px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.12); background: rgba(14,19,31,0.88);
+      color: #fff; font-size: 22px; line-height: 1; cursor: pointer; display: grid; place-items: center;
+      z-index: 501; transition: background .15s ease, transform .15s ease;
+    }
+    .image-lightbox-close:hover { background: rgba(255,255,255,0.12); transform: scale(1.04); }
     
     .incoming-row .bubble {
       background: var(--bubble-in); border-bottom-left-radius: 4px;
@@ -225,9 +267,15 @@
     .send-action-btn { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.1); color: var(--dash-accent); cursor: pointer; display: grid; place-items: center; transition: all 0.2s; }
     .send-action-btn:hover { background: var(--dash-accent); color: #000; box-shadow: 0 0 10px rgba(255,215,0,0.2); }
 
-    #imagePreviewBar { display: none; padding: 10px 24px; background: #111623; border-top: 1px solid var(--dash-border); align-items: center; gap: 14px; z-index: 6; }
-    #imagePreviewBar img { height: 44px; width: 44px; object-fit: cover; border-radius: 6px; }
-    .cancel-preview-btn { color: #ff5252; cursor: pointer; font-size: 12.5px; font-weight: 600; margin-left: auto; }
+    #imagePreviewBar { display: none; padding: 12px 24px; background: rgba(17,22,35,0.92); border-top: 1px solid var(--dash-border); align-items: center; gap: 14px; z-index: 6; position: relative; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    #imagePreviewBar img { height: 64px; width: 64px; object-fit: cover; border-radius: 10px; border: 1px solid rgba(255,255,255,.10); cursor: zoom-in; transition: transform .15s ease, filter .15s ease; }
+    #imagePreviewBar img:hover { transform: scale(1.04); filter: brightness(1.08); }
+    .preview-info { display: grid; gap: 4px; min-width: 0; }
+    .preview-title { font-size: 12.5px; color: rgba(240,244,248,0.72); font-weight: 650; }
+    .preview-hint { font-size: 11px; color: rgba(240,244,248,0.38); }
+    .preview-open-btn { border: 1px solid rgba(255,215,0,.16); background: rgba(255,215,0,.06); color: var(--dash-accent); border-radius: 9px; padding: 8px 10px; font-size: 11px; font-weight: 750; cursor: pointer; margin-left: auto; }
+    .preview-open-btn:hover { background: var(--dash-accent); color: #000; }
+    .cancel-preview-btn { color: #ff5252; cursor: pointer; font-size: 12.5px; font-weight: 700; }
 
     /* SYSTEM MODALS STYLING PACK */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; place-items: center; padding: 20px; backdrop-filter: blur(8px); }
@@ -246,9 +294,1201 @@
     .startchat-item-row { cursor: pointer; transition: background .2s; }
     .startchat-item-row:hover { background: rgba(255,215,0,0.04); border-color: rgba(255,215,0,0.1); }
 
+
+
+    /* PROFIL USER & BACKGROUND SETTINGS */
+    .profile-modal-body { display: grid; gap: 16px; }
+    .profile-hero { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 18px; background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.055); }
+    .profile-hero img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,215,0,.42); background: rgba(255,255,255,.04); cursor: zoom-in; }
+    .profile-name-role { font-size: 17px; font-weight: 800; color: var(--dash-text); margin-bottom: 6px; }
+    .profile-status-line { font-size: 12px; color: rgba(240,244,248,.5); }
+    .profile-note { font-size: 12px; color: rgba(240,244,248,.48); line-height: 1.55; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.04); }
+    .profile-bg-preview { min-height: 86px; border-radius: 16px; border: 1px solid rgba(255,255,255,.06); background-color: rgba(255,255,255,.025); background-size: cover; background-position: center; display: grid; place-items: center; overflow: hidden; color: rgba(240,244,248,.44); font-size: 11px; text-align: center; padding: 12px; }
+    .bg-help-text { font-size: 11.5px; color: rgba(240,244,248,.42); line-height: 1.55; margin-top: -4px; }
+    .bg-action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tiny-profile-btn { border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.035); color: rgba(240,244,248,.68); border-radius: 7px; font-size: 10px; font-weight: 750; padding: 4px 7px; cursor: pointer; }
+    .tiny-profile-btn:hover { color: #000; background: var(--dash-accent); border-color: var(--dash-accent); }
+    .chat-item-subline { display:flex; align-items:center; gap: 8px; flex-wrap: wrap; }
+
+    /* Background image fallback layer: lebih kuat untuk link Google/Pinterest direct image */
+    .visual-bg-img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center;
+      pointer-events: none; z-index: 0; opacity: .78; filter: saturate(1.06) contrast(1.03); transform: scale(1.01);
+    }
+    #dashboardBgImage { opacity: .36; }
+    #chatBgImage { opacity: .50; }
+
+    /* Notifikasi custom pojok kanan bawah monitor */
+    #desktopNotificationStack {
+      position: fixed; right: 22px; bottom: 22px; z-index: 900;
+      display: grid; gap: 10px; width: min(360px, calc(100vw - 36px)); pointer-events: none;
+    }
+    .desktop-notification-card {
+      pointer-events: auto; display: flex; align-items: center; gap: 12px;
+      padding: 13px 14px; border-radius: 18px;
+      background: rgba(14, 19, 31, .94); border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 60px rgba(0,0,0,.45); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      transform: translateX(120%); opacity: 0; animation: desktopToastIn .24s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    .desktop-notification-card.closing { animation: desktopToastOut .20s ease forwards; }
+    @keyframes desktopToastIn { to { transform: translateX(0); opacity: 1; } }
+    @keyframes desktopToastOut { to { transform: translateX(120%); opacity: 0; } }
+    .desktop-notification-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; border: 1.5px solid rgba(255,215,0,.45); background: rgba(255,255,255,.04); }
+    .desktop-notification-body { min-width: 0; flex: 1; }
+    .desktop-notification-title { font-size: 13px; font-weight: 800; color: var(--dash-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .desktop-notification-text { margin-top: 3px; font-size: 12px; line-height: 1.35; color: rgba(240,244,248,.58); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .desktop-notification-close { border: 0; background: transparent; color: rgba(240,244,248,.45); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px; }
+    .desktop-notification-close:hover { color: #fff; }
+
     @media(max-width: 680px) { #dashboardPage { grid-template-columns: 1fr; } .sidebar { display: none; } }
     @media (prefers-reduced-motion: reduce){ * { animation: none !important; transition: none !important; } }
+
+
+    /* =========================================================
+       FUTURISTIC NEON UI REDESIGN — sidebar, room list & chat
+       ========================================================= */
+    :root {
+      --dash-bg: #020611;
+      --dash-panel: rgba(3, 9, 23, 0.90);
+      --dash-chat-bg: #030713;
+      --dash-accent: #28DFFF;
+      --dash-accent-soft: rgba(40, 223, 255, 0.16);
+      --dash-accent-strong: rgba(40, 223, 255, 0.52);
+      --dash-purple: #8B5CFF;
+      --dash-purple-soft: rgba(139, 92, 255, 0.18);
+      --dash-danger: #FF4E7A;
+      --dash-border: rgba(40, 223, 255, 0.16);
+      --dash-text: #F1F8FF;
+      --bubble-in: linear-gradient(135deg, rgba(9, 22, 40, 0.78), rgba(8, 13, 28, 0.94));
+      --bubble-in-border: rgba(40, 223, 255, 0.16);
+      --bubble-out: linear-gradient(135deg, rgba(24, 93, 146, 0.86), rgba(26, 26, 74, 0.96));
+      --bubble-out-border: rgba(91, 211, 255, 0.38);
+    }
+
+    #dashboardPage {
+      grid-template-columns: 360px 1fr;
+      background:
+        radial-gradient(900px 520px at 0% 0%, rgba(40,223,255,.10), transparent 64%),
+        radial-gradient(820px 460px at 100% 0%, rgba(139,92,255,.10), transparent 62%),
+        linear-gradient(135deg, #01040B, #050A16 52%, #02040A);
+    }
+    #dashboardPage::after {
+      content:""; position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.16;
+      background-image:
+        linear-gradient(to right, rgba(40,223,255,.09) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(40,223,255,.06) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(90deg, rgba(0,0,0,.9), rgba(0,0,0,.28), rgba(0,0,0,.1));
+    }
+
+    .sidebar {
+      background:
+        radial-gradient(260px 220px at 24% 0%, rgba(40,223,255,.13), transparent 66%),
+        radial-gradient(220px 180px at 96% 28%, rgba(139,92,255,.11), transparent 70%),
+        linear-gradient(180deg, rgba(6,12,28,.94), rgba(3,8,20,.96));
+      border-right: 1px solid rgba(40,223,255,.18);
+      box-shadow: inset -1px 0 0 rgba(255,255,255,.03), 24px 0 90px rgba(0,0,0,.32);
+      overflow: hidden;
+    }
+    .sidebar::before {
+      content:""; position:absolute; inset:0; pointer-events:none; opacity:.23;
+      background:
+        linear-gradient(120deg, transparent 0 28%, rgba(40,223,255,.08) 29%, transparent 30% 100%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 26px);
+      mix-blend-mode: screen;
+    }
+    .sidebar::after {
+      content:""; position:absolute; right:-1px; top:0; bottom:0; width:1px; pointer-events:none;
+      background: linear-gradient(180deg, transparent, rgba(40,223,255,.75), rgba(139,92,255,.44), transparent);
+      box-shadow: 0 0 18px rgba(40,223,255,.45);
+    }
+
+    .sidebar-header {
+      padding: 18px 18px 16px;
+      gap: 14px;
+      border-bottom: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .sidebar-header::after {
+      content:""; height:1px; position:absolute; left:18px; right:18px; bottom:0;
+      background: linear-gradient(90deg, transparent, rgba(40,223,255,.48), rgba(139,92,255,.28), transparent);
+      box-shadow: 0 0 16px rgba(40,223,255,.25);
+    }
+
+    .sh-top {
+      position: relative;
+      align-items: stretch;
+      padding: 13px;
+      min-height: 88px;
+      border: 1px solid rgba(40,223,255,.24);
+      border-radius: 24px;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(15, 33, 58, .72), rgba(4, 9, 22, .88)),
+        radial-gradient(220px 80px at 14% 0%, rgba(40,223,255,.18), transparent 65%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.025) inset, 0 16px 38px rgba(0,0,0,.28), 0 0 24px rgba(40,223,255,.08);
+    }
+    .sh-top::before {
+      content:""; position:absolute; inset:0; pointer-events:none; opacity:.55;
+      background:
+        linear-gradient(135deg, rgba(40,223,255,.20), transparent 26%),
+        linear-gradient(315deg, rgba(139,92,255,.16), transparent 28%);
+      clip-path: polygon(0 0, 100% 0, 100% 62%, 88% 100%, 0 100%);
+    }
+    .user-profile { position:relative; z-index:1; gap: 13px; width: 100%; min-width:0; }
+    .avatar-wrapper { width: 60px; height: 60px; filter: drop-shadow(0 0 16px rgba(40,223,255,.26)); }
+    .avatar-wrapper::before {
+      content:""; position:absolute; inset:-5px; border-radius:50%; pointer-events:none;
+      border: 1px solid rgba(40,223,255,.58);
+      box-shadow: 0 0 18px rgba(40,223,255,.45), inset 0 0 18px rgba(40,223,255,.10);
+    }
+    .avatar-wrapper img {
+      border: 2px solid rgba(40,223,255,.78);
+      box-shadow: 0 0 0 4px rgba(40,223,255,.08), 0 0 28px rgba(40,223,255,.28);
+    }
+    #myProfileName {
+      font-size: 17px !important;
+      font-weight: 850 !important;
+      letter-spacing: -.02em;
+      color: #F7FBFF;
+      text-shadow: 0 0 12px rgba(40,223,255,.16);
+      margin: 3px 0 7px;
+    }
+    .user-role-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 22px; padding: 4px 9px;
+      border-radius: 999px;
+      color: #07111E;
+      background: linear-gradient(135deg, #38F0FF, #73B7FF 62%, #A16BFF);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 0 18px rgba(40,223,255,.26), inset 0 0 10px rgba(255,255,255,.22);
+      font-size: 10px; letter-spacing: .08em;
+    }
+
+    .sh-actions {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      padding: 11px;
+      border: 1px solid rgba(40,223,255,.22);
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(8,18,36,.78), rgba(3,8,19,.92)),
+        radial-gradient(200px 80px at 50% 0%, rgba(40,223,255,.10), transparent 70%);
+      box-shadow: 0 18px 42px rgba(0,0,0,.22), 0 0 24px rgba(40,223,255,.08), inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+    .action-link-btn {
+      min-width: 0;
+      height: 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 4px;
+      border-radius: 16px;
+      border: 1px solid rgba(40,223,255,.18);
+      background: linear-gradient(180deg, rgba(12,25,47,.75), rgba(4,9,21,.78));
+      color: rgba(235,248,255,.88);
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: -.015em;
+      font-size: 10.5px;
+      line-height: 1;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease, color .16s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .action-link-btn::before {
+      content:""; position:absolute; inset:0; pointer-events:none; opacity:.0;
+      background: radial-gradient(90px 70px at 50% 0%, rgba(40,223,255,.28), transparent 70%);
+      transition: opacity .16s ease;
+    }
+    .action-link-btn::after {
+      content:""; position:absolute; left:18%; right:18%; bottom:10px; height:2px; border-radius:999px;
+      background: linear-gradient(90deg, transparent, rgba(40,223,255,.9), transparent);
+      box-shadow: 0 0 10px rgba(40,223,255,.48);
+    }
+    .action-link-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(40,223,255,.52);
+      color: #FFFFFF;
+      background: linear-gradient(180deg, rgba(15,39,68,.92), rgba(5,13,28,.88));
+      box-shadow: 0 0 22px rgba(40,223,255,.18), inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .action-link-btn:hover::before { opacity: 1; }
+    .action-ico {
+      display: grid; place-items: center;
+      width: 24px; height: 24px; border-radius: 9px;
+      color: #67ECFF;
+      font-size: 17px;
+      text-shadow: 0 0 14px rgba(40,223,255,.55);
+    }
+    .action-text { position: relative; z-index: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+    .sh-actions:has(#adminPanelTrigger[style*="display:none"]),
+    .sh-actions:has(#adminPanelTrigger[style*="display: none"]) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .logout-btn {
+      color: #FF7897 !important;
+      border-color: rgba(255,78,122,.26);
+      background: linear-gradient(180deg, rgba(58,13,31,.64), rgba(10,8,20,.82));
+      margin-left: 0;
+    }
+    .logout-btn .action-ico { color: #FF5D82; text-shadow: 0 0 14px rgba(255,78,122,.55); }
+    .logout-btn::after { background: linear-gradient(90deg, transparent, rgba(255,78,122,.95), transparent); box-shadow: 0 0 10px rgba(255,78,122,.48); }
+    #adminPanelTrigger .action-ico { color: #FDE88B; text-shadow: 0 0 15px rgba(253,232,139,.45); }
+
+    .chat-list-container {
+      position: relative;
+      z-index: 2;
+      padding: 18px 16px 20px;
+      gap: 14px;
+    }
+    .section-label {
+      padding: 2px 2px 0;
+      color: rgba(195,229,255,.72);
+      letter-spacing: .18em;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .section-label span::before, .section-label span::after {
+      content:"///";
+      color: rgba(40,223,255,.82);
+      letter-spacing: .04em;
+      margin: 0 8px 0 0;
+      text-shadow: 0 0 10px rgba(40,223,255,.38);
+    }
+    .section-label span::after { margin: 0 0 0 8px; }
+    .start-chat-btn {
+      min-height: 32px;
+      padding: 0 10px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(40,223,255,.12), rgba(139,92,255,.12));
+      border: 1px solid rgba(40,223,255,.35);
+      color: #6FF1FF;
+      font-weight: 900;
+      box-shadow: 0 0 18px rgba(40,223,255,.12), inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+    .start-chat-btn:hover {
+      background: linear-gradient(135deg, rgba(40,223,255,.28), rgba(139,92,255,.18));
+      color: #fff;
+      box-shadow: 0 0 22px rgba(40,223,255,.22);
+    }
+
+    #activeChatRoomsBox { gap: 12px; }
+    .chat-item-card {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      padding: 14px;
+      border-left: 0;
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(13,29,53,.74), rgba(4,10,23,.88)),
+        radial-gradient(160px 90px at 100% 0%, rgba(139,92,255,.12), transparent 72%);
+      border: 1px solid rgba(40,223,255,.17);
+      box-shadow: 0 14px 34px rgba(0,0,0,.20), inset 0 0 0 1px rgba(255,255,255,.02);
+      overflow: hidden;
+    }
+    .chat-item-card::before {
+      content:""; position:absolute; inset:0; pointer-events:none; opacity:.42;
+      background:
+        linear-gradient(135deg, rgba(40,223,255,.24), transparent 18%),
+        linear-gradient(315deg, rgba(139,92,255,.20), transparent 24%);
+      clip-path: polygon(0 0, 100% 0, 100% 80%, 92% 100%, 0 100%);
+    }
+    .chat-item-card.active {
+      background:
+        linear-gradient(135deg, rgba(17,48,79,.90), rgba(5,12,26,.92)),
+        radial-gradient(180px 90px at 100% 0%, rgba(139,92,255,.18), transparent 72%);
+      border-color: rgba(40,223,255,.45);
+      box-shadow: 0 0 0 1px rgba(40,223,255,.12) inset, 0 0 28px rgba(40,223,255,.13), 0 16px 40px rgba(0,0,0,.30);
+    }
+    .chat-item-card:hover:not(.active) {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, rgba(15,38,66,.86), rgba(5,12,26,.88));
+      border-color: rgba(40,223,255,.34);
+      box-shadow: 0 0 24px rgba(40,223,255,.10), 0 16px 34px rgba(0,0,0,.24);
+    }
+    .chat-item-card .partner-avatar-img {
+      position: relative; z-index: 1;
+      width: 54px; height: 54px;
+      border: 2px solid rgba(40,223,255,.62);
+      box-shadow: 0 0 0 4px rgba(40,223,255,.07), 0 0 20px rgba(40,223,255,.22);
+    }
+    .chat-main-header .partner-avatar-img { width: 46px; height: 46px; border: 1px solid rgba(40,223,255,.42); box-shadow: 0 0 15px rgba(40,223,255,.16); }
+    .chat-item-name {
+      position: relative; z-index: 1;
+      font-size: 14.5px;
+      font-weight: 850;
+      color: #F6FBFF;
+      text-shadow: 0 0 12px rgba(40,223,255,.12);
+      margin-bottom: 8px;
+    }
+    .chat-item-subline { position: relative; z-index: 1; gap: 9px; }
+    .role-pill {
+      min-height: 22px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .07em;
+    }
+    .role-pill.admin {
+      color: #061221;
+      background: linear-gradient(135deg, #FFE98B, #37E7FF);
+      border-color: rgba(255,255,255,.24);
+      box-shadow: 0 0 16px rgba(40,223,255,.22);
+    }
+    .role-pill.user {
+      color: #77F2FF;
+      background: rgba(40,223,255,.10);
+      border-color: rgba(40,223,255,.34);
+      box-shadow: inset 0 0 12px rgba(40,223,255,.05);
+    }
+    .status-indicator {
+      gap: 7px;
+      color: rgba(205,226,245,.68);
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .status-indicator.online::before {
+      width: 8px; height: 8px;
+      background: #59FF84;
+      box-shadow: 0 0 12px rgba(89,255,132,.58);
+    }
+    .status-indicator.offline::before {
+      width: 8px; height: 8px;
+      background: #FF527A;
+      box-shadow: 0 0 12px rgba(255,82,122,.52);
+    }
+    .tiny-profile-btn {
+      position: relative; z-index: 1;
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 13px;
+      border: 1px solid rgba(40,223,255,.31);
+      background: rgba(40,223,255,.055);
+      color: rgba(236,249,255,.82);
+      font-size: 11px;
+      font-weight: 850;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .tiny-profile-btn::before { content:"◌"; margin-right: 6px; color:#6FF1FF; text-shadow:0 0 8px rgba(40,223,255,.45); }
+    .tiny-profile-btn:hover {
+      color: #04111D;
+      background: linear-gradient(135deg, #44EFFF, #8BB5FF);
+      border-color: rgba(255,255,255,.34);
+      box-shadow: 0 0 18px rgba(40,223,255,.25);
+    }
+    .unread-badge-alert {
+      right: 10px; top: 10px; transform: none;
+      background: linear-gradient(135deg, #FF4E7A, #FF7B4E);
+      box-shadow: 0 0 16px rgba(255,78,122,.56);
+      z-index: 2;
+    }
+
+    .chat-main-window {
+      background:
+        radial-gradient(700px 280px at 12% 0%, rgba(40,223,255,.08), transparent 62%),
+        radial-gradient(700px 360px at 100% 0%, rgba(139,92,255,.09), transparent 60%),
+        #030713;
+    }
+    .chat-main-window::after {
+      content:""; position:absolute; inset:0; pointer-events:none; z-index:1; opacity:.10;
+      background-image:
+        linear-gradient(to right, rgba(40,223,255,.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(40,223,255,.08) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.5), rgba(0,0,0,.12));
+    }
+    .chat-main-header {
+      min-height: 76px;
+      padding: 15px 24px;
+      background: linear-gradient(135deg, rgba(8,18,36,.82), rgba(4,10,22,.78));
+      border-bottom: 1px solid rgba(40,223,255,.16);
+      box-shadow: 0 15px 40px rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.03) inset;
+    }
+    #topHeaderTitle { font-size: 16px !important; font-weight: 850 !important; color: #F7FBFF; text-shadow: 0 0 12px rgba(40,223,255,.14); }
+    #topHeaderStatus { margin-top: 3px; color: rgba(190,220,246,.62) !important; }
+
+    .message-area {
+      padding: 28px;
+      gap: 18px;
+    }
+    .day-divider {
+      background: rgba(40,223,255,.06);
+      border-color: rgba(40,223,255,.18);
+      color: rgba(204,239,255,.72);
+      box-shadow: 0 0 18px rgba(40,223,255,.08);
+    }
+    .bubble {
+      border-radius: 20px;
+      box-shadow: 0 12px 34px rgba(0,0,0,.22), inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+    .incoming-row .bubble {
+      background: var(--bubble-in);
+      border: 1px solid var(--bubble-in-border);
+      color: #EAF5FF;
+    }
+    .outgoing-row .bubble {
+      background: var(--bubble-out);
+      border: 1px solid var(--bubble-out-border);
+      color: #F8FCFF;
+      box-shadow: 0 12px 34px rgba(0,0,0,.25), 0 0 22px rgba(40,223,255,.10), inset 0 0 0 1px rgba(255,255,255,.035);
+    }
+    .bubble img {
+      border: 1px solid rgba(40,223,255,.15);
+      box-shadow: 0 10px 24px rgba(0,0,0,.22);
+    }
+    .time-text { color: rgba(207,232,252,.58); }
+    .status-tick-icon { color: #65EEFF; text-shadow: 0 0 9px rgba(40,223,255,.45); }
+    .edited-marker { color: rgba(105,238,255,.55); }
+
+    .chat-footer-panel {
+      padding: 16px 24px 18px;
+      background: linear-gradient(135deg, rgba(7,17,34,.86), rgba(4,9,20,.88));
+      border-top: 1px solid rgba(40,223,255,.16);
+      box-shadow: 0 -16px 44px rgba(0,0,0,.20), 0 -1px 0 rgba(255,255,255,.03) inset;
+    }
+    .clip-btn {
+      color: #69EFFF;
+      background: rgba(40,223,255,.06);
+      border: 1px solid rgba(40,223,255,.18);
+      box-shadow: 0 0 14px rgba(40,223,255,.08);
+    }
+    .clip-btn:hover { color:#fff; background:rgba(40,223,255,.13); box-shadow:0 0 18px rgba(40,223,255,.16); }
+    .chat-footer-panel input[type="text"] {
+      height: 44px;
+      background: rgba(1,5,14,.70);
+      border: 1px solid rgba(40,223,255,.16);
+      border-radius: 22px;
+      color: #F7FBFF;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .chat-footer-panel input[type="text"]:focus {
+      border-color: rgba(40,223,255,.48);
+      box-shadow: 0 0 22px rgba(40,223,255,.12), inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+    .send-action-btn {
+      background: linear-gradient(135deg, rgba(40,223,255,.18), rgba(139,92,255,.16));
+      border: 1px solid rgba(40,223,255,.32);
+      color: #78F3FF;
+      box-shadow: 0 0 18px rgba(40,223,255,.12);
+    }
+    .send-action-btn:hover {
+      background: linear-gradient(135deg, #37E7FF, #8B5CFF);
+      color: #020814;
+      box-shadow: 0 0 28px rgba(40,223,255,.28);
+    }
+
+    .modal-box, #imagePreviewBar {
+      border-color: rgba(40,223,255,.18);
+      background: linear-gradient(135deg, rgba(8,18,36,.94), rgba(4,9,20,.96));
+      box-shadow: 0 24px 90px rgba(0,0,0,.56), 0 0 28px rgba(40,223,255,.08);
+    }
+    .modal-box h3 { border-bottom-color: rgba(40,223,255,.14); }
+    .modal-btn.primary, .preview-open-btn {
+      background: rgba(40,223,255,.08);
+      color: #72F0FF;
+      border-color: rgba(40,223,255,.24);
+    }
+    .modal-btn.primary:hover, .preview-open-btn:hover {
+      background: linear-gradient(135deg, #37E7FF, #8B5CFF);
+      color: #020814;
+    }
+
+
+
+    /* FIX UNREAD CHAT BADGE - rapi, tidak berserakan */
+    .chat-item-card {
+      grid-template-columns: 56px minmax(0, 1fr) 76px !important;
+      overflow: visible !important;
+    }
+    .chat-item-card > div:nth-child(2) {
+      min-width: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .chat-item-actions {
+      position: relative;
+      z-index: 3;
+      width: 76px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .chat-item-actions .tiny-profile-btn {
+      width: 70px;
+      min-height: 32px;
+      padding: 0 8px;
+      white-space: nowrap;
+    }
+    .chat-item-actions .unread-badge-alert {
+      position: static !important;
+      transform: none !important;
+      right: auto !important;
+      top: auto !important;
+      min-width: 70px;
+      height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      line-height: 1;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.22);
+      background: linear-gradient(135deg, #FF3E72, #FF7A3D);
+      box-shadow: 0 0 18px rgba(255,62,114,.45), inset 0 0 10px rgba(255,255,255,.12);
+      animation: unreadPulseClean 1.45s ease-in-out infinite;
+    }
+    .chat-item-actions .unread-badge-alert::before {
+      content: "NEW";
+      font-size: 8px;
+      font-weight: 950;
+      opacity: .88;
+      padding-top: 1px;
+    }
+    @keyframes unreadPulseClean {
+      0%, 100% { box-shadow: 0 0 14px rgba(255,62,114,.32), inset 0 0 10px rgba(255,255,255,.12); }
+      50% { box-shadow: 0 0 26px rgba(255,62,114,.62), 0 0 12px rgba(40,223,255,.18), inset 0 0 12px rgba(255,255,255,.18); }
+    }
+    @media(max-width: 420px) {
+      .chat-item-card { grid-template-columns: 48px minmax(0, 1fr) 64px !important; gap: 9px; padding: 12px; }
+      .chat-item-actions { width: 64px; }
+      .chat-item-actions .tiny-profile-btn,
+      .chat-item-actions .unread-badge-alert { min-width: 62px; width: 62px; font-size: 9.5px; }
+    }
+
   </style>
+
+  <style id="front-login-gold-only">
+    /* GOLD BLACK GLOSSY ONLY FOR FRONT LOGIN PAGE
+       Bagian dalam dashboard/chat tetap memakai tema futuristic cyan dari script utama. */
+    #loginPage.wrap {
+      background:
+        radial-gradient(760px 320px at 50% -8%, rgba(212,175,55,.14), transparent 60%),
+        radial-gradient(520px 220px at 50% 105%, rgba(176,130,28,.10), transparent 64%),
+        linear-gradient(180deg, #050505 0%, #0A0705 52%, #050505 100%);
+      overflow: hidden;
+    }
+
+    #loginPage.wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .28;
+      background:
+        linear-gradient(to right, rgba(212,175,55,.075) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(212,175,55,.045) 1px, transparent 1px);
+      background-size: 88px 88px;
+      mask-image: radial-gradient(circle at 50% 22%, rgba(0,0,0,.82), transparent 70%);
+    }
+
+    #loginPage.wrap::after {
+      content: "";
+      position: absolute;
+      width: min(520px, 72vw);
+      height: min(520px, 72vw);
+      border-radius: 50%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      background:
+        radial-gradient(circle, rgba(212,175,55,.10), transparent 58%);
+      filter: blur(4px);
+      opacity: .65;
+    }
+
+    #loginPage .card {
+      background:
+        linear-gradient(180deg, rgba(18,14,10,.88), rgba(8,7,5,.96)),
+        radial-gradient(300px 170px at 50% 0%, rgba(236,203,114,.11), transparent 72%);
+      border: 1px solid rgba(212,175,55,.22);
+      box-shadow:
+        0 26px 90px rgba(0,0,0,.58),
+        0 0 42px rgba(212,175,55,.06),
+        inset 0 1px 0 rgba(255,255,255,.035),
+        inset 0 0 0 1px rgba(212,175,55,.045);
+    }
+
+    #loginPage .card::before {
+      opacity: .95;
+      background:
+        radial-gradient(420px 190px at 50% -12%, rgba(236,203,114,.16), transparent 60%),
+        radial-gradient(240px 180px at 18% 24%, rgba(212,175,55,.065), transparent 62%),
+        radial-gradient(240px 180px at 86% 28%, rgba(255,255,255,.035), transparent 62%),
+        linear-gradient(135deg, rgba(212,175,55,.075), transparent 35%);
+    }
+
+    #loginPage .card::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: calc(var(--radius) - 10px);
+      pointer-events: none;
+      border: 1px solid rgba(212,175,55,.10);
+      box-shadow: inset 0 0 30px rgba(212,175,55,.035);
+    }
+
+    #loginPage .badge {
+      background: linear-gradient(180deg, rgba(212,175,55,.18), rgba(212,175,55,.055));
+      border-color: rgba(236,203,114,.28);
+      box-shadow: 0 0 26px rgba(212,175,55,.12), inset 0 0 12px rgba(255,255,255,.035);
+    }
+
+    #loginPage h1 {
+      color: #FFF7E5;
+      text-shadow: 0 0 22px rgba(212,175,55,.14);
+      letter-spacing: .01em;
+    }
+
+    #loginPage .sub {
+      color: rgba(255,246,225,.66);
+    }
+
+    #loginPage .field {
+      background: rgba(12,9,6,.72);
+      border-color: rgba(212,175,55,.17);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.012);
+    }
+
+    #loginPage .field:focus-within {
+      border-color: rgba(236,203,114,.42);
+      background: rgba(15,11,7,.92);
+      box-shadow:
+        0 0 0 4px rgba(212,175,55,.075),
+        0 16px 42px rgba(0,0,0,.34);
+    }
+
+    #loginPage input {
+      color: #FFF7E5;
+    }
+
+    #loginPage input::placeholder {
+      color: rgba(255,246,225,.36);
+    }
+
+    #loginPage .icon path {
+      stroke: rgba(236,220,176,.76);
+    }
+
+    #loginPage .btn {
+      background:
+        linear-gradient(180deg, rgba(69,52,18,.96), rgba(25,18,7,.98));
+      border-color: rgba(236,203,114,.30);
+      color: #FFF8E7;
+      box-shadow:
+        0 18px 46px rgba(0,0,0,.52),
+        0 0 24px rgba(212,175,55,.055),
+        inset 0 1px 0 rgba(255,255,255,.035);
+    }
+
+    #loginPage .btn::before {
+      background: radial-gradient(240px 70px at var(--mx,50%) 50%, rgba(236,203,114,.16), transparent 65%);
+    }
+
+    #loginPage .btn:hover {
+      border-color: rgba(236,203,114,.48);
+      filter: brightness(1.05);
+    }
+
+    #loginPage .meta {
+      color: rgba(255,246,225,.34);
+    }
+
+    #loginPage .alert {
+      background: rgba(255,86,86,.10);
+      border-color: rgba(255,120,120,.24);
+      color: rgba(255,222,214,.96);
+    }
+
+    @media (max-width: 680px) {
+      #loginPage.wrap {
+        padding: 18px 14px;
+      }
+      #loginPage .card {
+        width: min(420px, 94vw);
+        min-height: 480px;
+        border-radius: 24px;
+      }
+      #loginPage .inner {
+        padding: 28px 22px 22px;
+      }
+      #loginPage h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+
+
+  <style id="read-receipt-cyan-fix">
+    .bubble-meta {
+      gap: 7px;
+    }
+
+    .status-read-receipt {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      line-height: 1;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .status-read-receipt .tick-set {
+      font-size: 11px;
+      letter-spacing: -1px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .status-read-receipt .status-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+
+    .status-read-receipt.unread {
+      color: rgba(186,216,235,.82);
+      background: rgba(148,163,184,.08);
+      border-color: rgba(148,163,184,.16);
+    }
+
+    .status-read-receipt.unread .tick-set {
+      color: #9FB0C4;
+      text-shadow: 0 0 7px rgba(148,163,184,.18);
+    }
+
+    .status-read-receipt.read {
+      color: #E8FBFF;
+      background: linear-gradient(135deg, rgba(40,223,255,.14), rgba(139,92,255,.08));
+      border-color: rgba(40,223,255,.25);
+      box-shadow: 0 0 13px rgba(40,223,255,.10);
+    }
+
+    .status-read-receipt.read .tick-set {
+      color: #65EEFF;
+      text-shadow: 0 0 10px rgba(40,223,255,.38);
+    }
+
+    @media (max-width: 680px) {
+      .status-read-receipt .status-label {
+        display: none;
+      }
+      .status-read-receipt {
+        padding: 2px 6px;
+      }
+    }
+  </style>
+
+
+  <style id="dashboard-front-refined">
+    /* FRONT DASHBOARD / SIDEBAR dibuat lebih futuristik, clean, tidak norak */
+    .sidebar {
+      background:
+        radial-gradient(280px 180px at 18% 0%, rgba(40,223,255,.08), transparent 68%),
+        radial-gradient(220px 140px at 100% 14%, rgba(139,92,255,.06), transparent 70%),
+        linear-gradient(180deg, rgba(5,12,24,.965), rgba(3,8,18,.985));
+      border-right: 1px solid rgba(90,168,255,.16);
+      box-shadow: inset -1px 0 0 rgba(255,255,255,.015), 18px 0 48px rgba(0,0,0,.22);
+    }
+    .sidebar::before {
+      opacity: .13;
+      background:
+        linear-gradient(135deg, rgba(65,196,255,.10), transparent 22%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 26px);
+    }
+    .sidebar::after,
+    .sidebar-header::after {
+      background: linear-gradient(180deg, transparent, rgba(66,184,255,.42), rgba(139,92,255,.18), transparent) !important;
+      box-shadow: 0 0 10px rgba(66,184,255,.18) !important;
+    }
+
+    .sidebar-header {
+      padding: 16px 16px 14px;
+      gap: 12px;
+    }
+    .sh-top {
+      min-height: 82px;
+      padding: 12px 13px;
+      border-radius: 20px;
+      border: 1px solid rgba(66,184,255,.18);
+      background:
+        linear-gradient(135deg, rgba(10,24,44,.84), rgba(4,10,22,.92)),
+        radial-gradient(220px 80px at 10% 0%, rgba(66,184,255,.10), transparent 70%);
+      box-shadow: 0 12px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.02);
+    }
+    .sh-top::before {
+      opacity: .50;
+      background:
+        linear-gradient(135deg, rgba(66,184,255,.12), transparent 24%),
+        linear-gradient(315deg, rgba(139,92,255,.10), transparent 28%);
+      clip-path: none;
+    }
+    .user-profile { gap: 12px; }
+    .avatar-wrapper {
+      width: 56px;
+      height: 56px;
+      filter: drop-shadow(0 0 10px rgba(66,184,255,.12));
+    }
+    .avatar-wrapper::before {
+      inset: -4px;
+      border-color: rgba(66,184,255,.34);
+      box-shadow: 0 0 10px rgba(66,184,255,.18), inset 0 0 8px rgba(66,184,255,.06);
+    }
+    .avatar-wrapper img {
+      border: 2px solid rgba(66,184,255,.56);
+      box-shadow: 0 0 0 3px rgba(66,184,255,.05), 0 0 16px rgba(66,184,255,.12);
+    }
+    #myProfileName {
+      font-size: 16px !important;
+      font-weight: 800 !important;
+      letter-spacing: -.015em;
+      margin: 2px 0 7px;
+      color: #F4F9FF;
+      text-shadow: none !important;
+    }
+    .user-role-badge {
+      min-height: 20px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 9px;
+      letter-spacing: .08em;
+      box-shadow: none;
+    }
+
+    .sh-actions {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      padding: 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(66,184,255,.14);
+      background:
+        linear-gradient(135deg, rgba(8,18,34,.78), rgba(4,10,22,.90));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.02), 0 12px 26px rgba(0,0,0,.16);
+    }
+    .action-link-btn {
+      height: 62px;
+      gap: 6px;
+      padding: 8px 4px;
+      border-radius: 14px;
+      border: 1px solid rgba(66,184,255,.14);
+      background: linear-gradient(180deg, rgba(10,23,42,.84), rgba(5,11,22,.88));
+      color: rgba(235,246,255,.90);
+      font-size: 10.5px;
+      font-weight: 750;
+      letter-spacing: -.01em;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+    }
+    .action-link-btn::before {
+      background: radial-gradient(80px 60px at 50% 0%, rgba(66,184,255,.14), transparent 72%);
+    }
+    .action-link-btn::after {
+      left: 20%; right: 20%; bottom: 8px; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(66,184,255,.72), transparent);
+      box-shadow: 0 0 8px rgba(66,184,255,.22);
+    }
+    .action-link-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(66,184,255,.28);
+      background: linear-gradient(180deg, rgba(13,30,52,.92), rgba(6,14,28,.90));
+      box-shadow: 0 10px 18px rgba(0,0,0,.16), 0 0 14px rgba(66,184,255,.08);
+    }
+    .action-ico {
+      width: 22px; height: 22px; font-size: 15px;
+      color: #70EFFF;
+      text-shadow: 0 0 8px rgba(66,184,255,.20);
+    }
+    #adminPanelTrigger .action-ico {
+      color: #FFD56B !important;
+      text-shadow: 0 0 8px rgba(255,213,107,.14) !important;
+    }
+    .logout-btn {
+      color: #FFB0BC !important;
+      border-color: rgba(255,109,142,.16);
+      background: linear-gradient(180deg, rgba(50,16,30,.62), rgba(12,8,18,.84));
+    }
+    .logout-btn .action-ico {
+      color: #FF7E9A !important;
+      text-shadow: 0 0 8px rgba(255,126,154,.18) !important;
+    }
+
+    .chat-list-container {
+      padding: 16px 14px 18px;
+      gap: 12px;
+    }
+    .section-label {
+      padding: 2px 4px 0;
+      color: rgba(201,226,248,.78);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .section-label span::before,
+    .section-label span::after {
+      content: "//";
+      color: rgba(66,184,255,.64);
+      text-shadow: none;
+      margin: 0 8px 0 0;
+    }
+    .section-label span::after { margin: 0 0 0 8px; }
+    .start-chat-btn {
+      min-height: 32px;
+      padding: 0 11px;
+      border-radius: 12px;
+      border: 1px solid rgba(66,184,255,.22);
+      background: linear-gradient(135deg, rgba(66,184,255,.12), rgba(139,92,255,.10));
+      color: #8DEFFF;
+      font-weight: 800;
+      box-shadow: none;
+    }
+    .start-chat-btn:hover {
+      color: #FFFFFF;
+      background: linear-gradient(135deg, rgba(66,184,255,.22), rgba(139,92,255,.14));
+      box-shadow: 0 0 14px rgba(66,184,255,.10);
+    }
+
+    #activeChatRoomsBox { gap: 12px; }
+    .chat-item-card {
+      grid-template-columns: 56px minmax(0, 1fr) 76px !important;
+      gap: 12px;
+      padding: 13px;
+      border-radius: 20px;
+      background:
+        linear-gradient(135deg, rgba(8,20,38,.86), rgba(4,10,22,.92)),
+        radial-gradient(180px 100px at 100% 0%, rgba(139,92,255,.08), transparent 76%) !important;
+      border: 1px solid rgba(66,184,255,.16) !important;
+      box-shadow: 0 10px 24px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.02) !important;
+    }
+    .chat-item-card::before {
+      opacity: .26;
+      background:
+        linear-gradient(135deg, rgba(66,184,255,.10), transparent 18%),
+        linear-gradient(315deg, rgba(139,92,255,.08), transparent 24%) !important;
+      clip-path: none;
+    }
+    .chat-item-card.active {
+      background:
+        linear-gradient(135deg, rgba(11,28,49,.92), rgba(5,12,25,.94)),
+        radial-gradient(180px 90px at 100% 0%, rgba(139,92,255,.10), transparent 74%) !important;
+      border-color: rgba(66,184,255,.30) !important;
+      box-shadow: 0 0 0 1px rgba(66,184,255,.06) inset, 0 0 14px rgba(66,184,255,.07), 0 14px 28px rgba(0,0,0,.18) !important;
+    }
+    .chat-item-card:hover:not(.active) {
+      transform: translateY(-1px);
+      border-color: rgba(66,184,255,.24) !important;
+      background: linear-gradient(135deg, rgba(10,24,44,.90), rgba(5,12,25,.92)) !important;
+      box-shadow: 0 12px 22px rgba(0,0,0,.16), 0 0 12px rgba(66,184,255,.06) !important;
+    }
+    .chat-item-card .partner-avatar-img {
+      width: 52px; height: 52px;
+      border: 2px solid rgba(66,184,255,.42);
+      box-shadow: 0 0 0 3px rgba(66,184,255,.045), 0 0 14px rgba(66,184,255,.10);
+    }
+    .chat-item-name {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 7px;
+      color: #F4FAFF;
+      text-shadow: none;
+    }
+    .chat-item-subline {
+      gap: 8px;
+      align-items: center;
+    }
+    .role-pill {
+      min-height: 20px;
+      padding: 3px 8px;
+      font-size: 9px;
+      letter-spacing: .06em;
+      box-shadow: none;
+    }
+    .role-pill.user {
+      color: #7CEFFF;
+      background: rgba(66,184,255,.08);
+      border-color: rgba(66,184,255,.22);
+    }
+    .status-indicator {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: rgba(203,223,241,.70);
+    }
+    .tiny-profile-btn {
+      min-height: 32px;
+      width: 70px;
+      padding: 0 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(66,184,255,.20);
+      background: rgba(66,184,255,.06);
+      color: rgba(235,247,255,.84);
+      font-size: 11px;
+      font-weight: 750;
+      box-shadow: none;
+    }
+    .tiny-profile-btn::before { color: #79EEFF; text-shadow: none; }
+    .tiny-profile-btn:hover {
+      color: #04111D;
+      background: linear-gradient(135deg, #59E7FF, #8AB7FF);
+      box-shadow: 0 0 12px rgba(66,184,255,.12);
+    }
+    .chat-item-actions {
+      width: 76px;
+      gap: 7px;
+    }
+    .chat-item-actions .unread-badge-alert {
+      min-width: 70px;
+      height: 22px;
+      padding: 0 8px;
+      font-size: 9.5px;
+      box-shadow: 0 0 14px rgba(255,62,114,.28), inset 0 0 10px rgba(255,255,255,.10);
+    }
+    .chat-item-actions .unread-badge-alert::before {
+      font-size: 7.5px;
+    }
+
+    @media (max-width: 680px) {
+      .sidebar {
+        max-height: 48vh;
+      }
+      .sidebar-header {
+        padding: 14px 14px 12px;
+      }
+      .sh-top {
+        min-height: 76px;
+        border-radius: 18px;
+      }
+      .avatar-wrapper {
+        width: 50px;
+        height: 50px;
+      }
+      #myProfileName { font-size: 15px !important; }
+      .sh-actions {
+        gap: 6px;
+        padding: 7px;
+      }
+      .action-link-btn {
+        height: 58px;
+        font-size: 9.3px;
+      }
+      .chat-list-container {
+        padding: 12px 12px 14px;
+      }
+      .chat-item-card {
+        grid-template-columns: 50px minmax(0, 1fr) 66px !important;
+        gap: 10px;
+        padding: 12px;
+      }
+      .chat-item-card .partner-avatar-img { width: 48px; height: 48px; }
+      .chat-item-actions { width: 66px; }
+      .tiny-profile-btn,
+      .chat-item-actions .unread-badge-alert { width: 62px; min-width: 62px; }
+    }
+  </style>
+
+
+  <style id="admin-role-select-futuristic">
+    .user-admin-row {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(9,22,40,.82), rgba(4,10,22,.92));
+      border: 1px solid rgba(66,184,255,.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+    }
+    .user-admin-name {
+      min-width: 0;
+      color: #F2F8FF;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .admin-role-select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      min-width: 110px;
+      height: 38px;
+      padding: 0 38px 0 14px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: .03em;
+      cursor: pointer;
+      outline: none;
+      transition: .18s ease;
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 0 0 1px rgba(255,255,255,.015);
+    }
+    .admin-role-select:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+    .admin-role-select:focus {
+      box-shadow: 0 0 0 3px rgba(66,184,255,.14);
+    }
+    .admin-role-select.role-user {
+      color: #7CF0FF;
+      border: 1px solid rgba(66,184,255,.28);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%237CF0FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, rgba(66,184,255,.16), rgba(17,31,57,.94));
+      box-shadow: 0 0 14px rgba(66,184,255,.08), inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .admin-role-select.role-user:focus {
+      border-color: rgba(66,184,255,.46);
+      box-shadow: 0 0 0 3px rgba(66,184,255,.14), 0 0 14px rgba(66,184,255,.12);
+    }
+    .admin-role-select.role-admin {
+      color: #FFE38A;
+      border: 1px solid rgba(255,215,107,.34);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23FFE38A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, rgba(255,215,107,.18), rgba(56,36,8,.94));
+      box-shadow: 0 0 14px rgba(255,215,107,.10), inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .admin-role-select.role-admin:focus {
+      border-color: rgba(255,215,107,.56);
+      box-shadow: 0 0 0 3px rgba(255,215,107,.14), 0 0 14px rgba(255,215,107,.14);
+    }
+    .admin-role-select option {
+      background: #08111D;
+      color: #F2F8FF;
+    }
+    .admin-fixed-role-badge {
+      justify-self: end;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -308,9 +1548,21 @@
           </div>
         </div>
         <div class="sh-actions">
-          <button class="action-link-btn" onclick="openChangePasswordModal()">✏️ Sandi</button>
-          <button class="action-link-btn" id="adminPanelTrigger" style="display:none;" onclick="openAdminManagementModal()">👑 Admin</button>
-          <button class="action-link-btn logout-btn" onclick="triggerSignOut()">Keluar</button>
+          <button class="action-link-btn" onclick="openChangePasswordModal()">
+            <span class="action-ico">✎</span><span class="action-text">Sandi</span>
+          </button>
+          <button class="action-link-btn" onclick="openBackgroundSettingsModal()">
+            <span class="action-ico">▧</span><span class="action-text">Background</span>
+          </button>
+          <button class="action-link-btn" onclick="openUserProfileModal(loggedInUser)">
+            <span class="action-ico">●</span><span class="action-text">Profil</span>
+          </button>
+          <button class="action-link-btn" id="adminPanelTrigger" style="display:none;" onclick="openAdminManagementModal()">
+            <span class="action-ico">♛</span><span class="action-text">Admin</span>
+          </button>
+          <button class="action-link-btn logout-btn" onclick="triggerSignOut()">
+            <span class="action-ico">↪</span><span class="action-text">Keluar</span>
+          </button>
         </div>
       </div>
       
@@ -325,7 +1577,7 @@
 
     <div class="chat-main-window">
       <div class="chat-main-header">
-        <img src="" class="partner-avatar-img" id="partnerHeaderAvatar">
+        <img src="" class="partner-avatar-img profile-openable" id="partnerHeaderAvatar" title="Lihat profil" onclick="openActivePartnerProfile()">
         <div>
           <div id="topHeaderTitle" style="font-weight: 700; font-size: 15px;">Pilih Teman Mengobrol...</div>
           <div id="topHeaderStatus" style="font-size: 11px; color:rgba(255,255,255,0.3);">Klik Start Chat untuk memilih pengguna</div>
@@ -340,8 +1592,12 @@
       </div>
 
       <div id="imagePreviewBar">
-        <img src="" id="targetImgSrc" alt="Preview">
-        <span style="font-size: 12px; color: rgba(240,244,248,0.4);">Berkas gambar siap</span>
+        <img src="" id="targetImgSrc" alt="Preview" title="Klik untuk lihat gambar full sebelum dikirim" onclick="previewAttachedImageFull()">
+        <div class="preview-info">
+          <span class="preview-title" id="imagePreviewCaption">Berkas gambar siap</span>
+          <span class="preview-hint">Klik thumbnail / tombol Lihat Full sebelum dikirim.</span>
+        </div>
+        <button class="preview-open-btn" type="button" onclick="previewAttachedImageFull()">Lihat Full</button>
         <span class="cancel-preview-btn" onclick="discardImageAttachment()">Batal</span>
       </div>
 
@@ -364,6 +1620,13 @@
     </div>
   </div>
 
+  <div class="image-lightbox-overlay" id="chatImageLightbox" onclick="closeChatImageLightbox(event)">
+    <button class="image-lightbox-close" type="button" onclick="closeChatImageLightbox(event)" aria-label="Tutup gambar">×</button>
+    <img src="" id="chatImageLightboxImg" alt="Gambar full" onclick="event.stopPropagation()">
+  </div>
+
+  <div id="desktopNotificationStack" aria-live="polite" aria-label="Notifikasi pesan baru"></div>
+
   <div class="modal-overlay" id="startChatModal">
     <div class="modal-box">
       <h3>💬 Mulai Obrolan Baru</h3>
@@ -371,6 +1634,50 @@
       <div class="user-list-startchat" id="startChatUserContainer"></div>
       <div class="modal-foot">
         <button class="modal-btn secondary" onclick="closeStartChatModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-box">
+      <h3>👤 Profil Pengguna</h3>
+      <div class="profile-modal-body">
+        <div class="profile-hero">
+          <img src="" id="profileModalAvatar" alt="Foto profil" onclick="openChatImageLightbox(this.src)">
+          <div>
+            <div class="profile-name-role" id="profileModalNameRole">User - Role</div>
+            <div id="profileModalRoleBadge"></div>
+            <div class="profile-status-line" id="profileModalStatus">Status: -</div>
+          </div>
+        </div>
+        <div class="profile-bg-preview" id="profileModalBgPreview">Belum ada background dashboard</div>
+        <div class="profile-note" id="profileModalNote">Foto profil dan role user bisa dilihat oleh pengguna lain.</div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn secondary" onclick="closeUserProfileModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="backgroundModal">
+    <div class="modal-box">
+      <h3>🖼️ Background HD</h3>
+      <div class="modal-fields">
+        <div class="field"><input type="url" id="dashboardBgUrlInput" placeholder="Link gambar HD untuk background depan dashboard"></div>
+        <div class="field"><input type="url" id="chatBgUrlInput" placeholder="Link gambar HD untuk background chat"></div>
+        <div class="bg-help-text">
+          Bisa pakai direct link gambar HD. Untuk Google Images, gunakan link hasil Google yang memiliki parameter imgurl/mediaurl atau klik gambar lalu Copy image address. Untuk Pinterest, gunakan link i.pinimg.com agar background bisa tampil HD.
+        </div>
+      </div>
+      <div class="bg-action-row">
+        <button class="modal-btn secondary" onclick="previewBackgroundSettings()">Preview</button>
+        <button class="modal-btn primary" onclick="saveBackgroundSettings()">Simpan</button>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn secondary" onclick="resetBackgroundSettings()">Reset</button>
+        <button class="modal-btn secondary" onclick="closeBackgroundSettingsModal()">Tutup</button>
       </div>
     </div>
   </div>
@@ -435,16 +1742,277 @@
     let unsubsProfiles = null;
     let unsubsAdminList = null;
     let unsubsRoomsNotification = null;
+    let unsubsUserRoles = null;
+    let globalNotificationReady = false;
 
-    // Tracker Cache Lokal untuk Avatars & Notifikasi Pesan Masuk
+    // Tracker Cache Lokal untuk Avatars, Role, Profile & Notifikasi Pesan Masuk
     let cacheUserAvatars = {};
+    let cacheUserRoles = {};
+    let cacheUserProfiles = {};
     let cacheUnreadCounts = {};
     let roomListArray = [];
 
     const defaultAvatarSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238696a0'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
 
 
-    async function showDesktopNotification(title, body) {
+    function getRawRoleByUser(username) {
+      if (username === "Fadly") return "admin";
+      return (cacheUserRoles[username] || "biasa").toLowerCase();
+    }
+
+    function formatRoleName(role) {
+      return String(role || "biasa").toLowerCase() === "admin" ? "Admin" : "User";
+    }
+
+    function roleBadgeHtml(role) {
+      const raw = String(role || "biasa").toLowerCase();
+      const label = formatRoleName(raw);
+      return `<span class="role-pill ${raw === "admin" ? "admin" : "user"}">${label}</span>`;
+    }
+
+    function displayNameWithRole(username) {
+      if (!username) return "Pilih Teman Mengobrol...";
+      return `${username} - ${formatRoleName(getRawRoleByUser(username))}`;
+    }
+
+
+    function getAdminRoleSelectClass(role) {
+      return String(role || 'biasa').toLowerCase() === 'admin' ? 'role-admin' : 'role-user';
+    }
+
+
+    const readReceiptLocks = {};
+
+    let presenceSyncTimer = null;
+
+    async function syncOwnPresence(extraState = {}) {
+      if (!loggedInUser) return;
+      const payload = {
+        status: extraState.status || "online",
+        activeRoom: passivePartner || "",
+        isWindowActive: document.visibilityState === "visible",
+        last_changed: serverTimestamp()
+      };
+      try {
+        await setDoc(doc(db, "user_presence", loggedInUser), payload, { merge: true });
+      } catch (error) {
+        console.warn("Gagal sync presence:", error);
+      }
+    }
+
+    function startPresenceHeartbeat() {
+      if (presenceSyncTimer) clearInterval(presenceSyncTimer);
+      presenceSyncTimer = setInterval(() => {
+        syncOwnPresence({ status: document.getElementById('typedMessageInput')?.value ? 'typing' : 'online' });
+      }, 12000);
+    }
+
+    async function markAllMessagesInActiveRoomAsRead() {
+      if (!loggedInUser || !passivePartner) return;
+      try {
+        const roomSnapshot = await getDocs(query(collection(db, "obrolan_utama"), orderBy("timestamp", "asc")));
+        const jobs = [];
+        roomSnapshot.forEach((messageDoc) => {
+          const data = messageDoc.data() || {};
+          const shouldMark = data.sender === passivePartner && data.receiver === loggedInUser && !data.seenByReceiver;
+          if (shouldMark) {
+            jobs.push(updateDoc(doc(db, "obrolan_utama", messageDoc.id), {
+              seenByReceiver: true,
+              readAt: serverTimestamp()
+            }));
+          }
+        });
+        if (jobs.length) await Promise.allSettled(jobs);
+      } catch (error) {
+        console.warn("Gagal mark semua pesan sebagai dibaca:", error);
+      }
+    }
+
+    async function tryMarkJustSentMessageAsRead(docRef) {
+      if (!docRef || !passivePartner) return;
+      try {
+        const receiverSnap = await getDoc(doc(db, "user_presence", passivePartner));
+        if (!receiverSnap.exists()) return;
+        const receiverState = receiverSnap.data() || {};
+        const receiverIsActivelyViewingThisRoom = receiverState.activeRoom === loggedInUser && receiverState.isWindowActive === true && receiverState.status !== 'offline';
+        if (receiverIsActivelyViewingThisRoom) {
+          await updateDoc(docRef, {
+            seenByReceiver: true,
+            readAt: serverTimestamp()
+          });
+        }
+      } catch (error) {
+        console.warn("Gagal auto mark pesan kirim sebagai dibaca:", error);
+      }
+    }
+
+    function buildReadReceiptHtml(item) {
+      const hasBeenRead = !!item.seenByReceiver;
+      if (hasBeenRead) {
+        return `<span class="status-read-receipt read" title="Pesan sudah dibaca"><span class="tick-set">✔✔</span><span class="status-label">Dibaca</span></span>`;
+      }
+      return `<span class="status-read-receipt unread" title="Pesan belum dibaca"><span class="tick-set">✔</span><span class="status-label">Belum dibaca</span></span>`;
+    }
+
+    async function markMessageAsReadIfNeeded(docId, item) {
+      if (!docId || !item) return;
+      if (item.sender !== passivePartner || item.receiver !== loggedInUser) return;
+      if (item.seenByReceiver) return;
+      if (readReceiptLocks[docId]) return;
+
+      readReceiptLocks[docId] = true;
+      try {
+        await updateDoc(doc(db, "obrolan_utama", docId), {
+          seenByReceiver: true,
+          readAt: serverTimestamp()
+        });
+      } catch (error) {
+        console.warn("Gagal update status dibaca:", error);
+      } finally {
+        setTimeout(() => { delete readReceiptLocks[docId]; }, 2500);
+      }
+    }
+
+    function cssSafeUrl(url) {
+      return String(url || "").replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
+    }
+
+    function ensureBackgroundImageElement(elementId, parentSelector) {
+      const parent = document.querySelector(parentSelector);
+      if (!parent) return null;
+      let img = document.getElementById(elementId);
+      if (!img) {
+        img = document.createElement('img');
+        img.id = elementId;
+        img.className = 'visual-bg-img';
+        img.alt = '';
+        img.decoding = 'async';
+        img.loading = 'eager';
+        img.referrerPolicy = 'no-referrer';
+        parent.insertBefore(img, parent.firstChild);
+      }
+      return img;
+    }
+
+    function setBackgroundImageElement(elementId, parentSelector, imageUrl) {
+      const img = ensureBackgroundImageElement(elementId, parentSelector);
+      if (!img) return;
+      if (imageUrl) {
+        img.style.display = 'block';
+        img.src = imageUrl;
+      } else {
+        img.removeAttribute('src');
+        img.style.display = 'none';
+      }
+    }
+
+    function applyVisualBackgrounds(profileData = {}) {
+      const dashboardUrl = profileData.dashboardBackgroundUrl || "";
+      const chatUrl = profileData.chatBackgroundUrl || "";
+
+      // CSS variable tetap dipasang, lalu ditambah <img referrerpolicy=no-referrer>
+      // supaya link CDN/Google/Pinterest direct image lebih sering berhasil tampil.
+      document.documentElement.style.setProperty('--dashboard-bg-image', dashboardUrl ? `url("${cssSafeUrl(dashboardUrl)}")` : 'none');
+      document.documentElement.style.setProperty('--chat-bg-image', chatUrl ? `url("${cssSafeUrl(chatUrl)}")` : 'none');
+      setBackgroundImageElement('dashboardBgImage', '#dashboardPage', dashboardUrl);
+      setBackgroundImageElement('chatBgImage', '.chat-main-window', chatUrl);
+    }
+
+    function normalizeImageUrlCandidate(rawUrl) {
+      const value = String(rawUrl || "").trim();
+      if (!value) return "";
+
+      let url;
+      try {
+        url = new URL(value);
+      } catch (err) {
+        alert("Link gambar tidak valid. Gunakan link yang diawali http:// atau https://");
+        return null;
+      }
+
+      if (url.protocol !== "https:" && url.protocol !== "http:") {
+        alert("Link gambar tidak valid. Gunakan link yang diawali http:// atau https://");
+        return null;
+      }
+
+      // Google Images sering membungkus direct image di parameter imgurl/mediaurl/url/u.
+      const unwrapParams = ['imgurl', 'mediaurl', 'image_url', 'url', 'u'];
+      for (const key of unwrapParams) {
+        const paramValue = url.searchParams.get(key);
+        if (paramValue && /^https?:\/\//i.test(paramValue)) {
+          return normalizeImageUrlCandidate(paramValue);
+        }
+      }
+
+      const host = url.hostname.toLowerCase();
+      if ((host.includes('pinterest.') || host === 'pin.it') && !host.includes('pinimg.com')) {
+        alert("Link Pinterest yang ditempel masih berupa halaman, bukan file gambar. Buka gambar Pinterest > klik kanan/tahan gambar > Copy image address sampai link-nya menjadi i.pinimg.com/...jpg atau ...webp.");
+        return null;
+      }
+
+      return url.href;
+    }
+
+    function buildImageUrlCandidates(rawUrl) {
+      const normalized = normalizeImageUrlCandidate(rawUrl);
+      if (normalized === null) return null;
+      if (!normalized) return [""];
+
+      const candidates = [normalized];
+      try {
+        const url = new URL(normalized);
+        const host = url.hostname.toLowerCase();
+
+        // Pinterest direct image biasanya punya versi lebih besar di folder /originals/.
+        if (host.includes('pinimg.com')) {
+          const upgradedPath = url.pathname.replace(/\/(236x|474x|564x|736x|1200x)\//i, '/originals/');
+          if (upgradedPath !== url.pathname) {
+            const upgraded = new URL(url.href);
+            upgraded.pathname = upgradedPath;
+            candidates.unshift(upgraded.href);
+          }
+        }
+      } catch(e) {}
+
+      return [...new Set(candidates)];
+    }
+
+    function canLoadImageUrl(url, timeoutMs = 6500) {
+      if (!url) return Promise.resolve(true);
+      return new Promise((resolve) => {
+        const img = new Image();
+        let done = false;
+        const finish = (ok) => {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          resolve(ok);
+        };
+        const timer = setTimeout(() => finish(false), timeoutMs);
+        img.onload = () => finish(true);
+        img.onerror = () => finish(false);
+        img.referrerPolicy = 'no-referrer';
+        img.src = url;
+      });
+    }
+
+    async function resolveLoadableBackgroundUrl(rawUrl, labelName) {
+      const candidates = buildImageUrlCandidates(rawUrl);
+      if (candidates === null) return null;
+      if (!candidates[0]) return "";
+
+      for (const candidate of candidates) {
+        if (await canLoadImageUrl(candidate)) return candidate;
+      }
+
+      alert(`${labelName} tidak bisa dimuat sebagai gambar. Kalau dari Google/Pinterest, buka gambar full lalu pilih Copy image address/direct image link, bukan copy link halaman.`);
+      return null;
+    }
+
+
+    async function showDesktopNotification(title, body, senderName = passivePartner) {
+      showBottomRightNotification(senderName, body);
+
       if (!('Notification' in window)) return;
 
       if (Notification.permission === 'default') {
@@ -454,21 +2022,99 @@
       if (Notification.permission === 'granted') {
         new Notification(title, {
           body,
-          icon: cacheUserAvatars[passivePartner] || defaultAvatarSvg,
-          silent: false
+          icon: cacheUserAvatars[senderName] || defaultAvatarSvg,
+          badge: cacheUserAvatars[senderName] || defaultAvatarSvg,
+          silent: true
         });
       }
     }
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function showBottomRightNotification(senderName, bodyText) {
+      const stack = document.getElementById('desktopNotificationStack');
+      if (!stack) return;
+
+      const toast = document.createElement('div');
+      toast.className = 'desktop-notification-card';
+      toast.innerHTML = `
+        <img src="${escapeAttrCode(cacheUserAvatars[senderName] || defaultAvatarSvg)}" class="desktop-notification-avatar" alt="">
+        <div class="desktop-notification-body">
+          <div class="desktop-notification-title">${escapeXssCode(displayNameWithRole(senderName))}</div>
+          <div class="desktop-notification-text">${escapeXssCode(bodyText || 'Mengirim pesan baru')}</div>
+        </div>
+        <button class="desktop-notification-close" type="button" aria-label="Tutup notifikasi">×</button>
+      `;
+
+      toast.addEventListener('click', () => {
+        if (senderName) selectActiveChatRoom(senderName);
+        removeBottomRightNotification(toast);
+      });
+      toast.querySelector('.desktop-notification-close')?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        removeBottomRightNotification(toast);
+      });
+
+      stack.prepend(toast);
+      while (stack.children.length > 4) stack.lastElementChild?.remove();
+      setTimeout(() => removeBottomRightNotification(toast), 6500);
+    }
+
+    function removeBottomRightNotification(toast) {
+      if (!toast || toast.classList.contains('closing')) return;
+      toast.classList.add('closing');
+      setTimeout(() => toast.remove(), 240);
+    }
+
+    let audioCtx = null;
+    function getNotificationAudioContext() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+      if (!audioCtx) audioCtx = new AudioContextClass();
+      return audioCtx;
+    }
+
+    async function unlockNotificationAudio() {
+      try {
+        const ctx = getNotificationAudioContext();
+        if (ctx && ctx.state === 'suspended') await ctx.resume();
+      } catch(e) {}
+    }
+
+    document.addEventListener('pointerdown', unlockNotificationAudio, { once: true, passive: true });
+    document.addEventListener('keydown', unlockNotificationAudio, { once: true });
+
     function playLineNotificationSound() {
       try {
-        const now = audioCtx.currentTime;
-        const osc1 = audioCtx.createOscillator(); const gain1 = audioCtx.createGain();
-        osc1.type = 'sine'; osc1.frequency.setValueAtTime(1046.50, now);
-        gain1.gain.setValueAtTime(0.2, now); gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-        osc1.connect(gain1); gain1.connect(audioCtx.destination);
-        osc1.start(now); osc1.stop(now + 0.3);
+        const ctx = getNotificationAudioContext();
+        if (!ctx) return;
+        if (ctx.state === 'suspended') ctx.resume();
+
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(0.0001, ctx.currentTime);
+        master.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.018);
+        master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.72);
+        master.connect(ctx.destination);
+
+        // Chime pendek ala LINE default: nada naik, jeda kecil, lalu resolve lembut.
+        const tones = [
+          { freq: 1046.5, start: 0.00, dur: 0.18 },
+          { freq: 1318.5, start: 0.13, dur: 0.20 },
+          { freq: 1568.0, start: 0.28, dur: 0.28 }
+        ];
+
+        tones.forEach(({ freq, start, dur }) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const t = ctx.currentTime + start;
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(0.7, t + 0.018);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          osc.connect(gain);
+          gain.connect(master);
+          osc.start(t);
+          osc.stop(t + dur + 0.04);
+        });
       } catch (e) {}
     }
 
@@ -476,6 +2122,7 @@
       try {
         const fadlySnap = await getDoc(doc(db, "app_users", "Fadly"));
         if (!fadlySnap.exists()) await setDoc(doc(db, "app_users", "Fadly"), { password: "123456", role: "admin" });
+        else await setDoc(doc(db, "app_users", "Fadly"), { role: "admin" }, { merge: true });
         const indahSnap = await getDoc(doc(db, "app_users", "Indah"));
         if (!indahSnap.exists()) await setDoc(doc(db, "app_users", "Indah"), { password: "123456", role: "biasa" });
       } catch(e) { console.error("Inisialisasi user gagal", e); }
@@ -495,16 +2142,28 @@
         if (userSnap.exists() && userSnap.data().password === pass) {
           loggedInUser = user;
           userRole = (loggedInUser === "Fadly") ? "admin" : (userSnap.data().role || "biasa");
+          cacheUserRoles[loggedInUser] = userRole;
           
           document.getElementById('loginPage').style.display = 'none';
           document.getElementById('dashboardPage').style.display = 'grid';
-          document.getElementById('myProfileName').innerText = loggedInUser;
-          document.getElementById('myRoleLabel').innerText = userRole;
+          document.getElementById('myProfileName').innerText = displayNameWithRole(loggedInUser);
+          document.getElementById('myRoleLabel').innerText = formatRoleName(userRole);
 
-          if (userRole === "admin") document.getElementById('adminPanelTrigger').style.display = 'inline-block';
+          document.getElementById('adminPanelTrigger').style.display = (userRole === "admin") ? 'flex' : 'none';
 
-          await setDoc(doc(db, "user_presence", loggedInUser), { status: "online", last_changed: serverTimestamp() }, { merge: true });
+          await setDoc(doc(db, "user_presence", loggedInUser), {
+            status: "online",
+            activeRoom: "",
+            isWindowActive: document.visibilityState === "visible",
+            last_changed: serverTimestamp()
+          }, { merge: true });
+          unlockNotificationAudio();
+          startPresenceHeartbeat();
+          if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission().catch(() => {});
+          }
           
+          initiateUserRolesListener();
           initiateProfilePhotoListener();
           initiateGlobalRoomsAndNotificationEngine();
           
@@ -533,10 +2192,12 @@
       // Reset hitungan alert pesan masuk karena room sedang aktif kita baca
       cacheUnreadCounts[partnerName] = 0;
 
-      document.getElementById('topHeaderTitle').innerText = passivePartner;
+      document.getElementById('topHeaderTitle').innerText = displayNameWithRole(passivePartner);
       document.getElementById('partnerHeaderAvatar').src = cacheUserAvatars[passivePartner] || defaultAvatarSvg;
       
       buildVerticalChatRoomsDOM();
+      syncOwnPresence({ status: "online" });
+      markAllMessagesInActiveRoomAsRead();
       initiatePresenceListener();
       initiateMessagesListener();
     };
@@ -550,25 +2211,40 @@
         const isCurrentActive = (name === passivePartner);
         const avatarSrc = cacheUserAvatars[name] || defaultAvatarSvg;
         const unreadCount = cacheUnreadCounts[name] || 0;
+        const rawRole = getRawRoleByUser(name);
+        const displayLabel = displayNameWithRole(name);
 
         const card = document.createElement('div');
         card.className = `chat-item-card ${isCurrentActive ? 'active' : ''}`;
         card.onclick = () => { selectActiveChatRoom(name); };
 
-        // Jika ada pesan belum terbaca dari user lain, munculkan tanda merah melayang (Badge Alert)
         let unreadBadgeHtml = "";
         if (unreadCount > 0 && !isCurrentActive) {
-          unreadBadgeHtml = `<div class="unread-badge-alert">${unreadCount}</div>`;
+          unreadBadgeHtml = `<div class="unread-badge-alert">${unreadCount > 99 ? "99+" : unreadCount}</div>`;
         }
 
         card.innerHTML = `
-          <img src="${avatarSrc}" class="partner-avatar-img">
-          <div>
-            <div class="chat-item-name">${name}</div>
-            <div class="chat-item-status" id="presence_status_${name}">Offline</div>
+          <img src="${escapeAttrCode(avatarSrc)}" class="partner-avatar-img profile-openable" data-profile-open="1" title="Lihat profil ${escapeAttrCode(name)}">
+          <div style="min-width:0; flex:1;">
+            <div class="chat-item-name">${escapeXssCode(displayLabel)}</div>
+            <div class="chat-item-subline">
+              ${roleBadgeHtml(rawRole)}
+              <div class="chat-item-status" id="presence_status_${escapeAttrCode(name)}">Offline</div>
+            </div>
           </div>
-          ${unreadBadgeHtml}
+          <div class="chat-item-actions">
+            <button class="tiny-profile-btn" type="button" data-profile-open="1">Profil</button>
+            ${unreadBadgeHtml}
+          </div>
         `;
+
+        card.querySelectorAll('[data-profile-open="1"]').forEach((el) => {
+          el.addEventListener('click', (event) => {
+            event.stopPropagation();
+            openUserProfileModal(name);
+          });
+        });
+
         box.appendChild(card);
         fetchIndividualPresenceStatus(name);
       });
@@ -596,20 +2272,60 @@
         container.innerHTML = "";
         querySnapshot.forEach((uDoc) => {
           if (uDoc.id !== loggedInUser) {
+            const rawRole = (uDoc.id === "Fadly") ? "admin" : (uDoc.data().role || "biasa");
+            cacheUserRoles[uDoc.id] = rawRole;
             const div = document.createElement('div');
             div.className = "startchat-item-row";
-            div.innerHTML = `<span><strong>${uDoc.id}</strong></span> <span style="color:var(--dash-accent); font-size:11px; font-weight:600;">Chat ➔</span>`;
+            div.innerHTML = `
+              <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                <img src="${escapeAttrCode(cacheUserAvatars[uDoc.id] || defaultAvatarSvg)}" class="partner-avatar-img profile-openable" data-profile-open="1" title="Lihat profil">
+                <span><strong>${escapeXssCode(displayNameWithRole(uDoc.id))}</strong><br>${roleBadgeHtml(rawRole)}</span>
+              </div>
+              <span style="display:flex; gap:8px; align-items:center;">
+                <button class="tiny-profile-btn" type="button" data-profile-open="1">Profil</button>
+                <span style="color:var(--dash-accent); font-size:11px; font-weight:600;">Chat ➔</span>
+              </span>
+            `;
             div.onclick = () => { 
               addPartnerToActiveRoomList(uDoc.id); 
               selectActiveChatRoom(uDoc.id); 
               closeStartChatModal(); 
             };
+            div.querySelectorAll('[data-profile-open="1"]').forEach((el) => {
+              el.addEventListener('click', (event) => {
+                event.stopPropagation();
+                openUserProfileModal(uDoc.id);
+              });
+            });
             container.appendChild(div);
           }
         });
       } catch(e) { container.innerHTML = "Gagal memuat list user."; }
     };
+
     window.closeStartChatModal = function() { document.getElementById('startChatModal').style.display = 'none'; };
+
+
+    function initiateUserRolesListener() {
+      if (unsubsUserRoles) unsubsUserRoles();
+      unsubsUserRoles = onSnapshot(collection(db, "app_users"), (snapshot) => {
+        snapshot.forEach((uDoc) => {
+          cacheUserRoles[uDoc.id] = (uDoc.id === "Fadly") ? "admin" : (uDoc.data().role || "biasa");
+        });
+
+        if (loggedInUser) {
+          userRole = getRawRoleByUser(loggedInUser);
+          document.getElementById('myProfileName').innerText = displayNameWithRole(loggedInUser);
+          document.getElementById('myRoleLabel').innerText = formatRoleName(userRole);
+          document.getElementById('adminPanelTrigger').style.display = (userRole === "admin") ? 'flex' : 'none';
+        }
+
+        if (passivePartner) {
+          document.getElementById('topHeaderTitle').innerText = displayNameWithRole(passivePartner);
+        }
+        buildVerticalChatRoomsDOM();
+      });
+    }
 
     // DETEKTOR GLOBAL: Mendeteksi Pesan Masuk Realtime untuk Memberikan Notifikasi Tanda Pesan Masuk
     function initiateGlobalRoomsAndNotificationEngine() {
@@ -622,6 +2338,7 @@
         });
       });
 
+      globalNotificationReady = false;
       unsubsRoomsNotification = onSnapshot(q, (snapshot) => {
         let updateRequired = false;
 
@@ -634,18 +2351,21 @@
               const pengirim = item.sender;
               addPartnerToActiveRoomList(pengirim);
 
-              // Jika room pengirim sedang tidak kita buka, beri tanda merah (Badge) + Bunyi Notifikasi
+              // Jika room pengirim sedang tidak kita buka, beri tanda merah + toast pojok kanan bawah + suara LINE style.
               if (pengirim !== passivePartner) {
                 cacheUnreadCounts[pengirim] = (cacheUnreadCounts[pengirim] || 0) + 1;
-                if (initialLoadComplete) {
+                if (globalNotificationReady) {
+                  const previewText = item.textMessage || (item.imagePayload ? "Mengirim gambar" : "Mengirim pesan baru");
                   playLineNotificationSound();
-                  showDesktopNotification(`Pesan baru dari ${pengirim}`, item.textMessage || "Mengirim lampiran");
+                  showDesktopNotification(`Pesan baru dari ${pengirim}`, previewText, pengirim);
                 }
               }
               updateRequired = true;
             }
           }
         });
+
+        globalNotificationReady = true;
 
         if (updateRequired || roomListArray.length > 0) {
           buildVerticalChatRoomsDOM();
@@ -699,10 +2419,18 @@
           }
 
           let contentHtml = "";
-          if (item.imagePayload) contentHtml += `<img src="${item.imagePayload}" alt="Gambar">`;
+          if (item.imagePayload) {
+            const safeImagePayload = escapeAttrCode(item.imagePayload);
+            contentHtml += `<img class="chat-image-thumb" src="${safeImagePayload}" alt="Gambar" loading="lazy" onclick="openChatImageLightbox(this.src)">`;
+          }
           if (item.textMessage) contentHtml += `<div class="text-content-body">${escapeXssCode(item.textMessage)}</div>`;
 
+          if (isPartnerSender) {
+            markMessageAsReadIfNeeded(docId, item);
+          }
+
           const editLabel = item.edited ? `<span class="edited-marker">(diedit)</span>` : '';
+          const readReceiptHtml = isMeSender ? buildReadReceiptHtml(item) : '';
           let controlsHtml = "";
           if (isMeSender) {
             controlsHtml = `
@@ -719,7 +2447,7 @@
               ${contentHtml}
               <div class="bubble-meta">
                 <span class="time-text">${timeString}</span>${editLabel}
-                ${isMeSender ? `<span class="status-tick-icon">✔✔</span>` : ''}
+                ${readReceiptHtml}
               </div>
             </div>
             ${controlsHtml}
@@ -790,13 +2518,16 @@
           textMessage: text,
           imagePayload: activeImageBase64 || null,
           timestamp: serverTimestamp(),
-          edited: false
+          edited: false,
+          seenByReceiver: false,
+          readAt: null
         };
 
         try {
           field.value = ""; discardImageAttachment();
-          await addDoc(collection(db, "obrolan_utama"), messagePackage);
-          await setDoc(doc(db, "user_presence", loggedInUser), { status: "online" }, { merge: true });
+          const newMessageRef = await addDoc(collection(db, "obrolan_utama"), messagePackage);
+          await syncOwnPresence({ status: "online" });
+          await tryMarkJustSentMessageAsRead(newMessageRef);
         } catch (err) { alert("Gagal mengirim pesan."); }
       }
     };
@@ -814,7 +2545,11 @@
             topLabel.innerHTML = `<span style="color:var(--dash-accent); font-style:italic;">Sedang mengetik...</span>`;
           } else if (data.status === "online") {
             if(sideLabel) sideLabel.innerHTML = `<span class="status-indicator online">Online</span>`;
-            topLabel.innerHTML = `<span style="color:#4caf50;">● Online</span>`;
+            if (data.activeRoom === loggedInUser && data.isWindowActive === true) {
+              topLabel.innerHTML = `<span style="color:#65EEFF;">● Sedang melihat chat ini</span>`;
+            } else {
+              topLabel.innerHTML = `<span style="color:#4caf50;">● Online</span>`;
+            }
           } else {
             if(sideLabel) sideLabel.innerHTML = `<span class="status-indicator offline">Offline</span>`;
             topLabel.innerHTML = `<span style="color:rgba(255,255,255,0.35);">Offline</span>`;
@@ -828,27 +2563,36 @@
 
     window.handleTypingState = function() {
       if(!passivePartner) return;
-      setDoc(doc(db, "user_presence", loggedInUser), { status: "typing" }, { merge: true });
+      syncOwnPresence({ status: "typing" });
       clearTimeout(typingTimeout);
       typingTimeout = setTimeout(() => {
-        setDoc(doc(db, "user_presence", loggedInUser), { status: "online" }, { merge: true });
+        syncOwnPresence({ status: "online" });
       }, 1500);
     };
 
     function initiateProfilePhotoListener() {
       if (unsubsProfiles) unsubsProfiles();
       unsubsProfiles = onSnapshot(collection(db, "user_profiles"), (snapshot) => {
+        cacheUserProfiles = {};
         document.getElementById('myAvatarImg').src = defaultAvatarSvg;
-        snapshot.forEach((doc) => {
-          if (doc.data().avatarBase64) {
-            cacheUserAvatars[doc.id] = doc.data().avatarBase64;
+        snapshot.forEach((profileDoc) => {
+          const data = profileDoc.data() || {};
+          cacheUserProfiles[profileDoc.id] = data;
+          if (data.avatarBase64) {
+            cacheUserAvatars[profileDoc.id] = data.avatarBase64;
           }
-          if (doc.id === loggedInUser && doc.data().avatarBase64) {
-            document.getElementById('myAvatarImg').src = doc.data().avatarBase64;
+          if (profileDoc.id === loggedInUser) {
+            document.getElementById('myAvatarImg').src = data.avatarBase64 || defaultAvatarSvg;
+            applyVisualBackgrounds(data);
+            const dashboardInput = document.getElementById('dashboardBgUrlInput');
+            const chatInput = document.getElementById('chatBgUrlInput');
+            if (dashboardInput) dashboardInput.value = data.dashboardBackgroundUrl || "";
+            if (chatInput) chatInput.value = data.chatBackgroundUrl || "";
           }
         });
         if(passivePartner) {
           document.getElementById('partnerHeaderAvatar').src = cacheUserAvatars[passivePartner] || defaultAvatarSvg;
+          document.getElementById('topHeaderTitle').innerText = displayNameWithRole(passivePartner);
         }
         buildVerticalChatRoomsDOM();
       });
@@ -880,7 +2624,7 @@
     };
 
     window.openAdminManagementModal = function() {
-      if(loggedInUser !== "Fadly") return;
+      if(getRawRoleByUser(loggedInUser) !== "admin") return;
       document.getElementById('adminModal').style.display = 'grid';
       listenToUserListRealtime();
     };
@@ -907,15 +2651,17 @@
       unsubsAdminList = onSnapshot(collection(db, "app_users"), (snapshot) => {
         const cont = document.getElementById('adminUserContainer'); cont.innerHTML = "";
         snapshot.forEach((uDoc) => {
-          const uName = uDoc.id; const curRole = uDoc.data().role || "biasa";
+          const uName = uDoc.id;
+          const curRole = (uName === "Fadly") ? "admin" : (uDoc.data().role || "biasa");
+          cacheUserRoles[uName] = curRole;
           const row = document.createElement('div'); row.className = "user-admin-row";
           if (uName === "Fadly") {
-            row.innerHTML = `<span><strong>${uName}</strong></span> <span style="font-size:11px; color:var(--dash-accent)">Main Admin</span>`;
+            row.innerHTML = `<span class="user-admin-name"><strong>${escapeXssCode(displayNameWithRole(uName))}</strong></span><div class="admin-fixed-role-badge">${roleBadgeHtml("admin")}</div>`;
           } else {
             row.innerHTML = `
-              <span><strong>${uName}</strong></span>
-              <select onchange="changeUserRoleByAdmin('${uName}', this.value)">
-                <option value="biasa" ${curRole === 'biasa'?'selected':''}>Biasa</option>
+              <span class="user-admin-name"><strong>${escapeXssCode(displayNameWithRole(uName))}</strong></span>
+              <select class="admin-role-select ${getAdminRoleSelectClass(curRole)}" onchange="changeUserRoleByAdmin('${escapeAttrCode(uName)}', this.value, this)">
+                <option value="biasa" ${curRole === 'biasa'?'selected':''}>User</option>
                 <option value="admin" ${curRole === 'admin'?'selected':''}>Admin</option>
               </select>
             `;
@@ -925,41 +2671,261 @@
       });
     }
 
-    window.changeUserRoleByAdmin = async function(targetUser, selectedRole) {
-      try { await updateDoc(doc(db, "app_users", targetUser), { role: selectedRole }); } catch(e) {}
+    window.changeUserRoleByAdmin = async function(targetUser, selectedRole, selectElement) {
+      try {
+        if (selectElement) {
+          selectElement.classList.remove('role-user', 'role-admin');
+          selectElement.classList.add(getAdminRoleSelectClass(selectedRole));
+        }
+        await updateDoc(doc(db, "app_users", targetUser), { role: selectedRole });
+      } catch(e) {}
     };
 
     window.triggerSignOut = async function() {
-      if (loggedInUser) await setDoc(doc(db, "user_presence", loggedInUser), { status: "offline", last_changed: serverTimestamp() }, { merge: true });
-      if (unsubsMessages) unsubsMessages(); if (unsubsStatus) unsubsStatus(); if (unsubsProfiles) unsubsProfiles(); if (unsubsAdminList) unsubsAdminList(); if (unsubsRoomsNotification) unsubsRoomsNotification();
-      loggedInUser = ""; passivePartner = ""; roomListArray = []; cacheUnreadCounts = {};
+      if (presenceSyncTimer) { clearInterval(presenceSyncTimer); presenceSyncTimer = null; }
+      if (loggedInUser) await setDoc(doc(db, "user_presence", loggedInUser), {
+        status: "offline",
+        activeRoom: "",
+        isWindowActive: false,
+        last_changed: serverTimestamp()
+      }, { merge: true });
+      if (unsubsMessages) unsubsMessages(); if (unsubsStatus) unsubsStatus(); if (unsubsProfiles) unsubsProfiles(); if (unsubsAdminList) unsubsAdminList(); if (unsubsRoomsNotification) unsubsRoomsNotification(); if (unsubsUserRoles) unsubsUserRoles();
+      loggedInUser = ""; passivePartner = ""; roomListArray = []; cacheUnreadCounts = {}; cacheUserProfiles = {}; globalNotificationReady = false;
+      applyVisualBackgrounds({});
       document.getElementById('dashboardPage').style.display = 'none';
       document.getElementById('loginPage').style.display = 'grid';
       document.getElementById('mainLoginForm').reset();
       discardImageAttachment();
     };
 
-    window.processImageFile = function(event) {
-      const file = event.target.files[0]; if (!file) return;
+
+
+    window.openActivePartnerProfile = function() {
+      if (passivePartner) openUserProfileModal(passivePartner);
+    };
+
+    window.openUserProfileModal = async function(username) {
+      if (!username) return;
+      const modal = document.getElementById('profileModal');
+      const avatar = document.getElementById('profileModalAvatar');
+      const nameRole = document.getElementById('profileModalNameRole');
+      const roleBadge = document.getElementById('profileModalRoleBadge');
+      const statusLine = document.getElementById('profileModalStatus');
+      const bgPreview = document.getElementById('profileModalBgPreview');
+      const note = document.getElementById('profileModalNote');
+      const profileData = cacheUserProfiles[username] || {};
+      const rawRole = getRawRoleByUser(username);
+
+      avatar.src = cacheUserAvatars[username] || defaultAvatarSvg;
+      nameRole.innerText = displayNameWithRole(username);
+      roleBadge.innerHTML = roleBadgeHtml(rawRole);
+      note.innerText = username === loggedInUser
+        ? "Ini profil kamu. Foto profil, role, dan background dashboard/chat kamu dapat dilihat oleh pengguna lain."
+        : "Profil user ini bisa dilihat oleh pengguna lain: foto profil, nama, role, status, dan background yang dipasang.";
+
+      if (profileData.dashboardBackgroundUrl) {
+        bgPreview.style.backgroundImage = `linear-gradient(rgba(0,0,0,.30), rgba(0,0,0,.52)), url("${cssSafeUrl(profileData.dashboardBackgroundUrl)}")`;
+        bgPreview.innerText = "Background dashboard user";
+      } else {
+        bgPreview.style.backgroundImage = "none";
+        bgPreview.innerText = "Belum ada background dashboard";
+      }
+
+      statusLine.innerText = "Status: memuat...";
+      modal.style.display = 'grid';
+
+      try {
+        const snap = await getDoc(doc(db, "user_presence", username));
+        if (snap.exists()) {
+          const st = snap.data().status || "offline";
+          statusLine.innerText = st === "typing" ? "Status: Mengetik..." : `Status: ${st === "online" ? "Online" : "Offline"}`;
+        } else {
+          statusLine.innerText = "Status: Offline";
+        }
+      } catch(e) {
+        statusLine.innerText = "Status: tidak terbaca";
+      }
+    };
+
+    window.closeUserProfileModal = function() {
+      document.getElementById('profileModal').style.display = 'none';
+    };
+
+    window.openBackgroundSettingsModal = function() {
+      const profileData = cacheUserProfiles[loggedInUser] || {};
+      document.getElementById('dashboardBgUrlInput').value = profileData.dashboardBackgroundUrl || "";
+      document.getElementById('chatBgUrlInput').value = profileData.chatBackgroundUrl || "";
+      document.getElementById('backgroundModal').style.display = 'grid';
+    };
+
+    window.closeBackgroundSettingsModal = function() {
+      const profileData = cacheUserProfiles[loggedInUser] || {};
+      applyVisualBackgrounds(profileData);
+      document.getElementById('backgroundModal').style.display = 'none';
+    };
+
+    window.previewBackgroundSettings = async function() {
+      const previewBtn = document.querySelector('#backgroundModal .bg-action-row .modal-btn.secondary');
+      if (previewBtn) { previewBtn.disabled = true; previewBtn.innerText = 'Mengecek...'; }
+
+      const dashboardUrl = await resolveLoadableBackgroundUrl(document.getElementById('dashboardBgUrlInput').value, 'Background depan dashboard');
+      if (dashboardUrl === null) { if (previewBtn) { previewBtn.disabled = false; previewBtn.innerText = 'Preview'; } return; }
+      const chatUrl = await resolveLoadableBackgroundUrl(document.getElementById('chatBgUrlInput').value, 'Background chat');
+      if (chatUrl === null) { if (previewBtn) { previewBtn.disabled = false; previewBtn.innerText = 'Preview'; } return; }
+
+      document.getElementById('dashboardBgUrlInput').value = dashboardUrl;
+      document.getElementById('chatBgUrlInput').value = chatUrl;
+      applyVisualBackgrounds({ dashboardBackgroundUrl: dashboardUrl, chatBackgroundUrl: chatUrl });
+      if (previewBtn) { previewBtn.disabled = false; previewBtn.innerText = 'Preview'; }
+    };
+
+    window.saveBackgroundSettings = async function() {
+      const saveBtn = document.querySelector('#backgroundModal .bg-action-row .modal-btn.primary');
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = 'Menyimpan...'; }
+
+      const dashboardUrl = await resolveLoadableBackgroundUrl(document.getElementById('dashboardBgUrlInput').value, 'Background depan dashboard');
+      if (dashboardUrl === null) { if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = 'Simpan'; } return; }
+      const chatUrl = await resolveLoadableBackgroundUrl(document.getElementById('chatBgUrlInput').value, 'Background chat');
+      if (chatUrl === null) { if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = 'Simpan'; } return; }
+
+      try {
+        await setDoc(doc(db, "user_profiles", loggedInUser), {
+          dashboardBackgroundUrl: dashboardUrl,
+          chatBackgroundUrl: chatUrl
+        }, { merge: true });
+        document.getElementById('dashboardBgUrlInput').value = dashboardUrl;
+        document.getElementById('chatBgUrlInput').value = chatUrl;
+        applyVisualBackgrounds({ dashboardBackgroundUrl: dashboardUrl, chatBackgroundUrl: chatUrl });
+        alert("Background HD berhasil disimpan.");
+      } catch(e) {
+        alert("Gagal menyimpan background.");
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = 'Simpan'; }
+      }
+    };
+
+    window.resetBackgroundSettings = async function() {
+      try {
+        document.getElementById('dashboardBgUrlInput').value = "";
+        document.getElementById('chatBgUrlInput').value = "";
+        await setDoc(doc(db, "user_profiles", loggedInUser), {
+          dashboardBackgroundUrl: "",
+          chatBackgroundUrl: ""
+        }, { merge: true });
+        applyVisualBackgrounds({});
+        alert("Background sudah direset.");
+      } catch(e) {
+        alert("Gagal reset background.");
+      }
+    };
+
+    window.previewAttachedImageFull = function() {
+      if (!activeImageBase64) return;
+      openChatImageLightbox(activeImageBase64);
+    };
+
+    function setImageAttachmentFromDataUrl(dataUrl, captionText = "Berkas gambar siap") {
+      activeImageBase64 = dataUrl;
+      document.getElementById('targetImgSrc').src = activeImageBase64;
+      const caption = document.getElementById('imagePreviewCaption');
+      if (caption) caption.innerText = captionText;
+      document.getElementById('imagePreviewBar').style.display = 'flex';
+    }
+
+    function readImageFileToAttachment(file, captionText = "Berkas gambar siap") {
+      if (!file || !file.type || !file.type.startsWith('image/')) return;
+
       const reader = new FileReader();
       reader.onload = function(e) {
-        activeImageBase64 = e.target.result;
-        document.getElementById('targetImgSrc').src = activeImageBase64;
-        document.getElementById('imagePreviewBar').style.display = 'flex';
+        setImageAttachmentFromDataUrl(e.target.result, captionText);
       };
       reader.readAsDataURL(file);
+    }
+
+    window.processImageFile = function(event) {
+      const file = event.target.files[0];
+      readImageFileToAttachment(file, "Berkas gambar siap");
     };
 
     window.discardImageAttachment = function() {
-      activeImageBase64 = ""; document.getElementById('imageFileInput').value = ""; document.getElementById('imagePreviewBar').style.display = 'none';
+      activeImageBase64 = "";
+      document.getElementById('imageFileInput').value = "";
+      document.getElementById('imagePreviewBar').style.display = 'none';
+      const caption = document.getElementById('imagePreviewCaption');
+      if (caption) caption.innerText = "Berkas gambar siap";
     };
+
+    // FITUR BARU: paste gambar langsung ke chat dari clipboard / screenshot / copy image
+    document.addEventListener('paste', (event) => {
+      const dashboardVisible = document.getElementById('dashboardPage').style.display !== 'none';
+      if (!dashboardVisible || !passivePartner) return;
+
+      const clipboardItems = Array.from(event.clipboardData?.items || []);
+      const imageItem = clipboardItems.find((item) => item.kind === 'file' && item.type.startsWith('image/'));
+      if (!imageItem) return;
+
+      if (isEditingModeActive) {
+        event.preventDefault();
+        alert("Selesaikan mode edit pesan dulu sebelum paste gambar.");
+        return;
+      }
+
+      event.preventDefault();
+      const imageFile = imageItem.getAsFile();
+      readImageFileToAttachment(imageFile, "Gambar hasil paste siap dikirim");
+      document.getElementById('typedMessageInput').focus();
+    });
+
+    // FITUR BARU: klik gambar chat untuk melihat full screen
+    window.openChatImageLightbox = function(src) {
+      if (!src) return;
+      const modal = document.getElementById('chatImageLightbox');
+      const img = document.getElementById('chatImageLightboxImg');
+      img.src = src;
+      modal.style.display = 'grid';
+    };
+
+    window.closeChatImageLightbox = function(event) {
+      if (event) event.stopPropagation();
+      const modal = document.getElementById('chatImageLightbox');
+      const img = document.getElementById('chatImageLightboxImg');
+      modal.style.display = 'none';
+      img.src = "";
+    };
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeChatImageLightbox();
+    });
 
     document.getElementById('typedMessageInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') commitMessageToFirebase();
     });
 
     function escapeXssCode(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!loggedInUser) return;
+      syncOwnPresence({ status: document.getElementById('typedMessageInput')?.value ? 'typing' : 'online' });
+      if (!document.hidden) {
+        markAllMessagesInActiveRoomAsRead();
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      if (!loggedInUser) return;
+      syncOwnPresence({ status: 'online' });
+      markAllMessagesInActiveRoomAsRead();
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (!loggedInUser) return;
+      syncOwnPresence({ status: 'offline' });
+    });
+
+    function escapeAttrCode(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
     // BUTTON GLOW MX MOUSE TRACKER
