@@ -6470,6 +6470,287 @@
     let cacheUnreadCounts = {};
     let roomListArray = [];
 
+    /* =========================================================
+       FINAL SESSION LOGIN 15 MENIT - aman refresh + idle logout
+       ========================================================= */
+    const DASHBOARD_SESSION_KEY = "fandah_dashboard_login_session_v1";
+    const DASHBOARD_SESSION_LOGOUT_KEY = "fandah_dashboard_login_logout_v1";
+    const DASHBOARD_IDLE_LIMIT_MS = 15 * 60 * 1000; // 15 menit
+    const DASHBOARD_SESSION_CHECK_MS = 5000; // cek ringan tiap 5 detik
+    const DASHBOARD_ACTIVITY_WRITE_THROTTLE_MS = 12000; // tahan write localStorage supaya dashboard tetap smooth
+    let dashboardSessionTimer = null;
+    let dashboardLastActivityWriteAt = 0;
+    let dashboardSessionActivityBound = false;
+    let dashboardSessionStorageBound = false;
+    let dashboardSessionRestoring = false;
+    let dashboardSessionSigningOut = false;
+
+    function normalizeDashboardSessionUser(username) {
+      return getDisplayUsername(String(username || "").trim());
+    }
+
+    function safeReadStorage(key) {
+      try { return localStorage.getItem(key); } catch (error) { return null; }
+    }
+
+    function safeWriteStorage(key, value) {
+      try { localStorage.setItem(key, value); return true; } catch (error) { return false; }
+    }
+
+    function safeRemoveStorage(key) {
+      try { localStorage.removeItem(key); return true; } catch (error) { return false; }
+    }
+
+    function clearDashboardSession(options = {}) {
+      safeRemoveStorage(DASHBOARD_SESSION_KEY);
+      dashboardLastActivityWriteAt = 0;
+
+      // Broadcast kecil untuk sinkron logout di tab lain. Tidak berisi password/token.
+      if (options.broadcast) {
+        safeWriteStorage(DASHBOARD_SESSION_LOGOUT_KEY, JSON.stringify({
+          at: Date.now(),
+          reason: options.reason || "logout"
+        }));
+      }
+    }
+
+    function readDashboardSession(options = {}) {
+      const clearInvalid = options.clearInvalid !== false;
+      const raw = safeReadStorage(DASHBOARD_SESSION_KEY);
+      if (!raw) return null;
+
+      try {
+        const data = JSON.parse(raw);
+        const username = normalizeDashboardSessionUser(data?.username);
+        const expiresAt = Number(data?.expiresAt || 0);
+        const lastActivityAt = Number(data?.lastActivityAt || 0);
+        const createdAt = Number(data?.createdAt || lastActivityAt || Date.now());
+
+        if (!username || !Number.isFinite(expiresAt) || expiresAt <= 0) {
+          if (clearInvalid) clearDashboardSession();
+          return null;
+        }
+
+        if (Date.now() >= expiresAt) {
+          if (clearInvalid) clearDashboardSession();
+          return null;
+        }
+
+        return {
+          version: Number(data?.version || 1),
+          username,
+          createdAt,
+          lastActivityAt: Number.isFinite(lastActivityAt) ? lastActivityAt : createdAt,
+          expiresAt
+        };
+      } catch (error) {
+        if (clearInvalid) clearDashboardSession();
+        return null;
+      }
+    }
+
+    function saveDashboardSession(username, options = {}) {
+      const normalizedUser = normalizeDashboardSessionUser(username);
+      if (!normalizedUser) return false;
+
+      const now = Date.now();
+      const currentSession = readDashboardSession({ clearInvalid: false });
+      const sameUserSession = currentSession && currentSession.username === normalizedUser;
+
+      if (!options.force && sameUserSession && now - dashboardLastActivityWriteAt < DASHBOARD_ACTIVITY_WRITE_THROTTLE_MS) {
+        return true;
+      }
+
+      const createdAt = sameUserSession ? (currentSession.createdAt || now) : now;
+      dashboardLastActivityWriteAt = now;
+
+      return safeWriteStorage(DASHBOARD_SESSION_KEY, JSON.stringify({
+        version: 2,
+        username: normalizedUser,
+        createdAt,
+        lastActivityAt: now,
+        expiresAt: now + DASHBOARD_IDLE_LIMIT_MS
+      }));
+    }
+
+    function showLoginNotice(message) {
+      const errorBox = document.getElementById('authErrorNotification');
+      if (!errorBox) return;
+      errorBox.textContent = message;
+      errorBox.style.display = 'block';
+    }
+
+    function hideLoginNotice() {
+      const errorBox = document.getElementById('authErrorNotification');
+      if (!errorBox) return;
+      errorBox.textContent = 'Salah tuh User atau Passnya, Hayoo!!';
+      errorBox.style.display = 'none';
+    }
+
+    function refreshDashboardSessionActivity(force = false) {
+      if (!loggedInUser || dashboardSessionSigningOut) return;
+
+      const currentSession = readDashboardSession({ clearInvalid: false });
+      if (!currentSession || currentSession.username !== loggedInUser) return;
+
+      saveDashboardSession(loggedInUser, { force });
+    }
+
+    function bindDashboardSessionActivityWatcher() {
+      if (dashboardSessionActivityBound) return;
+      dashboardSessionActivityBound = true;
+
+      const activityHandler = () => refreshDashboardSessionActivity(false);
+      const activityEvents = ['click', 'keydown', 'input', 'mousedown', 'touchstart', 'wheel', 'scroll'];
+
+      activityEvents.forEach((eventName) => {
+        window.addEventListener(eventName, activityHandler, { passive: true, capture: true });
+      });
+
+      // Mousemove dibuat lebih ringan: tidak setiap gerakan langsung write localStorage.
+      window.addEventListener('mousemove', activityHandler, { passive: true });
+      window.addEventListener('focus', () => refreshDashboardSessionActivity(true), { passive: true });
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) refreshDashboardSessionActivity(true);
+      }, { passive: true });
+    }
+
+    function bindDashboardSessionStorageWatcher() {
+      if (dashboardSessionStorageBound) return;
+      dashboardSessionStorageBound = true;
+
+      window.addEventListener('storage', async (event) => {
+        if (!loggedInUser || dashboardSessionSigningOut) return;
+
+        if (event.key === DASHBOARD_SESSION_LOGOUT_KEY) {
+          if (typeof window.triggerSignOut === 'function') {
+            await window.triggerSignOut({ reason: 'remote', skipSessionBroadcast: true });
+          }
+          return;
+        }
+
+        if (event.key === DASHBOARD_SESSION_KEY) {
+          const currentSession = readDashboardSession({ clearInvalid: false });
+          if (!currentSession || currentSession.username !== loggedInUser) {
+            if (typeof window.triggerSignOut === 'function') {
+              await window.triggerSignOut({ reason: 'remote', skipSessionBroadcast: true });
+            }
+          }
+        }
+      });
+    }
+
+    async function expireDashboardSession(reason = 'idle') {
+      if (dashboardSessionSigningOut) return;
+      clearDashboardSession({ broadcast: true, reason });
+
+      if (typeof window.triggerSignOut === 'function') {
+        await window.triggerSignOut({ reason, skipSessionBroadcast: true });
+      }
+    }
+
+    async function checkDashboardSessionStillValid() {
+      if (!loggedInUser || dashboardSessionSigningOut) return;
+
+      const currentSession = readDashboardSession({ clearInvalid: false });
+      if (!currentSession || currentSession.username !== loggedInUser || Date.now() >= currentSession.expiresAt) {
+        await expireDashboardSession('idle');
+      }
+    }
+
+    function startDashboardSessionTimer() {
+      bindDashboardSessionActivityWatcher();
+      bindDashboardSessionStorageWatcher();
+
+      if (dashboardSessionTimer) clearInterval(dashboardSessionTimer);
+      dashboardSessionTimer = setInterval(checkDashboardSessionStillValid, DASHBOARD_SESSION_CHECK_MS);
+      checkDashboardSessionStillValid();
+    }
+
+    async function safeAwaitWithTimeout(promise, timeoutMs = 1200) {
+      try {
+        await Promise.race([
+          promise,
+          new Promise((resolve) => setTimeout(resolve, timeoutMs))
+        ]);
+      } catch (error) {
+        console.warn('Operasi logout/presence dilewati:', error);
+      }
+    }
+
+    async function activateDashboardSession(loginUser, userData = {}, originalUsername = loginUser, options = {}) {
+      const normalizedLoginUser = getDisplayUsername(loginUser);
+      loggedInUser = normalizedLoginUser;
+      userRole = normalizeRoleId((loggedInUser === OWNER_USERNAME || originalUsername === LEGACY_OWNER_USERNAME) ? "owner" : (userData.role || "biasa"));
+      cacheUserRoles[loggedInUser] = userRole;
+
+      if (String(userData.displayName || "").trim()) {
+        cacheUserDisplayNames[loggedInUser] = String(userData.displayName || "").trim();
+      }
+
+      hideLoginNotice();
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashboardPage').style.display = 'grid';
+      syncCurrentUserHeader();
+      applyCurrentUserAccess();
+
+      saveDashboardSession(loggedInUser, { force: true });
+      startDashboardSessionTimer();
+
+      await setDoc(doc(db, "user_presence", loggedInUser), {
+        status: "online",
+        activeRoom: "",
+        isWindowActive: document.visibilityState === "visible",
+        last_changed: serverTimestamp()
+      }, { merge: true });
+
+      unlockNotificationAudio();
+      startPresenceHeartbeat();
+
+      if (!options.restoredFromSession && 'Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().catch(() => {});
+      }
+
+      initiateRoleDefinitionsListener();
+      initiateUserRolesListener();
+      initiateProfilePhotoListener();
+      initiateGlobalRoomsAndNotificationEngine();
+
+      // Pulihkan daftar room dari localStorage, lalu listener global akan melengkapi dari semua riwayat Firestore.
+      restoreRoomListFromLocal();
+      buildVerticalChatRoomsDOM();
+
+      // Pilih default partner hanya jika belum ada room tersimpan.
+      const targetDefault = (loggedInUser === OWNER_USERNAME) ? "Indah" : OWNER_USERNAME;
+      if (roomListArray.length === 0) addPartnerToActiveRoomList(targetDefault);
+      selectActiveChatRoom(roomListArray[0] || targetDefault);
+    }
+
+    async function restoreDashboardSessionAfterRefresh() {
+      if (dashboardSessionRestoring || loggedInUser) return;
+      const savedSession = readDashboardSession();
+      if (!savedSession) return;
+
+      dashboardSessionRestoring = true;
+      try {
+        const savedUser = getDisplayUsername(savedSession.username);
+        const userSnap = await getDoc(doc(db, "app_users", savedUser));
+        if (!userSnap.exists()) {
+          clearDashboardSession();
+          return;
+        }
+
+        await activateDashboardSession(savedUser, userSnap.data() || {}, savedUser, { restoredFromSession: true });
+        refreshDashboardSessionActivity(true);
+      } catch (error) {
+        console.warn("Gagal memulihkan sesi dashboard:", error);
+        clearDashboardSession();
+      } finally {
+        dashboardSessionRestoring = false;
+      }
+    }
+
+
     const defaultAvatarSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238696a0'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
 
 
@@ -7417,6 +7698,7 @@
       const user = document.getElementById('inputUser').value.trim();
       const pass = document.getElementById('inputPass').value;
       const errorBox = document.getElementById('authErrorNotification');
+      hideLoginNotice();
 
       try {
         const loginUser = getDisplayUsername(user);
@@ -7440,49 +7722,23 @@
         );
 
         if (passwordOk) {
-          loggedInUser = loginUser;
-          userRole = normalizeRoleId((loggedInUser === OWNER_USERNAME || user === LEGACY_OWNER_USERNAME) ? "owner" : (userData.role || "biasa"));
-          cacheUserRoles[loggedInUser] = userRole;
-          if (String(userData.displayName || "").trim()) {
-            cacheUserDisplayNames[loggedInUser] = String(userData.displayName || "").trim();
-          }
-          
-          document.getElementById('loginPage').style.display = 'none';
-          document.getElementById('dashboardPage').style.display = 'grid';
-          syncCurrentUserHeader();
-
-          applyCurrentUserAccess();
-
-          await setDoc(doc(db, "user_presence", loggedInUser), {
-            status: "online",
-            activeRoom: "",
-            isWindowActive: document.visibilityState === "visible",
-            last_changed: serverTimestamp()
-          }, { merge: true });
-          unlockNotificationAudio();
-          startPresenceHeartbeat();
-          if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission().catch(() => {});
-          }
-          
-          initiateRoleDefinitionsListener();
-          initiateUserRolesListener();
-          initiateProfilePhotoListener();
-          initiateGlobalRoomsAndNotificationEngine();
-          
-          // Pulihkan daftar room dari localStorage, lalu listener global akan melengkapi dari semua riwayat Firestore.
-          restoreRoomListFromLocal();
-          buildVerticalChatRoomsDOM();
-
-          // Pilih default partner hanya jika belum ada room tersimpan.
-          const targetDefault = (loggedInUser === OWNER_USERNAME) ? "Indah" : OWNER_USERNAME;
-          if (roomListArray.length === 0) addPartnerToActiveRoomList(targetDefault);
-          selectActiveChatRoom(roomListArray[0] || targetDefault);
+          await activateDashboardSession(loginUser, userData, user);
         } else {
+          if (errorBox) {
+            errorBox.textContent = 'Salah tuh User atau Passnya, Hayoo!!';
+            errorBox.style.display = 'block';
+          }
+        }
+      } catch (err) {
+        if (errorBox) {
+          errorBox.textContent = 'Login gagal diproses. Cek koneksi lalu coba lagi.';
           errorBox.style.display = 'block';
         }
-      } catch (err) { errorBox.style.display = 'block'; }
+      }
     };
+
+    // Auto-login ulang setelah refresh selama sesi belum idle 15 menit.
+    restoreDashboardSessionAfterRefresh();
 
     // FUNGSI UTAMA: Menambah Target ke List Tanpa Mengeliminasi Teman Sebelumnya
     function addPartnerToActiveRoomList(partnerName) {
@@ -8361,24 +8617,85 @@
       }
     };
 
-    window.triggerSignOut = async function() {
-      if (presenceSyncTimer) { clearInterval(presenceSyncTimer); presenceSyncTimer = null; }
-      if (loggedInUser) await setDoc(doc(db, "user_presence", loggedInUser), {
-        status: "offline",
-        activeRoom: "",
-        isWindowActive: false,
-        last_changed: serverTimestamp()
-      }, { merge: true });
-      if (unsubsMessages) unsubsMessages(); if (unsubsStatus) unsubsStatus(); if (unsubsProfiles) unsubsProfiles(); if (unsubsAdminList) unsubsAdminList(); if (unsubsRoomsNotification) unsubsRoomsNotification(); if (unsubsUserRoles) unsubsUserRoles(); if (unsubsRoleDefinitions) unsubsRoleDefinitions();
-      loggedInUser = ""; passivePartner = ""; roomListArray = []; cacheUnreadCounts = {}; cacheRenderedMessages = {}; activeReplyData = null; cacheUserProfiles = {}; cacheUserDisplayNames = {}; cacheRoleDefinitions = defaultRoleDefinitions(); globalNotificationReady = false;
-      applyVisualBackgrounds({});
-      document.getElementById('dashboardPage').classList.remove('mobile-chat-active');
-      document.getElementById('dashboardPage').style.display = 'none';
-      document.getElementById('loginPage').style.display = 'grid';
-      document.getElementById('mainLoginForm').reset();
-      discardImageAttachment();
-      try { cancelReplyMode(); } catch (error) {}
-      try { closeAllBubbleActions(); } catch (error) {}
+    window.triggerSignOut = async function(options = {}) {
+      const opts = (typeof options === 'string') ? { reason: options } : (options || {});
+      const reason = opts.reason || 'manual';
+
+      if (dashboardSessionSigningOut) return;
+      dashboardSessionSigningOut = true;
+
+      try {
+        clearDashboardSession({
+          broadcast: !opts.skipSessionBroadcast && reason !== 'remote',
+          reason
+        });
+
+        if (dashboardSessionTimer) { clearInterval(dashboardSessionTimer); dashboardSessionTimer = null; }
+        if (presenceSyncTimer) { clearInterval(presenceSyncTimer); presenceSyncTimer = null; }
+
+        const signOutUser = loggedInUser;
+        if (signOutUser) {
+          await safeAwaitWithTimeout(setDoc(doc(db, "user_presence", signOutUser), {
+            status: "offline",
+            activeRoom: "",
+            isWindowActive: false,
+            last_changed: serverTimestamp()
+          }, { merge: true }), 1200);
+        }
+
+        const unsubscribeList = [
+          unsubsMessages, unsubsStatus, unsubsProfiles, unsubsAdminList,
+          unsubsRoomsNotification, unsubsUserRoles, unsubsRoleDefinitions
+        ];
+        unsubscribeList.forEach((unsubscribeFn) => {
+          try { if (typeof unsubscribeFn === 'function') unsubscribeFn(); } catch (error) {}
+        });
+
+        unsubsMessages = null;
+        unsubsStatus = null;
+        unsubsProfiles = null;
+        unsubsAdminList = null;
+        unsubsRoomsNotification = null;
+        unsubsUserRoles = null;
+        unsubsRoleDefinitions = null;
+
+        loggedInUser = "";
+        passivePartner = "";
+        roomListArray = [];
+        cacheUnreadCounts = {};
+        cacheRenderedMessages = {};
+        activeReplyData = null;
+        cacheUserProfiles = {};
+        cacheUserDisplayNames = {};
+        cacheRoleDefinitions = defaultRoleDefinitions();
+        globalNotificationReady = false;
+        dashboardLastActivityWriteAt = 0;
+
+        applyVisualBackgrounds({});
+
+        const dashboardPage = document.getElementById('dashboardPage');
+        const loginPage = document.getElementById('loginPage');
+        const loginForm = document.getElementById('mainLoginForm');
+
+        dashboardPage?.classList.remove('mobile-chat-active');
+        if (dashboardPage) dashboardPage.style.display = 'none';
+        if (loginPage) loginPage.style.display = 'grid';
+        if (loginForm) loginForm.reset();
+
+        if (reason === 'idle') {
+          showLoginNotice('Sesi berakhir otomatis karena tidak ada aktivitas selama 15 menit. Silakan login kembali.');
+        } else if (reason === 'remote') {
+          showLoginNotice('Sesi login ditutup dari tab lain. Silakan login kembali.');
+        } else {
+          hideLoginNotice();
+        }
+
+        try { discardImageAttachment(); } catch (error) {}
+        try { cancelReplyMode(); } catch (error) {}
+        try { closeAllBubbleActions(); } catch (error) {}
+      } finally {
+        dashboardSessionSigningOut = false;
+      }
     };
 
 
@@ -8822,7 +9139,9 @@
 
     window.addEventListener('beforeunload', () => {
       if (!loggedInUser) return;
-      syncOwnPresence({ status: 'offline' });
+      // Jangan hapus session saat refresh. Aktivitas terakhir tetap diperpanjang,
+      // sedangkan status offline hanya ditangani saat manual logout / idle logout.
+      refreshDashboardSessionActivity(true);
     });
 
     function escapeAttrCode(str) {
