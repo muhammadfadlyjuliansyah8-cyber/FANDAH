@@ -3198,6 +3198,289 @@
   </style>
 
 
+
+  <style id="admin-stats-owner-cache-style">
+    /* =========================================================
+       ADMIN STATISTIK RINGAN + OWNER CLEAR CACHE
+       ========================================================= */
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 11px;
+      perspective: 1000px;
+    }
+
+    .admin-stat-box {
+      position: relative;
+      overflow: hidden;
+      min-height: 104px;
+      padding: 14px;
+      border-radius: 18px;
+      background:
+        radial-gradient(150px 80px at 100% 0%, color-mix(in srgb, var(--theme-accent, #28DFFF) 16%, transparent), transparent 68%),
+        linear-gradient(145deg, color-mix(in srgb, var(--theme-panel-2, rgba(12,28,52,.82)) 92%, transparent), color-mix(in srgb, var(--theme-panel, rgba(4,10,22,.95)) 98%, transparent));
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 18%, transparent);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 12px 30px rgba(0,0,0,.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      opacity: 0;
+      transform: translateY(14px) scale(.985);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+      will-change: transform, opacity;
+    }
+
+    .admin-stat-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .78;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.08), transparent 27%, transparent 72%, color-mix(in srgb, var(--theme-accent, #28DFFF) 8%, transparent)),
+        repeating-linear-gradient(90deg, transparent 0 18px, color-mix(in srgb, var(--theme-accent, #28DFFF) 5%, transparent) 18px 19px, transparent 19px 38px);
+    }
+
+    .admin-stat-box::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 11px;
+      height: 22px;
+      opacity: .22;
+      pointer-events: none;
+      background:
+        linear-gradient(135deg, transparent 0 12%, color-mix(in srgb, var(--theme-accent, #28DFFF) 88%, transparent) 13% 15%, transparent 16% 33%, color-mix(in srgb, var(--theme-accent-3, #93C5FD) 78%, transparent) 34% 36%, transparent 37% 58%, color-mix(in srgb, var(--theme-accent, #28DFFF) 76%, transparent) 59% 62%, transparent 63% 100%);
+      filter: drop-shadow(0 0 8px color-mix(in srgb, var(--theme-accent, #28DFFF) 28%, transparent));
+      transform: translateY(2px);
+    }
+
+    .admin-stat-box:hover {
+      transform: translateY(-3px) scale(1.012);
+      border-color: color-mix(in srgb, var(--theme-accent, #28DFFF) 42%, transparent);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 16px 40px rgba(0,0,0,.24),
+        0 0 24px color-mix(in srgb, var(--theme-accent, #28DFFF) 13%, transparent);
+    }
+
+    .admin-stat-head {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .admin-stat-head span {
+      color: color-mix(in srgb, var(--theme-muted, rgba(218,236,250,.70)) 92%, #ffffff 8%);
+      font-size: 9.5px;
+      font-weight: 950;
+      letter-spacing: .095em;
+      text-transform: uppercase;
+      line-height: 1.35;
+      display: block;
+      max-width: 72%;
+    }
+
+    .admin-stat-icon {
+      flex: 0 0 auto;
+      width: 35px;
+      height: 35px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      color: var(--theme-accent-3, #B5F4FF);
+      background: color-mix(in srgb, var(--theme-accent, #28DFFF) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 17%, transparent);
+      box-shadow: inset 0 0 12px rgba(255,255,255,.035), 0 0 17px color-mix(in srgb, var(--theme-accent, #28DFFF) 10%, transparent);
+    }
+
+    .admin-stat-box strong {
+      position: relative;
+      z-index: 1;
+      color: var(--theme-text, #F4FBFF);
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: -.055em;
+      line-height: 1;
+      text-shadow: 0 0 15px color-mix(in srgb, var(--theme-accent, #28DFFF) 18%, transparent);
+    }
+
+    .admin-stat-box.owner-stat strong,
+    .admin-stat-box.owner-stat .admin-stat-icon { color: var(--theme-accent-3, #FFE39A); }
+    .admin-stat-box.online-stat strong,
+    .admin-stat-box.online-stat .admin-stat-icon { color: #74FFB2; }
+    .admin-stat-box.danger-stat strong,
+    .admin-stat-box.danger-stat .admin-stat-icon { color: #FFB5C5; }
+
+    .admin-stats-toolbar,
+    .owner-tools-foot {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .admin-stats-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .admin-icon-btn,
+    .admin-icon-pill,
+    .admin-mini-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 12px;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 22%, transparent);
+      background: color-mix(in srgb, var(--theme-accent, #28DFFF) 7%, transparent);
+      color: var(--theme-accent-3, #91F1FF);
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+      transition: .16s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      line-height: 1;
+    }
+
+    .admin-icon-btn {
+      cursor: pointer;
+    }
+
+    .admin-icon-btn:hover,
+    .admin-mini-btn:hover {
+      border-color: color-mix(in srgb, var(--theme-accent, #28DFFF) 40%, transparent);
+      background: color-mix(in srgb, var(--theme-accent, #28DFFF) 13%, transparent);
+      color: #fff;
+      box-shadow: 0 0 16px color-mix(in srgb, var(--theme-accent, #28DFFF) 14%, transparent);
+      transform: translateY(-1px);
+    }
+
+    .admin-icon-btn-glyph {
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .admin-icon-pill {
+      cursor: default;
+      color: color-mix(in srgb, var(--theme-muted, rgba(220,241,255,.74)) 90%, #fff 10%);
+      max-width: 100%;
+    }
+
+    .admin-icon-pill .admin-icon-btn-glyph {
+      color: #74FFB2;
+      text-shadow: 0 0 10px rgba(116,255,178,.22);
+      animation: adminLivePulse 2.15s ease-in-out infinite;
+    }
+
+    .owner-tools-card {
+      border-color: color-mix(in srgb, var(--theme-accent-3, #FFD76B) 20%, transparent);
+      background:
+        radial-gradient(160px 90px at 100% 0%, color-mix(in srgb, var(--theme-accent-3, #FFD76B) 13%, transparent), transparent 70%),
+        linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2, rgba(38,29,10,.78)) 84%, transparent), rgba(6,8,12,.94));
+    }
+
+    .owner-tools-card.is-hidden {
+      display: none !important;
+    }
+
+    .owner-tools-desc {
+      color: color-mix(in srgb, var(--theme-muted, rgba(255,239,200,.66)) 94%, #fff 6%);
+      font-size: 12px;
+      line-height: 1.55;
+      margin-bottom: 12px;
+      padding: 11px 12px;
+      border-radius: 13px;
+      border: 1px solid color-mix(in srgb, var(--theme-accent-3, #FFD76B) 12%, transparent);
+      background: color-mix(in srgb, var(--theme-accent-3, #FFD76B) 4%, transparent);
+    }
+
+    .modal-btn.danger {
+      background: linear-gradient(135deg, rgba(255,91,130,.16), rgba(62,15,28,.92));
+      color: #FFB5C5;
+      border: 1px solid rgba(255,91,130,.24);
+    }
+
+    .modal-btn.danger:hover {
+      color: #fff;
+      border-color: rgba(255,91,130,.42);
+      background: linear-gradient(135deg, rgba(255,91,130,.24), rgba(92,18,36,.96));
+      box-shadow: 0 0 18px rgba(255,91,130,.14);
+    }
+
+    .admin-cache-status {
+      min-height: 18px;
+      color: color-mix(in srgb, var(--theme-muted, rgba(255,239,200,.62)) 90%, #fff 10%);
+      font-size: 11px;
+    }
+
+    .admin-stats-grid.is-ready .admin-stat-box {
+      animation: adminStatReveal .54s cubic-bezier(.18,.78,.2,1) forwards, adminStatCryptoSettle 1.35s ease-out .54s 1;
+    }
+    .admin-stats-grid.is-ready .admin-stat-box:nth-child(1) { animation-delay: 0s, .54s; }
+    .admin-stats-grid.is-ready .admin-stat-box:nth-child(2) { animation-delay: .045s, .60s; }
+    .admin-stats-grid.is-ready .admin-stat-box:nth-child(3) { animation-delay: .09s, .66s; }
+    .admin-stats-grid.is-ready .admin-stat-box:nth-child(4) { animation-delay: .135s, .72s; }
+    .admin-stats-grid.is-ready .admin-stat-box:nth-child(5) { animation-delay: .18s, .78s; }
+
+    @keyframes adminStatReveal {
+      0% { opacity: 0; transform: translateY(14px) scale(.985); filter: blur(2px); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    @keyframes adminStatCryptoBreath {
+      0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 12px 30px rgba(0,0,0,.18); }
+      50% { box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 15px 36px rgba(0,0,0,.22), 0 0 22px color-mix(in srgb, var(--theme-accent, #28DFFF) 9%, transparent); }
+    }
+
+    @keyframes adminStatCryptoSettle {
+      0% { box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 12px 30px rgba(0,0,0,.18); }
+      42% { box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 15px 36px rgba(0,0,0,.22), 0 0 24px color-mix(in srgb, var(--theme-accent, #28DFFF) 13%, transparent); }
+      100% { box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 12px 30px rgba(0,0,0,.18); }
+    }
+
+    @keyframes adminLivePulse {
+      0%, 100% { opacity: 1; filter: drop-shadow(0 0 0 rgba(116,255,178,0)); }
+      50% { opacity: .78; filter: drop-shadow(0 0 10px rgba(116,255,178,.30)); }
+    }
+
+    @media (max-width: 920px) {
+      .admin-stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .admin-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 420px) {
+      .admin-stats-grid { grid-template-columns: 1fr; }
+      .admin-stats-toolbar,
+      .owner-tools-foot {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .admin-stats-toolbar-left,
+      .admin-icon-pill,
+      .admin-icon-btn,
+      .admin-mini-btn { width: 100%; }
+      .admin-stats-toolbar-left { display: grid; }
+    }
+  </style>
+
   <style id="owner-admin-upgrade-style">
     .role-pill.owner {
       color: #F9E7A6;
@@ -6088,6 +6371,32 @@
     }
   </style>
 
+
+  <style id="instant-chat-bottom-style">
+    /* =========================================================
+       FIX PINDAH CHAT: langsung tampil di pesan paling bawah
+       ========================================================= */
+    .message-area.chat-bottom-prep {
+      opacity: 0 !important;
+      scroll-behavior: auto !important;
+      pointer-events: none;
+    }
+
+    .message-area.chat-bottom-ready {
+      opacity: 1 !important;
+      animation: chatBottomReadyFade .16s ease-out both;
+    }
+
+    @keyframes chatBottomReadyFade {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .message-area.chat-bottom-ready { animation: none !important; }
+    }
+  </style>
+
 </head>
 
 <body>
@@ -6438,25 +6747,37 @@
     <div class="modal-box dashboard-theme-modal">
       <h3>🎨 Latar / Tema Dashboard</h3>
       <div class="dashboard-theme-options" id="dashboardThemeOptions">
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="cyber-crypto" onclick="setDashboardTheme('cyber-crypto')">
+          <span class="dashboard-theme-swatch theme-swatch-cyber-crypto"></span>
+          <span class="dashboard-theme-info"><b>Tema Cyber Crypto</b></span>
+        </button>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="cyber-luxury" onclick="setDashboardTheme('cyber-luxury')">
+          <span class="dashboard-theme-swatch theme-swatch-cyber-luxury"></span>
+          <span class="dashboard-theme-info"><b>Tema Cyber Luxury</b></span>
+        </button>
         <button type="button" class="dashboard-theme-card" data-dashboard-theme="gold-luxury" onclick="setDashboardTheme('gold-luxury')">
           <span class="dashboard-theme-swatch theme-swatch-gold"></span>
           <span class="dashboard-theme-info"><b>Emas Luxury</b></span>
         </button>
-        <button type="button" class="dashboard-theme-card" data-dashboard-theme="ocean-blue" onclick="setDashboardTheme('ocean-blue')">
-          <span class="dashboard-theme-swatch theme-swatch-ocean"></span>
-          <span class="dashboard-theme-info"><b>Ocean Blue</b></span>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="midnight-blue-premium" onclick="setDashboardTheme('midnight-blue-premium')">
+          <span class="dashboard-theme-swatch theme-swatch-midnight"></span>
+          <span class="dashboard-theme-info"><b>Midnight Blue Premium</b></span>
         </button>
-        <button type="button" class="dashboard-theme-card" data-dashboard-theme="emerald-green" onclick="setDashboardTheme('emerald-green')">
-          <span class="dashboard-theme-swatch theme-swatch-emerald"></span>
-          <span class="dashboard-theme-info"><b>Emerald Green</b></span>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="arctic-frost" onclick="setDashboardTheme('arctic-frost')">
+          <span class="dashboard-theme-swatch theme-swatch-arctic"></span>
+          <span class="dashboard-theme-info"><b>Arctic Frost</b></span>
         </button>
-        <button type="button" class="dashboard-theme-card" data-dashboard-theme="violet-neon" onclick="setDashboardTheme('violet-neon')">
-          <span class="dashboard-theme-swatch theme-swatch-violet"></span>
-          <span class="dashboard-theme-info"><b>Violet Neon</b></span>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="neon-tokyo" onclick="setDashboardTheme('neon-tokyo')">
+          <span class="dashboard-theme-swatch theme-swatch-neon-tokyo"></span>
+          <span class="dashboard-theme-info"><b>Neon Tokyo</b></span>
         </button>
-        <button type="button" class="dashboard-theme-card" data-dashboard-theme="ruby-red" onclick="setDashboardTheme('ruby-red')">
-          <span class="dashboard-theme-swatch theme-swatch-ruby"></span>
-          <span class="dashboard-theme-info"><b>Ruby Red</b></span>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="cyber-red" onclick="setDashboardTheme('cyber-red')">
+          <span class="dashboard-theme-swatch theme-swatch-cyber-red"></span>
+          <span class="dashboard-theme-info"><b>Cyber Red</b></span>
+        </button>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="matrix-green" onclick="setDashboardTheme('matrix-green')">
+          <span class="dashboard-theme-swatch theme-swatch-matrix"></span>
+          <span class="dashboard-theme-info"><b>Matrix Green</b></span>
         </button>
       </div>
       <div class="modal-foot">
@@ -6481,6 +6802,55 @@
   <div class="modal-overlay" id="adminModal">
     <div class="modal-box admin-control-modal">
       <h3>👑 Admin Control Panel</h3>
+
+      <div class="admin-section-card admin-stat-card" id="adminStatsDashboard">
+        <div class="admin-section-title">Dashboard Statistik Admin</div>
+        <div class="admin-stats-grid" id="adminStatsGrid">
+          <div class="admin-stat-box">
+            <div class="admin-stat-head"><span>Total User</span><div class="admin-stat-icon">👥</div></div>
+            <strong id="statTotalUsers" data-value="0">0</strong>
+          </div>
+          <div class="admin-stat-box owner-stat">
+            <div class="admin-stat-head"><span>Owner</span><div class="admin-stat-icon">👑</div></div>
+            <strong id="statOwnerUsers" data-value="0">0</strong>
+          </div>
+          <div class="admin-stat-box">
+            <div class="admin-stat-head"><span>Admin</span><div class="admin-stat-icon">🛡️</div></div>
+            <strong id="statAdminUsers" data-value="0">0</strong>
+          </div>
+          <div class="admin-stat-box">
+            <div class="admin-stat-head"><span>User Biasa</span><div class="admin-stat-icon">🙂</div></div>
+            <strong id="statRegularUsers" data-value="0">0</strong>
+          </div>
+          <div class="admin-stat-box online-stat">
+            <div class="admin-stat-head"><span>User Online</span><div class="admin-stat-icon">🟢</div></div>
+            <strong id="statOnlineUsers" data-value="0">0</strong>
+          </div>
+        </div>
+        <div class="admin-stats-toolbar">
+          <div class="admin-stats-toolbar-left">
+            <button type="button" class="admin-icon-btn" onclick="refreshAdminStatsDashboard()" title="Refresh Statistik" aria-label="Refresh Statistik">
+              <span class="admin-icon-btn-glyph">⟳</span>
+              <span>Refresh Statistik</span>
+            </button>
+          </div>
+          <div class="admin-icon-pill">
+            <span class="admin-icon-btn-glyph">◉</span>
+            <span id="adminStatsUpdatedAt">Statistik belum dimuat.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section-card owner-tools-card is-hidden" id="ownerToolsCard">
+        <div class="admin-section-title">Owner Tools — Clear Cache</div>
+        <div class="owner-tools-desc">
+          Tombol ini khusus OWNER. Fungsinya membersihkan cache dashboard, cache browser, data sementara, dan mengirim sinyal reset cache ke user lain yang sedang membuka dashboard. Data akun, role, dan chat di Firebase tidak ikut terhapus.
+        </div>
+        <button class="modal-btn danger admin-wide-btn" onclick="clearDashboardCacheOwnerOnly()">Clear Cache Dashboard</button>
+        <div class="owner-tools-foot">
+          <span class="admin-cache-status" id="ownerCacheStatus">Cache status: siap.</span>
+        </div>
+      </div>
 
       <div class="admin-section-card">
         <div class="admin-section-title">Tambah Pengguna</div>
@@ -6519,7 +6889,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, addDoc, query, orderBy, onSnapshot, serverTimestamp, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, addDoc, query, orderBy, onSnapshot, serverTimestamp, getDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
@@ -6563,6 +6933,8 @@
     let unsubsRoomsNotification = null;
     let unsubsUserRoles = null;
     let unsubsRoleDefinitions = null;
+    let unsubsCacheControl = null;
+    let unsubsPresenceList = null;
     let globalNotificationReady = false;
 
     // Tracker Cache Lokal untuk Avatars, Role, Profile & Notifikasi Pesan Masuk
@@ -6572,6 +6944,7 @@
     let cacheRoleDefinitions = {};
     let cacheUserProfiles = {};
     let cacheUnreadCounts = {};
+    let cachePresenceStates = {};
     let roomListArray = [];
 
     /* =========================================================
@@ -6582,6 +6955,8 @@
     const DASHBOARD_IDLE_LIMIT_MS = 10 * 60 * 1000; // 10 menit
     const DASHBOARD_SESSION_CHECK_MS = 5000; // cek ringan tiap 5 detik
     const DASHBOARD_ACTIVITY_WRITE_THROTTLE_MS = 12000; // tahan write localStorage supaya dashboard tetap smooth
+    const DASHBOARD_CACHE_SIGNAL_HANDLED_KEY = "fandah_dashboard_cache_signal_handled_v1";
+    const DASHBOARD_CACHE_STATUS_KEY = "fandah_dashboard_cache_last_clear_v1";
     let dashboardSessionTimer = null;
     let dashboardLastActivityWriteAt = 0;
     let dashboardSessionActivityBound = false;
@@ -6816,6 +7191,7 @@
         status: "online",
         activeRoom: "",
         isWindowActive: document.visibilityState === "visible",
+        lastSeenMs: Date.now(),
         last_changed: serverTimestamp()
       }, { merge: true });
 
@@ -6830,6 +7206,8 @@
       initiateUserRolesListener();
       initiateProfilePhotoListener();
       initiateGlobalRoomsAndNotificationEngine();
+      initiateCacheControlListener();
+      initiatePresenceListListener();
 
       // Pulihkan daftar room dari localStorage, lalu listener global akan melengkapi dari semua riwayat Firestore.
       restoreRoomListFromLocal();
@@ -7091,15 +7469,109 @@
     const readReceiptLocks = {};
 
     let presenceSyncTimer = null;
+    let presenceRenderTimer = null;
+    const PRESENCE_HEARTBEAT_MS = 9000;
+    const PRESENCE_RENDER_REFRESH_MS = 5000;
+    const PRESENCE_STALE_MS = 35000;
+
+    function getPresenceLastSeenMs(data = {}) {
+      const clientMs = Number(data.lastSeenMs || 0);
+      const serverDate = timestampToDate(data.last_changed || data.updatedAt || data.lastSeen);
+      const serverMs = serverDate ? serverDate.getTime() : 0;
+      return Math.max(clientMs, serverMs, 0);
+    }
+
+    function getPresenceViewState(data = {}) {
+      const normalizedStatus = String(data?.status || "offline").toLowerCase();
+      const lastSeenMs = getPresenceLastSeenMs(data);
+      const ageMs = lastSeenMs ? Math.max(0, Date.now() - lastSeenMs) : Number.POSITIVE_INFINITY;
+      const isFresh = ageMs <= PRESENCE_STALE_MS;
+      const activeWindow = data?.isWindowActive !== false;
+      const onlineLike = normalizedStatus === "online" || normalizedStatus === "typing";
+
+      if (isFresh && activeWindow && onlineLike) {
+        return normalizedStatus === "typing"
+          ? { state: "typing", label: "Mengetik...", online: true, ageMs }
+          : { state: "online", label: "Online", online: true, ageMs };
+      }
+
+      return { state: "offline", label: "Offline", online: false, ageMs };
+    }
+
+    function presenceLabelHtml(data = {}) {
+      const view = getPresenceViewState(data);
+      if (view.state === "typing") {
+        return `<span class="status-indicator online presence-typing">Mengetik...</span>`;
+      }
+      if (view.online) {
+        return `<span class="status-indicator online">Online</span>`;
+      }
+      return `<span class="status-indicator offline">Offline</span>`;
+    }
+
+    function renderPresenceStatusForUser(name, data = null) {
+      const normalizedName = getDisplayUsername(name);
+      const presenceData = data || cachePresenceStates[normalizedName] || null;
+      const labelNode = document.getElementById(`presence_status_${normalizedName}`);
+      if (labelNode) labelNode.innerHTML = presenceLabelHtml(presenceData || {});
+
+      if (passivePartner && normalizedName === passivePartner) {
+        const topLabel = document.getElementById('topHeaderStatus');
+        if (topLabel) {
+          const view = getPresenceViewState(presenceData || {});
+          if (view.state === "typing") {
+            topLabel.innerHTML = `<span style="color:var(--dash-accent); font-style:italic;">Sedang mengetik...</span>`;
+          } else if (view.online) {
+            topLabel.innerHTML = `<span style="color:#4caf50;">● Online</span>`;
+          } else {
+            topLabel.innerHTML = `<span style="color:rgba(255,255,255,0.35);">Offline</span>`;
+          }
+        }
+      }
+    }
+
+    function refreshPresenceLabelsFromCache() {
+      roomListArray.forEach((name) => renderPresenceStatusForUser(name));
+      if (passivePartner) renderPresenceStatusForUser(passivePartner);
+    }
+
+    function initiatePresenceListListener() {
+      if (unsubsPresenceList) {
+        try { unsubsPresenceList(); } catch (error) {}
+        unsubsPresenceList = null;
+      }
+
+      unsubsPresenceList = onSnapshot(collection(db, "user_presence"), (snapshot) => {
+        snapshot.forEach((presenceDoc) => {
+          const name = getDisplayUsername(presenceDoc.id);
+          cachePresenceStates[name] = presenceDoc.data() || {};
+        });
+        refreshPresenceLabelsFromCache();
+      }, (error) => {
+        console.warn("Gagal listener presence user:", error);
+      });
+    }
 
     async function syncOwnPresence(extraState = {}) {
       if (!loggedInUser) return;
+
+      const pageIsVisible = document.visibilityState === "visible";
+      let statusValue = extraState.status || "online";
+      if (!pageIsVisible && statusValue !== "offline") statusValue = "offline";
+
       const payload = {
-        status: extraState.status || "online",
-        activeRoom: passivePartner || "",
-        isWindowActive: document.visibilityState === "visible",
+        status: statusValue,
+        activeRoom: extraState.activeRoom ?? (pageIsVisible ? (passivePartner || "") : ""),
+        isWindowActive: extraState.isWindowActive ?? pageIsVisible,
+        lastSeenMs: Date.now(),
         last_changed: serverTimestamp()
       };
+
+      if (statusValue === "offline") {
+        payload.activeRoom = "";
+        payload.isWindowActive = false;
+      }
+
       try {
         await setDoc(doc(db, "user_presence", loggedInUser), payload, { merge: true });
       } catch (error) {
@@ -7107,11 +7579,36 @@
       }
     }
 
+    function getCurrentPresenceStatusFromInput() {
+      const input = document.getElementById('typedMessageInput');
+      return input && input.value ? 'typing' : 'online';
+    }
+
+    function startPresenceRenderTicker() {
+      if (presenceRenderTimer) clearInterval(presenceRenderTimer);
+      presenceRenderTimer = setInterval(() => {
+        refreshPresenceLabelsFromCache();
+      }, PRESENCE_RENDER_REFRESH_MS);
+    }
+
+    function stopPresenceHeartbeat() {
+      if (presenceSyncTimer) {
+        clearInterval(presenceSyncTimer);
+        presenceSyncTimer = null;
+      }
+      if (presenceRenderTimer) {
+        clearInterval(presenceRenderTimer);
+        presenceRenderTimer = null;
+      }
+    }
+
     function startPresenceHeartbeat() {
-      if (presenceSyncTimer) clearInterval(presenceSyncTimer);
+      stopPresenceHeartbeat();
+      syncOwnPresence({ status: getCurrentPresenceStatusFromInput() });
       presenceSyncTimer = setInterval(() => {
-        syncOwnPresence({ status: document.getElementById('typedMessageInput')?.value ? 'typing' : 'online' });
-      }, 12000);
+        syncOwnPresence({ status: getCurrentPresenceStatusFromInput() });
+      }, PRESENCE_HEARTBEAT_MS);
+      startPresenceRenderTicker();
     }
 
     function timestampToDate(value) {
@@ -7899,6 +8396,33 @@
       return document.getElementById('messageFlowBox');
     }
 
+    function prepareChatBottomInstantView() {
+      const flowBox = getMessageFlowBox();
+      if (!flowBox) return;
+      flowBox.classList.remove('chat-bottom-ready');
+      flowBox.classList.add('chat-bottom-prep');
+      flowBox.style.scrollBehavior = 'auto';
+      flowBox.innerHTML = "";
+      flowBox.scrollTop = flowBox.scrollHeight;
+    }
+
+    function revealChatAfterBottomSync(token) {
+      const flowBox = getMessageFlowBox();
+      if (!flowBox || token !== activeChatSwitchSerial) return;
+
+      forceActiveChatToBottom({ behavior: 'auto', token, skipSmoothCall: true });
+      requestAnimationFrame(() => {
+        if (token !== activeChatSwitchSerial) return;
+        forceActiveChatToBottom({ behavior: 'auto', token, skipSmoothCall: true });
+        flowBox.classList.remove('chat-bottom-prep');
+        flowBox.classList.add('chat-bottom-ready');
+        flowBox.style.scrollBehavior = '';
+        setTimeout(() => {
+          if (token === activeChatSwitchSerial) flowBox.classList.remove('chat-bottom-ready');
+        }, 220);
+      });
+    }
+
     function forceActiveChatToBottom(options = {}) {
       const flowBox = getMessageFlowBox();
       if (!flowBox) return;
@@ -7908,7 +8432,9 @@
 
       const doScroll = () => {
         if (expectedToken !== activeChatSwitchSerial) return;
+        if (behavior === 'auto') flowBox.style.scrollBehavior = 'auto';
         flowBox.scrollTop = flowBox.scrollHeight;
+        if (options.skipSmoothCall) return;
         try {
           flowBox.scrollTo({ top: flowBox.scrollHeight, behavior });
         } catch (error) {
@@ -7951,8 +8477,18 @@
         return;
       }
       passivePartner = getDisplayUsername(partnerName);
+      activeChatSwitchSerial += 1;
+      forceBottomAfterRoomSwitch = true;
       document.getElementById('dashboardPage')?.classList.add('mobile-chat-active');
       initialLoadComplete = false;
+      prepareChatBottomInstantView();
+      const selectedSwitchToken = activeChatSwitchSerial;
+      setTimeout(() => {
+        const flowBox = getMessageFlowBox();
+        if (selectedSwitchToken === activeChatSwitchSerial && flowBox?.classList.contains('chat-bottom-prep')) {
+          revealChatAfterBottomSync(selectedSwitchToken);
+        }
+      }, 1800);
       cancelLowerBarEditMode();
 
       // Reset hitungan alert pesan masuk karena room sedang aktif kita baca
@@ -8022,7 +8558,7 @@
         });
 
         box.appendChild(card);
-        fetchIndividualPresenceStatus(name);
+        renderPresenceStatusForUser(name);
       });
     }
 
@@ -8064,7 +8600,11 @@
           cancelReplyMode();
 
           const flowBox = document.getElementById('messageFlowBox');
-          if (flowBox) flowBox.innerHTML = "";
+          if (flowBox) {
+            flowBox.classList.remove('chat-bottom-prep', 'chat-bottom-ready');
+            flowBox.style.scrollBehavior = '';
+            flowBox.innerHTML = "";
+          }
 
           document.getElementById('topHeaderTitle').innerText = "Pilih Teman Mengobrol...";
           document.getElementById('topHeaderStatus').innerText = "Klik Start Chat untuk memilih pengguna";
@@ -8082,15 +8622,16 @@
     };
 
     function fetchIndividualPresenceStatus(name) {
-      getDoc(doc(db, "user_presence", name)).then((snap) => {
-        const el = document.getElementById(`presence_status_${name}`);
-        if (!el) return;
-        if (snap.exists() && snap.data().status === "online") {
-          el.innerHTML = `<span class="status-indicator online">Online</span>`;
-        } else {
-          el.innerHTML = `<span class="status-indicator offline">Offline</span>`;
-        }
-      });
+      const normalizedName = getDisplayUsername(name);
+      const cached = cachePresenceStates[normalizedName];
+      if (cached) {
+        renderPresenceStatusForUser(normalizedName, cached);
+        return;
+      }
+      getDoc(doc(db, "user_presence", normalizedName)).then((snap) => {
+        if (snap.exists()) cachePresenceStates[normalizedName] = snap.data() || {};
+        renderPresenceStatusForUser(normalizedName, cachePresenceStates[normalizedName] || null);
+      }).catch(() => renderPresenceStatusForUser(normalizedName, null));
     }
 
     window.openStartChatModal = async function() {
@@ -8255,6 +8796,13 @@
 
         const flowBox = document.getElementById('messageFlowBox');
         if (!flowBox) return;
+        const shouldKeepHiddenUntilBottom = !initialLoadComplete || forceBottomAfterRoomSwitch;
+        if (shouldKeepHiddenUntilBottom) {
+          flowBox.classList.add('chat-bottom-prep');
+          flowBox.classList.remove('chat-bottom-ready');
+          flowBox.style.scrollBehavior = 'auto';
+        }
+
         flowBox.innerHTML = "";
         lastDateSeparator = "";
 
@@ -8353,6 +8901,9 @@
         if (shouldForceBottom) {
           watchRenderedImagesForBottomScroll(flowBox, listenerSwitchToken);
           forceBottomAfterRoomSwitch = false;
+          revealChatAfterBottomSync(listenerSwitchToken);
+        } else {
+          flowBox.classList.remove('chat-bottom-prep');
         }
 
         initialLoadComplete = true;
@@ -8621,32 +9172,26 @@
     };
 
     function initiatePresenceListener() {
-      if (!passivePartner || unsubsStatus) { if(unsubsStatus) unsubsStatus(); }
+      if (unsubsStatus) {
+        try { unsubsStatus(); } catch (error) {}
+        unsubsStatus = null;
+      }
+      if (!passivePartner) return;
+
       unsubsStatus = onSnapshot(doc(db, "user_presence", passivePartner), (snapshot) => {
-        const sideLabel = document.getElementById(`presence_status_${passivePartner}`);
-        const topLabel = document.getElementById('topHeaderStatus');
-        
-        if (snapshot.exists()) {
-          const data = snapshot.data();
-          if (data.status === "typing") {
-            if(sideLabel) sideLabel.innerHTML = `<span style="color:var(--dash-accent);">Mengetik...</span>`;
-            topLabel.innerHTML = `<span style="color:var(--dash-accent); font-style:italic;">Sedang mengetik...</span>`;
-          } else if (data.status === "online") {
-            if(sideLabel) sideLabel.innerHTML = `<span class="status-indicator online">Online</span>`;
-            if (isPartnerActivelyReadingThisRoom(data, loggedInUser)) {
-              topLabel.innerHTML = `<span style="color:#65EEFF;">● Sedang melihat chat ini</span>`;
-              markAllMessagesInActiveRoomAsRead();
-            } else {
-              topLabel.innerHTML = `<span style="color:#4caf50;">● Online</span>`;
-            }
-          } else {
-            if(sideLabel) sideLabel.innerHTML = `<span class="status-indicator offline">Offline</span>`;
-            topLabel.innerHTML = `<span style="color:rgba(255,255,255,0.35);">Offline</span>`;
-          }
-        } else {
-          if(sideLabel) sideLabel.innerHTML = `<span class="status-indicator offline">Offline</span>`;
-          topLabel.innerHTML = `<span style="color:rgba(255,255,255,0.35);">Offline</span>`;
+        const data = snapshot.exists() ? (snapshot.data() || {}) : null;
+        if (data) cachePresenceStates[passivePartner] = data;
+        renderPresenceStatusForUser(passivePartner, data);
+
+        const view = getPresenceViewState(data || {});
+        if (view.online && isPartnerActivelyReadingThisRoom(data || {}, loggedInUser)) {
+          const topLabel = document.getElementById('topHeaderStatus');
+          if (topLabel && view.state !== "typing") topLabel.innerHTML = `<span style="color:#65EEFF;">● Sedang melihat chat ini</span>`;
+          markAllMessagesInActiveRoomAsRead();
         }
+      }, (error) => {
+        console.warn("Gagal listener status partner:", error);
+        renderPresenceStatusForUser(passivePartner, null);
       });
     }
 
@@ -8765,6 +9310,287 @@
       } catch(e) {}
     };
 
+
+    function isOwnerAccount() {
+      return getDisplayUsername(loggedInUser) === OWNER_USERNAME || normalizeRoleId(userRole) === "owner";
+    }
+
+    function setOwnerToolsVisibility() {
+      const ownerCard = document.getElementById('ownerToolsCard');
+      if (ownerCard) ownerCard.classList.toggle('is-hidden', !isOwnerAccount());
+    }
+
+    function parseNumericStatValue(value) {
+      if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+      const cleaned = String(value ?? '').replace(/[^\d.-]/g, '');
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function setAdminStatValue(id, value) {
+      const node = document.getElementById(id);
+      if (!node) return;
+      const targetValue = parseNumericStatValue(value);
+      const startValue = parseNumericStatValue(node.dataset.value || 0);
+      node.dataset.value = String(targetValue);
+      if (startValue === targetValue) {
+        node.textContent = formatNumberID(targetValue);
+        return;
+      }
+
+      const duration = 720;
+      const startTime = performance.now();
+      const delta = targetValue - startValue;
+      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+      function animateFrame(now) {
+        const progress = Math.min(1, (now - startTime) / duration);
+        const current = Math.round(startValue + (delta * easeOutCubic(progress)));
+        node.textContent = formatNumberID(current);
+        if (progress < 1) requestAnimationFrame(animateFrame);
+      }
+
+      requestAnimationFrame(animateFrame);
+    }
+
+    function formatNumberID(value) {
+      const numberValue = Number(value || 0);
+      try { return numberValue.toLocaleString('id-ID'); } catch (error) { return String(numberValue); }
+    }
+
+    function setAdminStatsStatus(message) {
+      const node = document.getElementById('adminStatsUpdatedAt');
+      if (node) node.textContent = message;
+    }
+
+    function playAdminStatsVisualAnimation() {
+      const grid = document.getElementById('adminStatsGrid');
+      if (!grid) return;
+      grid.classList.remove('is-ready');
+      void grid.offsetWidth;
+      grid.classList.add('is-ready');
+    }
+
+    window.refreshAdminStatsDashboard = async function() {
+      if (!hasPermission("adminPanel")) {
+        alert("Role kamu belum punya akses Dashboard Statistik Admin.");
+        return;
+      }
+
+      setAdminStatsStatus("Memuat statistik ringan...");
+      const refreshBtn = document.querySelector('#adminStatsDashboard .admin-icon-btn');
+      if (refreshBtn) {
+        refreshBtn.disabled = true;
+        refreshBtn.innerHTML = '<span class="admin-icon-btn-glyph">⟳</span><span>Memuat...</span>';
+      }
+
+      try {
+        // Statistik dibuat ringan: hanya baca app_users + user_presence.
+        // Collection obrolan_utama tidak dibaca lagi supaya Admin Panel tidak lama loading.
+        const [usersSnap, presenceSnap] = await Promise.all([
+          getDocs(collection(db, "app_users")),
+          getDocs(collection(db, "user_presence"))
+        ]);
+
+        let totalUsers = 0;
+        let ownerUsers = 0;
+        let adminUsers = 0;
+        let regularUsers = 0;
+
+        usersSnap.forEach((userDoc) => {
+          totalUsers++;
+          const userName = getDisplayUsername(userDoc.id);
+          const role = userName === OWNER_USERNAME ? "owner" : normalizeRoleId(userDoc.data()?.role || "biasa");
+
+          if (role === "owner") ownerUsers++;
+          else if (role === "admin") adminUsers++;
+          else regularUsers++;
+        });
+
+        let onlineUsers = 0;
+        presenceSnap.forEach((presenceDoc) => {
+          const data = presenceDoc.data() || {};
+          if (getPresenceViewState(data).online) onlineUsers++;
+        });
+
+        setAdminStatValue('statTotalUsers', totalUsers);
+        setAdminStatValue('statOwnerUsers', ownerUsers);
+        setAdminStatValue('statAdminUsers', adminUsers);
+        setAdminStatValue('statRegularUsers', regularUsers);
+        setAdminStatValue('statOnlineUsers', onlineUsers);
+
+        const nowText = new Date().toLocaleString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        setAdminStatsStatus('Update terakhir: ' + nowText + ' • Mode ringan');
+      } catch (error) {
+        console.error("Gagal memuat statistik admin:", error);
+        setAdminStatsStatus("Gagal memuat statistik. Cek koneksi atau rules Firebase.");
+      } finally {
+        if (refreshBtn) {
+          refreshBtn.disabled = false;
+          refreshBtn.innerHTML = '<span class="admin-icon-btn-glyph">⟳</span><span>Refresh Statistik</span>';
+          playAdminStatsVisualAnimation();
+        }
+      }
+    };
+
+    function setOwnerCacheStatus(message) {
+      const node = document.getElementById('ownerCacheStatus');
+      if (node) node.textContent = message;
+      try {
+        localStorage.setItem(DASHBOARD_CACHE_STATUS_KEY, JSON.stringify({
+          message,
+          at: Date.now()
+        }));
+      } catch (error) {}
+    }
+
+    async function clearCacheStorageBuckets() {
+      if (!("caches" in window)) return 0;
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+        return cacheNames.length;
+      } catch (error) {
+        console.warn("Gagal membersihkan Cache Storage:", error);
+        return 0;
+      }
+    }
+
+    function resetInMemoryDashboardCache() {
+      cacheRenderedMessages = {};
+      cacheUserAvatars = {};
+      cacheUserProfiles = {};
+      cacheUserDisplayNames = {};
+      cacheUnreadCounts = {};
+      roomListArray = [];
+      try { if (typeof buildVerticalChatRoomsDOM === "function") buildVerticalChatRoomsDOM(); } catch (error) {}
+    }
+
+    async function clearLocalDashboardCache(options = {}) {
+      const keepSession = options.keepSession !== false;
+      const handledSignal = Number(options.handledSignal || 0);
+      const preservedSession = keepSession ? safeReadStorage(DASHBOARD_SESSION_KEY) : null;
+
+      try {
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key) continue;
+          const isDashboardKey =
+            key.startsWith("fandah_") ||
+            key.startsWith("dashboard_") ||
+            key.startsWith("firebase:") ||
+            key.includes("chat") ||
+            key.includes("theme") ||
+            key.includes("latar");
+          if (isDashboardKey && key !== DASHBOARD_SESSION_KEY) keysToRemove.push(key);
+        }
+        keysToRemove.forEach((key) => safeRemoveStorage(key));
+      } catch (error) {
+        console.warn("Gagal membersihkan localStorage:", error);
+      }
+
+      try { sessionStorage.clear(); } catch (error) {}
+      resetInMemoryDashboardCache();
+
+      if (keepSession && preservedSession) safeWriteStorage(DASHBOARD_SESSION_KEY, preservedSession);
+      if (handledSignal) safeWriteStorage(DASHBOARD_CACHE_SIGNAL_HANDLED_KEY, String(handledSignal));
+
+      const clearedBuckets = await clearCacheStorageBuckets();
+      return { clearedBuckets };
+    }
+
+    window.clearDashboardCacheOwnerOnly = async function() {
+      if (!isOwnerAccount()) {
+        alert("Fitur clear cache hanya khusus OWNER.");
+        return;
+      }
+
+      const ok = confirm("Clear cache dashboard sekarang? Cache browser, data sementara, room lokal, dan cache tampilan akan dibersihkan. Data Firebase tidak akan dihapus.");
+      if (!ok) return;
+
+      const btn = document.querySelector('#ownerToolsCard .modal-btn.danger');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Membersihkan...";
+      }
+
+      const signalVersion = Date.now();
+      try {
+        await setDoc(doc(db, "app_settings", "dashboard_cache_control"), {
+          version: signalVersion,
+          action: "clear_cache",
+          updatedBy: loggedInUser,
+          updatedAt: serverTimestamp(),
+          updatedAtMs: signalVersion
+        }, { merge: true });
+
+        const result = await clearLocalDashboardCache({
+          keepSession: true,
+          handledSignal: signalVersion
+        });
+
+        setOwnerCacheStatus(`Cache berhasil dibersihkan. Cache Storage terhapus: ${formatNumberID(result.clearedBuckets)} bucket.`);
+        alert("Cache berhasil dibersihkan. Sinyal clear cache juga sudah dikirim ke dashboard user lain yang sedang aktif.");
+
+        setTimeout(() => {
+          try { window.location.reload(); } catch (error) {}
+        }, 650);
+      } catch (error) {
+        console.error("Gagal clear cache:", error);
+        setOwnerCacheStatus("Gagal clear cache. Cek koneksi atau rules Firebase.");
+        alert("Gagal clear cache. Cek koneksi atau rules Firebase.");
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "Clear Cache Dashboard";
+        }
+      }
+    };
+
+    function initiateCacheControlListener() {
+      if (unsubsCacheControl) {
+        try { unsubsCacheControl(); } catch (error) {}
+        unsubsCacheControl = null;
+        unsubsPresenceList = null;
+      }
+
+      try {
+        unsubsCacheControl = onSnapshot(doc(db, "app_settings", "dashboard_cache_control"), async (snapshot) => {
+          if (!snapshot.exists()) return;
+          const data = snapshot.data() || {};
+          const remoteVersion = Number(data.version || data.updatedAtMs || 0);
+          if (!remoteVersion) return;
+
+          const handledVersion = Number(safeReadStorage(DASHBOARD_CACHE_SIGNAL_HANDLED_KEY) || 0);
+          if (remoteVersion <= handledVersion) return;
+
+          await clearLocalDashboardCache({
+            keepSession: true,
+            handledSignal: remoteVersion
+          });
+
+          safeWriteStorage(DASHBOARD_CACHE_SIGNAL_HANDLED_KEY, String(remoteVersion));
+
+          if (getDisplayUsername(data.updatedBy || "") !== loggedInUser) {
+            setTimeout(() => {
+              try { window.location.reload(); } catch (error) {}
+            }, 800);
+          }
+        }, (error) => {
+          console.warn("Listener cache control gagal:", error);
+        });
+      } catch (error) {
+        console.warn("Gagal memasang listener cache control:", error);
+      }
+    }
+
     window.openAdminManagementModal = function() {
       if(!hasPermission("adminPanel")) {
         alert("Role kamu belum punya akses Admin Panel.");
@@ -8774,6 +9600,8 @@
       renderNewRoleAccessGrid();
       renderAdminRoleContainer();
       listenToUserListRealtime();
+      setOwnerToolsVisibility();
+      refreshAdminStatsDashboard();
     };
     window.closeAdminManagementModal = function() {
       document.getElementById('adminModal').style.display = 'none';
@@ -8838,12 +9666,86 @@
         alert("Role bawaan tidak bisa dihapus.");
         return;
       }
-      if (!confirm(`Hapus role ${formatRoleName(normalized)}? User yang memakai role ini sebaiknya dipindah dulu.`)) return;
+
+      const roleLabel = formatRoleName(normalized);
+      const ok = confirm(`Hapus role ${roleLabel}? Semua user yang sedang memakai role ini akan otomatis diubah menjadi role Biasa.`);
+      if (!ok) return;
+
+      const deleteButtons = Array.from(document.querySelectorAll('.role-delete-btn'));
+      deleteButtons.forEach((button) => {
+        button.disabled = true;
+        button.dataset.originalText = button.textContent || "Hapus";
+        button.textContent = "Memproses...";
+      });
+
       try {
-        await deleteDoc(doc(db, "app_roles", normalized));
-        alert("Role berhasil dihapus.");
+        const usersSnap = await getDocs(collection(db, "app_users"));
+        const usersToMove = [];
+
+        usersSnap.forEach((uDoc) => {
+          const safeUserName = getDisplayUsername(uDoc.id);
+          const userData = uDoc.data() || {};
+          const currentRole = normalizeRoleId(userData.role || "biasa");
+
+          // OWNER tidak boleh ikut berubah walaupun datanya tidak sengaja memakai role custom.
+          if (safeUserName !== OWNER_USERNAME && currentRole === normalized) {
+            usersToMove.push(uDoc.id);
+          }
+        });
+
+        const roleRef = doc(db, "app_roles", normalized);
+        const MAX_BATCH_WRITES = 450; // aman di bawah limit batch Firestore 500 operasi
+
+        if (usersToMove.length === 0) {
+          const batch = writeBatch(db);
+          batch.delete(roleRef);
+          await batch.commit();
+        } else {
+          for (let i = 0; i < usersToMove.length; i += MAX_BATCH_WRITES) {
+            const chunk = usersToMove.slice(i, i + MAX_BATCH_WRITES);
+            const batch = writeBatch(db);
+
+            chunk.forEach((username) => {
+              batch.update(doc(db, "app_users", username), {
+                role: "biasa",
+                roleUpdatedAt: serverTimestamp(),
+                roleUpdatedBy: loggedInUser || "system",
+                previousRoleBeforeDelete: normalized
+              });
+            });
+
+            if (i + MAX_BATCH_WRITES >= usersToMove.length) {
+              batch.delete(roleRef);
+            }
+
+            await batch.commit();
+          }
+        }
+
+        usersToMove.forEach((username) => {
+          const displayUsername = getDisplayUsername(username);
+          cacheUserRoles[displayUsername] = "biasa";
+        });
+
+        if (normalizeRoleId(userRole) === normalized) {
+          userRole = "biasa";
+          cacheUserRoles[loggedInUser] = "biasa";
+          syncCurrentUserHeader();
+          applyCurrentUserAccess();
+        }
+
+        renderAdminRoleContainer();
+        refreshAdminStatsDashboard();
+        alert(`Role ${roleLabel} berhasil dihapus. ${usersToMove.length} user otomatis dipindahkan ke role Biasa.`);
       } catch (error) {
-        alert("Gagal menghapus role.");
+        console.error("Gagal menghapus role dan memindahkan user:", error);
+        alert("Gagal menghapus role. Perubahan dibatalkan/terhenti. Cek koneksi atau rules Firebase.");
+      } finally {
+        deleteButtons.forEach((button) => {
+          button.disabled = false;
+          button.textContent = button.dataset.originalText || "Hapus";
+          delete button.dataset.originalText;
+        });
       }
     };
 
@@ -8905,6 +9807,7 @@
         try { await deleteDoc(doc(db, "user_rooms", targetUser)); } catch (e) {}
         delete cacheUserRoles[targetUser];
         delete cacheUserProfiles[targetUser];
+        delete cachePresenceStates[targetUser];
         alert("User berhasil dihapus.");
       } catch (error) {
         alert("Gagal menghapus user.");
@@ -8926,7 +9829,7 @@
         });
 
         if (dashboardSessionTimer) { clearInterval(dashboardSessionTimer); dashboardSessionTimer = null; }
-        if (presenceSyncTimer) { clearInterval(presenceSyncTimer); presenceSyncTimer = null; }
+        stopPresenceHeartbeat();
 
         const signOutUser = loggedInUser;
         if (signOutUser) {
@@ -8934,13 +9837,14 @@
             status: "offline",
             activeRoom: "",
             isWindowActive: false,
+            lastSeenMs: Date.now(),
             last_changed: serverTimestamp()
           }, { merge: true }), 1200);
         }
 
         const unsubscribeList = [
           unsubsMessages, unsubsStatus, unsubsProfiles, unsubsAdminList,
-          unsubsRoomsNotification, unsubsUserRoles, unsubsRoleDefinitions
+          unsubsRoomsNotification, unsubsUserRoles, unsubsRoleDefinitions, unsubsCacheControl, unsubsPresenceList
         ];
         unsubscribeList.forEach((unsubscribeFn) => {
           try { if (typeof unsubscribeFn === 'function') unsubscribeFn(); } catch (error) {}
@@ -8953,11 +9857,14 @@
         unsubsRoomsNotification = null;
         unsubsUserRoles = null;
         unsubsRoleDefinitions = null;
+        unsubsCacheControl = null;
+        unsubsPresenceList = null;
 
         loggedInUser = "";
         passivePartner = "";
         roomListArray = [];
         cacheUnreadCounts = {};
+        cachePresenceStates = {};
         cacheRenderedMessages = {};
         activeReplyData = null;
         cacheUserProfiles = {};
@@ -9567,25 +10474,35 @@
 
     document.addEventListener('visibilitychange', () => {
       if (!loggedInUser) return;
-      syncOwnPresence({ status: document.getElementById('typedMessageInput')?.value ? 'typing' : 'online' });
-      if (!document.hidden) {
-        markAllMessagesInActiveRoomAsRead();
-        setTimeout(markAllMessagesInActiveRoomAsRead, 350);
+      if (document.hidden) {
+        syncOwnPresence({ status: 'offline', activeRoom: '', isWindowActive: false });
+        refreshPresenceLabelsFromCache();
+        return;
       }
-    });
-
-    window.addEventListener('focus', () => {
-      if (!loggedInUser) return;
-      syncOwnPresence({ status: 'online' });
+      startPresenceHeartbeat();
+      syncOwnPresence({ status: getCurrentPresenceStatusFromInput(), isWindowActive: true });
+      refreshPresenceLabelsFromCache();
       markAllMessagesInActiveRoomAsRead();
       setTimeout(markAllMessagesInActiveRoomAsRead, 350);
     });
 
+    window.addEventListener('focus', () => {
+      if (!loggedInUser) return;
+      startPresenceHeartbeat();
+      syncOwnPresence({ status: getCurrentPresenceStatusFromInput(), isWindowActive: true });
+      markAllMessagesInActiveRoomAsRead();
+      setTimeout(markAllMessagesInActiveRoomAsRead, 350);
+    });
+
+    window.addEventListener('pagehide', () => {
+      if (!loggedInUser) return;
+      syncOwnPresence({ status: 'offline', activeRoom: '', isWindowActive: false });
+    });
+
     window.addEventListener('beforeunload', () => {
       if (!loggedInUser) return;
-      // Jangan hapus session saat refresh. Aktivitas terakhir tetap diperpanjang,
-      // sedangkan status offline hanya ditangani saat manual logout / idle logout.
       refreshDashboardSessionActivity(true);
+      syncOwnPresence({ status: 'offline', activeRoom: '', isWindowActive: false });
     });
 
     function escapeAttrCode(str) {
@@ -9824,6 +10741,34 @@
   <style id="final-theme-picker-admin-colors-upgrade">
     #backgroundModal { display: none !important; }
 
+    html[data-dashboard-theme="cyber-crypto"] {
+      --theme-bg-a: #03121D; --theme-bg-b: #062A3D; --theme-bg-c: #01050B;
+      --theme-panel: rgba(2, 13, 24, .94); --theme-panel-2: rgba(4, 29, 45, .82);
+      --theme-chat: #010811; --theme-accent: #19F6A7; --theme-accent-2: #0EA5E9; --theme-accent-3: #A7FFE0;
+      --theme-border: rgba(25, 246, 167, .24); --theme-text: #F6FFFC; --theme-muted: rgba(235, 255, 248, .82); --theme-soft-text: rgba(235, 255, 248, .72); --theme-out-text: #021611;
+      --theme-in-a: rgba(3, 31, 40, .90); --theme-in-b: rgba(1, 10, 18, .96);
+      --theme-out-a: rgba(25, 246, 167, .86); --theme-out-b: rgba(14, 165, 233, .90); --theme-out-c: rgba(3, 42, 62, .96);
+      --admin-select-bg-a: rgba(215, 255, 240, .96); --admin-select-bg-b: rgba(25, 246, 167, .92); --admin-select-text: #021611;
+      --admin-select-border: rgba(105, 255, 201, .76); --admin-select-focus: rgba(25, 246, 167, .24);
+      --admin-select-option-bg: #03121D; --admin-select-option-text: #EAFFF8;
+      --admin-delete-bg-a: rgba(62, 18, 41, .95); --admin-delete-bg-b: rgba(110, 24, 60, .96);
+      --admin-delete-text: #FFE2EE; --admin-delete-border: rgba(255, 126, 174, .26);
+    }
+
+    html[data-dashboard-theme="cyber-luxury"] {
+      --theme-bg-a: #0B0804; --theme-bg-b: #241804; --theme-bg-c: #030303;
+      --theme-panel: rgba(15, 12, 7, .94); --theme-panel-2: rgba(41, 29, 11, .82);
+      --theme-chat: #060504; --theme-accent: #E5B84C; --theme-accent-2: #38D9FF; --theme-accent-3: #FFF0B8;
+      --theme-border: rgba(229, 184, 76, .26); --theme-text: #FFF9EA; --theme-muted: rgba(255, 246, 220, .82); --theme-soft-text: rgba(255, 244, 214, .74); --theme-out-text: #1B1204;
+      --theme-in-a: rgba(36, 25, 10, .90); --theme-in-b: rgba(8, 6, 4, .96);
+      --theme-out-a: rgba(255, 236, 171, .92); --theme-out-b: rgba(229, 184, 76, .94); --theme-out-c: rgba(6, 42, 54, .96);
+      --admin-select-bg-a: rgba(255, 244, 207, .96); --admin-select-bg-b: rgba(229, 184, 76, .94); --admin-select-text: #1B1204;
+      --admin-select-border: rgba(255, 224, 140, .78); --admin-select-focus: rgba(229, 184, 76, .24);
+      --admin-select-option-bg: #1B1307; --admin-select-option-text: #FFF5D3;
+      --admin-delete-bg-a: rgba(90, 19, 38, .95); --admin-delete-bg-b: rgba(122, 26, 51, .96);
+      --admin-delete-text: #FFE5EC; --admin-delete-border: rgba(255, 141, 167, .26);
+    }
+
     html:not([data-dashboard-theme]),
     html[data-dashboard-theme="gold-luxury"] {
       --theme-bg-a: #090704; --theme-bg-b: #1A1207; --theme-bg-c: #050403;
@@ -9839,60 +10784,74 @@
       --admin-delete-text: #FFD9E3; --admin-delete-border: rgba(255, 126, 154, .24);
     }
 
-    html[data-dashboard-theme="ocean-blue"] {
-      --theme-bg-a: #020817; --theme-bg-b: #071A3A; --theme-bg-c: #020713;
-      --theme-panel: rgba(5, 17, 39, .92); --theme-panel-2: rgba(8, 26, 58, .82);
-      --theme-chat: #030A18; --theme-accent: #5DD7FF; --theme-accent-2: #2563EB; --theme-accent-3: #93C5FD;
-      --theme-border: rgba(93, 215, 255, .22); --theme-text: #EAF7FF; --theme-muted: rgba(218, 236, 255, .62);
-      --theme-in-a: rgba(6, 22, 48, .90); --theme-in-b: rgba(3, 9, 22, .95);
-      --theme-out-a: rgba(72, 190, 255, .84); --theme-out-b: rgba(37, 99, 235, .90); --theme-out-c: rgba(7, 33, 78, .96);
-      --admin-select-bg-a: rgba(224, 245, 255, .96); --admin-select-bg-b: rgba(52, 129, 255, .96); --admin-select-text: #041322;
-      --admin-select-border: rgba(120, 202, 255, .76); --admin-select-focus: rgba(93, 215, 255, .24);
-      --admin-select-option-bg: #071423; --admin-select-option-text: #E9F8FF;
-      --admin-delete-bg-a: rgba(69, 18, 40, .94); --admin-delete-bg-b: rgba(122, 28, 57, .96);
-      --admin-delete-text: #FFE6EE; --admin-delete-border: rgba(255, 131, 168, .26);
+    html[data-dashboard-theme="midnight-blue-premium"] {
+      --theme-bg-a: #061326; --theme-bg-b: #0B2142; --theme-bg-c: #020713;
+      --theme-panel: rgba(5, 14, 30, .95); --theme-panel-2: rgba(10, 30, 58, .84);
+      --theme-chat: #030914; --theme-accent: #4AB8FF; --theme-accent-2: #2563EB; --theme-accent-3: #C8E7FF;
+      --theme-border: rgba(74, 184, 255, .24); --theme-text: #F3F9FF; --theme-muted: rgba(218, 235, 250, .82); --theme-soft-text: rgba(197, 220, 240, .72); --theme-out-text: #F7FBFF;
+      --theme-in-a: rgba(8, 25, 49, .92); --theme-in-b: rgba(3, 10, 22, .96);
+      --theme-out-a: rgba(29, 78, 216, .86); --theme-out-b: rgba(14, 116, 190, .90); --theme-out-c: rgba(5, 31, 67, .96);
+      --admin-select-bg-a: rgba(231, 246, 255, .96); --admin-select-bg-b: rgba(74, 184, 255, .92); --admin-select-text: #041526;
+      --admin-select-border: rgba(140, 214, 255, .76); --admin-select-focus: rgba(74, 184, 255, .24);
+      --admin-select-option-bg: #061326; --admin-select-option-text: #F3F9FF;
+      --admin-delete-bg-a: rgba(78, 20, 43, .95); --admin-delete-bg-b: rgba(123, 28, 59, .96);
+      --admin-delete-text: #FFE6EF; --admin-delete-border: rgba(255, 137, 171, .26);
     }
 
-    html[data-dashboard-theme="emerald-green"] {
-      --theme-bg-a: #02120C; --theme-bg-b: #06351F; --theme-bg-c: #010A07;
-      --theme-panel: rgba(4, 31, 20, .92); --theme-panel-2: rgba(8, 52, 33, .80);
-      --theme-chat: #020D09; --theme-accent: #5EF0A1; --theme-accent-2: #10B981; --theme-accent-3: #A7F3D0;
-      --theme-border: rgba(94, 240, 161, .22); --theme-text: #ECFFF5; --theme-muted: rgba(220, 255, 236, .60);
-      --theme-in-a: rgba(5, 33, 21, .90); --theme-in-b: rgba(2, 13, 9, .95);
-      --theme-out-a: rgba(86, 216, 145, .84); --theme-out-b: rgba(16, 185, 129, .90); --theme-out-c: rgba(5, 54, 34, .96);
-      --admin-select-bg-a: rgba(232, 255, 244, .96); --admin-select-bg-b: rgba(16, 185, 129, .96); --admin-select-text: #032116;
-      --admin-select-border: rgba(120, 245, 191, .74); --admin-select-focus: rgba(94, 240, 161, .24);
-      --admin-select-option-bg: #071A12; --admin-select-option-text: #ECFFF5;
-      --admin-delete-bg-a: rgba(84, 23, 34, .95); --admin-delete-bg-b: rgba(122, 40, 51, .96);
-      --admin-delete-text: #FFE8ED; --admin-delete-border: rgba(255, 140, 160, .26);
+    html[data-dashboard-theme="arctic-frost"] {
+      --theme-bg-a: #071827; --theme-bg-b: #0E3147; --theme-bg-c: #020A12;
+      --theme-panel: rgba(5, 18, 31, .95); --theme-panel-2: rgba(16, 50, 72, .82);
+      --theme-chat: #03101B; --theme-accent: #7DD3FC; --theme-accent-2: #38BDF8; --theme-accent-3: #E0F7FF;
+      --theme-border: rgba(125, 211, 252, .24); --theme-text: #F6FDFF; --theme-muted: rgba(225, 246, 255, .82); --theme-soft-text: rgba(200, 232, 245, .74); --theme-out-text: #062033;
+      --theme-in-a: rgba(10, 35, 53, .92); --theme-in-b: rgba(4, 14, 24, .96);
+      --theme-out-a: rgba(224, 247, 255, .94); --theme-out-b: rgba(125, 211, 252, .94); --theme-out-c: rgba(56, 189, 248, .90);
+      --admin-select-bg-a: rgba(244, 253, 255, .98); --admin-select-bg-b: rgba(125, 211, 252, .94); --admin-select-text: #062033;
+      --admin-select-border: rgba(171, 229, 255, .80); --admin-select-focus: rgba(125, 211, 252, .24);
+      --admin-select-option-bg: #071827; --admin-select-option-text: #F6FDFF;
+      --admin-delete-bg-a: rgba(84, 25, 39, .95); --admin-delete-bg-b: rgba(122, 38, 54, .96);
+      --admin-delete-text: #FFE9EF; --admin-delete-border: rgba(255, 151, 170, .26);
     }
 
-    html[data-dashboard-theme="violet-neon"] {
-      --theme-bg-a: #0B0618; --theme-bg-b: #2A125C; --theme-bg-c: #04020A;
-      --theme-panel: rgba(18, 11, 38, .92); --theme-panel-2: rgba(45, 28, 92, .80);
-      --theme-chat: #080413; --theme-accent: #B48AFF; --theme-accent-2: #8B5CF6; --theme-accent-3: #DDD6FE;
-      --theme-border: rgba(180, 138, 255, .24); --theme-text: #F7F1FF; --theme-muted: rgba(234, 221, 255, .60);
-      --theme-in-a: rgba(30, 18, 62, .90); --theme-in-b: rgba(8, 5, 17, .95);
-      --theme-out-a: rgba(177, 125, 255, .84); --theme-out-b: rgba(139, 92, 246, .90); --theme-out-c: rgba(59, 7, 100, .96);
-      --admin-select-bg-a: rgba(243, 236, 255, .96); --admin-select-bg-b: rgba(139, 92, 246, .96); --admin-select-text: #130723;
-      --admin-select-border: rgba(201, 166, 255, .78); --admin-select-focus: rgba(180, 138, 255, .25);
-      --admin-select-option-bg: #120A24; --admin-select-option-text: #F7F1FF;
-      --admin-delete-bg-a: rgba(85, 20, 46, .95); --admin-delete-bg-b: rgba(124, 32, 72, .96);
-      --admin-delete-text: #FFE8F4; --admin-delete-border: rgba(255, 140, 196, .26);
+    html[data-dashboard-theme="neon-tokyo"] {
+      --theme-bg-a: #0B0618; --theme-bg-b: #1E0D33; --theme-bg-c: #04030A;
+      --theme-panel: rgba(13, 9, 28, .95); --theme-panel-2: rgba(34, 18, 59, .82);
+      --theme-chat: #070512; --theme-accent: #FF4FD8; --theme-accent-2: #22D3EE; --theme-accent-3: #FBE7FF;
+      --theme-border: rgba(255, 79, 216, .23); --theme-text: #FFF7FE; --theme-muted: rgba(242, 224, 255, .82); --theme-soft-text: rgba(224, 204, 245, .74); --theme-out-text: #FFF7FE;
+      --theme-in-a: rgba(28, 14, 48, .92); --theme-in-b: rgba(8, 5, 18, .96);
+      --theme-out-a: rgba(128, 45, 226, .84); --theme-out-b: rgba(236, 72, 153, .86); --theme-out-c: rgba(8, 145, 178, .82);
+      --admin-select-bg-a: rgba(255, 238, 252, .97); --admin-select-bg-b: rgba(255, 79, 216, .92); --admin-select-text: #250522;
+      --admin-select-border: rgba(255, 165, 234, .78); --admin-select-focus: rgba(255, 79, 216, .24);
+      --admin-select-option-bg: #120A24; --admin-select-option-text: #FFF7FE;
+      --admin-delete-bg-a: rgba(92, 16, 43, .95); --admin-delete-bg-b: rgba(134, 23, 62, .96);
+      --admin-delete-text: #FFE8F3; --admin-delete-border: rgba(255, 140, 196, .26);
     }
 
-    html[data-dashboard-theme="ruby-red"] {
-      --theme-bg-a: #16050B; --theme-bg-b: #3B0712; --theme-bg-c: #070206;
-      --theme-panel: rgba(35, 8, 17, .92); --theme-panel-2: rgba(70, 13, 28, .80);
-      --theme-chat: #100308; --theme-accent: #FF6E91; --theme-accent-2: #E11D48; --theme-accent-3: #FFC2D1;
-      --theme-border: rgba(255, 110, 145, .24); --theme-text: #FFF0F4; --theme-muted: rgba(255, 220, 229, .60);
-      --theme-in-a: rgba(48, 10, 22, .90); --theme-in-b: rgba(14, 3, 8, .95);
-      --theme-out-a: rgba(255, 116, 151, .84); --theme-out-b: rgba(225, 29, 72, .90); --theme-out-c: rgba(92, 8, 28, .96);
-      --admin-select-bg-a: rgba(255, 234, 239, .97); --admin-select-bg-b: rgba(225, 29, 72, .96); --admin-select-text: #24040D;
-      --admin-select-border: rgba(255, 149, 176, .78); --admin-select-focus: rgba(255, 110, 145, .24);
-      --admin-select-option-bg: #1E0810; --admin-select-option-text: #FFF0F4;
-      --admin-delete-bg-a: rgba(88, 18, 37, .95); --admin-delete-bg-b: rgba(123, 23, 49, .96);
+    html[data-dashboard-theme="cyber-red"] {
+      --theme-bg-a: #15060A; --theme-bg-b: #2A0910; --theme-bg-c: #070204;
+      --theme-panel: rgba(28, 8, 14, .95); --theme-panel-2: rgba(54, 13, 22, .82);
+      --theme-chat: #0D0306; --theme-accent: #FF4D6D; --theme-accent-2: #F97316; --theme-accent-3: #FFD8E0;
+      --theme-border: rgba(255, 77, 109, .23); --theme-text: #FFF6F8; --theme-muted: rgba(255, 222, 228, .82); --theme-soft-text: rgba(245, 198, 207, .74); --theme-out-text: #FFF6F8;
+      --theme-in-a: rgba(46, 12, 21, .92); --theme-in-b: rgba(14, 3, 7, .96);
+      --theme-out-a: rgba(190, 24, 93, .86); --theme-out-b: rgba(225, 29, 72, .90); --theme-out-c: rgba(127, 29, 29, .94);
+      --admin-select-bg-a: rgba(255, 239, 243, .98); --admin-select-bg-b: rgba(255, 77, 109, .94); --admin-select-text: #25040C;
+      --admin-select-border: rgba(255, 146, 166, .78); --admin-select-focus: rgba(255, 77, 109, .24);
+      --admin-select-option-bg: #1E0810; --admin-select-option-text: #FFF6F8;
+      --admin-delete-bg-a: rgba(90, 18, 37, .95); --admin-delete-bg-b: rgba(126, 25, 50, .96);
       --admin-delete-text: #FFE5EC; --admin-delete-border: rgba(255, 141, 167, .26);
+    }
+
+    html[data-dashboard-theme="matrix-green"] {
+      --theme-bg-a: #02120A; --theme-bg-b: #062514; --theme-bg-c: #010604;
+      --theme-panel: rgba(3, 20, 12, .95); --theme-panel-2: rgba(8, 43, 24, .82);
+      --theme-chat: #020B06; --theme-accent: #6DFF9A; --theme-accent-2: #22C55E; --theme-accent-3: #D4FFE2;
+      --theme-border: rgba(109, 255, 154, .22); --theme-text: #F3FFF7; --theme-muted: rgba(219, 255, 232, .82); --theme-soft-text: rgba(192, 235, 207, .74); --theme-out-text: #03180B;
+      --theme-in-a: rgba(7, 35, 19, .92); --theme-in-b: rgba(2, 12, 7, .96);
+      --theme-out-a: rgba(212, 255, 226, .94); --theme-out-b: rgba(109, 255, 154, .94); --theme-out-c: rgba(34, 197, 94, .90);
+      --admin-select-bg-a: rgba(241, 255, 246, .98); --admin-select-bg-b: rgba(109, 255, 154, .94); --admin-select-text: #03180B;
+      --admin-select-border: rgba(161, 255, 191, .78); --admin-select-focus: rgba(109, 255, 154, .24);
+      --admin-select-option-bg: #061A10; --admin-select-option-text: #F3FFF7;
+      --admin-delete-bg-a: rgba(82, 22, 34, .95); --admin-delete-bg-b: rgba(119, 36, 48, .96);
+      --admin-delete-text: #FFE8ED; --admin-delete-border: rgba(255, 140, 160, .26);
     }
 
     .dashboard-theme-modal { max-width: 560px !important; }
@@ -9905,11 +10864,14 @@
     .dashboard-theme-card:hover { transform: translateY(-1px); border-color: var(--theme-accent, #D9A93A); background: rgba(255,255,255,.055); }
     .dashboard-theme-card.active { border-color: var(--theme-accent, #D9A93A); box-shadow: 0 0 0 1px rgba(255,255,255,.04) inset, 0 0 18px rgba(217,169,58,.14); background: rgba(255,255,255,.06); }
     .dashboard-theme-swatch { width: 40px; height: 40px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 12px 26px rgba(0,0,0,.22); flex: 0 0 40px; }
+    .theme-swatch-cyber-crypto { background: linear-gradient(135deg, #A7FFE0, #19F6A7 42%, #0EA5E9 68%, #03121D); }
+    .theme-swatch-cyber-luxury { background: linear-gradient(135deg, #FFF0B8, #E5B84C 46%, #38D9FF 72%, #050403); }
     .theme-swatch-gold { background: linear-gradient(135deg, #FFE9A8, #D9A93A 56%, #6B430F); }
-    .theme-swatch-ocean { background: linear-gradient(135deg, #6EE7FF, #2563EB 56%, #071B44); }
-    .theme-swatch-emerald { background: linear-gradient(135deg, #A7F3D0, #10B981 56%, #053622); }
-    .theme-swatch-violet { background: linear-gradient(135deg, #DDD6FE, #8B5CF6 54%, #3B0764); }
-    .theme-swatch-ruby { background: linear-gradient(135deg, #FFC2D1, #E11D48 54%, #3F0713); }
+    .theme-swatch-midnight { background: linear-gradient(135deg, #C8E7FF, #4AB8FF 45%, #2563EB 70%, #061326); }
+    .theme-swatch-arctic { background: linear-gradient(135deg, #F6FDFF, #7DD3FC 45%, #38BDF8 70%, #071827); }
+    .theme-swatch-neon-tokyo { background: linear-gradient(135deg, #FBE7FF, #FF4FD8 42%, #22D3EE 68%, #0B0618); }
+    .theme-swatch-cyber-red { background: linear-gradient(135deg, #FFD8E0, #FF4D6D 45%, #F97316 70%, #15060A); }
+    .theme-swatch-matrix { background: linear-gradient(135deg, #D4FFE2, #6DFF9A 45%, #22C55E 70%, #02120A); }
     .dashboard-theme-info { min-width: 0; display: grid; gap: 0; }
     .dashboard-theme-info b { font-size: 13px; line-height: 1.15; color: var(--theme-text, #fff); }
 
@@ -10025,6 +10987,43 @@
     html[data-dashboard-theme] #adminModal .user-delete-btn:hover,
     html[data-dashboard-theme] #adminModal .role-delete-btn:hover { filter: brightness(1.05) !important; transform: translateY(-1px); }
 
+    html[data-dashboard-theme] #adminModal .admin-stat-box {
+      background:
+        radial-gradient(150px 80px at 100% 0%, color-mix(in srgb, var(--theme-accent) 16%, transparent), transparent 68%),
+        linear-gradient(145deg, color-mix(in srgb, var(--theme-panel-2) 88%, transparent), color-mix(in srgb, var(--theme-panel) 98%, transparent)) !important;
+      border-color: color-mix(in srgb, var(--theme-accent) 18%, transparent) !important;
+      color: var(--theme-text) !important;
+    }
+    html[data-dashboard-theme] #adminModal .admin-stat-box strong { color: var(--theme-text) !important; }
+    html[data-dashboard-theme] #adminModal .admin-stat-head span { color: var(--theme-muted) !important; }
+    html[data-dashboard-theme] #adminModal .admin-stat-icon,
+    html[data-dashboard-theme] #adminModal .admin-icon-btn,
+    html[data-dashboard-theme] #adminModal .admin-icon-pill {
+      border-color: color-mix(in srgb, var(--theme-accent) 22%, transparent) !important;
+      background: color-mix(in srgb, var(--theme-accent) 7%, transparent) !important;
+      color: var(--theme-accent-3) !important;
+    }
+    html[data-dashboard-theme] #adminModal .online-stat strong,
+    html[data-dashboard-theme] #adminModal .online-stat .admin-stat-icon { color: #74FFB2 !important; }
+
+    html[data-dashboard-theme="cyber-crypto"] #dashboardPage {
+      background:
+        radial-gradient(820px 460px at 0% 0%, rgba(25,246,167,.13), transparent 62%),
+        radial-gradient(700px 380px at 100% 0%, rgba(14,165,233,.12), transparent 60%),
+        linear-gradient(135deg, #01050B, #03121D 48%, #01050B) !important;
+    }
+    html[data-dashboard-theme="cyber-luxury"] #dashboardPage {
+      background:
+        radial-gradient(780px 430px at 0% 0%, rgba(229,184,76,.13), transparent 62%),
+        radial-gradient(680px 360px at 100% 0%, rgba(56,217,255,.10), transparent 60%),
+        linear-gradient(135deg, #030303, #0B0804 50%, #030303) !important;
+    }
+    html[data-dashboard-theme="cyber-crypto"] #dashboardPage::after,
+    html[data-dashboard-theme="cyber-luxury"] #dashboardPage::after {
+      opacity: .20 !important;
+      background-size: 64px 64px !important;
+    }
+
     @media (max-width: 680px) {
       .dashboard-theme-options { grid-template-columns: 1fr; }
       html[data-dashboard-theme] #adminModal .admin-control-modal { max-width: calc(100vw - 20px) !important; padding: 18px 14px !important; }
@@ -10035,11 +11034,18 @@
   <script id="final-theme-picker-admin-colors-script">
     (function() {
       const THEME_STORAGE_KEY = 'dashboard_latar_theme_v2';
-      const DEFAULT_THEME = 'gold-luxury';
-      const THEME_OPTIONS = ['gold-luxury', 'ocean-blue', 'emerald-green', 'violet-neon', 'ruby-red'];
+      const DEFAULT_THEME = 'cyber-crypto';
+      const THEME_OPTIONS = ['cyber-crypto', 'cyber-luxury', 'gold-luxury', 'midnight-blue-premium', 'arctic-frost', 'neon-tokyo', 'cyber-red', 'matrix-green'];
 
       function safeTheme(themeName) {
-        return THEME_OPTIONS.includes(themeName) ? themeName : DEFAULT_THEME;
+        const legacyThemeMap = {
+          'ocean-blue': 'midnight-blue-premium',
+          'emerald-green': 'matrix-green',
+          'violet-neon': 'neon-tokyo',
+          'ruby-red': 'cyber-red'
+        };
+        const mappedTheme = legacyThemeMap[themeName] || themeName;
+        return THEME_OPTIONS.includes(mappedTheme) ? mappedTheme : DEFAULT_THEME;
       }
 
       function applyTheme(themeName) {
@@ -10161,25 +11167,30 @@
       }
     }
 
+    html[data-dashboard-theme="cyber-crypto"] .login-love-particle {
+      --love-color: rgba(110, 232, 255, .64);
+    }
+    html[data-dashboard-theme="cyber-luxury"] .login-love-particle {
+      --love-color: rgba(255, 209, 120, .68);
+    }
     html[data-dashboard-theme="gold-luxury"] .login-love-particle,
     html:not([data-dashboard-theme]) .login-love-particle {
       --love-color: rgba(255, 210, 120, .68);
     }
-
-    html[data-dashboard-theme="ocean-blue"] .login-love-particle {
-      --love-color: rgba(119, 225, 255, .64);
+    html[data-dashboard-theme="midnight-blue-premium"] .login-love-particle {
+      --love-color: rgba(148, 204, 255, .60);
     }
-
-    html[data-dashboard-theme="emerald-green"] .login-love-particle {
-      --love-color: rgba(139, 255, 194, .62);
+    html[data-dashboard-theme="arctic-frost"] .login-love-particle {
+      --love-color: rgba(184, 239, 255, .62);
     }
-
-    html[data-dashboard-theme="violet-neon"] .login-love-particle {
-      --love-color: rgba(205, 173, 255, .66);
+    html[data-dashboard-theme="neon-tokyo"] .login-love-particle {
+      --love-color: rgba(255, 158, 222, .68);
     }
-
-    html[data-dashboard-theme="ruby-red"] .login-love-particle {
-      --love-color: rgba(255, 122, 158, .70);
+    html[data-dashboard-theme="cyber-red"] .login-love-particle {
+      --love-color: rgba(255, 138, 163, .70);
+    }
+    html[data-dashboard-theme="matrix-green"] .login-love-particle {
+      --love-color: rgba(158, 255, 196, .62);
     }
 
     @media (max-width: 680px) {
@@ -10201,10 +11212,10 @@
 
   <script id="final-lightweight-love-after-login-script">
     (function() {
-      const MAX_LOVES_DESKTOP = 56;
-      const MAX_LOVES_MOBILE = 28;
-      const SPAWN_INTERVAL_DESKTOP = 260;
-      const SPAWN_INTERVAL_MOBILE = 430;
+      const MAX_LOVES_DESKTOP = 54;
+      const MAX_LOVES_MOBILE = 24;
+      const SPAWN_INTERVAL_DESKTOP = 285;
+      const SPAWN_INTERVAL_MOBILE = 520;
 
       let loveTimer = null;
       let loveLayer = null;
@@ -10310,8 +11321,8 @@
 
         if (loveTimer) return;
 
-        for (let i = 0; i < Math.min(20, getMaxLoves()); i++) {
-          setTimeout(spawnLoveParticle, i * 140);
+        for (let i = 0; i < Math.min(28, getMaxLoves()); i++) {
+          setTimeout(spawnLoveParticle, i * 95);
         }
 
         loveTimer = setInterval(spawnLoveParticle, getSpawnInterval());
@@ -10523,28 +11534,53 @@
 
 
   <style id="final-extra-small-love-polish">
-    /* Tambahan efek love kecil: lebih banyak, tetap ringan */
-    .login-love-particle {
+    /* Premium particle: heart + sparkle + diamond, tetap ringan karena hanya text node + CSS */
+    .login-love-particle,
+    .prelogin-love-particle,
+    .chat-love-bg-particle {
       opacity: 0;
       transform-origin: center;
     }
 
-    .login-love-particle:nth-child(3n)::before {
+    .login-love-particle:nth-child(3n)::before,
+    .prelogin-love-particle:nth-child(3n)::before,
+    .chat-love-bg-particle:nth-child(3n)::before {
       content: "♡";
       font-weight: 900;
     }
 
-    .login-love-particle:nth-child(4n)::before {
-      content: "♥";
-      font-weight: 800;
+    .login-love-particle:nth-child(4n)::before,
+    .prelogin-love-particle:nth-child(4n)::before,
+    .chat-love-bg-particle:nth-child(4n)::before {
+      content: "✦";
+      font-weight: 900;
     }
 
-    .login-love-particle:nth-child(5n) {
-      filter: brightness(1.12);
+    .login-love-particle:nth-child(5n)::before,
+    .prelogin-love-particle:nth-child(5n)::before,
+    .chat-love-bg-particle:nth-child(5n)::before {
+      content: "✧";
+      font-weight: 900;
+    }
+
+    .login-love-particle:nth-child(7n)::before,
+    .prelogin-love-particle:nth-child(7n)::before,
+    .chat-love-bg-particle:nth-child(7n)::before {
+      content: "◆";
+      font-size: .72em;
+      font-weight: 900;
+    }
+
+    .login-love-particle:nth-child(5n),
+    .prelogin-love-particle:nth-child(5n),
+    .chat-love-bg-particle:nth-child(5n) {
+      filter: brightness(1.14);
     }
 
     @media (max-width: 680px) {
-      .login-love-particle:nth-child(5n) {
+      .login-love-particle:nth-child(8n),
+      .prelogin-love-particle:nth-child(8n),
+      .chat-love-bg-particle:nth-child(8n) {
         display: none;
       }
     }
@@ -10824,16 +11860,56 @@
         linear-gradient(180deg, var(--theme-bg-c, #050403), var(--theme-bg-a, #090704) 52%, var(--theme-bg-c, #050403)) !important;
     }
 
+    html[data-dashboard-theme] #loginPage .portal-head,
+    html[data-dashboard-theme] #loginPage .portal-head-main,
     html[data-dashboard-theme] #loginPage .portal-title-wrap,
+    html[data-dashboard-theme] #loginPage .rgb-marquee-shell,
     html[data-dashboard-theme] #loginPage .feature-pills,
     html[data-dashboard-theme] #loginPage .login-panel,
+    html[data-dashboard-theme] #loginPage .card,
+    html[data-dashboard-theme] #loginPage .inner,
     html[data-dashboard-theme] #loginPage .field,
     html[data-dashboard-theme] #loginPage .warning-line,
     html[data-dashboard-theme] #loginPage .login-brand-badge,
-    html[data-dashboard-theme] #loginPage .login-sub-badge {
+    html[data-dashboard-theme] #loginPage .login-sub-badge,
+    html[data-dashboard-theme] #loginPage .portal-head-logo,
+    html[data-dashboard-theme] #loginPage .portal-subtitle,
+    html[data-dashboard-theme] #loginPage .panel-chip,
+    html[data-dashboard-theme] #loginPage .badge,
+    html[data-dashboard-theme] #loginPage .theme-chip {
       border-color: var(--theme-border, rgba(217,169,58,.24)) !important;
     }
 
+    html[data-dashboard-theme] #loginPage .portal-head,
+    html[data-dashboard-theme] #loginPage .card,
+    html[data-dashboard-theme] #loginPage .rgb-marquee-shell {
+      background:
+        radial-gradient(220px 120px at 50% 0%, color-mix(in srgb, var(--theme-accent, #D9A93A) 12%, transparent), transparent 72%),
+        linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2, rgba(35,25,12,.82)) 86%, transparent), color-mix(in srgb, var(--theme-panel, rgba(18,13,7,.94)) 98%, transparent)) !important;
+      box-shadow:
+        0 22px 70px rgba(0,0,0,.30),
+        0 0 24px color-mix(in srgb, var(--theme-accent, #D9A93A) 8%, transparent),
+        inset 0 1px 0 rgba(255,255,255,.04) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .portal-head {
+      padding: 18px 22px;
+      border-radius: 28px;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 22%, transparent) !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    html[data-dashboard-theme] #loginPage .portal-head::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,.06), transparent 36%, transparent 68%, color-mix(in srgb, var(--theme-accent, #D9A93A) 7%, transparent));
+      opacity: .9;
+    }
+
+    html[data-dashboard-theme] #loginPage .portal-head-main,
     html[data-dashboard-theme] #loginPage .portal-title-wrap,
     html[data-dashboard-theme] #loginPage .login-panel,
     html[data-dashboard-theme] #loginPage .feature-pills {
@@ -10844,6 +11920,35 @@
         0 22px 70px rgba(0,0,0,.30),
         0 0 24px color-mix(in srgb, var(--theme-accent, #D9A93A) 8%, transparent),
         inset 0 1px 0 rgba(255,255,255,.04) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .portal-head-logo {
+      background: linear-gradient(180deg, color-mix(in srgb, var(--theme-accent-3, #FFE9A8) 26%, transparent), color-mix(in srgb, var(--theme-bg-a, #090704) 88%, transparent)) !important;
+      box-shadow: 0 0 22px color-mix(in srgb, var(--theme-accent, #D9A93A) 18%, transparent), inset 0 1px 0 rgba(255,255,255,.10) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .portal-subtitle,
+    html[data-dashboard-theme] #loginPage .panel-chip,
+    html[data-dashboard-theme] #loginPage .theme-chip,
+    html[data-dashboard-theme] #loginPage .rgb-chip {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2, rgba(35,25,12,.82)) 78%, transparent), color-mix(in srgb, var(--theme-panel, rgba(18,13,7,.94)) 94%, transparent)) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 0 16px color-mix(in srgb, var(--theme-accent, #D9A93A) 7%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .rgb-chip::before,
+    html[data-dashboard-theme] #loginPage .portal-subtitle::before,
+    html[data-dashboard-theme] #loginPage .panel-chip.secure::before,
+    html[data-dashboard-theme] #loginPage .panel-chip.verified::before,
+    html[data-dashboard-theme] #loginPage .field-label::before {
+      background: linear-gradient(135deg, var(--theme-accent-3, #FFE9A8), var(--theme-accent, #D9A93A)) !important;
+      box-shadow: 0 0 12px color-mix(in srgb, var(--theme-accent, #D9A93A) 28%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .badge,
+    html[data-dashboard-theme] #loginPage .inner,
+    html[data-dashboard-theme] #loginPage .field {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-bg-c, #050403) 88%, transparent), color-mix(in srgb, var(--theme-bg-a, #090704) 92%, transparent)) !important;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-accent, #D9A93A) 10%, transparent), 0 0 24px color-mix(in srgb, var(--theme-accent, #D9A93A) 8%, transparent) !important;
     }
 
     html[data-dashboard-theme] #loginPage h1,
@@ -10871,11 +11976,6 @@
     html[data-dashboard-theme] #loginPage .login-sub-badge,
     html[data-dashboard-theme] #loginPage .feature-pill {
       color: var(--theme-accent-3, #FFE9A8) !important;
-    }
-
-    html[data-dashboard-theme] #loginPage .field {
-      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-bg-c, #050403) 88%, transparent), color-mix(in srgb, var(--theme-bg-a, #090704) 90%, transparent)) !important;
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-accent, #D9A93A) 10%, transparent) !important;
     }
 
     html[data-dashboard-theme] #loginPage .field input {
@@ -10949,6 +12049,10 @@
         width: 40px;
         height: 40px;
       }
+      html[data-dashboard-theme] #loginPage .portal-head {
+        padding: 14px 16px;
+        border-radius: 22px;
+      }
     }
   </style>
 
@@ -11015,12 +12119,15 @@
       }
     }
 
-    html:not([data-dashboard-theme]),
-    html[data-dashboard-theme="gold-luxury"] { --login-love-color: rgba(255, 210, 120, .54); }
-    html[data-dashboard-theme="ocean-blue"] { --login-love-color: rgba(119, 225, 255, .52); }
-    html[data-dashboard-theme="emerald-green"] { --login-love-color: rgba(139, 255, 194, .50); }
-    html[data-dashboard-theme="violet-neon"] { --login-love-color: rgba(205, 173, 255, .52); }
-    html[data-dashboard-theme="ruby-red"] { --login-love-color: rgba(255, 122, 158, .54); }
+    html[data-dashboard-theme="cyber-crypto"] { --login-love-color: rgba(110, 232, 255, .52); }
+    html[data-dashboard-theme="cyber-luxury"] { --login-love-color: rgba(255, 209, 120, .55); }
+    html[data-dashboard-theme="gold-luxury"],
+    html:not([data-dashboard-theme]) { --login-love-color: rgba(255, 210, 120, .54); }
+    html[data-dashboard-theme="midnight-blue-premium"] { --login-love-color: rgba(148, 204, 255, .50); }
+    html[data-dashboard-theme="arctic-frost"] { --login-love-color: rgba(184, 239, 255, .52); }
+    html[data-dashboard-theme="neon-tokyo"] { --login-love-color: rgba(255, 158, 222, .52); }
+    html[data-dashboard-theme="cyber-red"] { --login-love-color: rgba(255, 138, 163, .54); }
+    html[data-dashboard-theme="matrix-green"] { --login-love-color: rgba(158, 255, 196, .50); }
 
     @media (prefers-reduced-motion: reduce) {
       #beforeLoginLoveLayer { display: none !important; }
@@ -11031,10 +12138,10 @@
 
   <script id="final-prelogin-love-and-theme-fab-script">
     (function() {
-      const MAX_PRELOGIN_LOVES_DESKTOP = 26;
-      const MAX_PRELOGIN_LOVES_MOBILE = 12;
-      const PRELOGIN_SPAWN_INTERVAL_DESKTOP = 420;
-      const PRELOGIN_SPAWN_INTERVAL_MOBILE = 680;
+      const MAX_PRELOGIN_LOVES_DESKTOP = 48;
+      const MAX_PRELOGIN_LOVES_MOBILE = 22;
+      const PRELOGIN_SPAWN_INTERVAL_DESKTOP = 270;
+      const PRELOGIN_SPAWN_INTERVAL_MOBILE = 500;
 
       let preloginLoveTimer = null;
       let preloginObserver = null;
@@ -11129,8 +12236,8 @@
         if (prefersReducedMotion()) return;
         if (preloginLoveTimer) return;
         document.body.classList.add('prelogin-love-active');
-        for (let i = 0; i < Math.min(10, getMaxPreloginLoves()); i++) {
-          setTimeout(spawnPreloginLoveParticle, i * 130);
+        for (let i = 0; i < Math.min(22, getMaxPreloginLoves()); i++) {
+          setTimeout(spawnPreloginLoveParticle, i * 90);
         }
         preloginLoveTimer = setInterval(spawnPreloginLoveParticle, getPreloginSpawnInterval());
       }
@@ -11198,48 +12305,81 @@
       --theme-muted-chip-text: rgba(255, 232, 175, .82);
     }
 
-    html[data-dashboard-theme="ocean-blue"] {
-      --theme-heading-text: #EAF8FF;
-      --theme-body-text: #DCEFFF;
-      --theme-soft-text: rgba(210, 234, 255, .74);
-      --theme-link-text: #A8E7FF;
-      --theme-input-text: #F4FBFF;
-      --theme-placeholder-text: rgba(210, 235, 255, .58);
-      --theme-dark-text-on-button: #031321;
-      --theme-muted-chip-text: rgba(205, 234, 255, .84);
+    html[data-dashboard-theme="cyber-crypto"] {
+      --theme-heading-text: #EAFBFF;
+      --theme-body-text: #D9F3FF;
+      --theme-soft-text: rgba(210, 239, 255, .76);
+      --theme-link-text: #9BEFFF;
+      --theme-input-text: #F5FCFF;
+      --theme-placeholder-text: rgba(204, 235, 248, .58);
+      --theme-dark-text-on-button: #04151D;
+      --theme-muted-chip-text: rgba(203, 238, 247, .84);
     }
 
-    html[data-dashboard-theme="emerald-green"] {
-      --theme-heading-text: #EFFFF7;
-      --theme-body-text: #DDFBEA;
-      --theme-soft-text: rgba(213, 250, 231, .74);
-      --theme-link-text: #A7F3D0;
-      --theme-input-text: #F2FFF8;
-      --theme-placeholder-text: rgba(211, 248, 229, .58);
-      --theme-dark-text-on-button: #032116;
-      --theme-muted-chip-text: rgba(210, 250, 230, .84);
+    html[data-dashboard-theme="cyber-luxury"] {
+      --theme-heading-text: #FFF2D0;
+      --theme-body-text: #FAE8C4;
+      --theme-soft-text: rgba(255, 233, 194, .74);
+      --theme-link-text: #FFD887;
+      --theme-input-text: #FFF8EA;
+      --theme-placeholder-text: rgba(249, 229, 190, .58);
+      --theme-dark-text-on-button: #201102;
+      --theme-muted-chip-text: rgba(255, 228, 185, .84);
     }
 
-    html[data-dashboard-theme="violet-neon"] {
-      --theme-heading-text: #F7F0FF;
-      --theme-body-text: #EDE0FF;
-      --theme-soft-text: rgba(232, 217, 255, .74);
-      --theme-link-text: #DAC7FF;
-      --theme-input-text: #FAF5FF;
-      --theme-placeholder-text: rgba(230, 214, 255, .58);
-      --theme-dark-text-on-button: #16072B;
-      --theme-muted-chip-text: rgba(230, 216, 255, .84);
+    html[data-dashboard-theme="midnight-blue-premium"] {
+      --theme-heading-text: #EEF7FF;
+      --theme-body-text: #DDEBFF;
+      --theme-soft-text: rgba(214, 228, 248, .76);
+      --theme-link-text: #A9D4FF;
+      --theme-input-text: #F7FBFF;
+      --theme-placeholder-text: rgba(211, 225, 247, .58);
+      --theme-dark-text-on-button: #041120;
+      --theme-muted-chip-text: rgba(213, 228, 248, .84);
     }
 
-    html[data-dashboard-theme="ruby-red"] {
-      --theme-heading-text: #FFF1F5;
-      --theme-body-text: #FFE0E8;
-      --theme-soft-text: rgba(255, 216, 226, .74);
-      --theme-link-text: #FFC2D1;
-      --theme-input-text: #FFF6F8;
-      --theme-placeholder-text: rgba(255, 215, 226, .58);
-      --theme-dark-text-on-button: #26040D;
-      --theme-muted-chip-text: rgba(255, 215, 226, .84);
+    html[data-dashboard-theme="arctic-frost"] {
+      --theme-heading-text: #F4FDFF;
+      --theme-body-text: #E3F7FB;
+      --theme-soft-text: rgba(224, 243, 250, .76);
+      --theme-link-text: #B8EEFF;
+      --theme-input-text: #FBFEFF;
+      --theme-placeholder-text: rgba(221, 241, 248, .58);
+      --theme-dark-text-on-button: #04171B;
+      --theme-muted-chip-text: rgba(221, 242, 248, .86);
+    }
+
+    html[data-dashboard-theme="neon-tokyo"] {
+      --theme-heading-text: #FFF2FA;
+      --theme-body-text: #F8E7F7;
+      --theme-soft-text: rgba(242, 221, 246, .76);
+      --theme-link-text: #FFC6EE;
+      --theme-input-text: #FFF9FE;
+      --theme-placeholder-text: rgba(239, 216, 243, .58);
+      --theme-dark-text-on-button: #25051B;
+      --theme-muted-chip-text: rgba(240, 219, 243, .84);
+    }
+
+    html[data-dashboard-theme="cyber-red"] {
+      --theme-heading-text: #FFF3F6;
+      --theme-body-text: #FFE1E8;
+      --theme-soft-text: rgba(250, 217, 225, .76);
+      --theme-link-text: #FFBFD0;
+      --theme-input-text: #FFF8FA;
+      --theme-placeholder-text: rgba(248, 213, 223, .58);
+      --theme-dark-text-on-button: #23050D;
+      --theme-muted-chip-text: rgba(247, 216, 223, .84);
+    }
+
+    html[data-dashboard-theme="matrix-green"] {
+      --theme-heading-text: #F0FFF7;
+      --theme-body-text: #DEFAEB;
+      --theme-soft-text: rgba(214, 246, 228, .76);
+      --theme-link-text: #B9F6CE;
+      --theme-input-text: #F8FFFB;
+      --theme-placeholder-text: rgba(211, 243, 225, .58);
+      --theme-dark-text-on-button: #041A10;
+      --theme-muted-chip-text: rgba(211, 244, 225, .84);
     }
 
     /* Halaman sebelum login */
@@ -11354,118 +12494,18 @@
       color: var(--theme-heading-text) !important;
     }
 
-    /* Dashboard umum */
+    /* Dashboard setelah login */
     html[data-dashboard-theme] #dashboardPage {
       color: var(--theme-body-text) !important;
     }
 
     html[data-dashboard-theme] #myProfileName,
     html[data-dashboard-theme] #topHeaderTitle,
-    html[data-dashboard-theme] .chat-item-name,
-    html[data-dashboard-theme] .modal-box h3,
-    html[data-dashboard-theme] .profile-name-role {
+    html[data-dashboard-theme] .chat-contact-name,
+    html[data-dashboard-theme] .bubble .text,
+    html[data-dashboard-theme] .message-text,
+    html[data-dashboard-theme] .sidebar .sidebar-label {
       color: var(--theme-heading-text) !important;
-      text-shadow: none !important;
-    }
-
-    html[data-dashboard-theme] #topHeaderStatus,
-    html[data-dashboard-theme] .profile-status-line,
-    html[data-dashboard-theme] .profile-note,
-    html[data-dashboard-theme] .section-label,
-    html[data-dashboard-theme] .chat-item-status,
-    html[data-dashboard-theme] .status-indicator {
-      color: var(--theme-soft-text) !important;
-      text-shadow: none !important;
-    }
-
-    html[data-dashboard-theme] .action-text,
-    html[data-dashboard-theme] .modal-btn.secondary,
-    html[data-dashboard-theme] .tiny-profile-btn {
-      color: var(--theme-body-text) !important;
-      text-shadow: none !important;
-    }
-
-    html[data-dashboard-theme] .action-ico {
-      color: var(--theme-link-text) !important;
-      text-shadow: 0 0 8px color-mix(in srgb, var(--theme-accent) 24%, transparent) !important;
-    }
-
-    /* Bubble chat text */
-    html[data-dashboard-theme] .incoming-row .bubble,
-    html[data-dashboard-theme] .incoming-row .bubble .text-content-body {
-      color: var(--theme-body-text) !important;
-      text-shadow: none !important;
-    }
-
-    html[data-dashboard-theme] .outgoing-row .bubble .text-content-body {
-      text-shadow: none !important;
-      font-weight: 650 !important;
-    }
-
-    html:not([data-dashboard-theme]) .outgoing-row .bubble .text-content-body,
-    html[data-dashboard-theme="gold-luxury"] .outgoing-row .bubble .text-content-body {
-      color: #1A1003 !important;
-    }
-
-    html[data-dashboard-theme="ocean-blue"] .outgoing-row .bubble .text-content-body,
-    html[data-dashboard-theme="emerald-green"] .outgoing-row .bubble .text-content-body,
-    html[data-dashboard-theme="violet-neon"] .outgoing-row .bubble .text-content-body,
-    html[data-dashboard-theme="ruby-red"] .outgoing-row .bubble .text-content-body {
-      color: var(--theme-heading-text) !important;
-    }
-
-    /* Admin panel text */
-    html[data-dashboard-theme] #adminModal,
-    html[data-dashboard-theme] #adminModal .admin-control-modal,
-    html[data-dashboard-theme] #adminModal .admin-section-card,
-    html[data-dashboard-theme] #adminModal .role-admin-row,
-    html[data-dashboard-theme] #adminModal .user-admin-row {
-      color: var(--theme-body-text) !important;
-    }
-
-    html[data-dashboard-theme] #adminModal .admin-section-title,
-    html[data-dashboard-theme] #adminModal .role-admin-title,
-    html[data-dashboard-theme] #adminModal .user-admin-name,
-    html[data-dashboard-theme] #adminModal .user-admin-name strong,
-    html[data-dashboard-theme] #adminModal h3 {
-      color: var(--theme-heading-text) !important;
-      text-shadow: none !important;
-    }
-
-    html[data-dashboard-theme] #adminModal .access-title,
-    html[data-dashboard-theme] #adminModal .permission-locked-note,
-    html[data-dashboard-theme] #adminModal .role-access-chip {
-      color: var(--theme-soft-text) !important;
-      text-shadow: none !important;
-    }
-
-    html[data-dashboard-theme] #adminModal .field input,
-    html[data-dashboard-theme] #adminModal input {
-      color: var(--theme-input-text) !important;
-      -webkit-text-fill-color: var(--theme-input-text) !important;
-    }
-
-    html[data-dashboard-theme] #adminModal .field input::placeholder,
-    html[data-dashboard-theme] #adminModal input::placeholder {
-      color: var(--theme-placeholder-text) !important;
-      opacity: 1 !important;
-    }
-
-    html[data-dashboard-theme] #adminModal .modal-btn.primary,
-    html[data-dashboard-theme] #adminModal .admin-wide-btn {
-      color: var(--theme-dark-text-on-button) !important;
-      -webkit-text-fill-color: var(--theme-dark-text-on-button) !important;
-      text-shadow: none !important;
-      font-weight: 900 !important;
-    }
-
-    /* Hilangkan efek pudar/blur pada teks penting */
-    html[data-dashboard-theme] #loginPage *,
-    html[data-dashboard-theme] #dashboardPage .bubble *,
-    html[data-dashboard-theme] #adminModal *,
-    html[data-dashboard-theme] #themeModal * {
-      -webkit-font-smoothing: antialiased;
-      text-rendering: geometricPrecision;
     }
   </style>
 
@@ -12336,11 +13376,15 @@
     }
 
     html:not([data-dashboard-theme]),
-    html[data-dashboard-theme="gold-luxury"] { --chat-love-color: rgba(255, 210, 120, .44); }
-    html[data-dashboard-theme="ocean-blue"] { --chat-love-color: rgba(119, 225, 255, .42); }
-    html[data-dashboard-theme="emerald-green"] { --chat-love-color: rgba(139, 255, 194, .40); }
-    html[data-dashboard-theme="violet-neon"] { --chat-love-color: rgba(205, 173, 255, .42); }
-    html[data-dashboard-theme="ruby-red"] { --chat-love-color: rgba(255, 122, 158, .44); }
+    html[data-dashboard-theme="cyber-crypto"] { --chat-love-color: rgba(110, 232, 255, .42); }
+    html[data-dashboard-theme="cyber-luxury"] { --chat-love-color: rgba(255, 209, 120, .44); }
+    html[data-dashboard-theme="gold-luxury"],
+    html:not([data-dashboard-theme]) { --chat-love-color: rgba(255, 210, 120, .44); }
+    html[data-dashboard-theme="midnight-blue-premium"] { --chat-love-color: rgba(148, 204, 255, .40); }
+    html[data-dashboard-theme="arctic-frost"] { --chat-love-color: rgba(184, 239, 255, .42); }
+    html[data-dashboard-theme="neon-tokyo"] { --chat-love-color: rgba(255, 158, 222, .42); }
+    html[data-dashboard-theme="cyber-red"] { --chat-love-color: rgba(255, 138, 163, .44); }
+    html[data-dashboard-theme="matrix-green"] { --chat-love-color: rgba(158, 255, 196, .40); }
 
     /* Pastikan bubble dan footer tetap di atas background love */
     #dashboardPage .chat-main-header,
@@ -12419,10 +13463,10 @@
       window.__compactEffectChatLoveReady = true;
 
       const SETTINGS_KEY = 'fandah_dashboard_ui_settings_v2';
-      const CHAT_LOVE_MAX_DESKTOP = 42;
-      const CHAT_LOVE_MAX_MOBILE = 20;
-      const CHAT_LOVE_INTERVAL_DESKTOP = 360;
-      const CHAT_LOVE_INTERVAL_MOBILE = 620;
+      const CHAT_LOVE_MAX_DESKTOP = 50;
+      const CHAT_LOVE_MAX_MOBILE = 22;
+      const CHAT_LOVE_INTERVAL_DESKTOP = 320;
+      const CHAT_LOVE_INTERVAL_MOBILE = 580;
 
       let chatLoveTimer = null;
       let chatLoveLayer = null;
@@ -12561,8 +13605,8 @@
 
         if (chatLoveTimer) return;
 
-        for (let i = 0; i < Math.min(12, getMaxChatLoves()); i++) {
-          setTimeout(spawnChatLove, i * 110);
+        for (let i = 0; i < Math.min(24, getMaxChatLoves()); i++) {
+          setTimeout(spawnChatLove, i * 85);
         }
 
         chatLoveTimer = setInterval(spawnChatLove, getChatLoveInterval());
@@ -12755,9 +13799,9 @@
       if (window.__finalLongTermSafeGuardReady) return;
       window.__finalLongTermSafeGuardReady = true;
 
-      const MAX_LOGIN_LOVES = 72;
-      const MAX_PRELOGIN_LOVES = 42;
-      const MAX_CHAT_LOVES = 56;
+      const MAX_LOGIN_LOVES = 56;
+      const MAX_PRELOGIN_LOVES = 50;
+      const MAX_CHAT_LOVES = 52;
 
       function prune(selector, max) {
         const nodes = Array.from(document.querySelectorAll(selector));
@@ -12852,6 +13896,790 @@
       setInterval(syncLightweightState, 60000);
     })();
   </script>
+
+
+  <style id="final-cyber-theme-font-readability-longterm-patch">
+    /* =========================================================
+       CYBER CRYPTO + CYBER LUXURY FONT READABILITY PATCH
+       - kontras font dibuat lebih kuat
+       - bubble chat terang pakai teks gelap
+       - animasi statistik dibuat one-shot agar lebih aman jangka panjang
+       ========================================================= */
+    html[data-dashboard-theme="cyber-crypto"],
+    html[data-dashboard-theme="cyber-luxury"] {
+      color-scheme: dark;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      --theme-readable-font: Inter, "Segoe UI", Roboto, Arial, system-ui, -apple-system, sans-serif;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] {
+      --theme-text: #F6FFFC;
+      --theme-muted: rgba(235, 255, 248, .82);
+      --theme-soft-text: rgba(235, 255, 248, .74);
+      --theme-out-text: #021611;
+    }
+
+    html[data-dashboard-theme="cyber-luxury"] {
+      --theme-text: #FFF9EA;
+      --theme-muted: rgba(255, 246, 220, .82);
+      --theme-soft-text: rgba(255, 244, 214, .74);
+      --theme-out-text: #1B1204;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] #dashboardPage,
+    html[data-dashboard-theme="cyber-luxury"] #dashboardPage,
+    html[data-dashboard-theme="cyber-crypto"] #dashboardPage button,
+    html[data-dashboard-theme="cyber-luxury"] #dashboardPage button,
+    html[data-dashboard-theme="cyber-crypto"] #dashboardPage input,
+    html[data-dashboard-theme="cyber-luxury"] #dashboardPage input,
+    html[data-dashboard-theme="cyber-crypto"] #dashboardPage select,
+    html[data-dashboard-theme="cyber-luxury"] #dashboardPage select,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal {
+      font-family: var(--theme-readable-font) !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .chat-main-window,
+    html[data-dashboard-theme="cyber-luxury"] .chat-main-window,
+    html[data-dashboard-theme="cyber-crypto"] .sidebar,
+    html[data-dashboard-theme="cyber-luxury"] .sidebar,
+    html[data-dashboard-theme="cyber-crypto"] .modal-box,
+    html[data-dashboard-theme="cyber-luxury"] .modal-box {
+      color: var(--theme-text) !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] #myProfileName,
+    html[data-dashboard-theme="cyber-luxury"] #myProfileName,
+    html[data-dashboard-theme="cyber-crypto"] #topHeaderTitle,
+    html[data-dashboard-theme="cyber-luxury"] #topHeaderTitle,
+    html[data-dashboard-theme="cyber-crypto"] .chat-item-name,
+    html[data-dashboard-theme="cyber-luxury"] .chat-item-name,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal h3,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal h3,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .admin-section-title,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .admin-section-title,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .access-title,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .access-title,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .role-admin-title,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .role-admin-title,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .user-admin-name,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .user-admin-name,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .user-admin-name strong,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .user-admin-name strong,
+    html[data-dashboard-theme="cyber-crypto"] .dashboard-theme-info b,
+    html[data-dashboard-theme="cyber-luxury"] .dashboard-theme-info b {
+      color: var(--theme-text) !important;
+      font-weight: 850 !important;
+      letter-spacing: -.015em;
+      text-shadow: 0 1px 0 rgba(0,0,0,.30), 0 0 10px color-mix(in srgb, var(--theme-accent) 10%, transparent) !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] #topHeaderStatus,
+    html[data-dashboard-theme="cyber-luxury"] #topHeaderStatus,
+    html[data-dashboard-theme="cyber-crypto"] .status-indicator,
+    html[data-dashboard-theme="cyber-luxury"] .status-indicator,
+    html[data-dashboard-theme="cyber-crypto"] .chat-item-subline,
+    html[data-dashboard-theme="cyber-luxury"] .chat-item-subline,
+    html[data-dashboard-theme="cyber-crypto"] .time-text,
+    html[data-dashboard-theme="cyber-luxury"] .time-text,
+    html[data-dashboard-theme="cyber-crypto"] .edited-marker,
+    html[data-dashboard-theme="cyber-luxury"] .edited-marker,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .permission-locked-note,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .permission-locked-note,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .role-access-chip,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .role-access-chip,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .admin-stat-head span,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .admin-stat-head span,
+    html[data-dashboard-theme="cyber-crypto"] #adminStatsUpdatedAt,
+    html[data-dashboard-theme="cyber-luxury"] #adminStatsUpdatedAt {
+      color: var(--theme-muted) !important;
+      font-weight: 650 !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .incoming-row .bubble,
+    html[data-dashboard-theme="cyber-luxury"] .incoming-row .bubble {
+      color: var(--theme-text) !important;
+      font-weight: 560 !important;
+      letter-spacing: .003em;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .outgoing-row .bubble,
+    html[data-dashboard-theme="cyber-luxury"] .outgoing-row .bubble {
+      color: var(--theme-out-text) !important;
+      font-weight: 650 !important;
+      letter-spacing: .003em;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .outgoing-row .time-text,
+    html[data-dashboard-theme="cyber-crypto"] .outgoing-row .edited-marker,
+    html[data-dashboard-theme="cyber-crypto"] .outgoing-row .status-tick-icon {
+      color: rgba(2, 22, 17, .68) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme="cyber-luxury"] .outgoing-row .time-text,
+    html[data-dashboard-theme="cyber-luxury"] .outgoing-row .edited-marker,
+    html[data-dashboard-theme="cyber-luxury"] .outgoing-row .status-tick-icon {
+      color: rgba(27, 18, 4, .68) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .chat-footer-panel input[type="text"],
+    html[data-dashboard-theme="cyber-luxury"] .chat-footer-panel input[type="text"],
+    html[data-dashboard-theme="cyber-crypto"] #adminModal input,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal input,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .field input,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .field input {
+      color: var(--theme-text) !important;
+      -webkit-text-fill-color: var(--theme-text) !important;
+      caret-color: var(--theme-accent) !important;
+      font-weight: 650 !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .chat-footer-panel input[type="text"]::placeholder,
+    html[data-dashboard-theme="cyber-luxury"] .chat-footer-panel input[type="text"]::placeholder,
+    html[data-dashboard-theme="cyber-crypto"] #adminModal input::placeholder,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal input::placeholder {
+      color: var(--theme-soft-text) !important;
+      -webkit-text-fill-color: var(--theme-soft-text) !important;
+      opacity: 1 !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .action-link-btn,
+    html[data-dashboard-theme="cyber-luxury"] .action-link-btn,
+    html[data-dashboard-theme="cyber-crypto"] .admin-icon-btn,
+    html[data-dashboard-theme="cyber-luxury"] .admin-icon-btn,
+    html[data-dashboard-theme="cyber-crypto"] .admin-icon-pill,
+    html[data-dashboard-theme="cyber-luxury"] .admin-icon-pill,
+    html[data-dashboard-theme="cyber-crypto"] .modal-btn.secondary,
+    html[data-dashboard-theme="cyber-luxury"] .modal-btn.secondary {
+      color: var(--theme-text) !important;
+      font-weight: 850 !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .action-link-btn .action-text,
+    html[data-dashboard-theme="cyber-luxury"] .action-link-btn .action-text {
+      color: var(--theme-text) !important;
+      text-shadow: 0 1px 0 rgba(0,0,0,.28) !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .admin-stat-box strong,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .admin-stat-box strong {
+      color: var(--theme-text) !important;
+      font-weight: 950 !important;
+      text-shadow: 0 0 10px color-mix(in srgb, var(--theme-accent) 16%, transparent) !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] #adminModal .admin-role-select,
+    html[data-dashboard-theme="cyber-luxury"] #adminModal .admin-role-select {
+      font-weight: 850 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .role-pill.user,
+    html[data-dashboard-theme="cyber-luxury"] .role-pill.user,
+    html[data-dashboard-theme="cyber-crypto"] .role-pill.admin,
+    html[data-dashboard-theme="cyber-luxury"] .role-pill.admin,
+    html[data-dashboard-theme="cyber-crypto"] .role-pill.owner,
+    html[data-dashboard-theme="cyber-luxury"] .role-pill.owner {
+      font-weight: 900 !important;
+      letter-spacing: .05em !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .admin-stats-grid.is-ready .admin-stat-box,
+    html[data-dashboard-theme="cyber-luxury"] .admin-stats-grid.is-ready .admin-stat-box {
+      animation: adminStatReveal .54s cubic-bezier(.18,.78,.2,1) forwards, adminStatCryptoSettle 1.35s ease-out .54s 1 !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .admin-stats-grid.is-ready .admin-stat-box::after,
+    html[data-dashboard-theme="cyber-luxury"] .admin-stats-grid.is-ready .admin-stat-box::after {
+      animation: adminChartLineSweep 1.1s ease-out .28s both;
+    }
+
+    @keyframes adminChartLineSweep {
+      0% { clip-path: inset(0 100% 0 0); opacity: 0; }
+      35% { opacity: .30; }
+      100% { clip-path: inset(0 0 0 0); opacity: .22; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html[data-dashboard-theme="cyber-crypto"] .admin-stats-grid.is-ready .admin-stat-box,
+      html[data-dashboard-theme="cyber-luxury"] .admin-stats-grid.is-ready .admin-stat-box,
+      html[data-dashboard-theme="cyber-crypto"] .admin-stats-grid.is-ready .admin-stat-box::after,
+      html[data-dashboard-theme="cyber-luxury"] .admin-stats-grid.is-ready .admin-stat-box::after,
+      html[data-dashboard-theme="cyber-crypto"] .admin-icon-pill .admin-icon-btn-glyph,
+      html[data-dashboard-theme="cyber-luxury"] .admin-icon-pill .admin-icon-btn-glyph {
+        animation: none !important;
+      }
+    }
+  </style>
+
+
+  <style id="theme-new-readable-all-menu-patch">
+    /* =========================================================
+       THEME NEW SET — readable text + all menu sync
+       - removed from picker: Ocean Blue, Emerald, Violet, Ruby Red
+       - added: Midnight Blue Premium, Arctic Frost, Neon Tokyo, Cyber Red, Matrix Green
+       - teks utama dibuat kontras, glow teks dibatasi agar tidak blur
+       ========================================================= */
+    html[data-dashboard-theme] {
+      color-scheme: dark;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      --theme-readable-font: Inter, "Segoe UI", Roboto, Arial, system-ui, -apple-system, sans-serif;
+    }
+
+    html[data-dashboard-theme] #dashboardPage,
+    html[data-dashboard-theme] #dashboardPage button,
+    html[data-dashboard-theme] #dashboardPage input,
+    html[data-dashboard-theme] #dashboardPage textarea,
+    html[data-dashboard-theme] #dashboardPage select,
+    html[data-dashboard-theme] .modal-box,
+    html[data-dashboard-theme] #adminModal,
+    html[data-dashboard-theme] #themeModal {
+      font-family: var(--theme-readable-font) !important;
+    }
+
+    html[data-dashboard-theme] .chat-main-window,
+    html[data-dashboard-theme] .sidebar,
+    html[data-dashboard-theme] .modal-box,
+    html[data-dashboard-theme] .chat-item-card,
+    html[data-dashboard-theme] #adminModal .admin-section-card,
+    html[data-dashboard-theme] #adminModal .user-admin-row,
+    html[data-dashboard-theme] #adminModal .role-admin-row {
+      color: var(--theme-text) !important;
+    }
+
+    html[data-dashboard-theme] #myProfileName,
+    html[data-dashboard-theme] #topHeaderTitle,
+    html[data-dashboard-theme] .chat-item-name,
+    html[data-dashboard-theme] #adminModal h3,
+    html[data-dashboard-theme] #adminModal .admin-section-title,
+    html[data-dashboard-theme] #adminModal .access-title,
+    html[data-dashboard-theme] #adminModal .role-admin-title,
+    html[data-dashboard-theme] #adminModal .user-admin-name,
+    html[data-dashboard-theme] #adminModal .user-admin-name strong,
+    html[data-dashboard-theme] .dashboard-theme-info b {
+      color: var(--theme-text) !important;
+      font-weight: 850 !important;
+      letter-spacing: -.012em !important;
+      text-shadow: 0 1px 0 rgba(0,0,0,.36) !important;
+    }
+
+    html[data-dashboard-theme] #topHeaderStatus,
+    html[data-dashboard-theme] .status-indicator,
+    html[data-dashboard-theme] .chat-item-subline,
+    html[data-dashboard-theme] .time-text,
+    html[data-dashboard-theme] .edited-marker,
+    html[data-dashboard-theme] #adminModal .permission-locked-note,
+    html[data-dashboard-theme] #adminModal .role-access-chip,
+    html[data-dashboard-theme] #adminModal .admin-stat-head span,
+    html[data-dashboard-theme] #adminStatsUpdatedAt,
+    html[data-dashboard-theme] .preview-hint,
+    html[data-dashboard-theme] .preview-title {
+      color: var(--theme-muted) !important;
+      font-weight: 650 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] .incoming-row .bubble {
+      color: var(--theme-text) !important;
+      font-weight: 570 !important;
+      letter-spacing: .003em !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] .outgoing-row .bubble {
+      color: var(--theme-out-text, var(--theme-text)) !important;
+      font-weight: 650 !important;
+      letter-spacing: .003em !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme="cyber-crypto"] .outgoing-row .time-text,
+    html[data-dashboard-theme="cyber-crypto"] .outgoing-row .edited-marker,
+    html[data-dashboard-theme="cyber-crypto"] .outgoing-row .status-tick-icon,
+    html[data-dashboard-theme="arctic-frost"] .outgoing-row .time-text,
+    html[data-dashboard-theme="arctic-frost"] .outgoing-row .edited-marker,
+    html[data-dashboard-theme="arctic-frost"] .outgoing-row .status-tick-icon,
+    html[data-dashboard-theme="matrix-green"] .outgoing-row .time-text,
+    html[data-dashboard-theme="matrix-green"] .outgoing-row .edited-marker,
+    html[data-dashboard-theme="matrix-green"] .outgoing-row .status-tick-icon {
+      color: color-mix(in srgb, var(--theme-out-text) 72%, transparent) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme="cyber-luxury"] .outgoing-row .time-text,
+    html[data-dashboard-theme="cyber-luxury"] .outgoing-row .edited-marker,
+    html[data-dashboard-theme="cyber-luxury"] .outgoing-row .status-tick-icon,
+    html[data-dashboard-theme="gold-luxury"] .outgoing-row .time-text,
+    html[data-dashboard-theme="gold-luxury"] .outgoing-row .edited-marker,
+    html[data-dashboard-theme="gold-luxury"] .outgoing-row .status-tick-icon {
+      color: rgba(27, 18, 4, .68) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] .chat-footer-panel input[type="text"],
+    html[data-dashboard-theme] #adminModal input,
+    html[data-dashboard-theme] #adminModal .field input,
+    html[data-dashboard-theme] #themeModal input {
+      color: var(--theme-text) !important;
+      -webkit-text-fill-color: var(--theme-text) !important;
+      caret-color: var(--theme-accent) !important;
+      font-weight: 650 !important;
+    }
+
+    html[data-dashboard-theme] .chat-footer-panel input[type="text"]::placeholder,
+    html[data-dashboard-theme] #adminModal input::placeholder,
+    html[data-dashboard-theme] #themeModal input::placeholder {
+      color: var(--theme-soft-text, var(--theme-muted)) !important;
+      -webkit-text-fill-color: var(--theme-soft-text, var(--theme-muted)) !important;
+      opacity: 1 !important;
+    }
+
+    html[data-dashboard-theme] .action-link-btn,
+    html[data-dashboard-theme] .action-link-btn .action-text,
+    html[data-dashboard-theme] .admin-icon-btn,
+    html[data-dashboard-theme] .admin-icon-pill,
+    html[data-dashboard-theme] .modal-btn.secondary,
+    html[data-dashboard-theme] .theme-setting-toggle {
+      color: var(--theme-text) !important;
+      font-weight: 850 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] #adminModal .admin-stat-box strong {
+      color: var(--theme-text) !important;
+      font-weight: 950 !important;
+      text-shadow: 0 1px 0 rgba(0,0,0,.28) !important;
+    }
+
+    html[data-dashboard-theme] .role-pill.user,
+    html[data-dashboard-theme] .role-pill.admin,
+    html[data-dashboard-theme] .role-pill.owner {
+      font-weight: 900 !important;
+      letter-spacing: .05em !important;
+    }
+
+    html[data-dashboard-theme="neon-tokyo"] #dashboardPage::after,
+    html[data-dashboard-theme="cyber-red"] #dashboardPage::after,
+    html[data-dashboard-theme="matrix-green"] #dashboardPage::after,
+    html[data-dashboard-theme="midnight-blue-premium"] #dashboardPage::after,
+    html[data-dashboard-theme="arctic-frost"] #dashboardPage::after {
+      opacity: .16 !important;
+      background-size: 68px 68px !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html[data-dashboard-theme] .admin-stats-grid.is-ready .admin-stat-box,
+      html[data-dashboard-theme] .admin-stats-grid.is-ready .admin-stat-box::after,
+      html[data-dashboard-theme] .admin-icon-pill .admin-icon-btn-glyph {
+        animation: none !important;
+      }
+    }
+  </style>
+
+
+  <style id="final-theme-switcher-and-premium-love-polish">
+    /* FINAL — Theme switcher login full mengikuti tema dashboard aktif + love premium ringan */
+    html[data-dashboard-theme] #loginPage {
+      --theme-chip-glow: color-mix(in srgb, var(--theme-accent, #D9A93A) 18%, transparent);
+      --theme-chip-glow-strong: color-mix(in srgb, var(--theme-accent, #D9A93A) 30%, transparent);
+      --theme-chip-bg: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--theme-panel-2, #1d1408) 86%, transparent),
+        color-mix(in srgb, var(--theme-bg-c, #050403) 96%, transparent)
+      );
+      --theme-chip-bg-active: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--theme-accent-3, #FFE9A8) 18%, transparent),
+        color-mix(in srgb, var(--theme-accent, #D9A93A) 22%, transparent) 48%,
+        color-mix(in srgb, var(--theme-panel, #120D07) 94%, transparent)
+      );
+    }
+
+    html[data-dashboard-theme] #loginPage .login-theme-switcher {
+      padding: 8px 10px !important;
+      border-radius: 999px !important;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 18%, transparent) !important;
+      background:
+        radial-gradient(220px 70px at 50% 0%, color-mix(in srgb, var(--theme-accent, #D9A93A) 10%, transparent), transparent 72%),
+        linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2, #1d1408) 74%, transparent), color-mix(in srgb, var(--theme-bg-c, #050403) 92%, transparent)) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 12px 34px rgba(0,0,0,.20),
+        0 0 20px var(--theme-chip-glow) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .theme-chip {
+      border-color: color-mix(in srgb, var(--theme-accent, #D9A93A) 20%, transparent) !important;
+      background: var(--theme-chip-bg) !important;
+      color: var(--theme-muted-chip-text, rgba(255,232,175,.84)) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 0 0 1px color-mix(in srgb, var(--theme-accent, #D9A93A) 5%, transparent),
+        0 0 14px color-mix(in srgb, var(--theme-accent, #D9A93A) 6%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .theme-chip:hover {
+      color: var(--theme-heading-text, #FFF1C2) !important;
+      border-color: color-mix(in srgb, var(--theme-accent-3, #FFE9A8) 44%, transparent) !important;
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--theme-accent, #D9A93A) 14%, transparent),
+        color-mix(in srgb, var(--theme-panel-2, #1d1408) 88%, transparent)
+      ) !important;
+      box-shadow: 0 0 20px var(--theme-chip-glow), inset 0 1px 0 rgba(255,255,255,.06) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .theme-chip.active {
+      color: var(--theme-dark-text-on-button, #1B1103) !important;
+      -webkit-text-fill-color: var(--theme-dark-text-on-button, #1B1103) !important;
+      border-color: color-mix(in srgb, var(--theme-accent-3, #FFE9A8) 64%, transparent) !important;
+      background: linear-gradient(135deg, var(--theme-accent-3, #FFE9A8), var(--theme-accent, #D9A93A) 58%, var(--theme-accent-2, #8B5E16)) !important;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.07) inset,
+        0 10px 24px color-mix(in srgb, var(--theme-accent, #D9A93A) 16%, transparent),
+        0 0 28px var(--theme-chip-glow-strong) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .theme-chip-swatch {
+      border-color: rgba(255,255,255,.30) !important;
+      background:
+        radial-gradient(circle at 35% 25%, rgba(255,255,255,.42), transparent 34%),
+        linear-gradient(135deg, var(--theme-accent-3, #FFE9A8), var(--theme-accent, #D9A93A) 54%, var(--theme-accent-2, #8B5E16)) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.20),
+        0 0 12px color-mix(in srgb, var(--theme-accent, #D9A93A) 28%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .theme-chip.active .theme-chip-swatch {
+      border-color: rgba(255,255,255,.55) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.28),
+        0 0 16px color-mix(in srgb, var(--theme-accent-3, #FFE9A8) 45%, transparent) !important;
+    }
+
+    /* Warna premium per tema untuk heart + sparkle */
+    html[data-dashboard-theme="cyber-crypto"] {
+      --login-love-color: rgba(110, 232, 255, .56);
+      --love-color: rgba(110, 232, 255, .68);
+      --chat-love-color: rgba(110, 232, 255, .44);
+      --love-spark-color: rgba(167, 255, 224, .72);
+    }
+    html[data-dashboard-theme="cyber-luxury"],
+    html[data-dashboard-theme="gold-luxury"],
+    html:not([data-dashboard-theme]) {
+      --login-love-color: rgba(255, 212, 136, .58);
+      --love-color: rgba(255, 210, 120, .70);
+      --chat-love-color: rgba(255, 210, 120, .46);
+      --love-spark-color: rgba(255, 239, 196, .76);
+    }
+    html[data-dashboard-theme="midnight-blue-premium"] {
+      --login-love-color: rgba(148, 204, 255, .54);
+      --love-color: rgba(148, 204, 255, .64);
+      --chat-love-color: rgba(148, 204, 255, .42);
+      --love-spark-color: rgba(214, 234, 255, .72);
+    }
+    html[data-dashboard-theme="arctic-frost"] {
+      --login-love-color: rgba(196, 244, 255, .58);
+      --love-color: rgba(196, 244, 255, .66);
+      --chat-love-color: rgba(196, 244, 255, .44);
+      --love-spark-color: rgba(245, 254, 255, .78);
+    }
+    html[data-dashboard-theme="neon-tokyo"] {
+      --login-love-color: rgba(255, 158, 222, .56);
+      --love-color: rgba(255, 158, 222, .70);
+      --chat-love-color: rgba(255, 158, 222, .44);
+      --love-spark-color: rgba(126, 230, 255, .70);
+    }
+    html[data-dashboard-theme="cyber-red"] {
+      --login-love-color: rgba(255, 138, 163, .58);
+      --love-color: rgba(255, 138, 163, .72);
+      --chat-love-color: rgba(255, 138, 163, .46);
+      --love-spark-color: rgba(255, 210, 185, .72);
+    }
+    html[data-dashboard-theme="matrix-green"] {
+      --login-love-color: rgba(158, 255, 196, .54);
+      --love-color: rgba(158, 255, 196, .66);
+      --chat-love-color: rgba(158, 255, 196, .42);
+      --love-spark-color: rgba(215, 255, 228, .72);
+    }
+
+    /* Love depan lama: ganti teks random menjadi shape premium via pseudo, tidak menambah node */
+    #loginPage .gold-love-points .love-point {
+      color: transparent !important;
+      text-shadow: none !important;
+      font-size: 0 !important;
+    }
+
+    #loginPage .gold-love-points .love-point::before {
+      content: "♥";
+      font-size: var(--s, 11px);
+      line-height: 1;
+      color: var(--login-love-color, rgba(255,210,120,.56));
+      text-shadow: 0 0 9px color-mix(in srgb, var(--login-love-color, rgba(255,210,120,.56)) 42%, transparent);
+    }
+
+    #loginPage .gold-love-points .love-point:nth-child(3n)::before,
+    .prelogin-love-particle:nth-child(4n)::before,
+    .login-love-particle:nth-child(4n)::before,
+    .chat-love-bg-particle:nth-child(4n)::before {
+      content: "✦" !important;
+      color: var(--love-spark-color, rgba(255,239,196,.76)) !important;
+    }
+
+    #loginPage .gold-love-points .love-point:nth-child(5n)::before,
+    .prelogin-love-particle:nth-child(5n)::before,
+    .login-love-particle:nth-child(5n)::before,
+    .chat-love-bg-particle:nth-child(5n)::before {
+      content: "✧" !important;
+      color: var(--love-spark-color, rgba(255,239,196,.72)) !important;
+    }
+
+    #loginPage .gold-love-points .love-point:nth-child(7n)::before,
+    .prelogin-love-particle:nth-child(7n)::before,
+    .login-love-particle:nth-child(7n)::before,
+    .chat-love-bg-particle:nth-child(7n)::before {
+      content: "◆" !important;
+      color: color-mix(in srgb, var(--love-spark-color, rgba(255,239,196,.72)) 78%, var(--login-love-color, rgba(255,210,120,.56))) !important;
+      font-size: calc(var(--love-size, var(--s, 11px)) * .78);
+    }
+
+    .prelogin-love-particle,
+    .login-love-particle,
+    .chat-love-bg-particle {
+      filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 34%, transparent));
+      contain: layout style paint;
+    }
+
+    .prelogin-love-particle::before,
+    .login-love-particle::before,
+    .chat-love-bg-particle::before {
+      content: "♥";
+    }
+
+    .prelogin-love-particle:nth-child(2n)::before,
+    .login-love-particle:nth-child(2n)::before,
+    .chat-love-bg-particle:nth-child(2n)::before {
+      content: "♡";
+      font-weight: 900;
+    }
+
+    .prelogin-love-particle:nth-child(6n),
+    .login-love-particle:nth-child(6n),
+    .chat-love-bg-particle:nth-child(6n) {
+      opacity: .82;
+    }
+
+    body.animations-off #beforeLoginLoveLayer,
+    body.animations-off #afterLoginLoveLayer,
+    body.animations-off #chatLoveBackgroundLayer {
+      display: none !important;
+    }
+
+    @media (max-width: 680px) {
+      html[data-dashboard-theme] #loginPage .login-theme-switcher {
+        padding: 7px 8px !important;
+      }
+      html[data-dashboard-theme] #loginPage .theme-chip {
+        min-height: 32px !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #loginPage .gold-love-points .love-point,
+      .prelogin-love-particle,
+      .login-love-particle,
+      .chat-love-bg-particle {
+        animation: none !important;
+      }
+    }
+  </style>
+
+
+  <style id="presence-realtime-accurate-and-premium-love-final-fix">
+    .presence-typing::after {
+      content: "";
+      width: 4px;
+      height: 4px;
+      margin-left: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 7px 0 0 currentColor, 14px 0 0 currentColor;
+      opacity: .72;
+      animation: presenceTypingDots 1.1s ease-in-out infinite;
+    }
+
+    @keyframes presenceTypingDots {
+      0%, 100% { opacity: .38; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-1px); }
+    }
+
+    .prelogin-love-particle:nth-child(4n)::before,
+    .chat-love-bg-particle:nth-child(4n)::before { content: "✦" !important; }
+    .prelogin-love-particle:nth-child(5n)::before,
+    .chat-love-bg-particle:nth-child(5n)::before { content: "✧" !important; }
+    .prelogin-love-particle:nth-child(7n)::before,
+    .chat-love-bg-particle:nth-child(7n)::before { content: "◆" !important; font-size: .72em; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .presence-typing::after { display: none !important; animation: none !important; }
+    }
+  </style>
+
+
+  <style id="final-premium-love-theme-switcher-smooth-patch">
+    /* Login theme switcher: warna tombol/chip benar-benar mengikuti tema aktif */
+    html[data-dashboard-theme] #loginPage .login-theme-switcher {
+      --switcher-bg: color-mix(in srgb, var(--theme-panel, #0B1020) 86%, transparent);
+      --switcher-bg-2: color-mix(in srgb, var(--theme-panel-2, #111A2B) 88%, transparent);
+      --switcher-border: color-mix(in srgb, var(--theme-accent, #67E8F9) 24%, transparent);
+      --switcher-glow: color-mix(in srgb, var(--theme-accent, #67E8F9) 12%, transparent);
+    }
+
+    html[data-dashboard-theme] #loginPage .theme-chip {
+      border-color: var(--switcher-border) !important;
+      background:
+        radial-gradient(80px 44px at 16% 0%, color-mix(in srgb, var(--theme-accent-3, #EAFBFF) 10%, transparent), transparent 68%),
+        linear-gradient(135deg, var(--switcher-bg-2), var(--switcher-bg)) !important;
+      color: var(--theme-muted-chip-text, rgba(235,245,255,.84)) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 0 12px var(--switcher-glow) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .theme-chip:hover {
+      border-color: color-mix(in srgb, var(--theme-accent, #67E8F9) 46%, transparent) !important;
+      color: var(--theme-heading-text, #F8FCFF) !important;
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 0 18px color-mix(in srgb, var(--theme-accent, #67E8F9) 18%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .theme-chip.active {
+      border-color: color-mix(in srgb, var(--theme-accent-3, #EAFBFF) 50%, transparent) !important;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--theme-accent-3, #EAFBFF) 22%, transparent), color-mix(in srgb, var(--theme-accent, #67E8F9) 18%, transparent)),
+        linear-gradient(135deg, var(--switcher-bg-2), var(--switcher-bg)) !important;
+      color: var(--theme-heading-text, #F8FCFF) !important;
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--theme-accent-3, #EAFBFF) 18%, transparent) inset,
+        0 0 22px color-mix(in srgb, var(--theme-accent, #67E8F9) 22%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .theme-chip-swatch {
+      background: linear-gradient(135deg, var(--theme-accent-3, #EAFBFF), var(--theme-accent, #67E8F9) 58%, var(--theme-accent-2, #2563EB)) !important;
+      border-color: color-mix(in srgb, var(--theme-accent-3, #EAFBFF) 42%, transparent) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.16),
+        0 0 12px color-mix(in srgb, var(--theme-accent, #67E8F9) 22%, transparent) !important;
+    }
+
+    /* Premium love ringan: heart + sparkle + diamond, tetap GPU-friendly */
+    .login-love-particle::before,
+    .prelogin-love-particle::before,
+    .chat-love-bg-particle::before {
+      content: "♥";
+    }
+
+    .login-love-particle:nth-child(3n)::before,
+    .prelogin-love-particle:nth-child(3n)::before,
+    .chat-love-bg-particle:nth-child(3n)::before {
+      content: "✦";
+      font-weight: 900;
+    }
+
+    .login-love-particle:nth-child(4n)::before,
+    .prelogin-love-particle:nth-child(4n)::before,
+    .chat-love-bg-particle:nth-child(4n)::before {
+      content: "♡";
+      font-weight: 900;
+    }
+
+    .login-love-particle:nth-child(5n)::before,
+    .prelogin-love-particle:nth-child(5n)::before,
+    .chat-love-bg-particle:nth-child(5n)::before {
+      content: "◆";
+      font-size: .72em;
+    }
+
+    .login-love-particle:nth-child(7n)::before,
+    .prelogin-love-particle:nth-child(7n)::before,
+    .chat-love-bg-particle:nth-child(7n)::before {
+      content: "✧";
+      font-weight: 900;
+    }
+
+    .login-love-particle,
+    .prelogin-love-particle,
+    .chat-love-bg-particle {
+      filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 38%, transparent));
+      backface-visibility: hidden;
+      transform-style: flat;
+    }
+
+    /* Love lebih banyak tapi tetap smooth: ukuran opacity dijaga halus */
+    .prelogin-love-particle {
+      opacity: 0;
+      text-shadow: 0 0 8px color-mix(in srgb, var(--login-love-color, rgba(255,210,120,.55)) 32%, transparent) !important;
+    }
+
+    .login-love-particle {
+      text-shadow: 0 0 9px color-mix(in srgb, var(--love-color, rgba(255,118,164,.72)) 42%, transparent) !important;
+    }
+
+    .chat-love-bg-particle {
+      text-shadow: 0 0 7px color-mix(in srgb, var(--chat-love-color, rgba(255,210,120,.42)) 32%, transparent) !important;
+    }
+
+    @media (max-width: 680px) {
+      .login-love-particle,
+      .prelogin-love-particle,
+      .chat-love-bg-particle {
+        filter: drop-shadow(0 0 4px color-mix(in srgb, currentColor 28%, transparent));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .login-love-particle,
+      .prelogin-love-particle,
+      .chat-love-bg-particle {
+        animation: none !important;
+        display: none !important;
+      }
+    }
+  </style>
+
+
+  <style id="final-realtime-presence-smooth-safe-patch">
+    .status-indicator.online::before {
+      animation: presenceDotSoftPulse 1.8s ease-in-out infinite;
+    }
+
+    .status-indicator.offline::before {
+      opacity: .82;
+      box-shadow: 0 0 8px rgba(255,82,122,.26);
+    }
+
+    @keyframes presenceDotSoftPulse {
+      0%, 100% { transform: scale(1); opacity: .92; }
+      50% { transform: scale(1.16); opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .status-indicator.online::before {
+        animation: none !important;
+      }
+    }
+  </style>
 
 </body>
 </html>
