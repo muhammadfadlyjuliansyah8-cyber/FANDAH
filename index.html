@@ -6105,7 +6105,7 @@
             <path d="M4 10.5 12 4l8 6.5" stroke="rgba(239,246,255,.72)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
           </svg>
         </div>
-        <div class="portal-title">FANDAH</div>
+        <div class="portal-title">FANDAH PORTAL</div>
       </div>
       <div class="portal-subtitle">Yang Tau Tau Aja</div>
     </div>
@@ -6397,6 +6397,10 @@
             <button type="button" class="profile-save-name-btn" onclick="saveMyProfileDisplayName()">Simpan</button>
           </div>
           <div class="profile-edit-hint">Nama ini akan tampil di chat, daftar room, dan profil. Username login tetap tidak berubah.</div>
+          <div class="profile-mobile-avatar-action">
+            <input type="file" id="profileMobileAvatarInput" accept="image/*" onchange="uploadAvatarFirebase(event)">
+            <button type="button" class="profile-change-photo-btn" onclick="openMobileProfilePhotoPicker()">Ganti Foto Profil</button>
+          </div>
         </div>
 
         <div class="profile-bg-preview" id="profileModalBgPreview">Belum ada background dashboard</div>
@@ -7969,6 +7973,7 @@
 
         const card = document.createElement('div');
         card.className = `chat-item-card ${isCurrentActive ? 'active' : ''}`;
+        card.dataset.chatPartner = name;
         card.onclick = () => { selectActiveChatRoom(name); };
 
         let unreadBadgeHtml = "";
@@ -8250,6 +8255,9 @@
 
           // Kondisi filter kamar chat aktif Anda dengan user bersangkutan.
           // Mendukung alias lama Fadly -> OWNER agar chat lama tetap muncul.
+          const hiddenFor = Array.isArray(item.hiddenFor) ? item.hiddenFor.map(getDisplayUsername) : [];
+          if (hiddenFor.includes(loggedInUser)) return;
+
           const isMeSender = isMessageFromTo(item, loggedInUser, passivePartner);
           const isPartnerSender = isMessageFromTo(item, passivePartner, loggedInUser);
 
@@ -8641,7 +8649,7 @@
       clearTimeout(typingTimeout);
       typingTimeout = setTimeout(() => {
         syncOwnPresence({ status: "online" });
-      }, 1500);
+      }, 6000);
     };
 
     function initiateProfilePhotoListener() {
@@ -8963,7 +8971,7 @@
         if (loginForm) loginForm.reset();
 
         if (reason === 'idle') {
-          showLoginNotice('10 menit ga ngapa²in makanya ke logout, Login lagi buruan.');
+          showLoginNotice('Sesi berakhir otomatis karena tidak ada aktivitas selama 10 menit. Silakan login kembali.');
         } else if (reason === 'remote') {
           showLoginNotice('Sesi login ditutup dari tab lain. Silakan login kembali.');
         } else {
@@ -11453,6 +11461,1466 @@
       text-rendering: geometricPrecision;
     }
   </style>
+
+
+  <style id="final-mobile-logout-chat-photo-fix-style">
+    /* Mobile fix: login harus tampil setelah logout */
+    @media (max-width: 680px) {
+      body.force-show-login-mobile #loginPage {
+        display: grid !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        z-index: 2 !important;
+      }
+
+      body.force-show-login-mobile #dashboardPage {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
+      body.force-show-login-mobile .prelogin-theme-fab {
+        display: grid !important;
+      }
+
+      body.force-show-login-mobile #beforeLoginLoveLayer {
+        display: block !important;
+      }
+
+      #dashboardPage.mobile-sidebar-open .sidebar,
+      #dashboardPage.mobile-sidebar-open #activeChatRoomsBox,
+      #dashboardPage.mobile-sidebar-open .chat-item-card {
+        pointer-events: auto !important;
+      }
+
+      #dashboardPage.mobile-sidebar-open .chat-item-card {
+        position: relative !important;
+        z-index: 50 !important;
+        cursor: pointer !important;
+        touch-action: manipulation !important;
+      }
+
+      .profile-mobile-avatar-action {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .profile-edit-name:not(.is-visible) .profile-mobile-avatar-action {
+        display: none !important;
+      }
+
+      .profile-change-photo-btn {
+        min-height: 40px;
+        border-radius: 12px;
+        border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 38%, transparent);
+        background: linear-gradient(135deg, var(--theme-accent-3, #FFE9A8), var(--theme-accent, #D9A93A) 58%, var(--theme-accent-2, #8B5E16));
+        color: var(--theme-dark-text-on-button, #1B1103);
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+        box-shadow: 0 10px 24px color-mix(in srgb, var(--theme-accent, #D9A93A) 14%, transparent);
+      }
+
+      .profile-change-photo-btn:active {
+        transform: translateY(1px);
+      }
+
+      #profileMobileAvatarInput {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        overflow: hidden !important;
+      }
+    }
+
+    @media (min-width: 681px) {
+      .profile-mobile-avatar-action {
+        display: none !important;
+      }
+    }
+  </style>
+
+  <script id="final-mobile-logout-chat-photo-fix-script">
+    (function() {
+      const mobileQuery = window.matchMedia('(max-width: 680px)');
+
+      function isMobile() {
+        return mobileQuery.matches;
+      }
+
+      function loginPage() {
+        return document.getElementById('loginPage');
+      }
+
+      function dashboardPage() {
+        return document.getElementById('dashboardPage');
+      }
+
+      function hardShowLoginMobile() {
+        const login = loginPage();
+        const dash = dashboardPage();
+
+        document.documentElement.classList.remove('session-restoring');
+        document.body.classList.remove('mobile-nav-lock', 'dashboard-love-active');
+        document.body.classList.add('force-show-login-mobile', 'prelogin-theme-fab-visible');
+
+        if (dash) {
+          dash.style.display = 'none';
+          dash.classList.remove('mobile-chat-active', 'mobile-sidebar-open', 'is-mobile-authenticated');
+        }
+
+        if (login) {
+          login.style.display = 'grid';
+          login.style.visibility = 'visible';
+          login.style.opacity = '1';
+        }
+
+        try {
+          if (typeof window.closeMobileSidebar === 'function') window.closeMobileSidebar();
+        } catch (error) {}
+
+        setTimeout(() => {
+          document.body.classList.remove('force-show-login-mobile');
+          if (typeof window.syncPreloginThemeFabVisibility === 'function') {
+            window.syncPreloginThemeFabVisibility();
+          }
+          if (typeof window.startPreloginLoveEffect === 'function') {
+            window.startPreloginLoveEffect();
+          }
+        }, 450);
+      }
+
+      function patchLogout() {
+        if (typeof window.triggerSignOut !== 'function' || window.triggerSignOut.__mobileFixed) return false;
+
+        const originalLogout = window.triggerSignOut;
+        async function fixedLogout(options) {
+          try {
+            return await originalLogout(options);
+          } finally {
+            if (isMobile()) {
+              hardShowLoginMobile();
+            }
+          }
+        }
+
+        fixedLogout.__mobileFixed = true;
+        window.triggerSignOut = fixedLogout;
+        return true;
+      }
+
+      function patchSelectChat() {
+        if (typeof window.selectActiveChatRoom !== 'function' || window.selectActiveChatRoom.__mobileSwitchFixed) return false;
+
+        const originalSelect = window.selectActiveChatRoom;
+        function fixedSelectChat(partnerName) {
+          const result = originalSelect(partnerName);
+
+          if (isMobile()) {
+            const page = dashboardPage();
+            if (page) page.classList.add('mobile-chat-active');
+            try {
+              if (typeof window.closeMobileSidebar === 'function') window.closeMobileSidebar();
+            } catch (error) {}
+
+            setTimeout(() => {
+              const flowBox = document.getElementById('messageFlowBox');
+              if (flowBox) flowBox.scrollTop = flowBox.scrollHeight;
+            }, 220);
+          }
+
+          return result;
+        }
+
+        fixedSelectChat.__mobileSwitchFixed = true;
+        window.selectActiveChatRoom = fixedSelectChat;
+        return true;
+      }
+
+      function bindDelegatedChatSwitch() {
+        if (document.body.dataset.mobileChatSwitchDelegated === '1') return;
+        document.body.dataset.mobileChatSwitchDelegated = '1';
+
+        document.addEventListener('click', (event) => {
+          if (!isMobile()) return;
+
+          const card = event.target.closest('.chat-item-card');
+          if (!card) return;
+          if (event.target.closest('[data-profile-open="1"], [data-delete-chat="1"], button, select, input, a')) return;
+
+          const partner = card.dataset.chatPartner;
+          if (!partner || typeof window.selectActiveChatRoom !== 'function') return;
+
+          event.preventDefault();
+          event.stopPropagation();
+          window.selectActiveChatRoom(partner);
+        }, true);
+      }
+
+      window.openMobileProfilePhotoPicker = function() {
+        const modalInput = document.getElementById('profileMobileAvatarInput');
+        const sidebarInput = document.getElementById('uploadAvatarInput');
+        const input = modalInput || sidebarInput;
+
+        if (!input) {
+          alert('Input foto profil tidak ditemukan.');
+          return;
+        }
+
+        try {
+          input.click();
+        } catch (error) {
+          alert('Tidak bisa membuka galeri. Coba buka menu profil lalu tekan ganti foto lagi.');
+        }
+      };
+
+      function syncMobileStateAfterVisibility() {
+        const dash = dashboardPage();
+        const login = loginPage();
+        if (!isMobile() || !dash || !login) return;
+
+        const dashVisible = window.getComputedStyle(dash).display !== 'none';
+        const loginVisible = window.getComputedStyle(login).display !== 'none';
+
+        if (!dashVisible && !loginVisible) {
+          hardShowLoginMobile();
+        }
+      }
+
+      function bootMobileFixes() {
+        patchLogout();
+        patchSelectChat();
+        bindDelegatedChatSwitch();
+        syncMobileStateAfterVisibility();
+
+        let attempts = 0;
+        const timer = setInterval(() => {
+          attempts++;
+          const okLogout = patchLogout();
+          const okSelect = patchSelectChat();
+          if ((okLogout && okSelect) || attempts > 30) clearInterval(timer);
+        }, 250);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootMobileFixes, { once: true });
+      } else {
+        bootMobileFixes();
+      }
+
+      window.addEventListener('resize', syncMobileStateAfterVisibility, { passive: true });
+      window.addEventListener('orientationchange', () => setTimeout(syncMobileStateAfterVisibility, 220), { passive: true });
+    })();
+  </script>
+
+
+  <style id="final-mega-features-no-search-style">
+    /* ===== FINAL MEGA FEATURES TANPA SEARCH CHAT ===== */
+
+    /* Load pesan lama / progressive display */
+    .load-older-messages-btn {
+      align-self: center;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 32%, transparent);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2, rgba(35,25,12,.82)) 88%, transparent), color-mix(in srgb, var(--theme-panel, rgba(18,13,7,.94)) 98%, transparent));
+      color: var(--theme-heading-text, #FFF1C2);
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      margin: 6px auto 8px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+    }
+
+    .load-older-messages-btn:hover {
+      border-color: var(--theme-accent, #D9A93A);
+      filter: brightness(1.06);
+    }
+
+    .msg-row.history-hidden,
+    .day-divider.history-hidden {
+      display: none !important;
+    }
+
+    /* Hint long press */
+    .longpress-chat-hint {
+      align-self: center;
+      max-width: min(420px, 90%);
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 22%, transparent);
+      background: rgba(255,255,255,.035);
+      color: var(--theme-soft-text, rgba(255,235,190,.72));
+      font-size: 10.5px;
+      font-weight: 750;
+      text-align: center;
+      margin: 4px auto 6px;
+    }
+
+    /* Mobile bottom navigation */
+    .mobile-bottom-nav {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      bottom: calc(8px + env(safe-area-inset-bottom));
+      z-index: 450;
+      display: none;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+      padding: 7px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2, rgba(35,25,12,.82)) 88%, transparent), color-mix(in srgb, var(--theme-panel, rgba(18,13,7,.94)) 98%, transparent));
+      border: 1px solid var(--theme-border, rgba(217,169,58,.24));
+      box-shadow: 0 18px 44px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .mobile-bottom-nav button {
+      min-width: 0;
+      min-height: 42px;
+      border: 0;
+      border-radius: 15px;
+      background: rgba(255,255,255,.045);
+      color: var(--theme-body-text, #F7E8C0);
+      font-size: 9px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .mobile-bottom-nav .mbn-ico {
+      color: var(--theme-link-text, #FFE39A);
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .mobile-bottom-nav button:active {
+      transform: translateY(1px);
+      background: color-mix(in srgb, var(--theme-accent, #D9A93A) 12%, transparent);
+    }
+
+    body.mobile-bottom-nav-active .mobile-bottom-nav {
+      display: grid;
+    }
+
+    @media (max-width: 680px) {
+      body.mobile-bottom-nav-active .chat-footer-panel {
+        padding-bottom: calc(74px + env(safe-area-inset-bottom)) !important;
+      }
+      body.mobile-bottom-nav-active .message-area {
+        padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+      }
+
+      .chat-footer-panel {
+        gap: 9px !important;
+      }
+      .chat-footer-panel input[type="text"] {
+        min-height: 46px !important;
+        font-size: 14px !important;
+      }
+      .send-action-btn {
+        width: 48px !important;
+        height: 48px !important;
+        min-width: 48px !important;
+      }
+
+      body.mobile-keyboard-active .mobile-bottom-nav {
+        display: none !important;
+      }
+      body.mobile-keyboard-active .chat-footer-panel {
+        padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+      }
+    }
+
+    /* Admin enhancements */
+    .admin-extra-panel {
+      margin-top: 12px;
+      padding: 13px;
+      border-radius: 18px;
+      border: 1px solid var(--theme-border, rgba(217,169,58,.24));
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2, rgba(35,25,12,.82)) 72%, transparent), color-mix(in srgb, var(--theme-panel, rgba(18,13,7,.94)) 96%, transparent));
+      display: grid;
+      gap: 10px;
+    }
+
+    .admin-extra-title {
+      color: var(--theme-heading-text, #FFF1C2);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .admin-extra-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .admin-extra-row input {
+      min-height: 38px;
+      border-radius: 12px;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 22%, transparent);
+      background: color-mix(in srgb, var(--theme-bg-c, #050403) 72%, transparent);
+      color: var(--theme-input-text, #FFF7E5);
+      padding: 0 12px;
+      outline: none;
+    }
+
+    .admin-extra-row button,
+    .admin-extra-btn {
+      min-height: 38px;
+      border-radius: 12px;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 38%, transparent);
+      background: linear-gradient(135deg, var(--theme-accent-3, #FFE9A8), var(--theme-accent, #D9A93A) 58%, var(--theme-accent-2, #8B5E16));
+      color: var(--theme-dark-text-on-button, #1B1103);
+      font-size: 11px;
+      font-weight: 950;
+      cursor: pointer;
+      padding: 0 12px;
+    }
+
+    .activity-log-list {
+      max-height: 220px;
+      overflow-y: auto;
+      display: grid;
+      gap: 8px;
+      padding-right: 3px;
+    }
+
+    .activity-log-item {
+      padding: 10px 11px;
+      border-radius: 13px;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 14%, transparent);
+      background: rgba(255,255,255,.028);
+      color: var(--theme-body-text, #F7E8C0);
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+
+    .activity-log-item small {
+      display: block;
+      color: var(--theme-soft-text, rgba(255,235,190,.72));
+      margin-top: 4px;
+      font-size: 10px;
+    }
+
+    @media (max-width: 680px) {
+      .admin-extra-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Compact mode */
+    body.dashboard-compact .chat-item-card { padding: 8px !important; min-height: 48px !important; }
+    body.dashboard-compact .bubble { padding: 7px 10px !important; font-size: 12.4px !important; }
+    body.dashboard-compact .message-area { gap: 9px !important; }
+    body.dashboard-compact .chat-main-header { min-height: 62px !important; padding: 10px 16px !important; }
+    body.dashboard-compact .action-link-btn { min-height: 42px !important; height: 42px !important; }
+
+    /* Settings toggles */
+    .theme-extra-settings {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .theme-setting-toggle {
+      min-height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--theme-border, rgba(217,169,58,.24));
+      background: rgba(255,255,255,.035);
+      color: var(--theme-body-text, #F7E8C0);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+    .theme-setting-toggle span:last-child {
+      color: var(--theme-link-text, #FFE39A);
+      font-weight: 950;
+    }
+
+    body.animations-off #afterLoginLoveLayer,
+    body.animations-off #beforeLoginLoveLayer,
+    body.animations-off .login-love-particle,
+    body.animations-off .prelogin-love-particle {
+      display: none !important;
+      animation: none !important;
+    }
+
+    /* Profile mobile photo */
+    @media (max-width: 680px) {
+      .profile-mobile-avatar-action {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .profile-edit-name:not(.is-visible) .profile-mobile-avatar-action {
+        display: none !important;
+      }
+      .profile-change-photo-btn {
+        min-height: 40px;
+        border-radius: 12px;
+        border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 38%, transparent);
+        background: linear-gradient(135deg, var(--theme-accent-3, #FFE9A8), var(--theme-accent, #D9A93A) 58%, var(--theme-accent-2, #8B5E16));
+        color: var(--theme-dark-text-on-button, #1B1103);
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+      #profileMobileAvatarInput {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    }
+    @media (min-width: 681px) {
+      .profile-mobile-avatar-action { display: none !important; }
+    }
+  </style>
+
+
+  <script type="module" id="final-mega-features-no-search-module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, addDoc, getDoc, getDocs,
+      query, orderBy, limit, serverTimestamp, arrayUnion
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfigMega = {
+      apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
+      authDomain: "fandah-c08fc.firebaseapp.com",
+      projectId: "fandah-c08fc",
+      storageBucket: "fandah-c08fc.firebasestorage.app",
+      messagingSenderId: "624734789171",
+      appId: "1:624734789171:web:7ba9ab16730acb5cfc8d46",
+      measurementId: "G-DN9Y49Q8QQ"
+    };
+
+    const appMega = getApps().length ? getApp() : initializeApp(firebaseConfigMega);
+    const dbMega = getFirestore(appMega);
+
+    const SESSION_KEY = "fandah_dashboard_login_session_v1";
+    const SETTINGS_KEY = "fandah_dashboard_ui_settings_v1";
+    const LOGIN_LOCK_KEY = "fandah_login_attempt_lock_v1";
+
+    function safeParse(raw, fallback = null) {
+      try { return JSON.parse(raw); } catch (error) { return fallback; }
+    }
+
+    function getSessionUser() {
+      const data = safeParse(localStorage.getItem(SESSION_KEY), {});
+      return String(data?.username || data?.user || "").trim();
+    }
+
+    function getSessionInfo() {
+      return safeParse(localStorage.getItem(SESSION_KEY), {}) || {};
+    }
+
+    function getSettings() {
+      return {
+        compact: false,
+        animations: true,
+        sound: true,
+        ...safeParse(localStorage.getItem(SETTINGS_KEY), {})
+      };
+    }
+
+    function saveSettings(next) {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+      applySettings();
+    }
+
+    function applySettings() {
+      const settings = getSettings();
+      document.body.classList.toggle("dashboard-compact", !!settings.compact);
+      document.body.classList.toggle("animations-off", settings.animations === false);
+      window.dashboardSoundEnabled = settings.sound !== false;
+      window.dashboardAnimationEnabled = settings.animations !== false;
+    }
+
+    async function logActivity(action, details = {}) {
+      const actor = getSessionUser() || "unknown";
+      try {
+        await addDoc(collection(dbMega, "app_activity_logs"), {
+          actor,
+          action,
+          details,
+          createdAt: serverTimestamp(),
+          clientCreatedAtMs: Date.now(),
+          userAgent: navigator.userAgent || ""
+        });
+      } catch (error) {
+        console.warn("Gagal menyimpan log aktivitas:", error);
+      }
+    }
+
+    async function resetUserPasswordByAdmin() {
+      const user = String(document.getElementById("adminResetUserInput")?.value || "").trim();
+      const pass = String(document.getElementById("adminResetPassInput")?.value || "").trim();
+      if (!user || !pass) {
+        alert("Isi username dan password baru.");
+        return;
+      }
+      if (pass.length < 3) {
+        alert("Password minimal 3 karakter.");
+        return;
+      }
+
+      try {
+        await updateDoc(doc(dbMega, "app_users", user), {
+          password: pass,
+          passwordResetAt: serverTimestamp(),
+          passwordResetBy: getSessionUser() || ""
+        });
+        await logActivity("RESET_PASSWORD", { targetUser: user });
+        alert("Password user berhasil direset.");
+        document.getElementById("adminResetPassInput").value = "";
+      } catch (error) {
+        console.error(error);
+        alert("Gagal reset password. Cek username / akses Firestore.");
+      }
+    }
+
+    async function forceLogoutUserByAdmin() {
+      const user = String(document.getElementById("adminResetUserInput")?.value || "").trim();
+      if (!user) {
+        alert("Isi username yang ingin di-logout.");
+        return;
+      }
+      try {
+        await setDoc(doc(dbMega, "user_session_control", user), {
+          forceLogoutAt: Date.now(),
+          forceLogoutBy: getSessionUser() || "",
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        await logActivity("FORCE_LOGOUT_USER", { targetUser: user });
+        alert("Perintah logout user sudah dikirim.");
+      } catch (error) {
+        console.error(error);
+        alert("Gagal mengirim perintah logout user.");
+      }
+    }
+
+    async function loadActivityLogs() {
+      const box = document.getElementById("activityLogList");
+      if (!box) return;
+      box.innerHTML = `<div class="activity-log-item">Memuat riwayat aktivitas...</div>`;
+      try {
+        const snap = await getDocs(query(collection(dbMega, "app_activity_logs"), orderBy("createdAt", "desc"), limit(50)));
+        if (snap.empty) {
+          box.innerHTML = `<div class="activity-log-item">Belum ada riwayat aktivitas.</div>`;
+          return;
+        }
+        box.innerHTML = "";
+        snap.forEach((item) => {
+          const data = item.data() || {};
+          const date = data.clientCreatedAtMs ? new Date(data.clientCreatedAtMs) : new Date();
+          const detailText = data.details ? JSON.stringify(data.details) : "";
+          const div = document.createElement("div");
+          div.className = "activity-log-item";
+          div.innerHTML = `
+            <strong>${String(data.action || "-")}</strong> oleh <b>${String(data.actor || "-")}</b>
+            <small>${date.toLocaleString("id-ID")} ${detailText ? "• " + detailText : ""}</small>
+          `;
+          box.appendChild(div);
+        });
+      } catch (error) {
+        console.error(error);
+        box.innerHTML = `<div class="activity-log-item">Gagal memuat log aktivitas.</div>`;
+      }
+    }
+
+    function ensureAdminExtraPanel() {
+      const modal = document.querySelector("#adminModal .admin-control-modal");
+      if (!modal || document.getElementById("adminExtraPanel")) return;
+
+      const panel = document.createElement("div");
+      panel.className = "admin-extra-panel";
+      panel.id = "adminExtraPanel";
+      panel.innerHTML = `
+        <div class="admin-extra-title">Security & Aktivitas</div>
+        <div class="admin-extra-row">
+          <input type="text" id="adminResetUserInput" placeholder="Username user">
+          <input type="text" id="adminResetPassInput" placeholder="Password baru">
+          <button type="button" id="adminResetPassBtn">Reset Password</button>
+        </div>
+        <div class="admin-extra-row" style="grid-template-columns: 1fr auto auto;">
+          <div style="color:var(--theme-soft-text);font-size:11.5px;">Pakai username di atas untuk logout device user.</div>
+          <button type="button" id="adminForceLogoutBtn">Logout User</button>
+          <button type="button" id="adminRefreshLogBtn">Refresh Log</button>
+        </div>
+        <div class="activity-log-list" id="activityLogList">
+          <div class="activity-log-item">Klik Refresh Log untuk melihat aktivitas admin.</div>
+        </div>
+      `;
+      modal.appendChild(panel);
+
+      document.getElementById("adminResetPassBtn")?.addEventListener("click", resetUserPasswordByAdmin);
+      document.getElementById("adminForceLogoutBtn")?.addEventListener("click", forceLogoutUserByAdmin);
+      document.getElementById("adminRefreshLogBtn")?.addEventListener("click", loadActivityLogs);
+    }
+
+    function patchAdminOpen() {
+      if (typeof window.openAdminManagementModal !== "function" || window.openAdminManagementModal.__megaPatched) return;
+      const original = window.openAdminManagementModal;
+      window.openAdminManagementModal = function(...args) {
+        const result = original.apply(this, args);
+        setTimeout(() => {
+          ensureAdminExtraPanel();
+          loadActivityLogs();
+        }, 120);
+        return result;
+      };
+      window.openAdminManagementModal.__megaPatched = true;
+    }
+
+    function patchActivityWrappers() {
+      const wrappers = [
+        ["submitCreateUserByAdmin", "CREATE_USER"],
+        ["deleteUserByAdmin", "DELETE_USER"],
+        ["submitCreateRoleByAdmin", "CREATE_ROLE"],
+        ["deleteRoleByAdmin", "DELETE_ROLE"],
+        ["changeUserRoleByAdmin", "CHANGE_USER_ROLE"]
+      ];
+
+      wrappers.forEach(([fnName, action]) => {
+        const fn = window[fnName];
+        if (typeof fn !== "function" || fn.__activityWrapped) return;
+        const wrapped = async function(...args) {
+          const result = await fn.apply(this, args);
+          logActivity(action, { args: args.map((arg) => typeof arg === "string" ? arg : String(arg?.value || "")) });
+          return result;
+        };
+        wrapped.__activityWrapped = true;
+        window[fnName] = wrapped;
+      });
+    }
+
+    function patchDeleteMessageOptions() {
+      if (typeof window.triggerDeleteFirebase !== "function" || window.triggerDeleteFirebase.__deleteOptionsPatched) return;
+
+      const patched = async function(docId) {
+        try { if (typeof window.closeAllBubbleActions === "function") window.closeAllBubbleActions(); } catch (error) {}
+        if (!docId) return;
+
+        const choice = prompt("Pilih jenis hapus:\\n1 = Hapus untuk saya saja\\n2 = Hapus permanen dari database", "1");
+        if (choice === null) return;
+
+        if (String(choice).trim() === "2") {
+          if (!confirm("Hapus permanen dari database?")) return;
+          try {
+            await deleteDoc(doc(dbMega, "obrolan_utama", docId));
+            await logActivity("DELETE_MESSAGE_PERMANENT", { docId });
+          } catch (error) {
+            console.error(error);
+            alert("Gagal hapus permanen.");
+          }
+          return;
+        }
+
+        try {
+          const user = getSessionUser();
+          await updateDoc(doc(dbMega, "obrolan_utama", docId), {
+            hiddenFor: arrayUnion(user),
+            hiddenAt: Date.now()
+          });
+          await logActivity("DELETE_MESSAGE_FOR_ME", { docId });
+        } catch (error) {
+          console.error(error);
+          alert("Gagal menyembunyikan pesan.");
+        }
+      };
+
+      patched.__deleteOptionsPatched = true;
+      window.triggerDeleteFirebase = patched;
+    }
+
+    async function checkRemoteForcedLogout() {
+      const user = getSessionUser();
+      if (!user) return;
+      try {
+        const controlSnap = await getDoc(doc(dbMega, "user_session_control", user));
+        if (!controlSnap.exists()) return;
+        const forceLogoutAt = Number(controlSnap.data()?.forceLogoutAt || 0);
+        const session = getSessionInfo();
+        const loginAt = Number(session.createdAt || session.lastActivityAt || 0);
+        if (forceLogoutAt && loginAt && forceLogoutAt > loginAt) {
+          if (typeof window.triggerSignOut === "function") {
+            await window.triggerSignOut({ reason: "remote", skipSessionBroadcast: true });
+          }
+        }
+      } catch (error) {}
+    }
+
+    function ensureThemeSettingsPanel() {
+      const modal = document.getElementById("themeModal");
+      const options = document.getElementById("dashboardThemeOptions");
+      if (!modal || !options || document.getElementById("themeExtraSettings")) return;
+
+      const panel = document.createElement("div");
+      panel.className = "theme-extra-settings";
+      panel.id = "themeExtraSettings";
+      panel.innerHTML = `
+        <button type="button" class="theme-setting-toggle" id="toggleCompactMode"><span>Mode Compact</span><span></span></button>
+        <button type="button" class="theme-setting-toggle" id="toggleAnimations"><span>Efek Love / Animasi</span><span></span></button>
+        <button type="button" class="theme-setting-toggle" id="toggleSound"><span>Suara Notifikasi</span><span></span></button>
+      `;
+      options.insertAdjacentElement("afterend", panel);
+
+      function syncLabels() {
+        const s = getSettings();
+        document.querySelector("#toggleCompactMode span:last-child").textContent = s.compact ? "ON" : "OFF";
+        document.querySelector("#toggleAnimations span:last-child").textContent = s.animations === false ? "OFF" : "ON";
+        document.querySelector("#toggleSound span:last-child").textContent = s.sound === false ? "OFF" : "ON";
+      }
+
+      document.getElementById("toggleCompactMode").addEventListener("click", () => {
+        const s = getSettings(); s.compact = !s.compact; saveSettings(s); syncLabels();
+      });
+      document.getElementById("toggleAnimations").addEventListener("click", () => {
+        const s = getSettings(); s.animations = !(s.animations !== false); saveSettings(s); syncLabels();
+      });
+      document.getElementById("toggleSound").addEventListener("click", () => {
+        const s = getSettings(); s.sound = !(s.sound !== false); saveSettings(s); syncLabels();
+      });
+      syncLabels();
+    }
+
+    function enhanceThemePreviewSave() {
+      if (!window.setDashboardTheme || window.setDashboardTheme.__previewSavePatched) return;
+
+      const originalSet = window.setDashboardTheme;
+      let originalTheme = document.documentElement.getAttribute("data-dashboard-theme") || "gold-luxury";
+      let pendingTheme = originalTheme;
+      let saved = true;
+
+      window.setDashboardTheme = function(themeName) {
+        pendingTheme = themeName;
+        saved = false;
+        document.documentElement.setAttribute("data-dashboard-theme", themeName);
+        document.querySelectorAll(".dashboard-theme-card[data-dashboard-theme]").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.dashboardTheme === themeName);
+        });
+      };
+      window.setDashboardTheme.__previewSavePatched = true;
+
+      const originalOpen = window.openThemeSettingsModal;
+      window.openThemeSettingsModal = function(...args) {
+        originalTheme = document.documentElement.getAttribute("data-dashboard-theme") || "gold-luxury";
+        pendingTheme = originalTheme;
+        saved = true;
+        const result = originalOpen ? originalOpen.apply(this, args) : undefined;
+        setTimeout(() => {
+          ensureThemeSettingsPanel();
+          const foot = document.querySelector("#themeModal .modal-foot");
+          if (foot && !document.getElementById("saveThemePreviewBtn")) {
+            const save = document.createElement("button");
+            save.className = "modal-btn primary";
+            save.id = "saveThemePreviewBtn";
+            save.textContent = "Simpan Tema";
+            save.addEventListener("click", () => {
+              originalSet(pendingTheme);
+              saved = true;
+              if (typeof window.closeThemeSettingsModal === "function") window.closeThemeSettingsModal();
+            });
+            foot.prepend(save);
+          }
+        }, 60);
+        return result;
+      };
+
+      const originalClose = window.closeThemeSettingsModal;
+      window.closeThemeSettingsModal = function(...args) {
+        if (!saved) {
+          document.documentElement.setAttribute("data-dashboard-theme", originalTheme);
+          originalSet(originalTheme);
+          saved = true;
+        }
+        return originalClose ? originalClose.apply(this, args) : undefined;
+      };
+    }
+
+    function createMobileBottomNav() {
+      if (document.getElementById("mobileBottomNav")) return;
+      const nav = document.createElement("div");
+      nav.id = "mobileBottomNav";
+      nav.className = "mobile-bottom-nav";
+      nav.innerHTML = `
+        <button type="button" data-mbn="chat"><span class="mbn-ico">☰</span><span>Chat</span></button>
+        <button type="button" data-mbn="start"><span class="mbn-ico">＋</span><span>Start</span></button>
+        <button type="button" data-mbn="profile"><span class="mbn-ico">●</span><span>Profil</span></button>
+        <button type="button" data-mbn="theme"><span class="mbn-ico">✦</span><span>Latar</span></button>
+        <button type="button" data-mbn="logout"><span class="mbn-ico">↪</span><span>Keluar</span></button>
+      `;
+      document.body.appendChild(nav);
+
+      nav.addEventListener("click", (event) => {
+        const btn = event.target.closest("button[data-mbn]");
+        if (!btn) return;
+        const action = btn.dataset.mbn;
+        if (action === "chat") {
+          if (typeof window.toggleMobileSidebar === "function") window.toggleMobileSidebar();
+          else document.getElementById("dashboardPage")?.classList.toggle("mobile-sidebar-open");
+        }
+        if (action === "start" && typeof window.openStartChatModal === "function") window.openStartChatModal();
+        if (action === "profile" && typeof window.openMyProfileModal === "function") window.openMyProfileModal();
+        if (action === "theme" && typeof window.openThemeSettingsModal === "function") window.openThemeSettingsModal();
+        if (action === "logout" && typeof window.triggerSignOut === "function") window.triggerSignOut();
+      });
+    }
+
+    function syncMobileBottomNav() {
+      const isMobile = window.matchMedia("(max-width: 680px)").matches;
+      const dash = document.getElementById("dashboardPage");
+      const visible = !!dash && window.getComputedStyle(dash).display !== "none";
+      document.body.classList.toggle("mobile-bottom-nav-active", isMobile && visible);
+    }
+
+    function setupMobileBackButton() {
+      if (window.__mobileBackButtonReady) return;
+      window.__mobileBackButtonReady = true;
+
+      window.addEventListener("popstate", () => {
+        if (!window.matchMedia("(max-width: 680px)").matches) return;
+        const page = document.getElementById("dashboardPage");
+        if (!page || window.getComputedStyle(page).display === "none") return;
+
+        if (!page.classList.contains("mobile-sidebar-open")) {
+          page.classList.add("mobile-sidebar-open");
+          document.body.classList.add("mobile-nav-lock");
+          history.pushState({ chatDashboard: true }, "", location.href);
+        }
+      });
+
+      if (history.state?.chatDashboard !== true) {
+        try { history.replaceState({ chatDashboard: true }, "", location.href); } catch (error) {}
+      }
+    }
+
+    function setupMobileInputComfort() {
+      const input = document.getElementById("typedMessageInput");
+      if (!input || input.dataset.mobileComfortReady === "1") return;
+      input.dataset.mobileComfortReady = "1";
+
+      input.addEventListener("focus", () => {
+        document.body.classList.add("mobile-keyboard-active");
+        setTimeout(() => {
+          const flowBox = document.getElementById("messageFlowBox");
+          if (flowBox) flowBox.scrollTop = flowBox.scrollHeight;
+        }, 280);
+      });
+
+      input.addEventListener("blur", () => {
+        setTimeout(() => document.body.classList.remove("mobile-keyboard-active"), 200);
+      });
+    }
+
+    function addLongPressHint() {
+      const flowBox = document.getElementById("messageFlowBox");
+      if (!flowBox || document.getElementById("longpressChatHint")) return;
+      const hint = document.createElement("div");
+      hint.id = "longpressChatHint";
+      hint.className = "longpress-chat-hint";
+      hint.textContent = "Tips: tekan lama pesan untuk Reply / Edit / Delete";
+      flowBox.prepend(hint);
+      setTimeout(() => hint.remove(), 9000);
+    }
+
+    function setupProgressiveHistoryDisplay() {
+      const flowBox = document.getElementById("messageFlowBox");
+      if (!flowBox || flowBox.dataset.progressiveHistoryReady === "1") return;
+      flowBox.dataset.progressiveHistoryReady = "1";
+      flowBox.dataset.visibleMessages = flowBox.dataset.visibleMessages || "120";
+
+      function applyLimit(keepBottom = false) {
+        const rows = Array.from(flowBox.querySelectorAll(".msg-row"));
+        if (!rows.length) return;
+        const visible = Number(flowBox.dataset.visibleMessages || 120);
+        const hiddenCount = Math.max(0, rows.length - visible);
+
+        rows.forEach((row, idx) => row.classList.toggle("history-hidden", idx < hiddenCount));
+
+        let btn = document.getElementById("loadOlderMessagesBtn");
+        if (hiddenCount > 0) {
+          if (!btn) {
+            btn = document.createElement("button");
+            btn.id = "loadOlderMessagesBtn";
+            btn.className = "load-older-messages-btn";
+            btn.type = "button";
+            btn.addEventListener("click", () => {
+              flowBox.dataset.visibleMessages = String(Number(flowBox.dataset.visibleMessages || 120) + 80);
+              applyLimit(false);
+            });
+            flowBox.prepend(btn);
+          }
+          btn.textContent = `Muat pesan lama (${hiddenCount})`;
+          btn.style.display = "inline-flex";
+        } else if (btn) {
+          btn.remove();
+        }
+
+        if (keepBottom) {
+          requestAnimationFrame(() => { flowBox.scrollTop = flowBox.scrollHeight; });
+        }
+      }
+
+      const observer = new MutationObserver(() => {
+        applyLimit(false);
+        addLongPressHint();
+      });
+      observer.observe(flowBox, { childList: true });
+      setTimeout(() => applyLimit(true), 400);
+    }
+
+    function patchDeleteAllChatLog() {
+      if (typeof window.deleteAllChatWithPartner !== "function" || window.deleteAllChatWithPartner.__logWrapped) return;
+      const original = window.deleteAllChatWithPartner;
+      window.deleteAllChatWithPartner = async function(partnerName) {
+        const result = await original.apply(this, arguments);
+        logActivity("DELETE_ALL_CHAT", { partnerName });
+        return result;
+      };
+      window.deleteAllChatWithPartner.__logWrapped = true;
+    }
+
+    function bootMegaFeatures() {
+      applySettings();
+      createMobileBottomNav();
+      syncMobileBottomNav();
+      setupMobileBackButton();
+      setupMobileInputComfort();
+      setupProgressiveHistoryDisplay();
+      patchAdminOpen();
+      patchActivityWrappers();
+      patchDeleteMessageOptions();
+      patchDeleteAllChatLog();
+      enhanceThemePreviewSave();
+      ensureThemeSettingsPanel();
+
+      setInterval(checkRemoteForcedLogout, 15000);
+      setInterval(() => {
+        patchAdminOpen();
+        patchActivityWrappers();
+        patchDeleteMessageOptions();
+        patchDeleteAllChatLog();
+        setupMobileInputComfort();
+        setupProgressiveHistoryDisplay();
+        syncMobileBottomNav();
+      }, 6000);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootMegaFeatures, { once: true });
+    } else {
+      bootMegaFeatures();
+    }
+
+    window.addEventListener("resize", syncMobileBottomNav, { passive: true });
+    window.addEventListener("orientationchange", () => setTimeout(syncMobileBottomNav, 240), { passive: true });
+  </script>
+
+
+  <script id="final-login-attempt-limit-script">
+    (function() {
+      const LOCK_KEY = "fandah_login_attempt_lock_v1";
+      const MAX_ATTEMPTS = 5;
+      const LOCK_MS = 5 * 60 * 1000;
+
+      function readState() {
+        try { return JSON.parse(localStorage.getItem(LOCK_KEY) || "{}"); } catch (e) { return {}; }
+      }
+      function writeState(data) {
+        try { localStorage.setItem(LOCK_KEY, JSON.stringify(data || {})); } catch (e) {}
+      }
+      function clearState() {
+        try { localStorage.removeItem(LOCK_KEY); } catch (e) {}
+      }
+      function showLockMessage(message) {
+        const box = document.getElementById("authErrorNotification");
+        if (box) {
+          box.textContent = message;
+          box.style.display = "block";
+        } else {
+          alert(message);
+        }
+      }
+      function remainingText(ms) {
+        const sec = Math.ceil(ms / 1000);
+        const min = Math.floor(sec / 60);
+        const rest = sec % 60;
+        return `${min}:${String(rest).padStart(2, "0")}`;
+      }
+      function isLocked() {
+        const state = readState();
+        const lockedUntil = Number(state.lockedUntil || 0);
+        if (lockedUntil && Date.now() < lockedUntil) {
+          showLockMessage(`Terlalu banyak percobaan login. Coba lagi dalam ${remainingText(lockedUntil - Date.now())}.`);
+          return true;
+        }
+        if (lockedUntil && Date.now() >= lockedUntil) clearState();
+        return false;
+      }
+      function patchLoginHandler() {
+        if (typeof window.executeLoginValidation !== "function" || window.executeLoginValidation.__attemptLimitPatched) return false;
+        const original = window.executeLoginValidation;
+        window.executeLoginValidation = async function(event) {
+          if (isLocked()) {
+            if (event) event.preventDefault();
+            return;
+          }
+          const beforeDash = document.getElementById("dashboardPage");
+          const result = await original.apply(this, arguments);
+          setTimeout(() => {
+            const dashVisible = beforeDash && getComputedStyle(beforeDash).display !== "none";
+            if (dashVisible) {
+              clearState();
+              return;
+            }
+            const state = readState();
+            const attempts = Number(state.attempts || 0) + 1;
+            if (attempts >= MAX_ATTEMPTS) {
+              writeState({ attempts, lockedUntil: Date.now() + LOCK_MS });
+              showLockMessage("Login salah 5x. Akun dikunci sementara 5 menit.");
+            } else {
+              writeState({ attempts, lockedUntil: 0 });
+            }
+          }, 900);
+          return result;
+        };
+        window.executeLoginValidation.__attemptLimitPatched = true;
+        return true;
+      }
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", patchLoginHandler, { once: true });
+      } else {
+        patchLoginHandler();
+      }
+      const timer = setInterval(() => {
+        if (patchLoginHandler()) clearInterval(timer);
+      }, 300);
+      setTimeout(() => clearInterval(timer), 12000);
+    })();
+  </script>
+
+
+  <style id="final-production-stability-polish">
+    /* FINAL PRODUCTION POLISH - menjaga mobile/login/chat tidak stuck */
+    html, body {
+      min-height: 100%;
+    }
+
+    body.force-show-login-mobile #loginPage,
+    body.force-show-login #loginPage {
+      display: grid !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    body.force-show-login-mobile #dashboardPage,
+    body.force-show-login #dashboardPage {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    #dashboardPage {
+      min-width: 0 !important;
+    }
+
+    #messageFlowBox,
+    .message-area {
+      min-height: 0 !important;
+      overscroll-behavior-y: contain !important;
+    }
+
+    .mobile-bottom-nav,
+    .prelogin-theme-fab,
+    .forgot-password-popup-overlay {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .load-older-messages-btn[disabled],
+    .admin-extra-btn[disabled],
+    #adminResetPassBtn[disabled],
+    #adminForceLogoutBtn[disabled],
+    #adminRefreshLogBtn[disabled] {
+      opacity: .58 !important;
+      pointer-events: none !important;
+      filter: grayscale(.15);
+    }
+
+    /* Cegah efek love menumpuk kalau browser/tab lama terbuka */
+    .login-love-particle,
+    .prelogin-love-particle {
+      pointer-events: none !important;
+      contain: layout style paint;
+    }
+
+    @media (max-width: 680px) {
+      #dashboardPage.mobile-sidebar-open .sidebar {
+        pointer-events: auto !important;
+      }
+
+      #dashboardPage.mobile-sidebar-open .chat-item-card {
+        pointer-events: auto !important;
+        touch-action: manipulation !important;
+      }
+
+      body.mobile-bottom-nav-active .chat-main-window {
+        min-height: 0 !important;
+      }
+
+      body.force-show-login-mobile .prelogin-theme-fab {
+        display: grid !important;
+      }
+    }
+  </style>
+
+
+  <script id="final-production-stability-guard">
+    (function() {
+      if (window.__finalProductionStabilityGuardReady) return;
+      window.__finalProductionStabilityGuardReady = true;
+
+      const MAX_FLOATING_LOVES = 64;
+      const MAX_PRELOGIN_LOVES = 36;
+      const CLEANUP_INTERVAL_MS = 30000;
+      const SYNC_INTERVAL_MS = 5000;
+      let lastSyncAt = 0;
+
+      function isMobile() {
+        return window.matchMedia && window.matchMedia('(max-width: 680px)').matches;
+      }
+
+      function visible(el) {
+        if (!el) return false;
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+      }
+
+      function getDashboard() {
+        return document.getElementById('dashboardPage');
+      }
+
+      function getLogin() {
+        return document.getElementById('loginPage');
+      }
+
+      function sessionExists() {
+        try {
+          const raw = localStorage.getItem('fandah_dashboard_login_session_v1');
+          if (!raw) return false;
+          const data = JSON.parse(raw);
+          if (!data || !data.username) return false;
+          if (Number(data.expiresAt || 0) && Date.now() >= Number(data.expiresAt)) return false;
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function forceLoginVisible() {
+        const login = getLogin();
+        const dash = getDashboard();
+        document.documentElement.classList.remove('session-restoring');
+        document.body.classList.add(isMobile() ? 'force-show-login-mobile' : 'force-show-login');
+        document.body.classList.remove('mobile-nav-lock', 'dashboard-love-active', 'mobile-bottom-nav-active');
+
+        if (dash) {
+          dash.style.display = 'none';
+          dash.classList.remove('mobile-chat-active', 'mobile-sidebar-open', 'is-mobile-authenticated');
+        }
+
+        if (login) {
+          login.style.display = 'grid';
+          login.style.visibility = 'visible';
+          login.style.opacity = '1';
+        }
+
+        setTimeout(() => {
+          document.body.classList.remove('force-show-login-mobile', 'force-show-login');
+          try { window.syncPreloginThemeFabVisibility && window.syncPreloginThemeFabVisibility(); } catch (error) {}
+          try { window.startPreloginLoveEffect && window.startPreloginLoveEffect(); } catch (error) {}
+        }, 500);
+      }
+
+      function syncAuthVisibility() {
+        const dash = getDashboard();
+        const login = getLogin();
+
+        if (!dash || !login) return;
+
+        const hasSession = sessionExists();
+        const dashVisible = visible(dash);
+        const loginVisible = visible(login);
+
+        if (!hasSession && !loginVisible) {
+          forceLoginVisible();
+          return;
+        }
+
+        if (hasSession && dashVisible) {
+          login.style.display = 'none';
+          document.body.classList.toggle('mobile-bottom-nav-active', isMobile());
+        }
+
+        if (isMobile() && dashVisible) {
+          document.body.classList.add('mobile-bottom-nav-active');
+        }
+      }
+
+      function pruneParticles(selector, maxCount) {
+        const nodes = Array.from(document.querySelectorAll(selector));
+        if (nodes.length <= maxCount) return;
+        nodes.slice(0, nodes.length - maxCount).forEach((node) => node.remove());
+      }
+
+      function cleanupFloatingUi() {
+        pruneParticles('.login-love-particle', MAX_FLOATING_LOVES);
+        pruneParticles('.prelogin-love-particle', MAX_PRELOGIN_LOVES);
+
+        document.querySelectorAll('.desktop-notification-card').forEach((node, idx) => {
+          if (idx > 5) node.remove();
+        });
+      }
+
+      function patchLogoutOneMoreTime() {
+        if (typeof window.triggerSignOut !== 'function' || window.triggerSignOut.__productionGuardPatched) return;
+        const original = window.triggerSignOut;
+        async function guardedLogout(options) {
+          try {
+            return await original.apply(this, arguments);
+          } finally {
+            forceLoginVisible();
+          }
+        }
+        guardedLogout.__productionGuardPatched = true;
+        window.triggerSignOut = guardedLogout;
+      }
+
+      function patchChatSwitchOneMoreTime() {
+        if (typeof window.selectActiveChatRoom !== 'function' || window.selectActiveChatRoom.__productionGuardPatched) return;
+        const original = window.selectActiveChatRoom;
+        function guardedSelect(partnerName) {
+          const result = original.apply(this, arguments);
+          const dash = getDashboard();
+
+          if (dash) {
+            dash.classList.add('mobile-chat-active');
+            if (isMobile()) dash.classList.remove('mobile-sidebar-open');
+          }
+
+          setTimeout(() => {
+            const flowBox = document.getElementById('messageFlowBox');
+            if (flowBox) flowBox.scrollTop = flowBox.scrollHeight;
+          }, 260);
+
+          return result;
+        }
+        guardedSelect.__productionGuardPatched = true;
+        window.selectActiveChatRoom = guardedSelect;
+      }
+
+      function bindMobileChatDelegation() {
+        if (document.body.dataset.productionChatDelegation === '1') return;
+        document.body.dataset.productionChatDelegation = '1';
+
+        document.addEventListener('click', (event) => {
+          if (!isMobile()) return;
+          const card = event.target.closest('.chat-item-card');
+          if (!card) return;
+          if (event.target.closest('button, input, select, a, [data-profile-open="1"], [data-delete-chat="1"]')) return;
+
+          const partner = card.dataset.chatPartner ||
+            card.getAttribute('data-chat-partner') ||
+            card.querySelector('.chat-item-name')?.textContent?.trim();
+
+          if (!partner || typeof window.selectActiveChatRoom !== 'function') return;
+
+          event.preventDefault();
+          event.stopPropagation();
+          window.selectActiveChatRoom(partner);
+        }, true);
+      }
+
+      function ensureProfilePhotoPicker() {
+        if (window.openMobileProfilePhotoPicker && window.openMobileProfilePhotoPicker.__productionGuardReady) return;
+
+        function picker() {
+          const input =
+            document.getElementById('profileMobileAvatarInput') ||
+            document.getElementById('uploadAvatarInput');
+
+          if (!input) {
+            alert('Input foto profil tidak ditemukan.');
+            return;
+          }
+
+          try {
+            input.click();
+          } catch (error) {
+            alert('Tidak bisa membuka galeri. Coba lagi dari menu profil.');
+          }
+        }
+
+        picker.__productionGuardReady = true;
+        window.openMobileProfilePhotoPicker = picker;
+      }
+
+      function throttleSync() {
+        const now = Date.now();
+        if (now - lastSyncAt < 700) return;
+        lastSyncAt = now;
+        syncAuthVisibility();
+        cleanupFloatingUi();
+        patchLogoutOneMoreTime();
+        patchChatSwitchOneMoreTime();
+        ensureProfilePhotoPicker();
+      }
+
+      window.addEventListener('error', (event) => {
+        console.warn('Dashboard runtime warning:', event.message);
+        throttleSync();
+      });
+
+      window.addEventListener('unhandledrejection', (event) => {
+        console.warn('Dashboard promise warning:', event.reason);
+        throttleSync();
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') throttleSync();
+      });
+
+      window.addEventListener('resize', throttleSync, { passive: true });
+      window.addEventListener('orientationchange', () => setTimeout(throttleSync, 240), { passive: true });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', throttleSync, { once: true });
+      } else {
+        throttleSync();
+      }
+
+      setInterval(throttleSync, SYNC_INTERVAL_MS);
+      setInterval(cleanupFloatingUi, CLEANUP_INTERVAL_MS);
+    })();
+  </script>
 
 </body>
 </html>
