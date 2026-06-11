@@ -6028,6 +6028,66 @@
     }
   </style>
 
+
+  <script id="session-restore-pre-guard">
+    (function() {
+      try {
+        var raw = localStorage.getItem('fandah_dashboard_login_session_v1');
+        if (!raw) return;
+        var data = JSON.parse(raw);
+        var expiresAt = Number(data && data.expiresAt || 0);
+        var username = String(data && data.username || '').trim();
+        if (username && expiresAt && Date.now() < expiresAt) {
+          document.documentElement.classList.add('session-restoring');
+        }
+      } catch (error) {}
+    })();
+  </script>
+
+  <style id="session-restore-no-flicker-style">
+    html.session-restoring #loginPage {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    html.session-restoring body::before {
+      content: "Memulihkan sesi...";
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(760px 320px at 50% -8%, rgba(212,175,55,.12), transparent 60%),
+        linear-gradient(180deg, #050505 0%, #0A0705 52%, #050505 100%);
+      color: #FFF4D6;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    html.session-restoring body::after {
+      content: "";
+      position: fixed;
+      left: 50%;
+      top: calc(50% + 32px);
+      width: 120px;
+      height: 3px;
+      z-index: 100000;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, #D9A93A, transparent);
+      animation: sessionRestorePulse 1s ease-in-out infinite;
+    }
+
+    @keyframes sessionRestorePulse {
+      0%, 100% { opacity: .35; transform: translateX(-50%) scaleX(.75); }
+      50% { opacity: 1; transform: translateX(-50%) scaleX(1); }
+    }
+  </style>
+
 </head>
 
 <body>
@@ -6157,8 +6217,8 @@
           <button class="action-link-btn" id="changePasswordActionBtn" onclick="openChangePasswordModal()">
             <span class="action-ico">✎</span><span class="action-text">Sandi</span>
           </button>
-          <button class="action-link-btn" id="backgroundActionBtn" onclick="openBackgroundSettingsModal()">
-            <span class="action-ico">▧</span><span class="action-text">Background</span>
+          <button class="action-link-btn" id="backgroundActionBtn" onclick="openThemeSettingsModal()">
+            <span class="action-ico">▧</span><span class="action-text">Latar</span>
           </button>
           <button class="action-link-btn" id="profileActionBtn" onclick="openMyProfileModal()">
             <span class="action-ico">●</span><span class="action-text">Profil</span>
@@ -6369,6 +6429,38 @@
     </div>
   </div>
 
+
+  <div class="modal-overlay" id="themeModal">
+    <div class="modal-box dashboard-theme-modal">
+      <h3>🎨 Latar / Tema Dashboard</h3>
+      <div class="dashboard-theme-options" id="dashboardThemeOptions">
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="gold-luxury" onclick="setDashboardTheme('gold-luxury')">
+          <span class="dashboard-theme-swatch theme-swatch-gold"></span>
+          <span class="dashboard-theme-info"><b>Emas Luxury</b></span>
+        </button>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="ocean-blue" onclick="setDashboardTheme('ocean-blue')">
+          <span class="dashboard-theme-swatch theme-swatch-ocean"></span>
+          <span class="dashboard-theme-info"><b>Ocean Blue</b></span>
+        </button>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="emerald-green" onclick="setDashboardTheme('emerald-green')">
+          <span class="dashboard-theme-swatch theme-swatch-emerald"></span>
+          <span class="dashboard-theme-info"><b>Emerald Green</b></span>
+        </button>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="violet-neon" onclick="setDashboardTheme('violet-neon')">
+          <span class="dashboard-theme-swatch theme-swatch-violet"></span>
+          <span class="dashboard-theme-info"><b>Violet Neon</b></span>
+        </button>
+        <button type="button" class="dashboard-theme-card" data-dashboard-theme="ruby-red" onclick="setDashboardTheme('ruby-red')">
+          <span class="dashboard-theme-swatch theme-swatch-ruby"></span>
+          <span class="dashboard-theme-info"><b>Ruby Red</b></span>
+        </button>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn secondary" onclick="closeThemeSettingsModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="passwordModal">
     <div class="modal-box">
       <h3>Ubah Kata Sandi</h3>
@@ -6477,11 +6569,11 @@
     let roomListArray = [];
 
     /* =========================================================
-       FINAL SESSION LOGIN 15 MENIT - aman refresh + idle logout
+       FINAL SESSION LOGIN 10 MENIT - aman refresh + idle logout
        ========================================================= */
     const DASHBOARD_SESSION_KEY = "fandah_dashboard_login_session_v1";
     const DASHBOARD_SESSION_LOGOUT_KEY = "fandah_dashboard_login_logout_v1";
-    const DASHBOARD_IDLE_LIMIT_MS = 15 * 60 * 1000; // 15 menit
+    const DASHBOARD_IDLE_LIMIT_MS = 10 * 60 * 1000; // 10 menit
     const DASHBOARD_SESSION_CHECK_MS = 5000; // cek ringan tiap 5 detik
     const DASHBOARD_ACTIVITY_WRITE_THROTTLE_MS = 12000; // tahan write localStorage supaya dashboard tetap smooth
     let dashboardSessionTimer = null;
@@ -6490,6 +6582,14 @@
     let dashboardSessionStorageBound = false;
     let dashboardSessionRestoring = false;
     let dashboardSessionSigningOut = false;
+
+
+    function finishDashboardSessionRestoreGuard() {
+      try {
+        document.documentElement.classList.remove('session-restoring');
+        document.documentElement.classList.add('session-restore-finished');
+      } catch (error) {}
+    }
 
     function normalizeDashboardSessionUser(username) {
       return getDisplayUsername(String(username || "").trim());
@@ -6695,8 +6795,11 @@
       }
 
       hideLoginNotice();
-      document.getElementById('loginPage').style.display = 'none';
-      document.getElementById('dashboardPage').style.display = 'grid';
+      const loginPageNode = document.getElementById('loginPage');
+      const dashboardPageNode = document.getElementById('dashboardPage');
+      if (loginPageNode) loginPageNode.style.display = 'none';
+      if (dashboardPageNode) dashboardPageNode.style.display = 'grid';
+      finishDashboardSessionRestoreGuard();
       syncCurrentUserHeader();
       applyCurrentUserAccess();
 
@@ -6733,16 +6836,29 @@
     }
 
     async function restoreDashboardSessionAfterRefresh() {
-      if (dashboardSessionRestoring || loggedInUser) return;
+      if (dashboardSessionRestoring || loggedInUser) {
+        finishDashboardSessionRestoreGuard();
+        return;
+      }
+
       const savedSession = readDashboardSession();
-      if (!savedSession) return;
+      if (!savedSession) {
+        finishDashboardSessionRestoreGuard();
+        return;
+      }
 
       dashboardSessionRestoring = true;
       try {
         const savedUser = getDisplayUsername(savedSession.username);
         const userSnap = await getDoc(doc(db, "app_users", savedUser));
+
         if (!userSnap.exists()) {
           clearDashboardSession();
+          const dashboardPage = document.getElementById('dashboardPage');
+          const loginPage = document.getElementById('loginPage');
+          if (dashboardPage) dashboardPage.style.display = 'none';
+          if (loginPage) loginPage.style.display = 'grid';
+          finishDashboardSessionRestoreGuard();
           return;
         }
 
@@ -6751,6 +6867,12 @@
       } catch (error) {
         console.warn("Gagal memulihkan sesi dashboard:", error);
         clearDashboardSession();
+        const dashboardPage = document.getElementById('dashboardPage');
+        const loginPage = document.getElementById('loginPage');
+        if (dashboardPage) dashboardPage.style.display = 'none';
+        if (loginPage) loginPage.style.display = 'grid';
+        showLoginNotice('Sesi gagal dipulihkan. Silakan login kembali.');
+        finishDashboardSessionRestoreGuard();
       } finally {
         dashboardSessionRestoring = false;
       }
@@ -7743,7 +7865,7 @@
       }
     };
 
-    // Auto-login ulang setelah refresh selama sesi belum idle 15 menit.
+    // Restore session setelah refresh tanpa menampilkan login terlebih dulu selama sesi belum idle 10 menit.
     restoreDashboardSessionAfterRefresh();
 
     // FUNGSI UTAMA: Menambah Target ke List Tanpa Mengeliminasi Teman Sebelumnya
@@ -8717,6 +8839,7 @@
 
       if (dashboardSessionSigningOut) return;
       dashboardSessionSigningOut = true;
+      finishDashboardSessionRestoreGuard();
 
       try {
         clearDashboardSession({
@@ -8777,7 +8900,7 @@
         if (loginForm) loginForm.reset();
 
         if (reason === 'idle') {
-          showLoginNotice('Sesi berakhir otomatis karena tidak ada aktivitas selama 15 menit. Silakan login kembali.');
+          showLoginNotice('Sesi berakhir otomatis karena tidak ada aktivitas selama 10 menit. Silakan login kembali.');
         } else if (reason === 'remote') {
           showLoginNotice('Sesi login ditutup dari tab lain. Silakan login kembali.');
         } else {
@@ -9616,6 +9739,277 @@
       } else {
         buildManyMovingLove();
       }
+    })();
+  </script>
+
+
+  <style id="final-theme-picker-admin-colors-upgrade">
+    #backgroundModal { display: none !important; }
+
+    html:not([data-dashboard-theme]),
+    html[data-dashboard-theme="gold-luxury"] {
+      --theme-bg-a: #090704; --theme-bg-b: #1A1207; --theme-bg-c: #050403;
+      --theme-panel: rgba(18, 13, 7, .94); --theme-panel-2: rgba(35, 25, 12, .82);
+      --theme-chat: #070604; --theme-accent: #D9A93A; --theme-accent-2: #8B5E16; --theme-accent-3: #FFE9A8;
+      --theme-border: rgba(217, 169, 58, .24); --theme-text: #FFF4D6; --theme-muted: rgba(255, 239, 205, .62);
+      --theme-in-a: rgba(30, 22, 10, .90); --theme-in-b: rgba(10, 7, 4, .96);
+      --theme-out-a: rgba(255, 233, 168, .92); --theme-out-b: rgba(217, 169, 58, .96); --theme-out-c: rgba(137, 90, 18, .96);
+      --admin-select-bg-a: rgba(255, 241, 195, .96); --admin-select-bg-b: rgba(199, 151, 46, .96); --admin-select-text: #201404;
+      --admin-select-border: rgba(255, 221, 140, .76); --admin-select-focus: rgba(255, 215, 107, .24);
+      --admin-select-option-bg: #1A1207; --admin-select-option-text: #FFF0C5;
+      --admin-delete-bg-a: rgba(104, 24, 44, .96); --admin-delete-bg-b: rgba(76, 18, 34, .96);
+      --admin-delete-text: #FFD9E3; --admin-delete-border: rgba(255, 126, 154, .24);
+    }
+
+    html[data-dashboard-theme="ocean-blue"] {
+      --theme-bg-a: #020817; --theme-bg-b: #071A3A; --theme-bg-c: #020713;
+      --theme-panel: rgba(5, 17, 39, .92); --theme-panel-2: rgba(8, 26, 58, .82);
+      --theme-chat: #030A18; --theme-accent: #5DD7FF; --theme-accent-2: #2563EB; --theme-accent-3: #93C5FD;
+      --theme-border: rgba(93, 215, 255, .22); --theme-text: #EAF7FF; --theme-muted: rgba(218, 236, 255, .62);
+      --theme-in-a: rgba(6, 22, 48, .90); --theme-in-b: rgba(3, 9, 22, .95);
+      --theme-out-a: rgba(72, 190, 255, .84); --theme-out-b: rgba(37, 99, 235, .90); --theme-out-c: rgba(7, 33, 78, .96);
+      --admin-select-bg-a: rgba(224, 245, 255, .96); --admin-select-bg-b: rgba(52, 129, 255, .96); --admin-select-text: #041322;
+      --admin-select-border: rgba(120, 202, 255, .76); --admin-select-focus: rgba(93, 215, 255, .24);
+      --admin-select-option-bg: #071423; --admin-select-option-text: #E9F8FF;
+      --admin-delete-bg-a: rgba(69, 18, 40, .94); --admin-delete-bg-b: rgba(122, 28, 57, .96);
+      --admin-delete-text: #FFE6EE; --admin-delete-border: rgba(255, 131, 168, .26);
+    }
+
+    html[data-dashboard-theme="emerald-green"] {
+      --theme-bg-a: #02120C; --theme-bg-b: #06351F; --theme-bg-c: #010A07;
+      --theme-panel: rgba(4, 31, 20, .92); --theme-panel-2: rgba(8, 52, 33, .80);
+      --theme-chat: #020D09; --theme-accent: #5EF0A1; --theme-accent-2: #10B981; --theme-accent-3: #A7F3D0;
+      --theme-border: rgba(94, 240, 161, .22); --theme-text: #ECFFF5; --theme-muted: rgba(220, 255, 236, .60);
+      --theme-in-a: rgba(5, 33, 21, .90); --theme-in-b: rgba(2, 13, 9, .95);
+      --theme-out-a: rgba(86, 216, 145, .84); --theme-out-b: rgba(16, 185, 129, .90); --theme-out-c: rgba(5, 54, 34, .96);
+      --admin-select-bg-a: rgba(232, 255, 244, .96); --admin-select-bg-b: rgba(16, 185, 129, .96); --admin-select-text: #032116;
+      --admin-select-border: rgba(120, 245, 191, .74); --admin-select-focus: rgba(94, 240, 161, .24);
+      --admin-select-option-bg: #071A12; --admin-select-option-text: #ECFFF5;
+      --admin-delete-bg-a: rgba(84, 23, 34, .95); --admin-delete-bg-b: rgba(122, 40, 51, .96);
+      --admin-delete-text: #FFE8ED; --admin-delete-border: rgba(255, 140, 160, .26);
+    }
+
+    html[data-dashboard-theme="violet-neon"] {
+      --theme-bg-a: #0B0618; --theme-bg-b: #2A125C; --theme-bg-c: #04020A;
+      --theme-panel: rgba(18, 11, 38, .92); --theme-panel-2: rgba(45, 28, 92, .80);
+      --theme-chat: #080413; --theme-accent: #B48AFF; --theme-accent-2: #8B5CF6; --theme-accent-3: #DDD6FE;
+      --theme-border: rgba(180, 138, 255, .24); --theme-text: #F7F1FF; --theme-muted: rgba(234, 221, 255, .60);
+      --theme-in-a: rgba(30, 18, 62, .90); --theme-in-b: rgba(8, 5, 17, .95);
+      --theme-out-a: rgba(177, 125, 255, .84); --theme-out-b: rgba(139, 92, 246, .90); --theme-out-c: rgba(59, 7, 100, .96);
+      --admin-select-bg-a: rgba(243, 236, 255, .96); --admin-select-bg-b: rgba(139, 92, 246, .96); --admin-select-text: #130723;
+      --admin-select-border: rgba(201, 166, 255, .78); --admin-select-focus: rgba(180, 138, 255, .25);
+      --admin-select-option-bg: #120A24; --admin-select-option-text: #F7F1FF;
+      --admin-delete-bg-a: rgba(85, 20, 46, .95); --admin-delete-bg-b: rgba(124, 32, 72, .96);
+      --admin-delete-text: #FFE8F4; --admin-delete-border: rgba(255, 140, 196, .26);
+    }
+
+    html[data-dashboard-theme="ruby-red"] {
+      --theme-bg-a: #16050B; --theme-bg-b: #3B0712; --theme-bg-c: #070206;
+      --theme-panel: rgba(35, 8, 17, .92); --theme-panel-2: rgba(70, 13, 28, .80);
+      --theme-chat: #100308; --theme-accent: #FF6E91; --theme-accent-2: #E11D48; --theme-accent-3: #FFC2D1;
+      --theme-border: rgba(255, 110, 145, .24); --theme-text: #FFF0F4; --theme-muted: rgba(255, 220, 229, .60);
+      --theme-in-a: rgba(48, 10, 22, .90); --theme-in-b: rgba(14, 3, 8, .95);
+      --theme-out-a: rgba(255, 116, 151, .84); --theme-out-b: rgba(225, 29, 72, .90); --theme-out-c: rgba(92, 8, 28, .96);
+      --admin-select-bg-a: rgba(255, 234, 239, .97); --admin-select-bg-b: rgba(225, 29, 72, .96); --admin-select-text: #24040D;
+      --admin-select-border: rgba(255, 149, 176, .78); --admin-select-focus: rgba(255, 110, 145, .24);
+      --admin-select-option-bg: #1E0810; --admin-select-option-text: #FFF0F4;
+      --admin-delete-bg-a: rgba(88, 18, 37, .95); --admin-delete-bg-b: rgba(123, 23, 49, .96);
+      --admin-delete-text: #FFE5EC; --admin-delete-border: rgba(255, 141, 167, .26);
+    }
+
+    .dashboard-theme-modal { max-width: 560px !important; }
+    .dashboard-theme-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+    .dashboard-theme-card {
+      appearance: none; min-height: 68px; border-radius: 18px; border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.035); color: var(--theme-text, #fff); display: flex; align-items: center;
+      gap: 12px; padding: 12px; text-align: left; cursor: pointer; transition: transform .14s ease, border-color .14s ease, background .14s ease, box-shadow .14s ease;
+    }
+    .dashboard-theme-card:hover { transform: translateY(-1px); border-color: var(--theme-accent, #D9A93A); background: rgba(255,255,255,.055); }
+    .dashboard-theme-card.active { border-color: var(--theme-accent, #D9A93A); box-shadow: 0 0 0 1px rgba(255,255,255,.04) inset, 0 0 18px rgba(217,169,58,.14); background: rgba(255,255,255,.06); }
+    .dashboard-theme-swatch { width: 40px; height: 40px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 12px 26px rgba(0,0,0,.22); flex: 0 0 40px; }
+    .theme-swatch-gold { background: linear-gradient(135deg, #FFE9A8, #D9A93A 56%, #6B430F); }
+    .theme-swatch-ocean { background: linear-gradient(135deg, #6EE7FF, #2563EB 56%, #071B44); }
+    .theme-swatch-emerald { background: linear-gradient(135deg, #A7F3D0, #10B981 56%, #053622); }
+    .theme-swatch-violet { background: linear-gradient(135deg, #DDD6FE, #8B5CF6 54%, #3B0764); }
+    .theme-swatch-ruby { background: linear-gradient(135deg, #FFC2D1, #E11D48 54%, #3F0713); }
+    .dashboard-theme-info { min-width: 0; display: grid; gap: 0; }
+    .dashboard-theme-info b { font-size: 13px; line-height: 1.15; color: var(--theme-text, #fff); }
+
+    html[data-dashboard-theme] #dashboardPage {
+      background: radial-gradient(760px 420px at 0% 0%, color-mix(in srgb, var(--theme-accent) 11%, transparent), transparent 64%),
+                  radial-gradient(680px 360px at 100% 0%, color-mix(in srgb, var(--theme-accent-2) 11%, transparent), transparent 60%),
+                  linear-gradient(135deg, var(--theme-bg-c), var(--theme-bg-a) 48%, var(--theme-bg-c)) !important;
+    }
+
+    html[data-dashboard-theme] .sidebar,
+    html[data-dashboard-theme] .chat-main-header,
+    html[data-dashboard-theme] .chat-footer-panel,
+    html[data-dashboard-theme] .action-link-btn,
+    html[data-dashboard-theme] .chat-item-card,
+    html[data-dashboard-theme] .modal-box {
+      background: linear-gradient(135deg, var(--theme-panel-2), var(--theme-panel)) !important;
+      border-color: var(--theme-border) !important;
+      color: var(--theme-text) !important;
+    }
+
+    html[data-dashboard-theme] .chat-main-window {
+      background: radial-gradient(700px 280px at 12% 0%, color-mix(in srgb, var(--theme-accent) 8%, transparent), transparent 62%), var(--theme-chat) !important;
+    }
+
+    html[data-dashboard-theme] .action-ico,
+    html[data-dashboard-theme] #topHeaderTitle,
+    html[data-dashboard-theme] .status-tick-icon {
+      color: var(--theme-accent-3) !important;
+      text-shadow: 0 0 8px color-mix(in srgb, var(--theme-accent) 30%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #topHeaderStatus,
+    html[data-dashboard-theme] .status-indicator,
+    html[data-dashboard-theme] .time-text,
+    html[data-dashboard-theme] .edited-marker {
+      color: var(--theme-muted) !important;
+    }
+
+    html[data-dashboard-theme] .incoming-row .bubble {
+      background: linear-gradient(135deg, var(--theme-in-a), var(--theme-in-b)) !important;
+      border-color: var(--theme-border) !important;
+      color: var(--theme-text) !important;
+    }
+
+    html[data-dashboard-theme] .outgoing-row .bubble {
+      background: linear-gradient(135deg, var(--theme-out-a), var(--theme-out-b), var(--theme-out-c)) !important;
+      border-color: color-mix(in srgb, var(--theme-accent) 35%, transparent) !important;
+      color: var(--theme-text) !important;
+    }
+
+    html:not([data-dashboard-theme]) .outgoing-row .bubble,
+    html[data-dashboard-theme="gold-luxury"] .outgoing-row .bubble {
+      color: #1A1003 !important;
+    }
+
+    #adminModal.modal-overlay { overflow-y: auto !important; align-items: flex-start !important; padding-top: 18px !important; padding-bottom: 18px !important; }
+    html[data-dashboard-theme] #adminModal .admin-control-modal {
+      max-width: min(780px, calc(100vw - 32px)) !important; max-height: calc(100vh - 36px) !important; overflow-y: auto !important; overscroll-behavior: contain !important;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2) 84%, transparent), var(--theme-panel)) !important;
+      border: 1px solid var(--theme-border) !important; color: var(--theme-text) !important;
+      box-shadow: 0 24px 90px rgba(0,0,0,.50), 0 0 26px color-mix(in srgb, var(--theme-accent) 10%, transparent) !important;
+    }
+    html[data-dashboard-theme] #adminModal .admin-section-card,
+    html[data-dashboard-theme] #adminModal .user-admin-row,
+    html[data-dashboard-theme] #adminModal .role-admin-row,
+    html[data-dashboard-theme] #adminModal .permission-locked-note {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2) 72%, transparent), color-mix(in srgb, var(--theme-panel) 94%, transparent)) !important;
+      border-color: var(--theme-border) !important; color: var(--theme-text) !important;
+      box-shadow: 0 10px 26px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.035) !important;
+    }
+    html[data-dashboard-theme] #adminModal .admin-section-title,
+    html[data-dashboard-theme] #adminModal .access-title,
+    html[data-dashboard-theme] #adminModal .role-admin-title,
+    html[data-dashboard-theme] #adminModal .user-admin-name,
+    html[data-dashboard-theme] #adminModal .user-admin-name strong { color: var(--theme-text) !important; }
+    html[data-dashboard-theme] #adminModal .admin-section-title::before { background: var(--theme-accent) !important; box-shadow: 0 0 12px color-mix(in srgb, var(--theme-accent) 45%, transparent) !important; }
+    html[data-dashboard-theme] #adminModal .field { background: color-mix(in srgb, var(--theme-bg-c) 72%, transparent) !important; border-color: color-mix(in srgb, var(--theme-accent) 20%, transparent) !important; }
+    html[data-dashboard-theme] #adminModal .field input { color: var(--theme-text) !important; }
+    html[data-dashboard-theme] #adminModal .field input::placeholder { color: color-mix(in srgb, var(--theme-muted) 80%, transparent) !important; }
+    html[data-dashboard-theme] #adminModal .access-check {
+      background: color-mix(in srgb, var(--theme-panel-2) 40%, transparent) !important; border-color: color-mix(in srgb, var(--theme-accent) 18%, transparent) !important; color: var(--theme-muted) !important;
+    }
+    html[data-dashboard-theme] #adminModal .access-check:hover {
+      background: color-mix(in srgb, var(--theme-accent) 9%, transparent) !important; border-color: color-mix(in srgb, var(--theme-accent) 34%, transparent) !important; color: var(--theme-text) !important;
+    }
+    html[data-dashboard-theme] #adminModal .access-check input { accent-color: var(--theme-accent) !important; }
+    html[data-dashboard-theme] #adminModal .role-access-chip {
+      background: color-mix(in srgb, var(--theme-accent) 8%, transparent) !important; border-color: color-mix(in srgb, var(--theme-accent) 20%, transparent) !important; color: var(--theme-muted) !important;
+    }
+    html[data-dashboard-theme] #adminModal .modal-btn.primary,
+    html[data-dashboard-theme] #adminModal .admin-wide-btn {
+      background: linear-gradient(135deg, var(--theme-accent-3), var(--theme-accent) 55%, var(--theme-accent-2)) !important;
+      border: 1px solid color-mix(in srgb, var(--theme-accent) 45%, transparent) !important; color: #06101C !important;
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--theme-accent) 16%, transparent) !important;
+    }
+    html[data-dashboard-theme] #adminModal .modal-btn.secondary {
+      background: color-mix(in srgb, var(--theme-panel-2) 70%, transparent) !important; border: 1px solid var(--theme-border) !important; color: var(--theme-text) !important;
+    }
+    html[data-dashboard-theme] #adminModal .admin-role-select {
+      color: var(--admin-select-text) !important; -webkit-text-fill-color: var(--admin-select-text) !important;
+      border: 1px solid var(--admin-select-border) !important; background-color: var(--admin-select-bg-b) !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"), linear-gradient(135deg, var(--admin-select-bg-a), var(--admin-select-bg-b)) !important;
+      background-repeat: no-repeat !important; background-position: right 12px center, center !important; background-size: 14px, auto !important;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.04) inset, 0 8px 18px rgba(0,0,0,.16) !important; text-shadow: none !important;
+    }
+    html[data-dashboard-theme] #adminModal .admin-role-select option { background: var(--admin-select-option-bg) !important; color: var(--admin-select-option-text) !important; }
+    html[data-dashboard-theme] #adminModal .user-delete-btn,
+    html[data-dashboard-theme] #adminModal .role-delete-btn {
+      background: linear-gradient(135deg, var(--admin-delete-bg-a), var(--admin-delete-bg-b)) !important;
+      color: var(--admin-delete-text) !important; border-color: var(--admin-delete-border) !important;
+      box-shadow: 0 10px 24px rgba(0,0,0,.14) !important;
+    }
+    html[data-dashboard-theme] #adminModal .user-delete-btn:hover,
+    html[data-dashboard-theme] #adminModal .role-delete-btn:hover { filter: brightness(1.05) !important; transform: translateY(-1px); }
+
+    @media (max-width: 680px) {
+      .dashboard-theme-options { grid-template-columns: 1fr; }
+      html[data-dashboard-theme] #adminModal .admin-control-modal { max-width: calc(100vw - 20px) !important; padding: 18px 14px !important; }
+    }
+  </style>
+
+
+  <script id="final-theme-picker-admin-colors-script">
+    (function() {
+      const THEME_STORAGE_KEY = 'dashboard_latar_theme_v2';
+      const DEFAULT_THEME = 'gold-luxury';
+      const THEME_OPTIONS = ['gold-luxury', 'ocean-blue', 'emerald-green', 'violet-neon', 'ruby-red'];
+
+      function safeTheme(themeName) {
+        return THEME_OPTIONS.includes(themeName) ? themeName : DEFAULT_THEME;
+      }
+
+      function applyTheme(themeName) {
+        const theme = safeTheme(themeName);
+        document.documentElement.setAttribute('data-dashboard-theme', theme);
+        document.querySelectorAll('.dashboard-theme-card[data-dashboard-theme]').forEach((button) => {
+          button.classList.toggle('active', button.dataset.dashboardTheme === theme);
+        });
+      }
+
+      window.setDashboardTheme = function(themeName) {
+        const theme = safeTheme(themeName);
+        applyTheme(theme);
+        try { localStorage.setItem(THEME_STORAGE_KEY, theme); } catch (error) {}
+      };
+
+      window.openThemeSettingsModal = function() {
+        const modal = document.getElementById('themeModal');
+        if (!modal) return;
+        applyTheme(document.documentElement.getAttribute('data-dashboard-theme') || DEFAULT_THEME);
+        modal.style.display = 'grid';
+      };
+
+      window.closeThemeSettingsModal = function() {
+        const modal = document.getElementById('themeModal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      function initTheme() {
+        let savedTheme = DEFAULT_THEME;
+        try { savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || DEFAULT_THEME; } catch (error) {}
+        applyTheme(savedTheme);
+
+        const bgBtn = document.getElementById('backgroundActionBtn');
+        if (bgBtn) {
+          bgBtn.setAttribute('onclick', 'openThemeSettingsModal()');
+          const textNode = bgBtn.querySelector('.action-text');
+          if (textNode) textNode.textContent = 'Latar';
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTheme, { once: true });
+      } else {
+        initTheme();
+      }
+
+      window.openBackgroundSettingsModal = window.openThemeSettingsModal;
     })();
   </script>
 
