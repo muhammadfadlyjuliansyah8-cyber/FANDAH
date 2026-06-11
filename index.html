@@ -6889,7 +6889,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, addDoc, query, orderBy, onSnapshot, serverTimestamp, getDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, getDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
@@ -6912,10 +6912,10 @@
     let activeAttachmentKind = "image";
     let activeAttachmentBytes = 0;
     let isSendingMessageNow = false;
-    const CHAT_IMAGE_MAX_BYTES = 680 * 1024; // aman untuk disimpan di Firestore, termasuk overhead dokumen.
-    const AVATAR_IMAGE_MAX_BYTES = 220 * 1024;
-    const IMAGE_PREVIEW_MAX_EDGE = 1280;
-    const AVATAR_PREVIEW_MAX_EDGE = 420;
+    const CHAT_IMAGE_MAX_BYTES = 480 * 1024; // lebih ringan untuk Firestore, terutama mobile.
+    const AVATAR_IMAGE_MAX_BYTES = 160 * 1024;
+    const IMAGE_PREVIEW_MAX_EDGE = 1024;
+    const AVATAR_PREVIEW_MAX_EDGE = 360;
     let typingTimeout = null;
     let initialLoadComplete = false;
     let forceBottomAfterRoomSwitch = false;
@@ -6937,6 +6937,26 @@
     let unsubsPresenceList = null;
     let globalNotificationReady = false;
 
+    // Optimasi ringan khusus penyimpanan/query data. Tidak mengubah tema, warna, font, atau layout.
+    const ROOM_LOCAL_MAX_ITEMS = 50;
+    const CHAT_QUERY_LIMIT_DESKTOP = 260;
+    const CHAT_QUERY_LIMIT_MOBILE = 140;
+    const GLOBAL_ROOM_QUERY_LIMIT_DESKTOP = 520;
+    const GLOBAL_ROOM_QUERY_LIMIT_MOBILE = 260;
+    const READ_MARK_QUERY_LIMIT = 180;
+
+    function isDashboardMobileLite() {
+      try { return window.matchMedia('(max-width: 680px)').matches; } catch (error) { return false; }
+    }
+
+    function getChatQueryLimit() {
+      return isDashboardMobileLite() ? CHAT_QUERY_LIMIT_MOBILE : CHAT_QUERY_LIMIT_DESKTOP;
+    }
+
+    function getGlobalRoomQueryLimit() {
+      return isDashboardMobileLite() ? GLOBAL_ROOM_QUERY_LIMIT_MOBILE : GLOBAL_ROOM_QUERY_LIMIT_DESKTOP;
+    }
+
     // Tracker Cache Lokal untuk Avatars, Role, Profile & Notifikasi Pesan Masuk
     let cacheUserAvatars = {};
     let cacheUserRoles = {};
@@ -6953,7 +6973,7 @@
     const DASHBOARD_SESSION_KEY = "fandah_dashboard_login_session_v1";
     const DASHBOARD_SESSION_LOGOUT_KEY = "fandah_dashboard_login_logout_v1";
     const DASHBOARD_IDLE_LIMIT_MS = 10 * 60 * 1000; // 10 menit
-    const DASHBOARD_SESSION_CHECK_MS = 5000; // cek ringan tiap 5 detik
+    const DASHBOARD_SESSION_CHECK_MS = 15000; // cek lebih ringan tiap 15 detik
     const DASHBOARD_ACTIVITY_WRITE_THROTTLE_MS = 12000; // tahan write localStorage supaya dashboard tetap smooth
     const DASHBOARD_CACHE_SIGNAL_HANDLED_KEY = "fandah_dashboard_cache_signal_handled_v1";
     const DASHBOARD_CACHE_STATUS_KEY = "fandah_dashboard_cache_last_clear_v1";
@@ -7347,6 +7367,13 @@
       return [displayName];
     }
 
+    function buildRoomKeyForUsers(userA, userB) {
+      return [getDisplayUsername(userA), getDisplayUsername(userB)]
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b))
+        .join('__');
+    }
+
     function isMessageFromTo(item, fromUser, toUser) {
       const fromAliases = getUserChatAliases(fromUser);
       const toAliases = getUserChatAliases(toUser);
@@ -7367,10 +7394,23 @@
       return loggedInUser ? `fandah_rooms_${loggedInUser}` : "";
     }
 
+    function normalizeRoomListForStorage(list = roomListArray) {
+      const unique = [];
+      (Array.isArray(list) ? list : []).forEach((name) => {
+        const normalized = getDisplayUsername(name);
+        if (!normalized || normalized === loggedInUser || unique.includes(normalized)) return;
+        unique.push(normalized);
+      });
+      return unique.slice(-ROOM_LOCAL_MAX_ITEMS);
+    }
+
     function saveRoomListToLocal() {
       const key = getRoomStorageKey();
       if (!key) return;
-      try { localStorage.setItem(key, JSON.stringify(roomListArray)); } catch (error) {}
+      try {
+        roomListArray = normalizeRoomListForStorage(roomListArray);
+        localStorage.setItem(key, JSON.stringify(roomListArray));
+      } catch (error) {}
     }
 
     function restoreRoomListFromLocal() {
@@ -7378,7 +7418,7 @@
       if (!key) return;
       try {
         const saved = JSON.parse(localStorage.getItem(key) || "[]");
-        if (Array.isArray(saved)) saved.forEach((name) => addPartnerToActiveRoomList(name));
+        roomListArray = normalizeRoomListForStorage(saved);
       } catch (error) {}
     }
 
@@ -7470,9 +7510,11 @@
 
     let presenceSyncTimer = null;
     let presenceRenderTimer = null;
-    const PRESENCE_HEARTBEAT_MS = 9000;
-    const PRESENCE_RENDER_REFRESH_MS = 5000;
-    const PRESENCE_STALE_MS = 35000;
+    let lastTypingPresenceSyncAt = 0;
+    const PRESENCE_HEARTBEAT_MS = 18000;
+    const PRESENCE_RENDER_REFRESH_MS = 10000;
+    const PRESENCE_STALE_MS = 45000;
+    const TYPING_SYNC_THROTTLE_MS = 2200;
 
     function getPresenceLastSeenMs(data = {}) {
       const clientMs = Number(data.lastSeenMs || 0);
@@ -7664,21 +7706,28 @@
     async function markAllMessagesInActiveRoomAsRead() {
       if (!loggedInUser || !passivePartner) return;
       try {
-        const roomSnapshot = await getDocs(query(collection(db, "obrolan_utama"), orderBy("timestamp", "asc")));
-        const jobs = [];
+        const roomSnapshot = await getDocs(query(
+          collection(db, "obrolan_utama"),
+          orderBy("timestamp", "desc"),
+          limit(READ_MARK_QUERY_LIMIT)
+        ));
+        const batch = writeBatch(db);
+        let writeCount = 0;
+        const readMs = Date.now();
         roomSnapshot.forEach((messageDoc) => {
           const data = messageDoc.data() || {};
           const shouldMark = isMessageFromTo(data, passivePartner, loggedInUser) && !data.seenByReceiver;
-          if (shouldMark) {
-            jobs.push(updateDoc(doc(db, "obrolan_utama", messageDoc.id), {
+          if (shouldMark && writeCount < 450) {
+            batch.update(doc(db, "obrolan_utama", messageDoc.id), {
               seenByReceiver: true,
               readAt: serverTimestamp(),
-              clientReadAtMs: Date.now(),
+              clientReadAtMs: readMs,
               readBy: loggedInUser
-            }));
+            });
+            writeCount++;
           }
         });
-        if (jobs.length) await Promise.allSettled(jobs);
+        if (writeCount) await batch.commit();
       } catch (error) {
         console.warn("Gagal mark semua pesan sebagai dibaca:", error);
       }
@@ -8387,6 +8436,7 @@
       if (!normalizedPartner || normalizedPartner === loggedInUser) return;
       if (!roomListArray.includes(normalizedPartner)) {
         roomListArray.push(normalizedPartner);
+        roomListArray = normalizeRoomListForStorage(roomListArray);
         saveRoomListToLocal();
       }
     }
@@ -8736,7 +8786,7 @@
     }
 
     function initiateGlobalRoomsAndNotificationEngine() {
-      const q = query(collection(db, "obrolan_utama"), orderBy("timestamp", "asc"));
+      const q = query(collection(db, "obrolan_utama"), orderBy("timestamp", "desc"), limit(getGlobalRoomQueryLimit()));
 
       getDocs(collection(db, "user_profiles")).then((snapshots) => {
         snapshots.forEach((pDoc) => {
@@ -8788,7 +8838,11 @@
 
       const listenerPartner = passivePartner;
       const listenerSwitchToken = activeChatSwitchSerial;
-      const q = query(collection(db, "obrolan_utama"), orderBy("timestamp", "asc"));
+      const q = query(
+        collection(db, "obrolan_utama"),
+        orderBy("timestamp", "desc"),
+        limit(getChatQueryLimit())
+      );
       let lastDateSeparator = "";
 
       unsubsMessages = onSnapshot(q, { includeMetadataChanges: true }, (snapshot) => {
@@ -8803,13 +8857,17 @@
           flowBox.style.scrollBehavior = 'auto';
         }
 
-        flowBox.innerHTML = "";
+        const docs = [];
+        snapshot.forEach((snapshotDoc) => docs.push(snapshotDoc));
+        docs.reverse(); // query terbaru dulu agar data ringan, render tetap urutan lama -> baru.
+
+        const fragment = document.createDocumentFragment();
+        const nextRenderedMessages = {};
         lastDateSeparator = "";
 
-        snapshot.forEach((snapshotDoc) => {
+        docs.forEach((snapshotDoc) => {
           const item = snapshotDoc.data();
           const docId = snapshotDoc.id;
-          cacheRenderedMessages[docId] = item;
 
           // Kondisi filter kamar chat aktif Anda dengan user bersangkutan.
           // Mendukung alias lama Fadly -> OWNER agar chat lama tetap muncul.
@@ -8817,6 +8875,7 @@
           const isPartnerSender = isMessageFromTo(item, passivePartner, loggedInUser);
 
           if (!isMeSender && !isPartnerSender) return;
+          nextRenderedMessages[docId] = item;
 
           const messageDateObj = getMessageCreatedDate(item);
           let timeString = formatClockFromDate(messageDateObj);
@@ -8825,7 +8884,7 @@
 
           if (dayString !== lastDateSeparator && isTimeReady) {
             const divider = document.createElement('div'); divider.className = 'day-divider';
-            divider.innerText = dayString; flowBox.appendChild(divider);
+            divider.innerText = dayString; fragment.appendChild(divider);
             lastDateSeparator = dayString;
           }
 
@@ -8854,7 +8913,7 @@
           }
           if (item.textMessage) contentHtml += `<div class="text-content-body">${escapeXssCode(item.textMessage)}</div>`;
 
-          if (isPartnerSender) {
+          if (isPartnerSender && document.visibilityState === "visible") {
             markMessageAsReadIfNeeded(docId, item);
           }
 
@@ -8883,8 +8942,11 @@
           const renderedBubble = rowNode.querySelector('.bubble');
           setupBubbleActionToggle(renderedBubble);
 
-          flowBox.appendChild(rowNode);
+          fragment.appendChild(rowNode);
         });
+
+        cacheRenderedMessages = nextRenderedMessages;
+        flowBox.replaceChildren(fragment);
 
         const isNearBottom =
           flowBox.scrollHeight - flowBox.scrollTop - flowBox.clientHeight < 150;
@@ -8910,7 +8972,7 @@
 
         // Final sync: saat room sedang terbuka, segera tandai pesan lawan sebagai dibaca.
         if (passivePartner && document.visibilityState === "visible") {
-          setTimeout(markAllMessagesInActiveRoomAsRead, 120);
+          setTimeout(markAllMessagesInActiveRoomAsRead, 160);
         }
       });
     }
@@ -9148,7 +9210,10 @@
           hasImage: !!activeReplyData.hasImage
         } : null,
         seenByReceiver: false,
-        readAt: null
+        readAt: null,
+        roomKey: buildRoomKeyForUsers(loggedInUser, passivePartner),
+        participants: [getDisplayUsername(loggedInUser), getDisplayUsername(passivePartner)].filter(Boolean),
+        storageVersion: 2
       };
 
       try {
@@ -9187,7 +9252,7 @@
         if (view.online && isPartnerActivelyReadingThisRoom(data || {}, loggedInUser)) {
           const topLabel = document.getElementById('topHeaderStatus');
           if (topLabel && view.state !== "typing") topLabel.innerHTML = `<span style="color:#65EEFF;">● Sedang melihat chat ini</span>`;
-          markAllMessagesInActiveRoomAsRead();
+          // Mark read tetap dijalankan dari render aktif, bukan setiap snapshot presence, supaya lebih ringan.
         }
       }, (error) => {
         console.warn("Gagal listener status partner:", error);
@@ -9197,11 +9262,15 @@
 
     window.handleTypingState = function() {
       if(!passivePartner) return;
-      syncOwnPresence({ status: "typing" });
+      const now = Date.now();
+      if (now - lastTypingPresenceSyncAt > TYPING_SYNC_THROTTLE_MS) {
+        lastTypingPresenceSyncAt = now;
+        syncOwnPresence({ status: "typing" });
+      }
       clearTimeout(typingTimeout);
       typingTimeout = setTimeout(() => {
         syncOwnPresence({ status: "online" });
-      }, 1500);
+      }, 1700);
     };
 
     function initiateProfilePhotoListener() {
