@@ -6181,7 +6181,7 @@
 
           <div class="login-helper-row">
             <label class="remember-check"><input type="checkbox" id="rememberLoginCheck"> <span>Remember me</span></label>
-            <a href="javascript:void(0)" class="forgot-link">Forgot Password?</a>
+            <a href="javascript:void(0)" class="forgot-link" id="forgotPasswordLink" onclick="openForgotPasswordPopup(event)">Forgot Password?</a>
           </div>
 
           <button class="btn" id="loginButton" type="submit">Login</button>
@@ -10532,6 +10532,925 @@
       .login-love-particle:nth-child(5n) {
         display: none;
       }
+    }
+  </style>
+
+
+  <div class="forgot-password-popup-overlay" id="forgotPasswordPopup" aria-hidden="true">
+    <div class="forgot-password-popup-box" role="dialog" aria-modal="true" aria-labelledby="forgotPasswordPopupTitle">
+      <button type="button" class="forgot-password-popup-close" onclick="closeForgotPasswordPopup()" aria-label="Tutup">×</button>
+      <div class="forgot-password-popup-icon">!</div>
+      <div class="forgot-password-popup-title" id="forgotPasswordPopupTitle">Forgot Password</div>
+      <div class="forgot-password-popup-message">Silahkan Hubungin Admin Dahulu!</div>
+      <button type="button" class="forgot-password-popup-ok" onclick="closeForgotPasswordPopup()">Mengerti</button>
+    </div>
+  </div>
+
+  <style id="final-forgot-password-theme-popup-style">
+    html:not([data-dashboard-theme]),
+    html[data-dashboard-theme="gold-luxury"] {
+      --forgot-popup-bg-a: rgba(26, 18, 8, .98);
+      --forgot-popup-bg-b: rgba(8, 6, 4, .98);
+      --forgot-popup-border: rgba(217, 169, 58, .34);
+      --forgot-popup-accent: #D9A93A;
+      --forgot-popup-accent-2: #FFE9A8;
+      --forgot-popup-text: #FFF4D6;
+      --forgot-popup-muted: rgba(255, 239, 205, .70);
+      --forgot-popup-button-text: #160D02;
+    }
+
+    html[data-dashboard-theme="ocean-blue"] {
+      --forgot-popup-bg-a: rgba(5, 17, 39, .98);
+      --forgot-popup-bg-b: rgba(3, 9, 22, .98);
+      --forgot-popup-border: rgba(93, 215, 255, .32);
+      --forgot-popup-accent: #5DD7FF;
+      --forgot-popup-accent-2: #93C5FD;
+      --forgot-popup-text: #EAF7FF;
+      --forgot-popup-muted: rgba(218, 236, 255, .72);
+      --forgot-popup-button-text: #041322;
+    }
+
+    html[data-dashboard-theme="emerald-green"] {
+      --forgot-popup-bg-a: rgba(4, 31, 20, .98);
+      --forgot-popup-bg-b: rgba(2, 13, 9, .98);
+      --forgot-popup-border: rgba(94, 240, 161, .32);
+      --forgot-popup-accent: #5EF0A1;
+      --forgot-popup-accent-2: #A7F3D0;
+      --forgot-popup-text: #ECFFF5;
+      --forgot-popup-muted: rgba(220, 255, 236, .72);
+      --forgot-popup-button-text: #032116;
+    }
+
+    html[data-dashboard-theme="violet-neon"] {
+      --forgot-popup-bg-a: rgba(18, 11, 38, .98);
+      --forgot-popup-bg-b: rgba(8, 5, 17, .98);
+      --forgot-popup-border: rgba(180, 138, 255, .34);
+      --forgot-popup-accent: #B48AFF;
+      --forgot-popup-accent-2: #DDD6FE;
+      --forgot-popup-text: #F7F1FF;
+      --forgot-popup-muted: rgba(234, 221, 255, .72);
+      --forgot-popup-button-text: #130723;
+    }
+
+    html[data-dashboard-theme="ruby-red"] {
+      --forgot-popup-bg-a: rgba(35, 8, 17, .98);
+      --forgot-popup-bg-b: rgba(14, 3, 8, .98);
+      --forgot-popup-border: rgba(255, 110, 145, .34);
+      --forgot-popup-accent: #FF6E91;
+      --forgot-popup-accent-2: #FFC2D1;
+      --forgot-popup-text: #FFF0F4;
+      --forgot-popup-muted: rgba(255, 220, 229, .72);
+      --forgot-popup-button-text: #24040D;
+    }
+
+    .forgot-password-popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100500;
+      display: none;
+      place-items: center;
+      padding: 22px;
+      background: rgba(0, 0, 0, .68);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity .16s ease;
+    }
+
+    .forgot-password-popup-overlay.is-open {
+      display: grid;
+      opacity: 1;
+    }
+
+    .forgot-password-popup-box {
+      width: min(360px, calc(100vw - 34px));
+      position: relative;
+      padding: 26px 22px 20px;
+      border-radius: 24px;
+      text-align: center;
+      color: var(--forgot-popup-text, #FFF4D6);
+      background:
+        radial-gradient(220px 120px at 50% 0%, color-mix(in srgb, var(--forgot-popup-accent, #D9A93A) 18%, transparent), transparent 70%),
+        linear-gradient(135deg, var(--forgot-popup-bg-a, rgba(26,18,8,.98)), var(--forgot-popup-bg-b, rgba(8,6,4,.98)));
+      border: 1px solid var(--forgot-popup-border, rgba(217,169,58,.34));
+      box-shadow:
+        0 26px 90px rgba(0,0,0,.60),
+        0 0 26px color-mix(in srgb, var(--forgot-popup-accent, #D9A93A) 14%, transparent),
+        inset 0 1px 0 rgba(255,255,255,.06);
+      transform: translateY(8px) scale(.96);
+      animation: forgotPopupIn .18s ease forwards;
+    }
+
+    @keyframes forgotPopupIn {
+      to { transform: translateY(0) scale(1); }
+    }
+
+    .forgot-password-popup-close {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 1px solid color-mix(in srgb, var(--forgot-popup-accent, #D9A93A) 24%, transparent);
+      background: rgba(255,255,255,.045);
+      color: var(--forgot-popup-muted, rgba(255,239,205,.70));
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .forgot-password-popup-close:hover {
+      color: var(--forgot-popup-text, #fff);
+      border-color: var(--forgot-popup-accent, #D9A93A);
+      background: color-mix(in srgb, var(--forgot-popup-accent, #D9A93A) 12%, transparent);
+    }
+
+    .forgot-password-popup-icon {
+      width: 46px;
+      height: 46px;
+      margin: 0 auto 12px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      color: var(--forgot-popup-button-text, #160D02);
+      background: linear-gradient(135deg, var(--forgot-popup-accent-2, #FFE9A8), var(--forgot-popup-accent, #D9A93A));
+      box-shadow: 0 0 22px color-mix(in srgb, var(--forgot-popup-accent, #D9A93A) 26%, transparent);
+      font-size: 23px;
+      font-weight: 950;
+    }
+
+    .forgot-password-popup-title {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: .01em;
+      color: var(--forgot-popup-text, #FFF4D6);
+      margin-bottom: 8px;
+    }
+
+    .forgot-password-popup-message {
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.45;
+      color: var(--forgot-popup-text, #FFF4D6);
+      margin-bottom: 18px;
+    }
+
+    .forgot-password-popup-ok {
+      width: 100%;
+      min-height: 40px;
+      border-radius: 13px;
+      border: 1px solid color-mix(in srgb, var(--forgot-popup-accent, #D9A93A) 48%, transparent);
+      background: linear-gradient(135deg, var(--forgot-popup-accent-2, #FFE9A8), var(--forgot-popup-accent, #D9A93A));
+      color: var(--forgot-popup-button-text, #160D02);
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 26px color-mix(in srgb, var(--forgot-popup-accent, #D9A93A) 18%, transparent);
+    }
+
+    .forgot-password-popup-ok:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 680px) {
+      .forgot-password-popup-box {
+        width: min(330px, calc(100vw - 26px));
+        padding: 24px 18px 18px;
+        border-radius: 22px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .forgot-password-popup-overlay,
+      .forgot-password-popup-box,
+      .forgot-password-popup-ok {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+
+  <script id="final-forgot-password-theme-popup-script">
+    (function() {
+      function getPopup() {
+        return document.getElementById('forgotPasswordPopup');
+      }
+
+      window.openForgotPasswordPopup = function(event) {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        const popup = getPopup();
+        if (!popup) {
+          alert('Silahkan Hubungin Admin Dahulu!');
+          return;
+        }
+
+        popup.classList.add('is-open');
+        popup.setAttribute('aria-hidden', 'false');
+
+        const okButton = popup.querySelector('.forgot-password-popup-ok');
+        if (okButton) setTimeout(() => okButton.focus(), 30);
+      };
+
+      window.closeForgotPasswordPopup = function() {
+        const popup = getPopup();
+        if (!popup) return;
+        popup.classList.remove('is-open');
+        popup.setAttribute('aria-hidden', 'true');
+      };
+
+      function bindForgotPasswordLink() {
+        document.querySelectorAll('.forgot-link').forEach((link) => {
+          if (link.dataset.forgotPopupReady === '1') return;
+          link.dataset.forgotPopupReady = '1';
+          link.addEventListener('click', window.openForgotPasswordPopup);
+        });
+
+        const popup = getPopup();
+        if (popup && popup.dataset.overlayReady !== '1') {
+          popup.dataset.overlayReady = '1';
+          popup.addEventListener('click', (event) => {
+            if (event.target === popup) window.closeForgotPasswordPopup();
+          });
+        }
+      }
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') window.closeForgotPasswordPopup();
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindForgotPasswordLink, { once: true });
+      } else {
+        bindForgotPasswordLink();
+      }
+    })();
+  </script>
+
+
+  <button type="button" id="preLoginThemeFab" class="prelogin-theme-fab" onclick="openThemeSettingsModal()" aria-label="Ganti tema">
+    <span class="prelogin-theme-fab-ico">✦</span>
+  </button>
+
+
+  <style id="final-prelogin-theme-and-love-style">
+    /* Tema juga berlaku untuk halaman login */
+    html[data-dashboard-theme] #loginPage {
+      background:
+        radial-gradient(760px 280px at 50% -8%, color-mix(in srgb, var(--theme-accent, #D9A93A) 10%, transparent), transparent 64%),
+        radial-gradient(900px 460px at 50% 108%, color-mix(in srgb, var(--theme-accent-2, #8B5E16) 10%, transparent), transparent 62%),
+        linear-gradient(180deg, var(--theme-bg-c, #050403), var(--theme-bg-a, #090704) 52%, var(--theme-bg-c, #050403)) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .portal-title-wrap,
+    html[data-dashboard-theme] #loginPage .feature-pills,
+    html[data-dashboard-theme] #loginPage .login-panel,
+    html[data-dashboard-theme] #loginPage .field,
+    html[data-dashboard-theme] #loginPage .warning-line,
+    html[data-dashboard-theme] #loginPage .login-brand-badge,
+    html[data-dashboard-theme] #loginPage .login-sub-badge {
+      border-color: var(--theme-border, rgba(217,169,58,.24)) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .portal-title-wrap,
+    html[data-dashboard-theme] #loginPage .login-panel,
+    html[data-dashboard-theme] #loginPage .feature-pills {
+      background:
+        radial-gradient(220px 120px at 50% 0%, color-mix(in srgb, var(--theme-accent, #D9A93A) 12%, transparent), transparent 72%),
+        linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2, rgba(35,25,12,.82)) 86%, transparent), color-mix(in srgb, var(--theme-panel, rgba(18,13,7,.94)) 98%, transparent)) !important;
+      box-shadow:
+        0 22px 70px rgba(0,0,0,.30),
+        0 0 24px color-mix(in srgb, var(--theme-accent, #D9A93A) 8%, transparent),
+        inset 0 1px 0 rgba(255,255,255,.04) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage h1,
+    html[data-dashboard-theme] #loginPage .portal-title,
+    html[data-dashboard-theme] #loginPage .feature-pill,
+    html[data-dashboard-theme] #loginPage .warning-line,
+    html[data-dashboard-theme] #loginPage .sub,
+    html[data-dashboard-theme] #loginPage .login-panel *,
+    html[data-dashboard-theme] #loginPage .remember-check span,
+    html[data-dashboard-theme] #loginPage .forgot-link {
+      color: var(--theme-text, #FFF4D6) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .forgot-link {
+      color: var(--theme-muted, rgba(255,239,205,.62)) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .forgot-link:hover {
+      color: var(--theme-accent-3, #FFE9A8) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .portal-title,
+    html[data-dashboard-theme] #loginPage h1,
+    html[data-dashboard-theme] #loginPage .login-sub-badge,
+    html[data-dashboard-theme] #loginPage .feature-pill {
+      color: var(--theme-accent-3, #FFE9A8) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .field {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-bg-c, #050403) 88%, transparent), color-mix(in srgb, var(--theme-bg-a, #090704) 90%, transparent)) !important;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-accent, #D9A93A) 10%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .field input {
+      color: var(--theme-text, #FFF4D6) !important;
+      caret-color: var(--theme-accent-3, #FFE9A8) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .field input::placeholder {
+      color: color-mix(in srgb, var(--theme-muted, rgba(255,239,205,.62)) 82%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .action-btn,
+    html[data-dashboard-theme] #loginPage .login-submit,
+    html[data-dashboard-theme] #loginPage button[type="submit"] {
+      background: linear-gradient(135deg, var(--theme-accent-3, #FFE9A8), var(--theme-accent, #D9A93A) 58%, var(--theme-accent-2, #8B5E16)) !important;
+      color: #120B02 !important;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 46%, transparent) !important;
+      box-shadow: 0 12px 28px color-mix(in srgb, var(--theme-accent, #D9A93A) 18%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .login-submit:hover,
+    html[data-dashboard-theme] #loginPage button[type="submit"]:hover {
+      filter: brightness(1.04) !important;
+      transform: translateY(-1px);
+    }
+
+    .prelogin-theme-fab {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 100400;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: none;
+      place-items: center;
+      cursor: pointer;
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #D9A93A) 32%, transparent);
+      background:
+        radial-gradient(80% 80% at 35% 25%, rgba(255,255,255,.16), transparent 72%),
+        linear-gradient(135deg, color-mix(in srgb, var(--theme-panel-2, rgba(35,25,12,.82)) 90%, transparent), color-mix(in srgb, var(--theme-panel, rgba(18,13,7,.94)) 98%, transparent));
+      color: var(--theme-accent-3, #FFE9A8);
+      box-shadow:
+        0 12px 30px rgba(0,0,0,.34),
+        0 0 22px color-mix(in srgb, var(--theme-accent, #D9A93A) 10%, transparent),
+        inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .prelogin-theme-fab:hover {
+      transform: translateY(-1px);
+      border-color: var(--theme-accent, #D9A93A);
+    }
+
+    .prelogin-theme-fab-ico {
+      font-size: 16px;
+      line-height: 1;
+      font-weight: 900;
+      text-shadow: 0 0 10px color-mix(in srgb, var(--theme-accent, #D9A93A) 24%, transparent);
+    }
+
+    body.prelogin-theme-fab-visible .prelogin-theme-fab {
+      display: grid;
+    }
+
+    @media (max-width: 680px) {
+      .prelogin-theme-fab {
+        left: 12px;
+        bottom: 12px;
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
+
+
+<div id="beforeLoginLoveLayer" aria-hidden="true"></div>
+
+  <style id="final-prelogin-love-layer-style">
+    #beforeLoginLoveLayer {
+      position: fixed;
+      inset: 0;
+      z-index: 55;
+      pointer-events: none;
+      overflow: hidden;
+      display: none;
+      contain: layout style paint;
+    }
+
+    body.prelogin-love-active #beforeLoginLoveLayer {
+      display: block;
+    }
+
+    .prelogin-love-particle {
+      position: absolute;
+      left: var(--love-x, 50vw);
+      bottom: -20px;
+      width: var(--love-size, 10px);
+      height: var(--love-size, 10px);
+      display: grid;
+      place-items: center;
+      color: var(--login-love-color, rgba(255,210,120,.55));
+      font-size: var(--love-size, 10px);
+      line-height: 1;
+      opacity: 0;
+      user-select: none;
+      will-change: transform, opacity;
+      animation: preloginLoveFloat var(--love-duration, 7.4s) linear forwards;
+      transform: translate3d(0, 0, 0) scale(.84) rotate(var(--love-rotate, -8deg));
+      text-shadow: 0 0 8px color-mix(in srgb, var(--login-love-color, rgba(255,210,120,.55)) 36%, transparent);
+    }
+
+    .prelogin-love-particle::before {
+      content: "♥";
+    }
+
+    .prelogin-love-particle:nth-child(3n)::before {
+      content: "♡";
+      font-weight: 900;
+    }
+
+    @keyframes preloginLoveFloat {
+      0% {
+        opacity: 0;
+        transform: translate3d(0,0,0) scale(.72) rotate(var(--love-rotate, -8deg));
+      }
+      10% {
+        opacity: var(--love-opacity, .48);
+      }
+      100% {
+        opacity: 0;
+        transform:
+          translate3d(var(--love-drift, 18px), calc(-1 * var(--love-travel, 92vh)), 0)
+          scale(1.02)
+          rotate(calc(var(--love-rotate, -8deg) + var(--love-spin, 16deg)));
+      }
+    }
+
+    html:not([data-dashboard-theme]),
+    html[data-dashboard-theme="gold-luxury"] { --login-love-color: rgba(255, 210, 120, .54); }
+    html[data-dashboard-theme="ocean-blue"] { --login-love-color: rgba(119, 225, 255, .52); }
+    html[data-dashboard-theme="emerald-green"] { --login-love-color: rgba(139, 255, 194, .50); }
+    html[data-dashboard-theme="violet-neon"] { --login-love-color: rgba(205, 173, 255, .52); }
+    html[data-dashboard-theme="ruby-red"] { --login-love-color: rgba(255, 122, 158, .54); }
+
+    @media (prefers-reduced-motion: reduce) {
+      #beforeLoginLoveLayer { display: none !important; }
+      .prelogin-love-particle { animation: none !important; }
+    }
+  </style>
+
+
+  <script id="final-prelogin-love-and-theme-fab-script">
+    (function() {
+      const MAX_PRELOGIN_LOVES_DESKTOP = 26;
+      const MAX_PRELOGIN_LOVES_MOBILE = 12;
+      const PRELOGIN_SPAWN_INTERVAL_DESKTOP = 420;
+      const PRELOGIN_SPAWN_INTERVAL_MOBILE = 680;
+
+      let preloginLoveTimer = null;
+      let preloginObserver = null;
+
+      function prefersReducedMotion() {
+        try {
+          return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function isMobileViewport() {
+        return window.innerWidth <= 680;
+      }
+
+      function getMaxPreloginLoves() {
+        return isMobileViewport() ? MAX_PRELOGIN_LOVES_MOBILE : MAX_PRELOGIN_LOVES_DESKTOP;
+      }
+
+      function getPreloginSpawnInterval() {
+        return isMobileViewport() ? PRELOGIN_SPAWN_INTERVAL_MOBILE : PRELOGIN_SPAWN_INTERVAL_DESKTOP;
+      }
+
+      function getPreloginLayer() {
+        return document.getElementById('beforeLoginLoveLayer');
+      }
+
+      function isLoginVisible() {
+        const login = document.getElementById('loginPage');
+        const dashboard = document.getElementById('dashboardPage');
+        if (!login) return false;
+        const loginStyle = window.getComputedStyle(login);
+        const dashStyle = dashboard ? window.getComputedStyle(dashboard) : null;
+        return loginStyle.display !== 'none' &&
+               loginStyle.visibility !== 'hidden' &&
+               (!dashStyle || dashStyle.display === 'none' || dashStyle.visibility === 'hidden');
+      }
+
+      function syncPreloginFabVisibility() {
+        if (isLoginVisible()) document.body.classList.add('prelogin-theme-fab-visible');
+        else document.body.classList.remove('prelogin-theme-fab-visible');
+      }
+
+      function prunePreloginParticles() {
+        const layer = getPreloginLayer();
+        if (!layer) return;
+        const nodes = layer.querySelectorAll('.prelogin-love-particle');
+        const max = getMaxPreloginLoves();
+        if (nodes.length <= max) return;
+        Array.from(nodes).slice(0, nodes.length - max).forEach((node) => node.remove());
+      }
+
+      function spawnPreloginLoveParticle() {
+        if (!isLoginVisible() || prefersReducedMotion()) {
+          stopPreloginLoveEffect(false);
+          return;
+        }
+
+        const layer = getPreloginLayer();
+        if (!layer) return;
+        prunePreloginParticles();
+
+        if (layer.querySelectorAll('.prelogin-love-particle').length >= getMaxPreloginLoves()) return;
+
+        const love = document.createElement('span');
+        love.className = 'prelogin-love-particle';
+
+        const x = Math.round(3 + Math.random() * 94);
+        const size = Math.round((isMobileViewport() ? 4 : 5) + Math.random() * (isMobileViewport() ? 5 : 7));
+        const duration = (6.2 + Math.random() * 3.8).toFixed(2);
+        const drift = Math.round((Math.random() * 70) - 35);
+        const travel = Math.round(60 + Math.random() * 40);
+        const rotate = Math.round((Math.random() * 28) - 14);
+        const spin = Math.round((Math.random() * 44) - 22);
+        const opacity = (0.26 + Math.random() * 0.28).toFixed(2);
+
+        love.style.setProperty('--love-x', `${x}vw`);
+        love.style.setProperty('--love-size', `${size}px`);
+        love.style.setProperty('--love-duration', `${duration}s`);
+        love.style.setProperty('--love-drift', `${drift}px`);
+        love.style.setProperty('--love-travel', `${travel}vh`);
+        love.style.setProperty('--love-rotate', `${rotate}deg`);
+        love.style.setProperty('--love-spin', `${spin}deg`);
+        love.style.setProperty('--love-opacity', opacity);
+
+        love.addEventListener('animationend', () => love.remove(), { once: true });
+        layer.appendChild(love);
+      }
+
+      function startPreloginLoveEffect() {
+        if (prefersReducedMotion()) return;
+        if (preloginLoveTimer) return;
+        document.body.classList.add('prelogin-love-active');
+        for (let i = 0; i < Math.min(10, getMaxPreloginLoves()); i++) {
+          setTimeout(spawnPreloginLoveParticle, i * 130);
+        }
+        preloginLoveTimer = setInterval(spawnPreloginLoveParticle, getPreloginSpawnInterval());
+      }
+
+      function stopPreloginLoveEffect(clearParticles = true) {
+        document.body.classList.remove('prelogin-love-active');
+        if (preloginLoveTimer) {
+          clearInterval(preloginLoveTimer);
+          preloginLoveTimer = null;
+        }
+        const layer = getPreloginLayer();
+        if (clearParticles && layer) {
+          layer.querySelectorAll('.prelogin-love-particle').forEach((node) => node.remove());
+        }
+      }
+
+      function syncPreloginEnhancements() {
+        syncPreloginFabVisibility();
+        if (isLoginVisible()) startPreloginLoveEffect();
+        else stopPreloginLoveEffect(true);
+      }
+
+      function bootPreloginEnhancements() {
+        syncPreloginEnhancements();
+        const login = document.getElementById('loginPage');
+        const dashboard = document.getElementById('dashboardPage');
+
+        if (preloginObserver) preloginObserver.disconnect();
+        preloginObserver = new MutationObserver(syncPreloginEnhancements);
+        if (login) preloginObserver.observe(login, { attributes: true, attributeFilter: ['style', 'class'] });
+        if (dashboard) preloginObserver.observe(dashboard, { attributes: true, attributeFilter: ['style', 'class'] });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') syncPreloginEnhancements();
+          else stopPreloginLoveEffect(false);
+        });
+
+        window.addEventListener('resize', syncPreloginEnhancements, { passive: true });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootPreloginEnhancements, { once: true });
+      } else {
+        bootPreloginEnhancements();
+      }
+
+      window.startPreloginLoveEffect = startPreloginLoveEffect;
+      window.stopPreloginLoveEffect = stopPreloginLoveEffect;
+      window.syncPreloginThemeFabVisibility = syncPreloginFabVisibility;
+    })();
+  </script>
+
+
+  <style id="final-theme-text-color-harmony-fix">
+    /* Warna teks khusus tiap tema: kontras, cocok, dan tidak tabrakan dengan warna utama */
+    html:not([data-dashboard-theme]),
+    html[data-dashboard-theme="gold-luxury"] {
+      --theme-heading-text: #FFF1C2;
+      --theme-body-text: #F7E8C0;
+      --theme-soft-text: rgba(255, 235, 190, .72);
+      --theme-link-text: #FFE39A;
+      --theme-input-text: #FFF7E5;
+      --theme-placeholder-text: rgba(255, 237, 196, .56);
+      --theme-dark-text-on-button: #1B1103;
+      --theme-muted-chip-text: rgba(255, 232, 175, .82);
+    }
+
+    html[data-dashboard-theme="ocean-blue"] {
+      --theme-heading-text: #EAF8FF;
+      --theme-body-text: #DCEFFF;
+      --theme-soft-text: rgba(210, 234, 255, .74);
+      --theme-link-text: #A8E7FF;
+      --theme-input-text: #F4FBFF;
+      --theme-placeholder-text: rgba(210, 235, 255, .58);
+      --theme-dark-text-on-button: #031321;
+      --theme-muted-chip-text: rgba(205, 234, 255, .84);
+    }
+
+    html[data-dashboard-theme="emerald-green"] {
+      --theme-heading-text: #EFFFF7;
+      --theme-body-text: #DDFBEA;
+      --theme-soft-text: rgba(213, 250, 231, .74);
+      --theme-link-text: #A7F3D0;
+      --theme-input-text: #F2FFF8;
+      --theme-placeholder-text: rgba(211, 248, 229, .58);
+      --theme-dark-text-on-button: #032116;
+      --theme-muted-chip-text: rgba(210, 250, 230, .84);
+    }
+
+    html[data-dashboard-theme="violet-neon"] {
+      --theme-heading-text: #F7F0FF;
+      --theme-body-text: #EDE0FF;
+      --theme-soft-text: rgba(232, 217, 255, .74);
+      --theme-link-text: #DAC7FF;
+      --theme-input-text: #FAF5FF;
+      --theme-placeholder-text: rgba(230, 214, 255, .58);
+      --theme-dark-text-on-button: #16072B;
+      --theme-muted-chip-text: rgba(230, 216, 255, .84);
+    }
+
+    html[data-dashboard-theme="ruby-red"] {
+      --theme-heading-text: #FFF1F5;
+      --theme-body-text: #FFE0E8;
+      --theme-soft-text: rgba(255, 216, 226, .74);
+      --theme-link-text: #FFC2D1;
+      --theme-input-text: #FFF6F8;
+      --theme-placeholder-text: rgba(255, 215, 226, .58);
+      --theme-dark-text-on-button: #26040D;
+      --theme-muted-chip-text: rgba(255, 215, 226, .84);
+    }
+
+    /* Halaman sebelum login */
+    html[data-dashboard-theme] #loginPage,
+    html[data-dashboard-theme] #loginPage .inner,
+    html[data-dashboard-theme] #loginPage .login-panel,
+    html[data-dashboard-theme] #loginPage .card {
+      color: var(--theme-body-text) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage h1,
+    html[data-dashboard-theme] #loginPage .portal-title,
+    html[data-dashboard-theme] #loginPage .brand-title,
+    html[data-dashboard-theme] #loginPage .login-title,
+    html[data-dashboard-theme] #loginPage .title,
+    html[data-dashboard-theme] #loginPage .top h1 {
+      color: var(--theme-heading-text) !important;
+      text-shadow: 0 0 18px color-mix(in srgb, var(--theme-accent) 18%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .sub,
+    html[data-dashboard-theme] #loginPage .login-footnote,
+    html[data-dashboard-theme] #loginPage .info-line,
+    html[data-dashboard-theme] #loginPage .field-label,
+    html[data-dashboard-theme] #loginPage .remember-check,
+    html[data-dashboard-theme] #loginPage .remember-check span,
+    html[data-dashboard-theme] #loginPage .meta {
+      color: var(--theme-soft-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .warning-line,
+    html[data-dashboard-theme] #loginPage .login-sub-badge,
+    html[data-dashboard-theme] #loginPage .feature-pill,
+    html[data-dashboard-theme] #loginPage .feature-pill span,
+    html[data-dashboard-theme] #loginPage .rgb-chip,
+    html[data-dashboard-theme] #loginPage .rgb-chip span {
+      color: var(--theme-muted-chip-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .forgot-link,
+    html[data-dashboard-theme] #loginPage a {
+      color: var(--theme-link-text) !important;
+      text-decoration-color: color-mix(in srgb, var(--theme-link-text) 45%, transparent) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .forgot-link:hover,
+    html[data-dashboard-theme] #loginPage a:hover {
+      color: var(--theme-heading-text) !important;
+      text-decoration: underline;
+    }
+
+    html[data-dashboard-theme] #loginPage input,
+    html[data-dashboard-theme] #loginPage .field input {
+      color: var(--theme-input-text) !important;
+      -webkit-text-fill-color: var(--theme-input-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] #loginPage input::placeholder,
+    html[data-dashboard-theme] #loginPage .field input::placeholder {
+      color: var(--theme-placeholder-text) !important;
+      opacity: 1 !important;
+    }
+
+    html[data-dashboard-theme] #loginPage svg,
+    html[data-dashboard-theme] #loginPage .icon {
+      color: var(--theme-link-text) !important;
+      opacity: .9 !important;
+    }
+
+    html[data-dashboard-theme] #loginPage svg path {
+      stroke: var(--theme-link-text) !important;
+    }
+
+    html[data-dashboard-theme] #loginPage .btn,
+    html[data-dashboard-theme] #loginPage #loginButton,
+    html[data-dashboard-theme] #loginPage button[type="submit"] {
+      color: var(--theme-dark-text-on-button) !important;
+      -webkit-text-fill-color: var(--theme-dark-text-on-button) !important;
+      text-shadow: none !important;
+      font-weight: 900 !important;
+      letter-spacing: .24em !important;
+    }
+
+    /* Popup Forgot Password */
+    html[data-dashboard-theme] .forgot-password-popup-title,
+    html[data-dashboard-theme] .forgot-password-popup-message {
+      color: var(--theme-heading-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] .forgot-password-popup-close {
+      color: var(--theme-soft-text) !important;
+    }
+
+    html[data-dashboard-theme] .forgot-password-popup-ok {
+      color: var(--theme-dark-text-on-button) !important;
+      -webkit-text-fill-color: var(--theme-dark-text-on-button) !important;
+      text-shadow: none !important;
+    }
+
+    /* Modal Tema */
+    html[data-dashboard-theme] #themeModal,
+    html[data-dashboard-theme] #themeModal .modal-box {
+      color: var(--theme-body-text) !important;
+    }
+
+    html[data-dashboard-theme] #themeModal h3,
+    html[data-dashboard-theme] #themeModal .dashboard-theme-info b {
+      color: var(--theme-heading-text) !important;
+    }
+
+    /* Dashboard umum */
+    html[data-dashboard-theme] #dashboardPage {
+      color: var(--theme-body-text) !important;
+    }
+
+    html[data-dashboard-theme] #myProfileName,
+    html[data-dashboard-theme] #topHeaderTitle,
+    html[data-dashboard-theme] .chat-item-name,
+    html[data-dashboard-theme] .modal-box h3,
+    html[data-dashboard-theme] .profile-name-role {
+      color: var(--theme-heading-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] #topHeaderStatus,
+    html[data-dashboard-theme] .profile-status-line,
+    html[data-dashboard-theme] .profile-note,
+    html[data-dashboard-theme] .section-label,
+    html[data-dashboard-theme] .chat-item-status,
+    html[data-dashboard-theme] .status-indicator {
+      color: var(--theme-soft-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] .action-text,
+    html[data-dashboard-theme] .modal-btn.secondary,
+    html[data-dashboard-theme] .tiny-profile-btn {
+      color: var(--theme-body-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] .action-ico {
+      color: var(--theme-link-text) !important;
+      text-shadow: 0 0 8px color-mix(in srgb, var(--theme-accent) 24%, transparent) !important;
+    }
+
+    /* Bubble chat text */
+    html[data-dashboard-theme] .incoming-row .bubble,
+    html[data-dashboard-theme] .incoming-row .bubble .text-content-body {
+      color: var(--theme-body-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] .outgoing-row .bubble .text-content-body {
+      text-shadow: none !important;
+      font-weight: 650 !important;
+    }
+
+    html:not([data-dashboard-theme]) .outgoing-row .bubble .text-content-body,
+    html[data-dashboard-theme="gold-luxury"] .outgoing-row .bubble .text-content-body {
+      color: #1A1003 !important;
+    }
+
+    html[data-dashboard-theme="ocean-blue"] .outgoing-row .bubble .text-content-body,
+    html[data-dashboard-theme="emerald-green"] .outgoing-row .bubble .text-content-body,
+    html[data-dashboard-theme="violet-neon"] .outgoing-row .bubble .text-content-body,
+    html[data-dashboard-theme="ruby-red"] .outgoing-row .bubble .text-content-body {
+      color: var(--theme-heading-text) !important;
+    }
+
+    /* Admin panel text */
+    html[data-dashboard-theme] #adminModal,
+    html[data-dashboard-theme] #adminModal .admin-control-modal,
+    html[data-dashboard-theme] #adminModal .admin-section-card,
+    html[data-dashboard-theme] #adminModal .role-admin-row,
+    html[data-dashboard-theme] #adminModal .user-admin-row {
+      color: var(--theme-body-text) !important;
+    }
+
+    html[data-dashboard-theme] #adminModal .admin-section-title,
+    html[data-dashboard-theme] #adminModal .role-admin-title,
+    html[data-dashboard-theme] #adminModal .user-admin-name,
+    html[data-dashboard-theme] #adminModal .user-admin-name strong,
+    html[data-dashboard-theme] #adminModal h3 {
+      color: var(--theme-heading-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] #adminModal .access-title,
+    html[data-dashboard-theme] #adminModal .permission-locked-note,
+    html[data-dashboard-theme] #adminModal .role-access-chip {
+      color: var(--theme-soft-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-dashboard-theme] #adminModal .field input,
+    html[data-dashboard-theme] #adminModal input {
+      color: var(--theme-input-text) !important;
+      -webkit-text-fill-color: var(--theme-input-text) !important;
+    }
+
+    html[data-dashboard-theme] #adminModal .field input::placeholder,
+    html[data-dashboard-theme] #adminModal input::placeholder {
+      color: var(--theme-placeholder-text) !important;
+      opacity: 1 !important;
+    }
+
+    html[data-dashboard-theme] #adminModal .modal-btn.primary,
+    html[data-dashboard-theme] #adminModal .admin-wide-btn {
+      color: var(--theme-dark-text-on-button) !important;
+      -webkit-text-fill-color: var(--theme-dark-text-on-button) !important;
+      text-shadow: none !important;
+      font-weight: 900 !important;
+    }
+
+    /* Hilangkan efek pudar/blur pada teks penting */
+    html[data-dashboard-theme] #loginPage *,
+    html[data-dashboard-theme] #dashboardPage .bubble *,
+    html[data-dashboard-theme] #adminModal *,
+    html[data-dashboard-theme] #themeModal * {
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
     }
   </style>
 
