@@ -10201,10 +10201,10 @@
 
   <script id="final-lightweight-love-after-login-script">
     (function() {
-      const MAX_LOVES_DESKTOP = 42;
-      const MAX_LOVES_MOBILE = 22;
-      const SPAWN_INTERVAL_DESKTOP = 310;
-      const SPAWN_INTERVAL_MOBILE = 520;
+      const MAX_LOVES_DESKTOP = 56;
+      const MAX_LOVES_MOBILE = 28;
+      const SPAWN_INTERVAL_DESKTOP = 260;
+      const SPAWN_INTERVAL_MOBILE = 430;
 
       let loveTimer = null;
       let loveLayer = null;
@@ -10310,7 +10310,7 @@
 
         if (loveTimer) return;
 
-        for (let i = 0; i < Math.min(16, getMaxLoves()); i++) {
+        for (let i = 0; i < Math.min(20, getMaxLoves()); i++) {
           setTimeout(spawnLoveParticle, i * 140);
         }
 
@@ -12201,6 +12201,656 @@
     } else {
       bootSafeFinal();
     }
+  </script>
+
+
+  <style id="final-compact-effect-chat-love-style">
+    /* Mode Compact ON/OFF */
+    body.dashboard-compact #dashboardPage .chat-item-card {
+      min-height: 48px !important;
+      padding: 8px !important;
+      gap: 8px !important;
+      border-radius: 14px !important;
+    }
+
+    body.dashboard-compact #dashboardPage .chat-main-header {
+      min-height: 62px !important;
+      padding: 10px 16px !important;
+    }
+
+    body.dashboard-compact #dashboardPage .message-area {
+      gap: 9px !important;
+      padding-top: 14px !important;
+      padding-bottom: 14px !important;
+    }
+
+    body.dashboard-compact #dashboardPage .bubble {
+      padding: 7px 10px !important;
+      font-size: 12.4px !important;
+      line-height: 1.38 !important;
+      border-radius: 15px !important;
+    }
+
+    body.dashboard-compact #dashboardPage .bubble-meta {
+      margin-top: 3px !important;
+    }
+
+    body.dashboard-compact #dashboardPage .sh-actions .action-link-btn,
+    body.dashboard-compact #dashboardPage .action-link-btn {
+      min-height: 42px !important;
+      height: 42px !important;
+    }
+
+    body.dashboard-compact #dashboardPage .chat-footer-panel {
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+    }
+
+    body.dashboard-compact #dashboardPage .chat-footer-panel input[type="text"] {
+      height: 38px !important;
+    }
+
+    body.dashboard-compact #dashboardPage .send-action-btn {
+      width: 40px !important;
+      height: 40px !important;
+    }
+
+    /* Effect OFF benar-benar sembunyikan animasi */
+    body.animations-off #afterLoginLoveLayer,
+    body.animations-off #beforeLoginLoveLayer,
+    body.animations-off #chatLoveBackgroundLayer,
+    body.animations-off .login-love-particle,
+    body.animations-off .prelogin-love-particle,
+    body.animations-off .chat-love-bg-particle {
+      display: none !important;
+      animation: none !important;
+    }
+
+    /* Love kecil khusus background chat */
+    #chatLoveBackgroundLayer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+      display: none;
+      contain: layout style paint;
+    }
+
+    body.dashboard-chat-love-active #chatLoveBackgroundLayer {
+      display: block;
+    }
+
+    .chat-love-bg-particle {
+      position: absolute;
+      left: var(--love-x, 50%);
+      bottom: -18px;
+      width: var(--love-size, 8px);
+      height: var(--love-size, 8px);
+      display: grid;
+      place-items: center;
+      color: var(--chat-love-color, rgba(255, 210, 120, .42));
+      font-size: var(--love-size, 8px);
+      line-height: 1;
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+      will-change: transform, opacity;
+      transform: translate3d(0,0,0) scale(.75) rotate(var(--love-rotate, -8deg));
+      animation: chatLoveBgFloat var(--love-duration, 8s) linear forwards;
+      text-shadow: 0 0 8px color-mix(in srgb, var(--chat-love-color, rgba(255,210,120,.42)) 36%, transparent);
+    }
+
+    .chat-love-bg-particle::before {
+      content: "♥";
+    }
+
+    .chat-love-bg-particle:nth-child(3n)::before {
+      content: "♡";
+      font-weight: 900;
+    }
+
+    .chat-love-bg-particle:nth-child(4n)::before {
+      content: "♥";
+      opacity: .82;
+    }
+
+    @keyframes chatLoveBgFloat {
+      0% {
+        opacity: 0;
+        transform: translate3d(0,0,0) scale(.65) rotate(var(--love-rotate, -8deg));
+      }
+      12% {
+        opacity: var(--love-opacity, .38);
+      }
+      75% {
+        opacity: calc(var(--love-opacity, .38) * .72);
+      }
+      100% {
+        opacity: 0;
+        transform:
+          translate3d(var(--love-drift, 18px), calc(-1 * var(--love-travel, 78vh)), 0)
+          scale(1)
+          rotate(calc(var(--love-rotate, -8deg) + var(--love-spin, 16deg)));
+      }
+    }
+
+    html:not([data-dashboard-theme]),
+    html[data-dashboard-theme="gold-luxury"] { --chat-love-color: rgba(255, 210, 120, .44); }
+    html[data-dashboard-theme="ocean-blue"] { --chat-love-color: rgba(119, 225, 255, .42); }
+    html[data-dashboard-theme="emerald-green"] { --chat-love-color: rgba(139, 255, 194, .40); }
+    html[data-dashboard-theme="violet-neon"] { --chat-love-color: rgba(205, 173, 255, .42); }
+    html[data-dashboard-theme="ruby-red"] { --chat-love-color: rgba(255, 122, 158, .44); }
+
+    /* Pastikan bubble dan footer tetap di atas background love */
+    #dashboardPage .chat-main-header,
+    #dashboardPage .message-area,
+    #dashboardPage .chat-footer-panel,
+    #dashboardPage #imagePreviewBar,
+    #dashboardPage #replyStatusBar,
+    #dashboardPage #editStatusBar {
+      position: relative;
+      z-index: 3;
+    }
+
+    /* Panel pengaturan tambahan di menu Latar */
+    .theme-extra-settings {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .theme-setting-toggle {
+      min-height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--theme-border, rgba(217,169,58,.24));
+      background: rgba(255,255,255,.035);
+      color: var(--theme-body-text, #F7E8C0);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 850;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .theme-setting-toggle:hover {
+      border-color: var(--theme-accent, #D9A93A);
+      background: rgba(255,255,255,.055);
+    }
+
+    .theme-setting-toggle span:last-child {
+      color: var(--theme-link-text, #FFE39A);
+      font-weight: 950;
+      letter-spacing: .04em;
+    }
+
+    @media (max-width: 680px) {
+      body.dashboard-compact #dashboardPage .message-area {
+        gap: 7px !important;
+        padding-top: 10px !important;
+      }
+
+      body.dashboard-compact #dashboardPage .bubble {
+        font-size: 12px !important;
+        padding: 7px 9px !important;
+      }
+
+      .chat-love-bg-particle:nth-child(5n) {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #chatLoveBackgroundLayer,
+      .chat-love-bg-particle {
+        display: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+
+
+  <script id="final-compact-effect-chat-love-script">
+    (function() {
+      if (window.__compactEffectChatLoveReady) return;
+      window.__compactEffectChatLoveReady = true;
+
+      const SETTINGS_KEY = 'fandah_dashboard_ui_settings_v2';
+      const CHAT_LOVE_MAX_DESKTOP = 42;
+      const CHAT_LOVE_MAX_MOBILE = 20;
+      const CHAT_LOVE_INTERVAL_DESKTOP = 360;
+      const CHAT_LOVE_INTERVAL_MOBILE = 620;
+
+      let chatLoveTimer = null;
+      let chatLoveLayer = null;
+      let themePatchTimer = null;
+
+      function isMobile() {
+        return window.innerWidth <= 680;
+      }
+
+      function getDefaultSettings() {
+        return { compact: false, effects: true };
+      }
+
+      function readSettings() {
+        try {
+          return { ...getDefaultSettings(), ...(JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') || {}) };
+        } catch (error) {
+          return getDefaultSettings();
+        }
+      }
+
+      function saveSettings(settings) {
+        try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings || getDefaultSettings())); } catch (error) {}
+      }
+
+      function dashboardVisible() {
+        const dash = document.getElementById('dashboardPage');
+        if (!dash) return false;
+        const style = window.getComputedStyle(dash);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+      }
+
+      function effectsEnabled() {
+        return readSettings().effects !== false;
+      }
+
+      function compactEnabled() {
+        return !!readSettings().compact;
+      }
+
+      function applyDashboardUiSettings() {
+        const settings = readSettings();
+        document.body.classList.toggle('dashboard-compact', !!settings.compact);
+        document.body.classList.toggle('animations-off', settings.effects === false);
+
+        if (settings.effects === false) {
+          stopChatLoveEffect(true);
+          try { if (typeof window.stopLightLoveAfterLogin === 'function') window.stopLightLoveAfterLogin(true); } catch (error) {}
+          try { if (typeof window.stopPreloginLoveEffect === 'function') window.stopPreloginLoveEffect(true); } catch (error) {}
+        } else {
+          try { if (dashboardVisible() && typeof window.startLightLoveAfterLogin === 'function') window.startLightLoveAfterLogin(); } catch (error) {}
+          if (dashboardVisible()) startChatLoveEffect();
+        }
+
+        syncThemeSettingsLabels();
+      }
+
+      function ensureChatLoveLayer() {
+        const chatWindow = document.querySelector('.chat-main-window');
+        if (!chatWindow) return null;
+
+        if (chatLoveLayer && chatWindow.contains(chatLoveLayer)) return chatLoveLayer;
+
+        chatLoveLayer = document.getElementById('chatLoveBackgroundLayer');
+        if (!chatLoveLayer) {
+          chatLoveLayer = document.createElement('div');
+          chatLoveLayer.id = 'chatLoveBackgroundLayer';
+          chatLoveLayer.setAttribute('aria-hidden', 'true');
+        }
+
+        if (chatLoveLayer.parentElement !== chatWindow) {
+          chatWindow.insertBefore(chatLoveLayer, chatWindow.firstChild);
+        }
+
+        return chatLoveLayer;
+      }
+
+      function getMaxChatLoves() {
+        return isMobile() ? CHAT_LOVE_MAX_MOBILE : CHAT_LOVE_MAX_DESKTOP;
+      }
+
+      function getChatLoveInterval() {
+        return isMobile() ? CHAT_LOVE_INTERVAL_MOBILE : CHAT_LOVE_INTERVAL_DESKTOP;
+      }
+
+      function pruneChatLoves() {
+        const layer = ensureChatLoveLayer();
+        if (!layer) return;
+        const nodes = layer.querySelectorAll('.chat-love-bg-particle');
+        const max = getMaxChatLoves();
+        if (nodes.length <= max) return;
+        Array.from(nodes).slice(0, nodes.length - max).forEach((node) => node.remove());
+      }
+
+      function spawnChatLove() {
+        if (!effectsEnabled() || !dashboardVisible()) {
+          stopChatLoveEffect(false);
+          return;
+        }
+
+        const layer = ensureChatLoveLayer();
+        if (!layer) return;
+        pruneChatLoves();
+
+        if (layer.querySelectorAll('.chat-love-bg-particle').length >= getMaxChatLoves()) return;
+
+        const love = document.createElement('span');
+        love.className = 'chat-love-bg-particle';
+
+        const x = Math.round(3 + Math.random() * 94);
+        const size = Math.round((isMobile() ? 4 : 5) + Math.random() * (isMobile() ? 5 : 7));
+        const duration = (6.5 + Math.random() * 4.2).toFixed(2);
+        const drift = Math.round((Math.random() * 76) - 38);
+        const travel = Math.round(55 + Math.random() * 44);
+        const rotate = Math.round((Math.random() * 30) - 15);
+        const spin = Math.round((Math.random() * 46) - 23);
+        const opacity = (0.22 + Math.random() * 0.26).toFixed(2);
+
+        love.style.setProperty('--love-x', `${x}%`);
+        love.style.setProperty('--love-size', `${size}px`);
+        love.style.setProperty('--love-duration', `${duration}s`);
+        love.style.setProperty('--love-drift', `${drift}px`);
+        love.style.setProperty('--love-travel', `${travel}vh`);
+        love.style.setProperty('--love-rotate', `${rotate}deg`);
+        love.style.setProperty('--love-spin', `${spin}deg`);
+        love.style.setProperty('--love-opacity', opacity);
+
+        love.addEventListener('animationend', () => love.remove(), { once: true });
+        layer.appendChild(love);
+      }
+
+      function startChatLoveEffect() {
+        if (!effectsEnabled() || !dashboardVisible()) return;
+        ensureChatLoveLayer();
+        document.body.classList.add('dashboard-chat-love-active');
+
+        if (chatLoveTimer) return;
+
+        for (let i = 0; i < Math.min(12, getMaxChatLoves()); i++) {
+          setTimeout(spawnChatLove, i * 110);
+        }
+
+        chatLoveTimer = setInterval(spawnChatLove, getChatLoveInterval());
+      }
+
+      function stopChatLoveEffect(clearParticles = true) {
+        document.body.classList.remove('dashboard-chat-love-active');
+
+        if (chatLoveTimer) {
+          clearInterval(chatLoveTimer);
+          chatLoveTimer = null;
+        }
+
+        if (clearParticles && chatLoveLayer) {
+          chatLoveLayer.querySelectorAll('.chat-love-bg-particle').forEach((node) => node.remove());
+        }
+      }
+
+      function ensureThemeExtraSettings() {
+        const modal = document.getElementById('themeModal');
+        const options = document.getElementById('dashboardThemeOptions');
+        if (!modal || !options) return false;
+
+        if (document.getElementById('themeExtraSettings')) {
+          syncThemeSettingsLabels();
+          return true;
+        }
+
+        const panel = document.createElement('div');
+        panel.className = 'theme-extra-settings';
+        panel.id = 'themeExtraSettings';
+        panel.innerHTML = `
+          <button type="button" class="theme-setting-toggle" id="toggleCompactMode">
+            <span>Mode Compact</span><span>OFF</span>
+          </button>
+          <button type="button" class="theme-setting-toggle" id="toggleEffectsMode">
+            <span>Efek Love / Animasi</span><span>ON</span>
+          </button>
+        `;
+
+        options.insertAdjacentElement('afterend', panel);
+
+        document.getElementById('toggleCompactMode')?.addEventListener('click', () => {
+          const s = readSettings();
+          s.compact = !s.compact;
+          saveSettings(s);
+          applyDashboardUiSettings();
+        });
+
+        document.getElementById('toggleEffectsMode')?.addEventListener('click', () => {
+          const s = readSettings();
+          s.effects = !(s.effects !== false);
+          saveSettings(s);
+          applyDashboardUiSettings();
+        });
+
+        syncThemeSettingsLabels();
+        return true;
+      }
+
+      function syncThemeSettingsLabels() {
+        const settings = readSettings();
+        const compactLabel = document.querySelector('#toggleCompactMode span:last-child');
+        const effectLabel = document.querySelector('#toggleEffectsMode span:last-child');
+
+        if (compactLabel) compactLabel.textContent = settings.compact ? 'ON' : 'OFF';
+        if (effectLabel) effectLabel.textContent = settings.effects === false ? 'OFF' : 'ON';
+      }
+
+      function patchThemeModalOpen() {
+        if (typeof window.openThemeSettingsModal !== 'function' || window.openThemeSettingsModal.__compactEffectPatched) return false;
+
+        const originalOpen = window.openThemeSettingsModal;
+        window.openThemeSettingsModal = function(...args) {
+          const result = originalOpen.apply(this, args);
+          setTimeout(() => {
+            ensureThemeExtraSettings();
+            syncThemeSettingsLabels();
+          }, 50);
+          return result;
+        };
+
+        window.openThemeSettingsModal.__compactEffectPatched = true;
+        return true;
+      }
+
+      function syncChatLoveState() {
+        applyDashboardUiSettings();
+
+        if (effectsEnabled() && dashboardVisible()) startChatLoveEffect();
+        else stopChatLoveEffect(true);
+      }
+
+      function boot() {
+        applyDashboardUiSettings();
+        patchThemeModalOpen();
+        ensureThemeExtraSettings();
+        syncChatLoveState();
+
+        const dash = document.getElementById('dashboardPage');
+        if (dash) {
+          new MutationObserver(syncChatLoveState).observe(dash, { attributes: true, attributeFilter: ['style', 'class'] });
+        }
+
+        if (themePatchTimer) clearInterval(themePatchTimer);
+        themePatchTimer = setInterval(() => {
+          patchThemeModalOpen();
+          ensureThemeExtraSettings();
+          syncChatLoveState();
+        }, 8000);
+
+        window.addEventListener('resize', () => {
+          pruneChatLoves();
+          syncChatLoveState();
+        }, { passive: true });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') syncChatLoveState();
+          else stopChatLoveEffect(false);
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot, { once: true });
+      } else {
+        boot();
+      }
+
+      window.applyDashboardUiSettings = applyDashboardUiSettings;
+      window.startChatLoveEffect = startChatLoveEffect;
+      window.stopChatLoveEffect = stopChatLoveEffect;
+    })();
+  </script>
+
+
+  <style id="final-longterm-safe-polish">
+    /* Long term polish: menjaga UI ringan tanpa mengubah jalur utama login/chat */
+    #afterLoginLoveLayer,
+    #beforeLoginLoveLayer,
+    #chatLoveBackgroundLayer {
+      pointer-events: none !important;
+      contain: layout style paint;
+    }
+
+    .login-love-particle,
+    .prelogin-love-particle,
+    .chat-love-bg-particle {
+      pointer-events: none !important;
+      user-select: none !important;
+      contain: layout style paint;
+    }
+
+    #dashboardPage,
+    .chat-main-window,
+    .message-area,
+    #messageFlowBox {
+      min-width: 0 !important;
+      min-height: 0 !important;
+    }
+
+    #messageFlowBox {
+      overscroll-behavior-y: contain;
+    }
+
+    #themeModal .modal-box,
+    #adminModal .modal-box,
+    #profileModal .modal-box,
+    #startChatModal .modal-box {
+      max-height: calc(100vh - 34px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    @media (max-width: 680px) {
+      #dashboardPage.mobile-sidebar-open .sidebar,
+      #dashboardPage.mobile-sidebar-open .chat-item-card,
+      #dashboardPage.mobile-sidebar-open #activeChatRoomsBox {
+        pointer-events: auto !important;
+      }
+
+      #dashboardPage .chat-footer-panel input[type="text"] {
+        font-size: 16px !important; /* cegah zoom otomatis Safari/iOS */
+      }
+    }
+  </style>
+
+
+  <script id="final-longterm-safe-guard">
+    (function() {
+      if (window.__finalLongTermSafeGuardReady) return;
+      window.__finalLongTermSafeGuardReady = true;
+
+      const MAX_LOGIN_LOVES = 72;
+      const MAX_PRELOGIN_LOVES = 42;
+      const MAX_CHAT_LOVES = 56;
+
+      function prune(selector, max) {
+        const nodes = Array.from(document.querySelectorAll(selector));
+        if (nodes.length <= max) return;
+        nodes.slice(0, nodes.length - max).forEach((node) => node.remove());
+      }
+
+      function cleanupParticles() {
+        prune('.login-love-particle', MAX_LOGIN_LOVES);
+        prune('.prelogin-love-particle', MAX_PRELOGIN_LOVES);
+        prune('.chat-love-bg-particle', MAX_CHAT_LOVES);
+      }
+
+      function syncLightweightState() {
+        cleanupParticles();
+
+        const dash = document.getElementById('dashboardPage');
+        const bottomNav = document.getElementById('mobileBottomNav');
+        if (dash && bottomNav) {
+          const visible = window.getComputedStyle(dash).display !== 'none';
+          const mobile = window.matchMedia && window.matchMedia('(max-width: 680px)').matches;
+          document.body.classList.toggle('mobile-bottom-nav-active', !!visible && !!mobile);
+        }
+
+        try {
+          if (typeof window.applyDashboardUiSettings === 'function') {
+            window.applyDashboardUiSettings();
+          }
+        } catch (error) {}
+      }
+
+      function bindSafeDelegation() {
+        if (document.body.dataset.longTermDelegationReady === '1') return;
+        document.body.dataset.longTermDelegationReady = '1';
+
+        document.addEventListener('click', function(event) {
+          const card = event.target.closest('.chat-item-card');
+          if (!card) return;
+          if (event.target.closest('button, input, select, a, [data-profile-open="1"], [data-delete-chat="1"]')) return;
+
+          if (window.matchMedia && !window.matchMedia('(max-width: 680px)').matches) return;
+
+          const partner = card.dataset.chatPartner;
+          if (!partner || typeof window.selectActiveChatRoom !== 'function') return;
+
+          event.preventDefault();
+          event.stopPropagation();
+          window.selectActiveChatRoom(partner);
+        }, true);
+      }
+
+      function ensureProfilePickerFallback() {
+        if (typeof window.openMobileProfilePhotoPicker === 'function' && window.openMobileProfilePhotoPicker.__longTermFallback) return;
+
+        const existing = window.openMobileProfilePhotoPicker;
+        window.openMobileProfilePhotoPicker = function() {
+          if (typeof existing === 'function') {
+            try { return existing.apply(this, arguments); } catch (error) {}
+          }
+
+          const input = document.getElementById('profileMobileAvatarInput') || document.getElementById('uploadAvatarInput');
+          if (!input) {
+            alert('Input foto profil tidak ditemukan.');
+            return;
+          }
+          input.click();
+        };
+        window.openMobileProfilePhotoPicker.__longTermFallback = true;
+      }
+
+      function boot() {
+        bindSafeDelegation();
+        ensureProfilePickerFallback();
+        syncLightweightState();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot, { once: true });
+      } else {
+        boot();
+      }
+
+      document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') syncLightweightState();
+      });
+
+      window.addEventListener('resize', syncLightweightState, { passive: true });
+      window.addEventListener('orientationchange', function() {
+        setTimeout(syncLightweightState, 260);
+      }, { passive: true });
+
+      setInterval(syncLightweightState, 60000);
+    })();
   </script>
 
 </body>
