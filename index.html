@@ -6912,9 +6912,9 @@
     let activeAttachmentKind = "image";
     let activeAttachmentBytes = 0;
     let isSendingMessageNow = false;
-    const CHAT_IMAGE_MAX_BYTES = 480 * 1024; // lebih ringan untuk Firestore, terutama mobile.
+    const CHAT_IMAGE_MAX_BYTES = 320 * 1024; // lebih ringan untuk Firestore, terutama mobile.
     const AVATAR_IMAGE_MAX_BYTES = 160 * 1024;
-    const IMAGE_PREVIEW_MAX_EDGE = 1024;
+    const IMAGE_PREVIEW_MAX_EDGE = 860;
     const AVATAR_PREVIEW_MAX_EDGE = 360;
     let typingTimeout = null;
     let initialLoadComplete = false;
@@ -6939,11 +6939,11 @@
 
     // Optimasi ringan khusus penyimpanan/query data. Tidak mengubah tema, warna, font, atau layout.
     const ROOM_LOCAL_MAX_ITEMS = 50;
-    const CHAT_QUERY_LIMIT_DESKTOP = 260;
-    const CHAT_QUERY_LIMIT_MOBILE = 140;
-    const GLOBAL_ROOM_QUERY_LIMIT_DESKTOP = 520;
-    const GLOBAL_ROOM_QUERY_LIMIT_MOBILE = 260;
-    const READ_MARK_QUERY_LIMIT = 180;
+    const CHAT_QUERY_LIMIT_DESKTOP = 160;
+    const CHAT_QUERY_LIMIT_MOBILE = 80;
+    const GLOBAL_ROOM_QUERY_LIMIT_DESKTOP = 260;
+    const GLOBAL_ROOM_QUERY_LIMIT_MOBILE = 120;
+    const READ_MARK_QUERY_LIMIT = 80;
 
     function isDashboardMobileLite() {
       try { return window.matchMedia('(max-width: 680px)').matches; } catch (error) { return false; }
@@ -9146,7 +9146,8 @@
     }
 
     window.commitMessageToFirebase = async function() {
-      if (isSendingMessageNow) return;
+      // Fast-send mode: jangan block kirim pesan beruntun/spam.
+      // Tombol tidak dibuat busy agar Enter berkali-kali tetap responsif.
 
       const field = document.getElementById('typedMessageInput');
       const text = String(field?.value || '').trim();
@@ -9217,22 +9218,20 @@
       };
 
       try {
-        isSendingMessageNow = true;
-        setSendButtonBusy(true, 'KIRIM');
-        const newMessageRef = await addDoc(collection(db, "obrolan_utama"), messagePackage);
-
+        // UI langsung dikosongkan sebelum request Firebase selesai, supaya terasa instan saat kirim cepat/spam.
         if (field) field.value = "";
         discardImageAttachment();
         cancelReplyMode();
 
-        await syncOwnPresence({ status: "online" });
-        await tryMarkJustSentMessageAsRead(newMessageRef);
+        const newMessageRef = await addDoc(collection(db, "obrolan_utama"), messagePackage);
+
+        // Presence/read receipt dijalankan background agar tidak menahan kirim berikutnya.
+        Promise.resolve(syncOwnPresence({ status: "online" })).catch(() => {});
+        Promise.resolve(tryMarkJustSentMessageAsRead(newMessageRef)).catch(() => {});
       } catch (err) {
         console.error("Gagal mengirim pesan:", err, messagePackage);
         alert(`Gagal mengirim pesan. ${getFirebaseErrorHint(err)}`);
-      } finally {
-        isSendingMessageNow = false;
-        setSendButtonBusy(false);
+        if (field && !field.value && text) field.value = text;
       }
     };
 
@@ -14749,6 +14748,797 @@
       }
     }
   </style>
+
+
+  <!-- =========================================================
+       FINAL PATCH: LIGHTWEIGHT MOBILE/WEB + OWNER MAINTENANCE
+       ========================================================= -->
+  <style id="final-lightweight-maintenance-owner-patch-style">
+    :root {
+      --theme-accent-2: #8B5CFF;
+      --theme-accent-3: #FFE39A;
+      --theme-good: #74FFB2;
+      --theme-warn: #FFB86B;
+      --theme-danger: #FF5D82;
+    }
+
+    /* Warna tema dibuat lebih hidup namun tetap premium, tidak terlalu ramai. */
+    html[data-dashboard-theme] #dashboardPage,
+    #dashboardPage {
+      background:
+        radial-gradient(820px 440px at 8% 4%, color-mix(in srgb, var(--theme-accent, #28DFFF) 10%, transparent), transparent 62%),
+        radial-gradient(780px 420px at 100% 0%, color-mix(in srgb, var(--theme-accent-2, #8B5CFF) 9%, transparent), transparent 60%),
+        radial-gradient(560px 320px at 58% 105%, color-mix(in srgb, var(--theme-accent-3, #FFE39A) 5%, transparent), transparent 65%),
+        var(--dash-bg, #020611) !important;
+    }
+
+    .sidebar,
+    .chat-main-header,
+    .chat-footer-panel,
+    .modal-box,
+    .admin-section-card,
+    .chat-item-card {
+      border-color: color-mix(in srgb, var(--theme-accent, #28DFFF) 18%, rgba(255,255,255,.08)) !important;
+    }
+
+    .role-pill.admin,
+    .user-role-badge.admin-badge {
+      background: linear-gradient(135deg, var(--theme-accent-3, #FFE39A), var(--theme-accent, #28DFFF)) !important;
+      color: #061221 !important;
+    }
+
+    .role-pill.user,
+    .user-role-badge.user-badge {
+      color: color-mix(in srgb, var(--theme-accent, #28DFFF) 72%, #FFFFFF) !important;
+      background: color-mix(in srgb, var(--theme-accent, #28DFFF) 10%, transparent) !important;
+    }
+
+    /* Optimasi performa web dan mobile: kurangi repaint berat dari blur, shadow, animasi, grid, dan hover. */
+    .message-area,
+    .chat-list-container,
+    .user-list-admin,
+    .role-list-admin,
+    .user-list-startchat {
+      content-visibility: auto;
+      contain-intrinsic-size: 720px;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
+
+    .bubble,
+    .chat-item-card,
+    .desktop-notification-card,
+    .modal-box,
+    .admin-section-card {
+      backface-visibility: hidden;
+      transform: translateZ(0);
+    }
+
+    @media (hover: none), (pointer: coarse), (max-width: 920px) {
+      html, body { overscroll-behavior: none; }
+      .fx, .grid, .noise,
+      #dashboardPage::after,
+      .chat-main-window::after,
+      .sidebar::before,
+      .chat-item-card::before,
+      #dashboardPage::before,
+      .chat-main-window::before {
+        opacity: .08 !important;
+        filter: none !important;
+        transform: none !important;
+      }
+
+      .card,
+      .sidebar,
+      .chat-main-header,
+      .chat-footer-panel,
+      .modal-overlay,
+      .modal-box,
+      .bubble,
+      .desktop-notification-card,
+      #imagePreviewBar,
+      .image-lightbox-overlay {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      .bubble:hover,
+      .chat-item-card:hover,
+      .action-link-btn:hover,
+      .tiny-profile-btn:hover,
+      .send-action-btn:hover {
+        transform: none !important;
+      }
+
+      .message-area { scroll-behavior: auto !important; padding: 14px 12px !important; gap: 10px !important; }
+      .bubble { max-width: 86% !important; padding: 10px 13px !important; box-shadow: 0 6px 16px rgba(0,0,0,.18) !important; }
+      .bubble img { max-height: 180px !important; }
+      .chat-main-header { min-height: 58px !important; padding: 10px 12px !important; }
+      .chat-footer-panel { padding: 10px 12px calc(10px + env(safe-area-inset-bottom)) !important; gap: 8px !important; }
+      .chat-footer-panel input[type="text"] { height: 40px !important; font-size: 13px !important; }
+      .clip-btn, .send-action-btn { width: 38px !important; height: 38px !important; }
+      .msg-avatar { width: 28px !important; height: 28px !important; }
+      .msg-controls { display: none !important; }
+      .login-love-particle,
+      .prelogin-love-particle,
+      .chat-love-bg-particle,
+      #loginPage .gold-love-points .love-point {
+        animation-duration: 9s !important;
+        text-shadow: none !important;
+        filter: none !important;
+      }
+    }
+
+    @media (max-width: 680px) {
+      #dashboardPage { grid-template-columns: 1fr !important; }
+      .sidebar { box-shadow: 10px 0 28px rgba(0,0,0,.30) !important; }
+      .sh-actions { gap: 6px !important; }
+      .action-link-btn { height: 56px !important; border-radius: 14px !important; }
+      .action-ico { font-size: 15px !important; }
+      .chat-item-card { box-shadow: 0 8px 18px rgba(0,0,0,.18) !important; }
+      #desktopNotificationStack { right: 10px !important; bottom: 10px !important; width: calc(100vw - 20px) !important; }
+    }
+
+    @media (prefers-reduced-motion: reduce), (max-width: 480px) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    .maintenance-owner-card {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+      padding: 15px;
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--theme-danger, #FF5D82) 10%, transparent), color-mix(in srgb, var(--theme-accent, #28DFFF) 8%, transparent)),
+        rgba(255,255,255,.025);
+      border: 1px solid color-mix(in srgb, var(--theme-warn, #FFB86B) 24%, rgba(255,255,255,.08));
+    }
+    .maintenance-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      color: #061221;
+      background: linear-gradient(135deg, var(--theme-good, #74FFB2), var(--theme-accent, #28DFFF));
+    }
+    .maintenance-status-pill.is-active {
+      background: linear-gradient(135deg, var(--theme-danger, #FF5D82), var(--theme-warn, #FFB86B));
+      color: #fff;
+    }
+    .maintenance-owner-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .maintenance-toggle-btn {
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 28%, rgba(255,255,255,.08));
+      border-radius: 12px;
+      padding: 10px 13px;
+      color: #fff;
+      font-weight: 850;
+      cursor: pointer;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-accent, #28DFFF) 20%, #071122), color-mix(in srgb, var(--theme-accent-2, #8B5CFF) 18%, #071122));
+    }
+    .maintenance-toggle-btn.danger {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-danger, #FF5D82) 32%, #160814), color-mix(in srgb, var(--theme-warn, #FFB86B) 22%, #160814));
+    }
+
+    .maintenance-popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: none;
+      place-items: center;
+      padding: 22px;
+      background:
+        radial-gradient(760px 360px at 50% 8%, color-mix(in srgb, var(--theme-danger, #FF5D82) 18%, transparent), transparent 64%),
+        radial-gradient(620px 340px at 100% 0%, color-mix(in srgb, var(--theme-accent, #28DFFF) 14%, transparent), transparent 62%),
+        rgba(1,4,12,.86);
+    }
+    .maintenance-popup-overlay.is-visible { display: grid; }
+    .maintenance-popup-box {
+      width: min(460px, 94vw);
+      border-radius: 28px;
+      padding: 28px;
+      color: var(--theme-text, #F7FBFF);
+      background:
+        linear-gradient(135deg, rgba(13,24,44,.96), rgba(8,8,20,.98)),
+        radial-gradient(260px 140px at 50% 0%, color-mix(in srgb, var(--theme-warn, #FFB86B) 12%, transparent), transparent 72%);
+      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 24%, rgba(255,255,255,.10));
+      box-shadow: 0 28px 90px rgba(0,0,0,.58), 0 0 38px color-mix(in srgb, var(--theme-accent, #28DFFF) 10%, transparent);
+      text-align: center;
+    }
+    .maintenance-popup-icon {
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 14px;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--theme-danger, #FF5D82), var(--theme-warn, #FFB86B), var(--theme-accent, #28DFFF));
+      color: #061221;
+      font-size: 28px;
+      font-weight: 900;
+      box-shadow: 0 0 24px color-mix(in srgb, var(--theme-warn, #FFB86B) 22%, transparent);
+    }
+    .maintenance-popup-title { font-size: 20px; font-weight: 950; letter-spacing: -.02em; margin-bottom: 9px; }
+    .maintenance-popup-text { font-size: 13.5px; line-height: 1.6; color: color-mix(in srgb, var(--theme-text, #F7FBFF) 72%, transparent); }
+  </style>
+
+  <script type="module" id="final-lightweight-maintenance-owner-patch-script">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfigMaintenance = {
+      apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
+      authDomain: "fandah-c08fc.firebaseapp.com",
+      projectId: "fandah-c08fc",
+      storageBucket: "fandah-c08fc.firebasestorage.app",
+      messagingSenderId: "624734789171",
+      appId: "1:624734789171:web:7ba9ab16730acb5cfc8d46",
+      measurementId: "G-DN9Y49Q8QQ"
+    };
+
+    const maintenanceApp = getApps().length ? getApp() : initializeApp(firebaseConfigMaintenance);
+    const maintenanceDb = getFirestore(maintenanceApp);
+    const MAINTENANCE_DOC_REF = doc(maintenanceDb, "app_settings", "maintenance_dashboard");
+    const OWNER_NAME = "OWNER";
+    const LEGACY_OWNER_NAME = "Fadly";
+    let maintenanceState = { active: false, message: "Dashboard sedang maintenance. Silakan coba lagi nanti." };
+
+    function readCurrentSessionUser() {
+      try {
+        const raw = localStorage.getItem("fandah_dashboard_login_session_v1");
+        if (!raw) return "";
+        const data = JSON.parse(raw);
+        return String(data && data.username || "").trim();
+      } catch (error) { return ""; }
+    }
+
+    function normalizeLoginName(name) {
+      const raw = String(name || "").trim();
+      if (raw.toLowerCase() === LEGACY_OWNER_NAME.toLowerCase()) return OWNER_NAME;
+      if (raw.toLowerCase() === OWNER_NAME.toLowerCase()) return OWNER_NAME;
+      return raw;
+    }
+
+    function isOwnerName(name) {
+      return normalizeLoginName(name) === OWNER_NAME;
+    }
+
+    function ensureMaintenancePopup() {
+      let overlay = document.getElementById("maintenanceDashboardPopup");
+      if (overlay) return overlay;
+      overlay = document.createElement("div");
+      overlay.id = "maintenanceDashboardPopup";
+      overlay.className = "maintenance-popup-overlay";
+      overlay.innerHTML = `
+        <div class="maintenance-popup-box" role="alert" aria-live="assertive">
+          <div class="maintenance-popup-icon">⚙</div>
+          <div class="maintenance-popup-title">MAINTENANCE DASHBOARD</div>
+          <div class="maintenance-popup-text" id="maintenanceDashboardPopupText">Dashboard sedang maintenance. Silakan coba lagi nanti.</div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      return overlay;
+    }
+
+    function showMaintenancePopup(message) {
+      const overlay = ensureMaintenancePopup();
+      const text = document.getElementById("maintenanceDashboardPopupText");
+      if (text) text.textContent = message || "Dashboard sedang maintenance. Silakan coba lagi nanti.";
+      overlay.classList.add("is-visible");
+    }
+
+    function hideMaintenancePopup() {
+      document.getElementById("maintenanceDashboardPopup")?.classList.remove("is-visible");
+    }
+
+    function updateMaintenanceOwnerPanel() {
+      const status = document.getElementById("maintenanceOwnerStatus");
+      const activateBtn = document.getElementById("maintenanceActivateBtn");
+      const deactivateBtn = document.getElementById("maintenanceDeactivateBtn");
+      if (status) {
+        status.textContent = maintenanceState.active ? "MAINTENANCE AKTIF" : "NORMAL AKTIF";
+        status.classList.toggle("is-active", !!maintenanceState.active);
+      }
+      if (activateBtn) activateBtn.style.display = maintenanceState.active ? "none" : "inline-flex";
+      if (deactivateBtn) deactivateBtn.style.display = maintenanceState.active ? "inline-flex" : "none";
+    }
+
+    function ensureMaintenanceOwnerPanel() {
+      const ownerCard = document.getElementById("ownerToolsCard");
+      if (!ownerCard || document.getElementById("maintenanceOwnerCard")) return;
+      const card = document.createElement("div");
+      card.className = "maintenance-owner-card";
+      card.id = "maintenanceOwnerCard";
+      card.innerHTML = `
+        <div class="admin-section-title">Owner Tools — Maintenance Dashboard</div>
+        <div class="owner-tools-desc">
+          Jika diaktifkan, semua user selain OWNER akan otomatis logout dan melihat pop up MAINTENANCE DASHBOARD. OWNER tetap bisa masuk untuk mengaktifkan/nonaktifkan kembali.
+        </div>
+        <span class="maintenance-status-pill" id="maintenanceOwnerStatus">NORMAL AKTIF</span>
+        <div class="maintenance-owner-actions">
+          <button type="button" class="maintenance-toggle-btn danger" id="maintenanceActivateBtn" onclick="activateMaintenanceDashboardOwnerOnly()">Aktifkan Maintenance</button>
+          <button type="button" class="maintenance-toggle-btn" id="maintenanceDeactivateBtn" onclick="deactivateMaintenanceDashboardOwnerOnly()">Nonaktifkan Maintenance</button>
+        </div>
+      `;
+      ownerCard.appendChild(card);
+      updateMaintenanceOwnerPanel();
+    }
+
+    async function enforceMaintenanceState() {
+      updateMaintenanceOwnerPanel();
+      const currentUser = readCurrentSessionUser();
+      if (maintenanceState.active) {
+        if (currentUser && !isOwnerName(currentUser) && typeof window.triggerSignOut === "function") {
+          await window.triggerSignOut({ reason: "maintenance", skipSessionBroadcast: true });
+        }
+        if (!currentUser || !isOwnerName(currentUser)) showMaintenancePopup(maintenanceState.message);
+      } else {
+        hideMaintenancePopup();
+      }
+    }
+
+    window.activateMaintenanceDashboardOwnerOnly = async function() {
+      const currentUser = readCurrentSessionUser();
+      if (!isOwnerName(currentUser)) return alert("Fitur maintenance hanya untuk OWNER.");
+      if (!confirm("Aktifkan MAINTENANCE DASHBOARD dan logout semua user?")) return;
+      await setDoc(MAINTENANCE_DOC_REF, {
+        active: true,
+        message: "Dashboard sedang maintenance. Silakan coba lagi nanti.",
+        updatedBy: OWNER_NAME,
+        updatedAtMs: Date.now(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    };
+
+    window.deactivateMaintenanceDashboardOwnerOnly = async function() {
+      const currentUser = readCurrentSessionUser();
+      if (!isOwnerName(currentUser)) return alert("Fitur maintenance hanya untuk OWNER.");
+      await setDoc(MAINTENANCE_DOC_REF, {
+        active: false,
+        updatedBy: OWNER_NAME,
+        updatedAtMs: Date.now(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    };
+
+    function patchLoginValidationForMaintenance() {
+      if (typeof window.executeLoginValidation !== "function" || window.executeLoginValidation.__maintenancePatched) return false;
+      const originalLogin = window.executeLoginValidation;
+      window.executeLoginValidation = async function(event) {
+        const typedUser = document.getElementById("inputUser")?.value || "";
+        try {
+          const snap = await getDoc(MAINTENANCE_DOC_REF);
+          const data = snap.exists() ? (snap.data() || {}) : {};
+          const active = data.active === true;
+          const message = data.message || "Dashboard sedang maintenance. Silakan coba lagi nanti.";
+          if (active && !isOwnerName(typedUser)) {
+            event?.preventDefault?.();
+            showMaintenancePopup(message);
+            const errorBox = document.getElementById("authErrorNotification");
+            if (errorBox) {
+              errorBox.textContent = "MAINTENANCE DASHBOARD aktif. Login user sementara ditutup.";
+              errorBox.style.display = "block";
+            }
+            return;
+          }
+        } catch (error) {}
+        return originalLogin.call(this, event);
+      };
+      window.executeLoginValidation.__maintenancePatched = true;
+      return true;
+    }
+
+    function patchAdminOpenForMaintenancePanel() {
+      if (typeof window.openAdminManagementModal !== "function" || window.openAdminManagementModal.__maintenancePatched) return false;
+      const originalOpenAdmin = window.openAdminManagementModal;
+      window.openAdminManagementModal = function(...args) {
+        const result = originalOpenAdmin.apply(this, args);
+        setTimeout(() => {
+          if (isOwnerName(readCurrentSessionUser())) ensureMaintenanceOwnerPanel();
+          updateMaintenanceOwnerPanel();
+        }, 60);
+        return result;
+      };
+      window.openAdminManagementModal.__maintenancePatched = true;
+      return true;
+    }
+
+    function bootMaintenancePatch() {
+      ensureMaintenancePopup();
+      patchLoginValidationForMaintenance();
+      patchAdminOpenForMaintenancePanel();
+      let tries = 0;
+      const timer = setInterval(() => {
+        tries += 1;
+        const okLogin = patchLoginValidationForMaintenance();
+        const okAdmin = patchAdminOpenForMaintenancePanel();
+        if ((okLogin && okAdmin) || tries > 60) clearInterval(timer);
+      }, 250);
+
+      onSnapshot(MAINTENANCE_DOC_REF, async (snap) => {
+        const data = snap.exists() ? (snap.data() || {}) : {};
+        maintenanceState = {
+          active: data.active === true,
+          message: data.message || "Dashboard sedang maintenance. Silakan coba lagi nanti."
+        };
+        if (isOwnerName(readCurrentSessionUser())) ensureMaintenanceOwnerPanel();
+        await enforceMaintenanceState();
+      }, () => {});
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootMaintenancePatch, { once: true });
+    } else {
+      bootMaintenancePatch();
+    }
+  </script>
+
+
+
+  <!-- =========================================================
+       EXTRA PATCH: FAST SEND + ULTRA LIGHT DASHBOARD MOBILE/WEB
+       ========================================================= -->
+  <style id="extra-fast-send-ultra-light-patch">
+    /* Mode ultra-ringan untuk web dan mobile: tampilan tetap premium, tapi repaint lebih rendah. */
+    #dashboardPage, .chat-main-window, .sidebar, .chat-main-header, .chat-footer-panel {
+      will-change: auto !important;
+    }
+
+    .fx, .grid, .noise,
+    #dashboardPage::after,
+    .chat-main-window::after,
+    .sidebar::before {
+      animation: none !important;
+    }
+
+    .bubble, .chat-item-card, .action-link-btn, .modal-box, .desktop-notification-card {
+      transition: opacity .12s ease, background-color .12s ease, border-color .12s ease !important;
+    }
+
+    .message-area {
+      contain: layout paint style;
+      content-visibility: auto;
+      scroll-behavior: auto !important;
+    }
+
+    .msg-row {
+      contain: layout paint;
+    }
+
+    .bubble:hover, .chat-item-card:hover, .action-link-btn:hover {
+      transform: none !important;
+      filter: none !important;
+    }
+
+    @media (max-width: 920px), (hover: none), (pointer: coarse) {
+      .login-love-particle, .prelogin-love-particle, .chat-love-bg-particle,
+      .gold-love-points, .fx, .grid, .noise {
+        display: none !important;
+      }
+
+      #dashboardPage::before, .chat-main-window::before {
+        opacity: .38 !important;
+      }
+
+      .sidebar, .chat-main-header, .chat-footer-panel, .bubble, .modal-box, .card {
+        box-shadow: 0 6px 18px rgba(0,0,0,.22) !important;
+      }
+
+      .message-area {
+        padding: 10px !important;
+        gap: 8px !important;
+      }
+
+      .bubble {
+        font-size: 13px !important;
+        line-height: 1.42 !important;
+        max-width: 88% !important;
+      }
+
+      .desktop-notification-card {
+        box-shadow: 0 8px 22px rgba(0,0,0,.28) !important;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .msg-avatar { display: none !important; }
+      .bubble { max-width: 92% !important; }
+      .chat-main-header .partner-avatar-img { width: 36px !important; height: 36px !important; }
+      #topHeaderTitle { font-size: 14px !important; }
+      #topHeaderStatus { font-size: 11px !important; }
+    }
+  </style>
+
+
+  <!-- =========================================================
+       FINAL STABILITY PATCH: FAST SPAM SEND + LIGHT WEB/MOBILE
+       ========================================================= -->
+  <style id="final-stable-ultralight-web-mobile-css">
+    :root {
+      --stable-shadow-soft: 0 6px 18px rgba(0,0,0,.24);
+      --stable-border-cyan: rgba(40,223,255,.18);
+      --stable-border-purple: rgba(139,92,255,.16);
+    }
+
+    html.is-ultralight-dashboard *,
+    html.is-ultralight-dashboard *::before,
+    html.is-ultralight-dashboard *::after {
+      text-rendering: optimizeSpeed !important;
+    }
+
+    html.is-ultralight-dashboard .fx,
+    html.is-ultralight-dashboard .grid,
+    html.is-ultralight-dashboard .noise,
+    html.is-ultralight-dashboard .login-love-particle,
+    html.is-ultralight-dashboard .prelogin-love-particle,
+    html.is-ultralight-dashboard .chat-love-bg-particle,
+    html.is-ultralight-dashboard .gold-love-points {
+      display: none !important;
+    }
+
+    html.is-ultralight-dashboard .sidebar,
+    html.is-ultralight-dashboard .chat-main-header,
+    html.is-ultralight-dashboard .chat-footer-panel,
+    html.is-ultralight-dashboard .modal-box,
+    html.is-ultralight-dashboard .bubble,
+    html.is-ultralight-dashboard .chat-item-card,
+    html.is-ultralight-dashboard .card {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: var(--stable-shadow-soft) !important;
+    }
+
+    html.is-ultralight-dashboard #dashboardPage::after,
+    html.is-ultralight-dashboard .chat-main-window::after,
+    html.is-ultralight-dashboard .sidebar::before,
+    html.is-ultralight-dashboard .card::before {
+      opacity: .08 !important;
+      animation: none !important;
+    }
+
+    html.is-ultralight-dashboard .chat-item-card,
+    html.is-ultralight-dashboard .bubble,
+    html.is-ultralight-dashboard .action-link-btn,
+    html.is-ultralight-dashboard .send-action-btn,
+    html.is-ultralight-dashboard .clip-btn,
+    html.is-ultralight-dashboard .tiny-profile-btn,
+    html.is-ultralight-dashboard .desktop-notification-card {
+      transform: none !important;
+      filter: none !important;
+      transition: background-color .10s linear, border-color .10s linear, opacity .10s linear !important;
+    }
+
+    html.is-ultralight-dashboard .message-area {
+      contain: layout paint style !important;
+      content-visibility: auto !important;
+      scroll-behavior: auto !important;
+      overscroll-behavior: contain !important;
+      will-change: scroll-position !important;
+    }
+
+    html.is-ultralight-dashboard .msg-row {
+      contain: layout paint !important;
+    }
+
+    html.is-ultralight-dashboard .bubble img,
+    html.is-ultralight-dashboard .image-lightbox-overlay img,
+    html.is-ultralight-dashboard #imagePreviewBar img {
+      image-rendering: auto !important;
+      object-fit: cover !important;
+    }
+
+    .send-action-btn.is-fast-sending {
+      opacity: .88 !important;
+      pointer-events: auto !important;
+    }
+
+    @media (max-width: 920px), (hover: none), (pointer: coarse) {
+      :root { --radius: 20px; }
+
+      #dashboardPage::before,
+      .chat-main-window::before,
+      #dashboardBgImage,
+      #chatBgImage {
+        opacity: .26 !important;
+        filter: none !important;
+      }
+
+      .sidebar,
+      .chat-main-header,
+      .chat-footer-panel,
+      .modal-box,
+      .bubble,
+      .chat-item-card,
+      .card {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,.22) !important;
+      }
+
+      .message-area {
+        padding: 9px !important;
+        gap: 7px !important;
+      }
+
+      .bubble {
+        padding: 9px 12px !important;
+        border-radius: 15px !important;
+        font-size: 12.8px !important;
+        line-height: 1.38 !important;
+        max-width: 91% !important;
+      }
+
+      .chat-main-header {
+        min-height: 58px !important;
+        padding: 9px 12px !important;
+      }
+
+      .chat-footer-panel {
+        padding: 9px 10px calc(9px + env(safe-area-inset-bottom)) !important;
+        gap: 8px !important;
+      }
+
+      .chat-footer-panel input[type="text"] {
+        height: 40px !important;
+        font-size: 13px !important;
+      }
+
+      .send-action-btn,
+      .clip-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+      }
+
+      .msg-avatar { display: none !important; }
+    }
+
+    @media (max-width: 520px) {
+      .bubble { max-width: 94% !important; }
+      .chat-main-header .partner-avatar-img { width: 34px !important; height: 34px !important; }
+      #topHeaderTitle { font-size: 13.5px !important; }
+      #topHeaderStatus { font-size: 10.8px !important; }
+      .desktop-notification-card { display: none !important; }
+    }
+  </style>
+
+  <script id="final-stable-fast-send-and-performance-script">
+    (function(){
+      "use strict";
+
+      const root = document.documentElement;
+      const lowCpu = !!(navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 6);
+      const lowMemory = !!(navigator.deviceMemory && navigator.deviceMemory <= 4);
+      const mobileLike = window.matchMedia && window.matchMedia("(max-width: 920px), (hover: none), (pointer: coarse)").matches;
+      if (lowCpu || lowMemory || mobileLike) root.classList.add("is-ultralight-dashboard");
+
+      function raf(fn) {
+        if (typeof requestAnimationFrame === "function") requestAnimationFrame(fn);
+        else setTimeout(fn, 0);
+      }
+
+      function installFastSendGuard() {
+        const input = document.getElementById("typedMessageInput");
+        const button = document.getElementById("sendOrSaveActionButton");
+        if (!input || !button || typeof window.commitMessageToFirebase !== "function") return false;
+        if (window.commitMessageToFirebase.__stableFastPatched) return true;
+
+        const originalCommit = window.commitMessageToFirebase;
+        let runningCount = 0;
+
+        window.commitMessageToFirebase = async function stableFastCommitWrapper() {
+          const btn = document.getElementById("sendOrSaveActionButton");
+          if (btn) {
+            btn.disabled = false;
+            btn.style.pointerEvents = "auto";
+            btn.classList.add("is-fast-sending");
+          }
+
+          runningCount += 1;
+          try {
+            return await originalCommit.apply(this, arguments);
+          } finally {
+            runningCount = Math.max(0, runningCount - 1);
+            if (btn && runningCount === 0) {
+              btn.disabled = false;
+              btn.style.pointerEvents = "auto";
+              btn.classList.remove("is-fast-sending");
+            }
+          }
+        };
+        window.commitMessageToFirebase.__stableFastPatched = true;
+
+        document.addEventListener("keydown", function(event){
+          if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+          const activeInput = document.getElementById("typedMessageInput");
+          if (!activeInput || document.activeElement !== activeInput) return;
+          event.preventDefault();
+          event.stopPropagation();
+          window.commitMessageToFirebase();
+        }, true);
+
+        button.addEventListener("click", function(){
+          button.disabled = false;
+          button.style.pointerEvents = "auto";
+        }, true);
+
+        return true;
+      }
+
+      function throttleTypingPresence() {
+        if (typeof window.handleTypingState !== "function" || window.handleTypingState.__stableThrottlePatched) return false;
+        const originalTyping = window.handleTypingState;
+        let timer = null;
+        let lastRun = 0;
+        window.handleTypingState = function stableTypingThrottle() {
+          const now = Date.now();
+          const run = () => {
+            timer = null;
+            lastRun = Date.now();
+            try { originalTyping.apply(this, arguments); } catch (error) {}
+          };
+          if (now - lastRun > 650) run();
+          else {
+            clearTimeout(timer);
+            timer = setTimeout(run, 650);
+          }
+        };
+        window.handleTypingState.__stableThrottlePatched = true;
+        return true;
+      }
+
+      function keepLatestChatStable() {
+        const flowBox = document.getElementById("messageFlowBox");
+        if (!flowBox || flowBox.__stableScrollPatched) return false;
+        flowBox.__stableScrollPatched = true;
+        let userManualScroll = false;
+        let scrollTimer = null;
+
+        flowBox.addEventListener("scroll", function(){
+          const gap = flowBox.scrollHeight - flowBox.scrollTop - flowBox.clientHeight;
+          userManualScroll = gap > 120;
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(function(){
+            const latestGap = flowBox.scrollHeight - flowBox.scrollTop - flowBox.clientHeight;
+            userManualScroll = latestGap > 120;
+          }, 180);
+        }, { passive: true });
+
+        const observer = new MutationObserver(function(){
+          if (userManualScroll) return;
+          raf(function(){ flowBox.scrollTop = flowBox.scrollHeight; });
+        });
+        observer.observe(flowBox, { childList: true, subtree: false });
+        return true;
+      }
+
+      function bootStablePatch() {
+        installFastSendGuard();
+        throttleTypingPresence();
+        keepLatestChatStable();
+
+        let tries = 0;
+        const timer = setInterval(function(){
+          tries += 1;
+          const done = installFastSendGuard() && throttleTypingPresence() && keepLatestChatStable();
+          if (done || tries > 80) clearInterval(timer);
+        }, 200);
+      }
+
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootStablePatch, { once: true });
+      else bootStablePatch();
+    })();
+  </script>
 
 </body>
 </html>
