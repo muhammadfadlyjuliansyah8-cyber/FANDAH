@@ -6491,6 +6491,150 @@
     })();
   </script>
 
+
+
+  <style id="owner-maintenance-dashboard-final-style">
+    /* OWNER MAINTENANCE DASHBOARD — ringan, aman mobile, tidak mengubah tema utama */
+    .maintenance-owner-card {
+      border: 1px solid rgba(255, 214, 102, .20) !important;
+      background:
+        radial-gradient(260px 120px at 0% 0%, rgba(255, 214, 102, .10), transparent 66%),
+        linear-gradient(135deg, rgba(21, 18, 8, .72), rgba(4, 10, 22, .86)) !important;
+    }
+    .maintenance-owner-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.055);
+    }
+    .maintenance-owner-desc {
+      font-size: 12px;
+      line-height: 1.55;
+      color: rgba(240,244,248,.66);
+      margin: 10px 0 12px;
+    }
+    .maintenance-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(148,163,184,.10);
+      color: rgba(226,232,240,.82);
+      white-space: nowrap;
+    }
+    .maintenance-status-pill::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #59ff84;
+      box-shadow: 0 0 10px rgba(89,255,132,.35);
+      flex: 0 0 8px;
+    }
+    .maintenance-status-pill.is-on {
+      background: rgba(255, 78, 122, .12);
+      border-color: rgba(255, 78, 122, .28);
+      color: #ffdbe4;
+    }
+    .maintenance-status-pill.is-on::before {
+      background: #ff527a;
+      box-shadow: 0 0 12px rgba(255,82,122,.48);
+    }
+    .maintenance-toggle-btn {
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,214,102,.24);
+      background: linear-gradient(135deg, rgba(255,214,102,.10), rgba(40,223,255,.08));
+      color: #fff3bd;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .14s ease, filter .14s ease, background .14s ease;
+      white-space: nowrap;
+    }
+    .maintenance-toggle-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    .maintenance-toggle-btn.is-on {
+      border-color: rgba(89,255,132,.24);
+      background: linear-gradient(135deg, rgba(89,255,132,.12), rgba(40,223,255,.08));
+      color: #d9ffe5;
+    }
+    .maintenance-block-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: none;
+      place-items: center;
+      padding: 22px;
+      background:
+        radial-gradient(540px 260px at 50% 18%, rgba(255,214,102,.13), transparent 65%),
+        radial-gradient(420px 240px at 85% 12%, rgba(255,78,122,.11), transparent 65%),
+        rgba(2, 6, 17, .94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .maintenance-block-overlay.is-active { display: grid; }
+    .maintenance-block-card {
+      width: min(440px, 94vw);
+      border-radius: 28px;
+      padding: 28px 24px;
+      text-align: center;
+      border: 1px solid rgba(255,214,102,.22);
+      background:
+        linear-gradient(180deg, rgba(18,16,10,.92), rgba(5,8,18,.96)),
+        radial-gradient(260px 120px at 50% 0%, rgba(255,214,102,.12), transparent 70%);
+      box-shadow: 0 24px 80px rgba(0,0,0,.56), 0 0 32px rgba(255,214,102,.08);
+    }
+    .maintenance-block-logo {
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 16px;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(255,214,102,.18), rgba(40,223,255,.08));
+      border: 1px solid rgba(255,214,102,.28);
+      font-size: 30px;
+      box-shadow: 0 0 26px rgba(255,214,102,.10);
+    }
+    .maintenance-block-card h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      color: #fff7d6;
+      letter-spacing: -.02em;
+    }
+    .maintenance-block-card p {
+      margin: 0;
+      color: rgba(240,244,248,.72);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .maintenance-block-note {
+      margin-top: 15px !important;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.06);
+      font-size: 12px !important;
+      color: rgba(255,247,214,.72) !important;
+    }
+    @media(max-width: 680px) {
+      .maintenance-owner-row { align-items: stretch; flex-direction: column; }
+      .maintenance-toggle-btn { width: 100%; }
+      .maintenance-block-card { padding: 24px 18px; border-radius: 24px; }
+    }
+  </style>
+
 </head>
 
 <body>
@@ -16356,127 +16500,491 @@
   }
 </style>
 
-<script id="final-audit-stable-personal-chat-hardening-script">
+<script id="final-send-fix-no-stuck-guard-v2">
 (function(){
   'use strict';
-  const MAX_TOASTS = 4;
-  const SEND_MIN_GAP = 650;
-  let lastSendAt = 0;
+  if (window.__finalSendFixNoStuckGuardV2) return;
+  window.__finalSendFixNoStuckGuardV2 = true;
 
-  function isVisible(el){
-    if (!el) return false;
-    const st = getComputedStyle(el);
-    return st.display !== 'none' && st.visibility !== 'hidden' && st.opacity !== '0';
+  const INPUT_ID = 'typedMessageInput';
+  const BUTTON_ID = 'sendOrSaveActionButton';
+  const FLOW_IDS = ['messageFlowBox', 'liveMessageStream'];
+  const MIN_GAP_MS = 420;
+  let localSending = false;
+  let lastRealSendAt = 0;
+  let installTimer = 0;
+
+  function getInput(){ return document.getElementById(INPUT_ID); }
+  function getButton(){ return document.getElementById(BUTTON_ID); }
+  function getFlow(){
+    for (const id of FLOW_IDS) {
+      const el = document.getElementById(id);
+      if (el) return el;
+    }
+    return document.querySelector('.message-area');
+  }
+
+  function hasSendContent(){
+    const input = getInput();
+    const text = String(input && input.value || '').trim();
+    const preview = document.getElementById('imagePreviewBar');
+    const previewVisible = preview && getComputedStyle(preview).display !== 'none';
+    const previewImg = document.getElementById('targetImgSrc');
+    const hasPreviewImage = previewVisible && !!(previewImg && previewImg.getAttribute('src'));
+    return !!text || !!hasPreviewImage;
+  }
+
+  function clearStaleBusyState(){
+    const btn = getButton();
+    if (!btn) return;
+    if (!localSending) {
+      btn.setAttribute('aria-busy', 'false');
+      btn.classList.remove('is-sending-now');
+      btn.style.pointerEvents = '';
+      btn.style.opacity = '';
+      if (btn.disabled && hasSendContent()) btn.disabled = false;
+    }
+  }
+
+  function forceBottom(repeat){
+    const box = getFlow();
+    if (!box) return;
+    const run = () => {
+      try {
+        box.scrollTop = box.scrollHeight;
+        if (typeof box.scrollTo === 'function') box.scrollTo({ top: box.scrollHeight, behavior: 'auto' });
+      } catch(e) {}
+    };
+    requestAnimationFrame(run);
+    if (repeat) [50, 150, 350, 700].forEach((d) => setTimeout(run, d));
+  }
+
+  function patchCommit(){
+    const original = window.commitMessageToFirebase;
+    if (typeof original !== 'function') return false;
+    if (original.__finalSendFixNoStuckGuardV2) return true;
+
+    async function fixedCommitWrapper(){
+      clearStaleBusyState();
+      const isEditMode = !!window.isEditingModeActive;
+      const wantsToSend = hasSendContent() || isEditMode;
+      if (!wantsToSend) return;
+
+      const now = Date.now();
+      if (localSending) return;
+      if (now - lastRealSendAt < MIN_GAP_MS) return;
+
+      const btn = getButton();
+      localSending = true;
+      lastRealSendAt = now;
+      if (btn) {
+        btn.setAttribute('aria-busy', 'true');
+        btn.classList.add('is-sending-now');
+      }
+
+      try {
+        const result = await original.apply(this, arguments);
+        forceBottom(true);
+        return result;
+      } catch(error) {
+        console.error('Send wrapper error:', error);
+        throw error;
+      } finally {
+        setTimeout(() => {
+          localSending = false;
+          const button = getButton();
+          if (button) {
+            button.setAttribute('aria-busy', 'false');
+            button.classList.remove('is-sending-now');
+            button.style.pointerEvents = '';
+            button.style.opacity = '';
+          }
+          clearStaleBusyState();
+        }, 180);
+      }
+    }
+
+    fixedCommitWrapper.__finalSendFixNoStuckGuardV2 = true;
+    fixedCommitWrapper.__originalCommit = original;
+    window.commitMessageToFirebase = fixedCommitWrapper;
+    return true;
+  }
+
+  function installButtonAndEnterFallback(){
+    const btn = getButton();
+    if (btn && btn.dataset.finalSendFixClick !== '1') {
+      btn.dataset.finalSendFixClick = '1';
+      btn.addEventListener('click', function(event){
+        clearStaleBusyState();
+        if (typeof window.commitMessageToFirebase !== 'function') return;
+        if (!hasSendContent()) return;
+        // onclick inline tetap berjalan; fallback ini hanya membantu jika onclick gagal karena patch lama.
+        setTimeout(() => {
+          if (!localSending && hasSendContent()) window.commitMessageToFirebase();
+        }, 0);
+      }, { passive: true });
+    }
+
+    const input = getInput();
+    if (input && input.dataset.finalSendFixEnter !== '1') {
+      input.dataset.finalSendFixEnter = '1';
+      input.addEventListener('keydown', function(event){
+        if (event.key !== 'Enter' || event.shiftKey) return;
+        if (event.isComposing) return;
+        event.preventDefault();
+        clearStaleBusyState();
+        if (typeof window.commitMessageToFirebase === 'function') window.commitMessageToFirebase();
+      });
+      input.addEventListener('input', clearStaleBusyState, { passive: true });
+      input.addEventListener('focus', clearStaleBusyState, { passive: true });
+    }
+  }
+
+  function patchRoomOpenScroll(){
+    if (typeof window.selectActiveChatRoom !== 'function') return false;
+    if (window.selectActiveChatRoom.__finalSendFixScrollV2) return true;
+    const original = window.selectActiveChatRoom;
+    function patchedSelectActiveChatRoom(){
+      const result = original.apply(this, arguments);
+      forceBottom(true);
+      return result;
+    }
+    patchedSelectActiveChatRoom.__finalSendFixScrollV2 = true;
+    window.selectActiveChatRoom = patchedSelectActiveChatRoom;
+    return true;
   }
 
   function keepToastStackLight(){
     const stack = document.getElementById('desktopNotificationStack');
     if (!stack) return;
     const cards = Array.from(stack.querySelectorAll('.desktop-notification-card'));
-    while (cards.length > MAX_TOASTS) {
+    while (cards.length > 4) {
       const old = cards.shift();
       try { old.remove(); } catch(e) {}
     }
   }
 
-  function forceBottomSafe(repeat){
-    const box = document.getElementById('messageFlowBox') || document.getElementById('liveMessageStream');
-    if (!box) return;
-    const run = () => {
-      try { box.scrollTop = box.scrollHeight; } catch(e) {}
-    };
-    requestAnimationFrame(run);
-    if (repeat) [60,160,360].forEach((d)=>setTimeout(run,d));
-  }
-
-  function patchSendGuard(){
-    if (typeof window.commitMessageToFirebase !== 'function' || window.commitMessageToFirebase.__auditStableGuard) return false;
-    const original = window.commitMessageToFirebase;
-    async function guardedCommit(){
-      const now = Date.now();
-      if (now - lastSendAt < SEND_MIN_GAP) return;
-      lastSendAt = now;
-      const btn = document.getElementById('sendOrSaveActionButton');
-      if (btn && btn.getAttribute('aria-busy') === 'true') return;
-      try {
-        if (btn) {
-          btn.setAttribute('aria-busy','true');
-          btn.classList.add('is-sending-now');
-        }
-        await original.apply(this, arguments);
-        forceBottomSafe(true);
-      } finally {
-        setTimeout(()=>{
-          if (btn) {
-            btn.setAttribute('aria-busy','false');
-            btn.classList.remove('is-sending-now');
-          }
-        }, 220);
-      }
-    }
-    guardedCommit.__auditStableGuard = true;
-    window.commitMessageToFirebase = guardedCommit;
-    return true;
-  }
-
-  function patchRoomOpenScroll(){
-    if (typeof window.selectActiveChatRoom !== 'function' || window.selectActiveChatRoom.__auditStableScroll) return false;
-    const original = window.selectActiveChatRoom;
-    function patchedSelectActiveChatRoom(){
-      const result = original.apply(this, arguments);
-      forceBottomSafe(true);
-      return result;
-    }
-    patchedSelectActiveChatRoom.__auditStableScroll = true;
-    window.selectActiveChatRoom = patchedSelectActiveChatRoom;
-    return true;
-  }
-
-  function patchNotificationStack(){
-    if (window.__auditStableNotifPatched) return true;
-    const observer = new MutationObserver(keepToastStackLight);
-    const start = () => {
-      const stack = document.getElementById('desktopNotificationStack');
-      if (!stack) return false;
-      observer.observe(stack, { childList: true });
-      keepToastStackLight();
-      window.__auditStableNotifPatched = true;
-      return true;
-    };
-    return start();
-  }
-
-  function mobilePerfClass(){
-    try {
-      const mobile = matchMedia('(max-width: 680px)').matches;
-      document.documentElement.classList.toggle('audit-mobile-lite', mobile);
-    } catch(e) {}
-  }
-
   function boot(){
-    mobilePerfClass();
-    patchSendGuard();
+    patchCommit();
     patchRoomOpenScroll();
-    patchNotificationStack();
+    installButtonAndEnterFallback();
+    keepToastStackLight();
+    clearStaleBusyState();
+
     let attempts = 0;
-    const t = setInterval(()=>{
+    clearInterval(installTimer);
+    installTimer = setInterval(() => {
       attempts++;
-      const okSend = patchSendGuard();
-      const okRoom = patchRoomOpenScroll();
-      const okNotif = patchNotificationStack();
-      if ((okSend && okRoom && okNotif) || attempts > 30) clearInterval(t);
-    }, 300);
-    window.addEventListener('resize', mobilePerfClass, { passive:true });
-    document.addEventListener('visibilitychange', ()=>{
-      if (!document.hidden && isVisible(document.getElementById('dashboardPage'))) {
-        keepToastStackLight();
+      patchCommit();
+      patchRoomOpenScroll();
+      installButtonAndEnterFallback();
+      clearStaleBusyState();
+      if (attempts > 40 || (typeof window.commitMessageToFirebase === 'function' && getButton() && getInput())) {
+        clearInterval(installTimer);
       }
-    }, { passive:true });
+    }, 250);
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once:true });
+  window.__resetChatSendStuckState = function(){
+    localSending = false;
+    lastRealSendAt = 0;
+    clearStaleBusyState();
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
   else boot();
+
+  window.addEventListener('pagehide', () => clearInterval(installTimer), { once: true });
 })();
+</script>
+
+
+
+<script type="module" id="owner-maintenance-dashboard-final-script">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const maintenanceFirebaseConfig = {
+    apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
+    authDomain: "fandah-c08fc.firebaseapp.com",
+    projectId: "fandah-c08fc",
+    storageBucket: "fandah-c08fc.firebasestorage.app",
+    messagingSenderId: "624734789171",
+    appId: "1:624734789171:web:7ba9ab16730acb5cfc8d46",
+    measurementId: "G-DN9Y49Q8QQ"
+  };
+
+  const maintenanceApp = getApps().length ? getApp() : initializeApp(maintenanceFirebaseConfig);
+  const maintenanceDb = getFirestore(maintenanceApp);
+  const MAINTENANCE_DOC_REF = doc(maintenanceDb, "app_settings", "maintenance_dashboard");
+  const MAINTENANCE_OWNER = "OWNER";
+  const MAINTENANCE_LEGACY_OWNER = "Fadly";
+  const MAINTENANCE_SESSION_KEY = "fandah_dashboard_login_session_v1";
+
+  let maintenanceState = { enabled: false, message: "Dashboard sedang dalam perawatan. Silakan coba lagi nanti." };
+  let maintenanceLoginWrapped = false;
+  let maintenanceApplyingBlock = false;
+
+  function normalizeMaintenanceUser(username) {
+    const raw = String(username || "").trim();
+    return raw === MAINTENANCE_LEGACY_OWNER ? MAINTENANCE_OWNER : raw;
+  }
+
+  function isMaintenanceOwner(username) {
+    return normalizeMaintenanceUser(username) === MAINTENANCE_OWNER;
+  }
+
+  function readMaintenanceSessionUser() {
+    try {
+      const raw = localStorage.getItem(MAINTENANCE_SESSION_KEY);
+      if (!raw) return "";
+      const data = JSON.parse(raw);
+      return normalizeMaintenanceUser(data && data.username);
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function getLoginInputUser() {
+    const input = document.getElementById("inputUser");
+    return normalizeMaintenanceUser(input ? input.value : "");
+  }
+
+  function showMaintenanceLoginNotice(message) {
+    const text = String(message || maintenanceState.message || "Dashboard sedang maintenance.");
+    const errorBox = document.getElementById("authErrorNotification");
+    if (errorBox) {
+      errorBox.textContent = text;
+      errorBox.style.display = "block";
+    }
+  }
+
+  function ensureMaintenanceOverlay() {
+    let overlay = document.getElementById("maintenanceBlockOverlay");
+    if (overlay) return overlay;
+
+    overlay = document.createElement("div");
+    overlay.id = "maintenanceBlockOverlay";
+    overlay.className = "maintenance-block-overlay";
+    overlay.innerHTML = `
+      <div class="maintenance-block-card" role="dialog" aria-live="polite" aria-label="Maintenance Dashboard">
+        <div class="maintenance-block-logo">👑</div>
+        <h2>Maintenance Dashboard</h2>
+        <p id="maintenanceBlockMessage">Dashboard sedang dalam MAINTENANCE! Silahkan menunggu hingga pembaruan selesai..</p>
+        <p class="maintenance-block-note">Akses anda akan kembali normal jika proses Maintenance selesai..</p>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function showMaintenanceOverlay(message) {
+    const overlay = ensureMaintenanceOverlay();
+    const messageNode = document.getElementById("maintenanceBlockMessage");
+    if (messageNode) {
+      messageNode.textContent = String(message || maintenanceState.message || "Dashboard sedang dalam perawatan. Hanya owner yang dapat mengakses sementara waktu.");
+    }
+    overlay.classList.add("is-active");
+  }
+
+  function hideMaintenanceOverlay() {
+    const overlay = document.getElementById("maintenanceBlockOverlay");
+    if (overlay) overlay.classList.remove("is-active");
+  }
+
+  function updateMaintenanceOwnerUi() {
+    const status = document.getElementById("maintenanceStatusPill");
+    const btn = document.getElementById("maintenanceToggleBtn");
+    const enabled = !!maintenanceState.enabled;
+
+    if (status) {
+      status.textContent = enabled ? "MAINTENANCE AKTIF" : "AKSES NORMAL";
+      status.classList.toggle("is-on", enabled);
+    }
+
+    if (btn) {
+      btn.textContent = enabled ? "Nonaktifkan Maintenance" : "Aktifkan Maintenance";
+      btn.classList.toggle("is-on", enabled);
+      btn.disabled = false;
+      btn.setAttribute("aria-pressed", enabled ? "true" : "false");
+    }
+  }
+
+  function injectMaintenanceOwnerPanel() {
+    const ownerToolsCard = document.getElementById("ownerToolsCard");
+    if (!ownerToolsCard || document.getElementById("maintenanceOwnerCard")) return;
+
+    const card = document.createElement("div");
+    card.className = "admin-section-card maintenance-owner-card";
+    card.id = "maintenanceOwnerCard";
+    card.innerHTML = `
+      <div class="admin-section-title">Maintenance Dashboard Khusus Owner</div>
+      <div class="maintenance-owner-desc">
+        Saat aktif, hanya OWNER yang dapat masuk dashboard. User lain akan ditahan di halaman maintenance dan tidak bisa mengakses chat sampai mode ini dimatikan.
+      </div>
+      <div class="maintenance-owner-row">
+        <span class="maintenance-status-pill" id="maintenanceStatusPill">AKSES NORMAL</span>
+        <button type="button" class="maintenance-toggle-btn" id="maintenanceToggleBtn" onclick="toggleOwnerMaintenanceDashboard()" aria-pressed="false">Aktifkan Maintenance</button>
+      </div>
+    `;
+    ownerToolsCard.insertAdjacentElement("afterend", card);
+    updateMaintenanceOwnerUi();
+  }
+
+  async function fetchMaintenanceState() {
+    try {
+      const snap = await getDoc(MAINTENANCE_DOC_REF);
+      if (!snap.exists()) return { enabled: false, message: maintenanceState.message };
+      const data = snap.data() || {};
+      return {
+        enabled: data.enabled === true,
+        message: String(data.message || maintenanceState.message || "Dashboard sedang dalam perawatan.")
+      };
+    } catch (error) {
+      console.warn("Gagal membaca Maintenance Dashboard:", error);
+      return maintenanceState;
+    }
+  }
+
+  async function blockNonOwnerIfNeeded(source = "runtime") {
+    if (maintenanceApplyingBlock) return;
+    const activeUser = readMaintenanceSessionUser();
+    if (!maintenanceState.enabled || !activeUser || isMaintenanceOwner(activeUser)) {
+      if (!maintenanceState.enabled || isMaintenanceOwner(activeUser)) hideMaintenanceOverlay();
+      return;
+    }
+
+    maintenanceApplyingBlock = true;
+    try {
+      showMaintenanceOverlay(maintenanceState.message);
+      try {
+        if (typeof window.triggerSignOut === "function") {
+          await window.triggerSignOut({ reason: "maintenance", skipSessionBroadcast: true });
+        }
+      } catch (error) {
+        console.warn("Logout maintenance dilewati:", error);
+      }
+      try { localStorage.removeItem(MAINTENANCE_SESSION_KEY); } catch (error) {}
+      const dashboard = document.getElementById("dashboardPage");
+      const login = document.getElementById("loginPage");
+      if (dashboard) dashboard.style.display = "none";
+      if (login) login.style.display = "grid";
+      showMaintenanceLoginNotice(maintenanceState.message || "Dashboard sedang maintenance. Hanya owner yang dapat masuk.");
+      showMaintenanceOverlay(maintenanceState.message);
+    } finally {
+      maintenanceApplyingBlock = false;
+    }
+  }
+
+  function wrapMaintenanceLogin() {
+    if (maintenanceLoginWrapped || typeof window.executeLoginValidation !== "function") return false;
+    const originalLogin = window.executeLoginValidation;
+
+    window.executeLoginValidation = async function maintenanceWrappedLogin(event) {
+      if (event && typeof event.preventDefault === "function") event.preventDefault();
+      const loginUser = getLoginInputUser();
+      const latestState = await fetchMaintenanceState();
+      maintenanceState = { ...maintenanceState, ...latestState };
+      updateMaintenanceOwnerUi();
+
+      if (maintenanceState.enabled && !isMaintenanceOwner(loginUser)) {
+        showMaintenanceLoginNotice(maintenanceState.message || "Dashboard sedang maintenance. Hanya owner yang dapat masuk.");
+        showMaintenanceOverlay(maintenanceState.message);
+        return false;
+      }
+
+      hideMaintenanceOverlay();
+      return originalLogin.call(this, event);
+    };
+
+    maintenanceLoginWrapped = true;
+    return true;
+  }
+
+  window.toggleOwnerMaintenanceDashboard = async function toggleOwnerMaintenanceDashboard() {
+    const activeUser = readMaintenanceSessionUser();
+    if (!isMaintenanceOwner(activeUser)) {
+      alert("Fitur Maintenance Dashboard hanya untuk OWNER.");
+      return;
+    }
+
+    const btn = document.getElementById("maintenanceToggleBtn");
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Menyimpan...";
+    }
+
+    const nextEnabled = !maintenanceState.enabled;
+    try {
+      await setDoc(MAINTENANCE_DOC_REF, {
+        enabled: nextEnabled,
+        message: "Dashboard sedang dalam maintenance. Hanya owner yang dapat mengakses sementara waktu.",
+        updatedBy: activeUser,
+        updatedAt: serverTimestamp(),
+        updatedAtMs: Date.now()
+      }, { merge: true });
+      maintenanceState.enabled = nextEnabled;
+      updateMaintenanceOwnerUi();
+      if (!nextEnabled) hideMaintenanceOverlay();
+    } catch (error) {
+      console.error("Gagal mengubah Maintenance Dashboard:", error);
+      alert("Gagal mengubah Maintenance Dashboard. Cek koneksi atau rules Firebase.");
+      updateMaintenanceOwnerUi();
+    }
+  };
+
+  function startMaintenanceListener() {
+    try {
+      onSnapshot(MAINTENANCE_DOC_REF, (snap) => {
+        const data = snap.exists() ? (snap.data() || {}) : {};
+        maintenanceState = {
+          enabled: data.enabled === true,
+          message: String(data.message || "Dashboard sedang dalam maintenance. Hanya owner yang dapat mengakses sementara waktu.")
+        };
+        injectMaintenanceOwnerPanel();
+        updateMaintenanceOwnerUi();
+        blockNonOwnerIfNeeded("snapshot");
+      }, (error) => {
+        console.warn("Listener Maintenance Dashboard gagal:", error);
+      });
+    } catch (error) {
+      console.warn("Maintenance Dashboard listener tidak aktif:", error);
+    }
+  }
+
+  function bootMaintenanceDashboardPatch() {
+    ensureMaintenanceOverlay();
+    injectMaintenanceOwnerPanel();
+    startMaintenanceListener();
+
+    const wrapTimer = setInterval(() => {
+      if (wrapMaintenanceLogin()) clearInterval(wrapTimer);
+    }, 100);
+    setTimeout(() => clearInterval(wrapTimer), 8000);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) blockNonOwnerIfNeeded("visibility");
+    }, { passive: true });
+
+    window.addEventListener("focus", () => blockNonOwnerIfNeeded("focus"), { passive: true });
+    window.addEventListener("storage", (event) => {
+      if (event.key === MAINTENANCE_SESSION_KEY) blockNonOwnerIfNeeded("storage");
+    });
+
+    const adminModal = document.getElementById("adminModal");
+    if (adminModal && "MutationObserver" in window) {
+      const observer = new MutationObserver(() => injectMaintenanceOwnerPanel());
+      observer.observe(adminModal, { attributes: true, childList: true, subtree: true });
+    }
+
+    setTimeout(() => blockNonOwnerIfNeeded("boot"), 400);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootMaintenanceDashboardPatch, { once: true });
+  } else {
+    bootMaintenanceDashboardPatch();
+  }
 </script>
 
 </body>
