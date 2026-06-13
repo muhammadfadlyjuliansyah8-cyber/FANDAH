@@ -15540,5 +15540,403 @@
     })();
   </script>
 
+
+
+  <!-- =========================================================
+       FINAL PATCH BY CHATGPT — Maintenance Login Gate + Mobile Stabilizer
+       Update: popup MAINTENANCE hanya tampil setelah username/password diisi lalu klik Login.
+       Update: dashboard mobile dibuat usable dengan drawer sidebar, viewport 100dvh, input stabil.
+       ========================================================= -->
+  <style id="chatgpt-final-maintenance-mobile-stabilizer-style">
+    /* KUNCI UTAMA: popup maintenance tidak boleh muncul otomatis sebelum user klik login. */
+    body:not(.maintenance-login-attempted) #maintenanceDashboardPopup.is-visible,
+    body:not(.maintenance-login-attempted) .maintenance-popup-overlay.is-visible {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+    }
+    body.maintenance-login-attempted #maintenanceDashboardPopup.is-visible,
+    body.maintenance-login-attempted .maintenance-popup-overlay.is-visible {
+      display: grid !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+
+    /* Mobile hard fix: dashboard/chat harus bisa dipakai di layar kecil. */
+    @media (max-width: 680px) {
+      html, body {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 100dvh !important;
+        overflow: hidden !important;
+        overscroll-behavior: none !important;
+        touch-action: manipulation !important;
+      }
+
+      #loginPage.wrap {
+        min-height: 100dvh !important;
+        height: 100dvh !important;
+        padding: max(14px, env(safe-area-inset-top)) 12px max(14px, env(safe-area-inset-bottom)) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      #loginPage .card {
+        width: min(430px, 94vw) !important;
+        min-height: auto !important;
+        max-height: none !important;
+      }
+
+      #dashboardPage.is-mobile-authenticated,
+      #dashboardPage.mobile-chat-active,
+      #dashboardPage[style*="display: grid"],
+      #dashboardPage[style*="display:grid"] {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: 1fr !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+        max-height: 100dvh !important;
+        overflow: hidden !important;
+        position: fixed !important;
+        inset: 0 !important;
+      }
+
+      #dashboardPage .chat-main-window {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      #dashboardPage .message-area {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 10px 9px !important;
+        scroll-behavior: auto !important;
+      }
+
+      #dashboardPage .chat-main-header {
+        flex: 0 0 auto !important;
+        min-height: 56px !important;
+        padding: calc(8px + env(safe-area-inset-top)) 10px 8px !important;
+        gap: 8px !important;
+      }
+
+      #dashboardPage .chat-footer-panel {
+        flex: 0 0 auto !important;
+        padding: 8px 8px calc(8px + env(safe-area-inset-bottom)) !important;
+        gap: 7px !important;
+      }
+
+      #dashboardPage .chat-footer-panel input[type="text"],
+      #typedMessageInput {
+        min-width: 0 !important;
+        width: 100% !important;
+        height: 42px !important;
+        font-size: 16px !important; /* cegah zoom input iOS/Android */
+      }
+
+      #dashboardPage .bubble {
+        max-width: 94% !important;
+        font-size: 13px !important;
+        line-height: 1.42 !important;
+        padding: 9px 12px !important;
+      }
+
+      #dashboardPage .sidebar {
+        display: flex !important;
+        position: fixed !important;
+        z-index: 320 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: min(88vw, 340px) !important;
+        max-width: min(88vw, 340px) !important;
+        height: 100dvh !important;
+        transform: translateX(-105%) !important;
+        transition: transform .18s ease !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      #dashboardPage.mobile-sidebar-open .sidebar {
+        transform: translateX(0) !important;
+      }
+
+      #dashboardPage .mobile-sidebar-backdrop {
+        display: none !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 310 !important;
+        background: rgba(0,0,0,.58) !important;
+        backdrop-filter: blur(3px) !important;
+        -webkit-backdrop-filter: blur(3px) !important;
+      }
+
+      #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
+        display: block !important;
+      }
+
+      #dashboardPage .mobile-sidebar-toggle {
+        display: inline-grid !important;
+        place-items: center !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        border-radius: 13px !important;
+        border: 1px solid rgba(255,255,255,.14) !important;
+        background: rgba(8,18,36,.86) !important;
+        color: var(--dash-accent, #28DFFF) !important;
+        font-size: 21px !important;
+        cursor: pointer !important;
+      }
+
+      #dashboardPage .mobile-sidebar-close {
+        display: grid !important;
+        place-items: center !important;
+        position: absolute !important;
+        top: max(10px, env(safe-area-inset-top)) !important;
+        right: 12px !important;
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 50% !important;
+        border: 1px solid rgba(255,255,255,.16) !important;
+        background: rgba(0,0,0,.32) !important;
+        color: #fff !important;
+        z-index: 5 !important;
+      }
+
+      body.mobile-nav-lock {
+        overflow: hidden !important;
+      }
+    }
+
+    /* Ringankan efek berat tanpa menghilangkan tampilan premium. */
+    html.is-ultralight-dashboard *,
+    html.mobile-performance-mode * {
+      transition-duration: .12s !important;
+      animation-duration: .18s !important;
+    }
+    html.is-ultralight-dashboard .fx,
+    html.mobile-performance-mode .fx,
+    html.is-ultralight-dashboard .grid,
+    html.mobile-performance-mode .grid,
+    html.is-ultralight-dashboard .noise,
+    html.mobile-performance-mode .noise {
+      display: none !important;
+    }
+  </style>
+
+  <script type="module" id="chatgpt-final-maintenance-mobile-stabilizer-script">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfigFinalGate = {
+      apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
+      authDomain: "fandah-c08fc.firebaseapp.com",
+      projectId: "fandah-c08fc",
+      storageBucket: "fandah-c08fc.firebasestorage.app",
+      messagingSenderId: "624734789171",
+      appId: "1:624734789171:web:7ba9ab16730acb5cfc8d46",
+      measurementId: "G-DN9Y49Q8QQ"
+    };
+
+    const finalGateApp = getApps().length ? getApp() : initializeApp(firebaseConfigFinalGate);
+    const finalGateDb = getFirestore(finalGateApp);
+    const FINAL_MAINTENANCE_REF = doc(finalGateDb, "app_settings", "maintenance_dashboard");
+    const OWNER_USERNAME_FINAL = "OWNER";
+
+    function normalizeFinalUser(name) {
+      const raw = String(name || "").trim();
+      if (raw.toLowerCase() === "fadly") return OWNER_USERNAME_FINAL;
+      if (raw.toLowerCase() === "owner") return OWNER_USERNAME_FINAL;
+      return raw;
+    }
+
+    function isOwnerFinal(name) {
+      return normalizeFinalUser(name) === OWNER_USERNAME_FINAL;
+    }
+
+    function setLoginErrorFinal(message) {
+      const errorBox = document.getElementById("authErrorNotification");
+      if (!errorBox) return;
+      errorBox.textContent = message || "";
+      errorBox.style.display = message ? "block" : "none";
+    }
+
+    function hideMaintenanceBeforeLoginAttempt() {
+      if (!document.body.classList.contains("maintenance-login-attempted")) {
+        const popup = document.getElementById("maintenanceDashboardPopup");
+        if (popup) popup.classList.remove("is-visible");
+      }
+    }
+
+    function updateMobileAuthenticatedClass() {
+      const page = document.getElementById("dashboardPage");
+      if (!page) return;
+      const inlineDisplay = String(page.getAttribute("style") || "").replace(/\s/g, "").toLowerCase();
+      const visible = inlineDisplay.includes("display:grid") || getComputedStyle(page).display === "grid";
+      page.classList.toggle("is-mobile-authenticated", visible);
+      if (visible) document.body.classList.remove("force-show-login-mobile");
+    }
+
+    function openMobileSidebarFinal() {
+      document.getElementById("dashboardPage")?.classList.add("mobile-sidebar-open");
+      document.body.classList.add("mobile-nav-lock");
+    }
+
+    function closeMobileSidebarFinal() {
+      document.getElementById("dashboardPage")?.classList.remove("mobile-sidebar-open");
+      document.body.classList.remove("mobile-nav-lock");
+    }
+
+    window.openMobileSidebar = openMobileSidebarFinal;
+    window.closeMobileSidebar = closeMobileSidebarFinal;
+    window.toggleMobileSidebar = function() {
+      const page = document.getElementById("dashboardPage");
+      if (!page) return;
+      if (page.classList.contains("mobile-sidebar-open")) closeMobileSidebarFinal();
+      else openMobileSidebarFinal();
+    };
+
+    function patchLoginMaintenanceGate() {
+      if (typeof window.executeLoginValidation !== "function" || window.executeLoginValidation.__chatgptFinalGate) return false;
+      const previousLogin = window.executeLoginValidation;
+
+      window.executeLoginValidation = async function(event) {
+        event?.preventDefault?.();
+        const userInput = document.getElementById("inputUser");
+        const passInput = document.getElementById("inputPass");
+        const typedUser = String(userInput?.value || "").trim();
+        const typedPass = String(passInput?.value || "");
+
+        document.body.classList.remove("maintenance-login-attempted");
+        hideMaintenanceBeforeLoginAttempt();
+
+        if (!typedUser || !typedPass) {
+          setLoginErrorFinal("Isi username dan kata sandi terlebih dahulu.");
+          return;
+        }
+
+        try {
+          const snap = await getDoc(FINAL_MAINTENANCE_REF);
+          const data = snap.exists() ? (snap.data() || {}) : {};
+          const maintenanceActive = data.active === true;
+          const message = data.message || "Dashboard sedang maintenance. Silakan coba lagi nanti.";
+
+          if (maintenanceActive && !isOwnerFinal(typedUser)) {
+            document.body.classList.add("maintenance-login-attempted");
+            if (typeof window.showMaintenancePopup === "function") {
+              window.showMaintenancePopup(message);
+            } else {
+              const popup = document.getElementById("maintenanceDashboardPopup");
+              const text = document.getElementById("maintenanceDashboardPopupText");
+              if (text) text.textContent = message;
+              if (popup) popup.classList.add("is-visible");
+            }
+            setLoginErrorFinal("MAINTENANCE DASHBOARD aktif. Login user sementara ditutup.");
+            return;
+          }
+        } catch (error) {
+          /* Jika status maintenance gagal dibaca, login asli tetap berjalan agar dashboard tidak terkunci total. */
+        }
+
+        const result = await previousLogin.call(this, event);
+        setTimeout(updateMobileAuthenticatedClass, 40);
+        setTimeout(updateMobileAuthenticatedClass, 240);
+        return result;
+      };
+
+      window.executeLoginValidation.__chatgptFinalGate = true;
+      return true;
+    }
+
+    function patchChatMobileStability() {
+      if (window.__chatgptMobileStabilityPatched) return;
+      window.__chatgptMobileStabilityPatched = true;
+
+      const lowCpu = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 6;
+      const lowMemory = navigator.deviceMemory && navigator.deviceMemory <= 4;
+      const isMobile = window.matchMedia && window.matchMedia("(max-width: 920px), (hover: none), (pointer: coarse)").matches;
+      if (lowCpu || lowMemory || isMobile) document.documentElement.classList.add("mobile-performance-mode", "is-ultralight-dashboard");
+
+      document.addEventListener("click", function(event) {
+        if (event.target.closest("#mobileSidebarBackdrop")) closeMobileSidebarFinal();
+        if (event.target.closest(".chat-item-card")) setTimeout(closeMobileSidebarFinal, 80);
+      }, true);
+
+      document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") closeMobileSidebarFinal();
+      }, true);
+
+      const page = document.getElementById("dashboardPage");
+      if (page) {
+        const observer = new MutationObserver(updateMobileAuthenticatedClass);
+        observer.observe(page, { attributes: true, attributeFilter: ["style", "class"] });
+      }
+
+      if (typeof window.selectActiveChatRoom === "function" && !window.selectActiveChatRoom.__chatgptMobileFinal) {
+        const oldSelect = window.selectActiveChatRoom;
+        window.selectActiveChatRoom = function() {
+          const result = oldSelect.apply(this, arguments);
+          document.getElementById("dashboardPage")?.classList.add("mobile-chat-active", "is-mobile-authenticated");
+          setTimeout(closeMobileSidebarFinal, 90);
+          setTimeout(function(){
+            const flow = document.getElementById("messageFlowBox");
+            if (flow) flow.scrollTop = flow.scrollHeight;
+          }, 120);
+          return result;
+        };
+        window.selectActiveChatRoom.__chatgptMobileFinal = true;
+      }
+
+      if (typeof window.activateDashboardSession === "function" && !window.activateDashboardSession.__chatgptMobileFinal) {
+        const oldActivate = window.activateDashboardSession;
+        window.activateDashboardSession = async function() {
+          const result = await oldActivate.apply(this, arguments);
+          const page = document.getElementById("dashboardPage");
+          if (page) page.classList.add("is-mobile-authenticated");
+          document.body.classList.remove("force-show-login-mobile");
+          setTimeout(updateMobileAuthenticatedClass, 50);
+          return result;
+        };
+        window.activateDashboardSession.__chatgptMobileFinal = true;
+      }
+    }
+
+    function bootFinalStabilizer() {
+      hideMaintenanceBeforeLoginAttempt();
+      patchLoginMaintenanceGate();
+      patchChatMobileStability();
+      updateMobileAuthenticatedClass();
+
+      let tries = 0;
+      const timer = setInterval(function() {
+        tries += 1;
+        hideMaintenanceBeforeLoginAttempt();
+        patchLoginMaintenanceGate();
+        patchChatMobileStability();
+        updateMobileAuthenticatedClass();
+        if (tries > 80) clearInterval(timer);
+      }, 180);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootFinalStabilizer, { once: true });
+    } else {
+      bootFinalStabilizer();
+    }
+  </script>
+
 </body>
 </html>
