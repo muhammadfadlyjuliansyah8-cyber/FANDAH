@@ -6307,6 +6307,125 @@
   </style>
 
 
+
+
+  <!-- =========================================================
+       FINAL ANTI DOUBLE LISTENER GUARD — WEB + MOBILE
+       Tujuan: mencegah addEventListener / setInterval / observer yang sama
+       terpasang berulang saat script patch berjalan beberapa kali.
+       ========================================================= -->
+  <script id="final-anti-double-listener-guard">
+  (function(){
+    "use strict";
+    if (window.__FD_ANTI_DOUBLE_LISTENER_GUARD_V1__) return;
+    window.__FD_ANTI_DOUBLE_LISTENER_GUARD_V1__ = true;
+
+    var targetIds = new WeakMap();
+    var callbackIds = new WeakMap();
+    var listenerKeys = new Set();
+    var intervalKeys = new Map();
+    var observerKeys = new WeakMap();
+    var nextTargetId = 1;
+    var nextCallbackId = 1;
+
+    function getTargetId(target) {
+      if (!targetIds.has(target)) targetIds.set(target, nextTargetId++);
+      return targetIds.get(target);
+    }
+
+    function safeFnSource(fn) {
+      try { return String(fn).replace(/\s+/g, ' ').slice(0, 260); }
+      catch (e) { return 'unknown'; }
+    }
+
+    function getCallbackKey(callback) {
+      if (!callback) return 'null';
+      var type = typeof callback;
+      if (type === 'function') {
+        if (!callbackIds.has(callback)) callbackIds.set(callback, nextCallbackId++);
+        return 'fn:' + callbackIds.get(callback) + ':' + safeFnSource(callback);
+      }
+      if (callback && type === 'object' && typeof callback.handleEvent === 'function') {
+        if (!callbackIds.has(callback)) callbackIds.set(callback, nextCallbackId++);
+        return 'obj:' + callbackIds.get(callback) + ':' + safeFnSource(callback.handleEvent);
+      }
+      return type + ':' + safeFnSource(callback);
+    }
+
+    function getCapture(options) {
+      if (options === true) return '1';
+      if (options && typeof options === 'object' && options.capture) return '1';
+      return '0';
+    }
+
+    var nativeAdd = EventTarget.prototype.addEventListener;
+    var nativeRemove = EventTarget.prototype.removeEventListener;
+
+    EventTarget.prototype.addEventListener = function(type, callback, options) {
+      if (!callback || !type) return nativeAdd.call(this, type, callback, options);
+
+      var key = getTargetId(this) + '|' + type + '|' + getCapture(options) + '|' + getCallbackKey(callback);
+
+      // Untuk event global yang sering bikin bug/lag, listener identik cukup dipasang sekali.
+      // Event khusus element tetap aman karena targetId berbeda.
+      if (listenerKeys.has(key)) return;
+      listenerKeys.add(key);
+      return nativeAdd.call(this, type, callback, options);
+    };
+
+    EventTarget.prototype.removeEventListener = function(type, callback, options) {
+      try {
+        var key = getTargetId(this) + '|' + type + '|' + getCapture(options) + '|' + getCallbackKey(callback);
+        listenerKeys.delete(key);
+      } catch (e) {}
+      return nativeRemove.call(this, type, callback, options);
+    };
+
+    var nativeSetInterval = window.setInterval;
+    var nativeClearInterval = window.clearInterval;
+
+    window.setInterval = function(callback, delay) {
+      var delayNum = Number(delay || 0);
+      var source = safeFnSource(callback);
+      var key = delayNum + '|' + source;
+
+      // Hindari interval identik berjalan dobel; ini penyebab umum dashboard makin berat setelah patch bertumpuk.
+      if (intervalKeys.has(key)) return intervalKeys.get(key);
+      var id = nativeSetInterval.apply(window, arguments);
+      intervalKeys.set(key, id);
+      return id;
+    };
+
+    window.clearInterval = function(id) {
+      intervalKeys.forEach(function(value, key){ if (value === id) intervalKeys.delete(key); });
+      return nativeClearInterval.call(window, id);
+    };
+
+    if (window.MutationObserver) {
+      var NativeMutationObserver = window.MutationObserver;
+      window.MutationObserver = function(callback) {
+        var observer = new NativeMutationObserver(callback);
+        var nativeObserve = observer.observe;
+        observer.observe = function(target, options) {
+          try {
+            var key = safeFnSource(callback) + '|' + getTargetId(target) + '|' + JSON.stringify(options || {});
+            if (observerKeys.get(observer) === key) return;
+            observerKeys.set(observer, key);
+          } catch (e) {}
+          return nativeObserve.call(observer, target, options);
+        };
+        return observer;
+      };
+      window.MutationObserver.prototype = NativeMutationObserver.prototype;
+      window.MutationObserver.__nativeObserver = NativeMutationObserver;
+    }
+
+    window.__fdListenerGuardStats = function(){
+      return { listeners: listenerKeys.size, intervals: intervalKeys.size };
+    };
+  })();
+  </script>
+
   <script id="session-restore-pre-guard">
     (function() {
       try {
@@ -18232,14 +18351,8 @@
       && Number(st.typingUntilMs || 0) > Date.now()
       && Number(st.lastSeenMs || 0) > Date.now() - 70000;
   }
-  setInterval(function(){
-    const top = document.getElementById('topHeaderStatus');
-    const partner = window.passivePartner || '';
-    if (!top || !partner) return;
-    if (partnerTypingActive()) {
-      top.innerHTML = '<span class="single-typing-indicator">Sedang mengetik...</span>';
-    }
-  }, 700);
+  // DISABLE: typing header sudah ditangani unified cleanup ticker agar tidak berat.
+  // setInterval(function(){ ... }, 700);
 })();
 </script>
 
@@ -18297,7 +18410,8 @@
         return result;
       };
     }
-    setInterval(ensureThemeButtonVisible, 3000);
+    // DISABLE: diganti oleh final unified cleanup ticker agar tidak ada interval dobel.
+    // setInterval(ensureThemeButtonVisible, 3000);
   })();
 </script>
 
@@ -18326,7 +18440,8 @@
     }
     removeBottomTypingIndicator();
     document.addEventListener('DOMContentLoaded', removeBottomTypingIndicator);
-    setInterval(removeBottomTypingIndicator, 5000);
+    // DISABLE: diganti oleh final unified cleanup ticker agar tidak ada interval dobel.
+    // setInterval(removeBottomTypingIndicator, 5000);
   })();
 </script>
 
@@ -18455,7 +18570,8 @@
 
   document.addEventListener('DOMContentLoaded', removeDuplicateTypingVisual);
   window.addEventListener('load', removeDuplicateTypingVisual);
-  setInterval(removeDuplicateTypingVisual, 1200);
+  // DISABLE: diganti oleh final unified cleanup ticker agar tidak ada interval dobel.
+  // setInterval(removeDuplicateTypingVisual, 1200);
 })();
 </script>
 
@@ -18522,7 +18638,8 @@
   }
   document.addEventListener('DOMContentLoaded', normalizeTypingHeader);
   window.addEventListener('load', normalizeTypingHeader);
-  setInterval(normalizeTypingHeader, 1200);
+  // DISABLE: diganti oleh final unified cleanup ticker agar tidak ada interval dobel.
+  // setInterval(normalizeTypingHeader, 1200);
 })();
 </script>
 
@@ -19765,5 +19882,96 @@
 </script>
 <!-- END FINAL FIX LOGIN PIRATE LOGO DIRECT IMG -->
 
+
+
+<!-- FINAL CEK ULANG MOBILE/WEB LIGHT MODE + UNIFIED CLEANUP TICKER -->
+<style id="final-mobile-web-light-cleanup-v2">
+  /* Mode ringan otomatis untuk mobile dan dashboard: mematikan efek yang paling sering bikin lag. */
+  body.fd-light-dashboard #dashboardPage *,
+  body.fd-light-dashboard #dashboardPage *::before,
+  body.fd-light-dashboard #dashboardPage *::after {
+    animation: none !important;
+    transition-duration: .08s !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+  }
+  body.fd-light-dashboard #dashboardPage .sidebar,
+  body.fd-light-dashboard #dashboardPage .chat-main-header,
+  body.fd-light-dashboard #dashboardPage .chat-footer-panel,
+  body.fd-light-dashboard #dashboardPage .modal-overlay,
+  body.fd-light-dashboard #dashboardPage .desktop-notification-card,
+  body.fd-light-dashboard #dashboardPage #imagePreviewBar {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  body.fd-light-dashboard #dashboardPage .chat-item-card,
+  body.fd-light-dashboard #dashboardPage .bubble,
+  body.fd-light-dashboard #dashboardPage .modal-box,
+  body.fd-light-dashboard #dashboardPage .action-link-btn {
+    box-shadow: 0 6px 18px rgba(0,0,0,.18) !important;
+  }
+  @media (max-width: 680px), (pointer: coarse) {
+    body:not(.fd-force-effects) { --shadow: 0 12px 32px rgba(0,0,0,.32); }
+    #dashboardPage *, #dashboardPage *::before, #dashboardPage *::after {
+      animation: none !important;
+      transition-duration: .06s !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      filter: none !important;
+      text-shadow: none !important;
+    }
+    #dashboardPage .sidebar, #dashboardPage .chat-main-header, #dashboardPage .chat-footer-panel,
+    #dashboardPage .modal-overlay, #dashboardPage #imagePreviewBar, #desktopNotificationStack .desktop-notification-card {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    #dashboardPage .chat-item-card, #dashboardPage .bubble, #dashboardPage .modal-box, #dashboardPage .action-link-btn {
+      box-shadow: 0 4px 14px rgba(0,0,0,.18) !important;
+    }
+    #dashboardPage::after, .chat-main-window::after, .sidebar::before { display: none !important; }
+  }
+</style>
+<script id="final-unified-cleanup-ticker-v2">
+(function(){
+  'use strict';
+  if (window.__FD_UNIFIED_CLEANUP_TICKER_V2__) return;
+  window.__FD_UNIFIED_CLEANUP_TICKER_V2__ = true;
+
+  function isMobileLike(){
+    return (window.matchMedia && (window.matchMedia('(max-width: 680px)').matches || window.matchMedia('(pointer: coarse)').matches));
+  }
+  function syncLightMode(){
+    try { document.body.classList.toggle('fd-light-dashboard', isMobileLike()); } catch(e) {}
+  }
+  function runLightCleanup(){
+    syncLightMode();
+    try {
+      document.querySelectorAll('#typingLiveLine,.typing-live-line,#typingIndicator,.typing-indicator').forEach(function(el){ el.remove(); });
+    } catch(e) {}
+    try { if (typeof window.ensureThemeButtonVisible === 'function') window.ensureThemeButtonVisible(); } catch(e) {}
+    try {
+      var top = document.getElementById('topHeaderStatus');
+      if (top && /mengetik/i.test(top.textContent || '')) {
+        top.innerHTML = '<span class="single-typing-indicator">Sedang mengetik...</span>';
+      }
+    } catch(e) {}
+  }
+
+  var pending = false;
+  function scheduleCleanup(){
+    if (pending) return;
+    pending = true;
+    setTimeout(function(){ pending = false; runLightCleanup(); }, 120);
+  }
+
+  runLightCleanup();
+  document.addEventListener('visibilitychange', scheduleCleanup, { passive: true });
+  window.addEventListener('resize', scheduleCleanup, { passive: true });
+  window.addEventListener('orientationchange', scheduleCleanup, { passive: true });
+  window.addEventListener('load', scheduleCleanup, { once: true, passive: true });
+  setInterval(runLightCleanup, 10000);
+})();
+</script>
 </body>
 </html>
