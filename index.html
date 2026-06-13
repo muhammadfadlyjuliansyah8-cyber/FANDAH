@@ -8891,7 +8891,7 @@
         const userData = userSnap.exists() ? (userSnap.data() || {}) : {};
         if (userSnap.exists() && userData.loginBlocked === true) {
           if (errorBox) {
-            errorBox.textContent = 'Akun ini sedang diblokir oleh Admin/Owner. Hubungi Admin dahulu.';
+            errorBox.textContent = 'AKUN ANDA TERBLOKIR,SILAHKAN HUBUNGI ADMIN TERLEBIH DAHULU';
             errorBox.style.display = 'block';
           } else {
             alert('Akun ini sedang diblokir oleh Admin/Owner. Hubungi Admin dahulu.');
@@ -18598,20 +18598,37 @@
   const MAX_RENDERED_CHAT_NODES_DESKTOP = 180;
   const MAX_RENDERED_CHAT_NODES_MOBILE = 120;
   const MAX_TOASTS = 3;
-  const SEND_LOCK_MS = 650;
+  const SEND_LOCK_MS = 750;
+  const BOOT_RETRY_LIMIT = 30;
 
   let lastScrollRequest = 0;
   let lastSendAt = 0;
   let lastSendSignature = "";
+  let bootRetry = 0;
+  let runScheduled = false;
 
   function isMobile(){
     try { return window.matchMedia && window.matchMedia("(max-width: 680px)").matches; }
     catch(e){ return false; }
   }
 
+  function schedule(fn, delay){
+    return window.setTimeout(fn, delay || 0);
+  }
+
+  function scheduleRun(delay){
+    if (runScheduled) return;
+    runScheduled = true;
+    schedule(function(){
+      runScheduled = false;
+      run();
+    }, delay || 80);
+  }
+
   function markDashboardActive(){
     const dash = document.getElementById("dashboardPage");
-    document.body.classList.toggle("dashboard-active", !!dash && getComputedStyle(dash).display !== "none");
+    const active = !!dash && getComputedStyle(dash).display !== "none";
+    document.body.classList.toggle("dashboard-active", active);
   }
 
   function trimRenderedChatNodes(){
@@ -18621,38 +18638,33 @@
     const rows = Array.from(box.querySelectorAll(".msg-row"));
     if (rows.length <= max) return;
 
-    const removeCount = rows.length - max;
-    for (let i = 0; i < removeCount; i++) {
-      rows[i].remove();
-    }
+    const keepFrom = rows.length - max;
+    for (let i = 0; i < keepFrom; i++) rows[i].remove();
 
     const dividers = Array.from(box.querySelectorAll(".day-divider"));
-    if (dividers.length > 12) {
-      dividers.slice(0, dividers.length - 12).forEach(el => el.remove());
-    }
+    if (dividers.length > 10) dividers.slice(0, dividers.length - 10).forEach(el => el.remove());
   }
 
   function trimToastStack(){
     const stack = document.getElementById("desktopNotificationStack");
     if (!stack) return;
     const cards = Array.from(stack.querySelectorAll(".desktop-notification-card"));
-    if (cards.length <= MAX_TOASTS) return;
-    cards.slice(0, cards.length - MAX_TOASTS).forEach(card => card.remove());
+    if (cards.length > MAX_TOASTS) cards.slice(0, cards.length - MAX_TOASTS).forEach(card => card.remove());
   }
 
   function safeScrollBottom(){
     const now = Date.now();
-    if (now - lastScrollRequest < 80) return;
+    if (now - lastScrollRequest < 120) return;
     lastScrollRequest = now;
     const box = document.querySelector(".message-area");
     if (!box) return;
-    (window.requestAnimationFrame || setTimeout)(function(){
+    (window.requestAnimationFrame || function(cb){ return setTimeout(cb, 16); })(function(){
       try { box.scrollTop = box.scrollHeight; } catch(e) {}
     });
   }
 
   function patchSendFunction(){
-    if (typeof window.commitMessageToFirebase !== "function" || window.commitMessageToFirebase.__antiLagPatched) return;
+    if (typeof window.commitMessageToFirebase !== "function" || window.commitMessageToFirebase.__antiLagPatched) return false;
 
     const original = window.commitMessageToFirebase;
     window.commitMessageToFirebase = function(){
@@ -18663,46 +18675,47 @@
       const signature = [partner, text, imageLen].join("|");
       const now = Date.now();
 
-      if (signature && signature === lastSendSignature && now - lastSendAt < SEND_LOCK_MS) {
-        return;
-      }
+      if (signature && signature === lastSendSignature && now - lastSendAt < SEND_LOCK_MS) return;
 
       lastSendSignature = signature;
       lastSendAt = now;
 
       const result = original.apply(this, arguments);
       Promise.resolve(result).finally(function(){
-        setTimeout(trimRenderedChatNodes, 80);
-        setTimeout(trimToastStack, 80);
-        safeScrollBottom();
+        schedule(function(){
+          trimRenderedChatNodes();
+          trimToastStack();
+          safeScrollBottom();
+        }, 90);
       });
       return result;
     };
     window.commitMessageToFirebase.__antiLagPatched = true;
+    return true;
   }
 
-  function patchTypingInput(){
-    const input = document.getElementById("typedMessageInput");
-    if (!input || input.__antiLagTypingPatched) return;
-    let timer = null;
-    let lastValue = input.value || "";
-    input.addEventListener("input", function(){
-      const value = input.value || "";
-      if (value === lastValue) return;
-      lastValue = value;
-      clearTimeout(timer);
+  function patchTypingFunction(){
+    if (typeof window.handleTypingState !== "function" || window.handleTypingState.__antiLagTypingPatched) return false;
 
-      if (typeof window.handleTypingState === "function") {
-        window.handleTypingState();
-      }
+    const original = window.handleTypingState;
+    let lastCall = 0;
+    let pending = null;
+    window.handleTypingState = function(){
+      const ctx = this;
+      const args = arguments;
+      const now = Date.now();
+      const runOriginal = function(){
+        lastCall = Date.now();
+        pending = null;
+        try { return original.apply(ctx, args); } catch(e) { console.warn("Typing state error:", e); }
+      };
 
-      timer = setTimeout(function(){
-        if (typeof window.handleTypingState === "function") {
-          window.handleTypingState();
-        }
-      }, 650);
-    }, { passive: true });
-    input.__antiLagTypingPatched = true;
+      if (now - lastCall > 350) return runOriginal();
+      clearTimeout(pending);
+      pending = setTimeout(runOriginal, 360);
+    };
+    window.handleTypingState.__antiLagTypingPatched = true;
+    return true;
   }
 
   function observeChatArea(){
@@ -18712,7 +18725,7 @@
     const observer = new MutationObserver(function(){
       if (scheduled) return;
       scheduled = true;
-      (window.requestAnimationFrame || setTimeout)(function(){
+      (window.requestAnimationFrame || function(cb){ return setTimeout(cb, 16); })(function(){
         scheduled = false;
         trimRenderedChatNodes();
         trimToastStack();
@@ -18722,24 +18735,35 @@
     box.__antiLagObserver = observer;
   }
 
+  function observeDashboardState(){
+    const dash = document.getElementById("dashboardPage");
+    if (!dash || dash.__antiLagDisplayObserver) return;
+    const obs = new MutationObserver(function(){ scheduleRun(80); });
+    obs.observe(dash, { attributes:true, attributeFilter:["style", "class"] });
+    dash.__antiLagDisplayObserver = obs;
+  }
+
   function run(){
     markDashboardActive();
     patchSendFunction();
-    patchTypingInput();
+    patchTypingFunction();
     observeChatArea();
+    observeDashboardState();
     trimRenderedChatNodes();
     trimToastStack();
+
+    if (bootRetry < BOOT_RETRY_LIMIT && (typeof window.commitMessageToFirebase !== "function" || typeof window.handleTypingState !== "function")) {
+      bootRetry++;
+      scheduleRun(500);
+    }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", run, { once: true });
-  } else {
-    run();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run, { once: true });
+  else run();
 
   window.addEventListener("load", run, { once: true });
-  window.addEventListener("focus", run, { passive: true });
-  setInterval(run, 5000);
+  window.addEventListener("focus", function(){ scheduleRun(120); }, { passive: true });
+  window.addEventListener("resize", function(){ scheduleRun(180); }, { passive: true });
 })();
 </script>
 
