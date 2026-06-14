@@ -5780,116 +5780,10 @@
        terpasang berulang saat script patch berjalan beberapa kali.
        ========================================================= -->
   <script id="final-anti-double-listener-guard">
-  (function(){
-    "use strict";
-    if (window.__FD_ANTI_DOUBLE_LISTENER_GUARD_V1__) return;
-    window.__FD_ANTI_DOUBLE_LISTENER_GUARD_V1__ = true;
-
-    var targetIds = new WeakMap();
-    var callbackIds = new WeakMap();
-    var listenerKeys = new Set();
-    var intervalKeys = new Map();
-    var observerKeys = new WeakMap();
-    var nextTargetId = 1;
-    var nextCallbackId = 1;
-
-    function getTargetId(target) {
-      if (!targetIds.has(target)) targetIds.set(target, nextTargetId++);
-      return targetIds.get(target);
-    }
-
-    function safeFnSource(fn) {
-      try { return String(fn).replace(/\s+/g, ' ').slice(0, 260); }
-      catch (e) { return 'unknown'; }
-    }
-
-    function getCallbackKey(callback) {
-      if (!callback) return 'null';
-      var type = typeof callback;
-      if (type === 'function') {
-        if (!callbackIds.has(callback)) callbackIds.set(callback, nextCallbackId++);
-        return 'fn:' + callbackIds.get(callback) + ':' + safeFnSource(callback);
-      }
-      if (callback && type === 'object' && typeof callback.handleEvent === 'function') {
-        if (!callbackIds.has(callback)) callbackIds.set(callback, nextCallbackId++);
-        return 'obj:' + callbackIds.get(callback) + ':' + safeFnSource(callback.handleEvent);
-      }
-      return type + ':' + safeFnSource(callback);
-    }
-
-    function getCapture(options) {
-      if (options === true) return '1';
-      if (options && typeof options === 'object' && options.capture) return '1';
-      return '0';
-    }
-
-    var nativeAdd = EventTarget.prototype.addEventListener;
-    var nativeRemove = EventTarget.prototype.removeEventListener;
-
-    EventTarget.prototype.addEventListener = function(type, callback, options) {
-      if (!callback || !type) return nativeAdd.call(this, type, callback, options);
-
-      var key = getTargetId(this) + '|' + type + '|' + getCapture(options) + '|' + getCallbackKey(callback);
-
-      // Untuk event global yang sering bikin bug/lag, listener identik cukup dipasang sekali.
-      // Event khusus element tetap aman karena targetId berbeda.
-      if (listenerKeys.has(key)) return;
-      listenerKeys.add(key);
-      return nativeAdd.call(this, type, callback, options);
-    };
-
-    EventTarget.prototype.removeEventListener = function(type, callback, options) {
-      try {
-        var key = getTargetId(this) + '|' + type + '|' + getCapture(options) + '|' + getCallbackKey(callback);
-        listenerKeys.delete(key);
-      } catch (e) {}
-      return nativeRemove.call(this, type, callback, options);
-    };
-
-    var nativeSetInterval = window.setInterval;
-    var nativeClearInterval = window.clearInterval;
-
-    window.setInterval = function(callback, delay) {
-      var delayNum = Number(delay || 0);
-      var source = safeFnSource(callback);
-      var key = delayNum + '|' + source;
-
-      // Hindari interval identik berjalan dobel; ini penyebab umum dashboard makin berat setelah patch bertumpuk.
-      if (intervalKeys.has(key)) return intervalKeys.get(key);
-      var id = nativeSetInterval.apply(window, arguments);
-      intervalKeys.set(key, id);
-      return id;
-    };
-
-    window.clearInterval = function(id) {
-      intervalKeys.forEach(function(value, key){ if (value === id) intervalKeys.delete(key); });
-      return nativeClearInterval.call(window, id);
-    };
-
-    if (window.MutationObserver) {
-      var NativeMutationObserver = window.MutationObserver;
-      window.MutationObserver = function(callback) {
-        var observer = new NativeMutationObserver(callback);
-        var nativeObserve = observer.observe;
-        observer.observe = function(target, options) {
-          try {
-            var key = safeFnSource(callback) + '|' + getTargetId(target) + '|' + JSON.stringify(options || {});
-            if (observerKeys.get(observer) === key) return;
-            observerKeys.set(observer, key);
-          } catch (e) {}
-          return nativeObserve.call(observer, target, options);
-        };
-        return observer;
-      };
-      window.MutationObserver.prototype = NativeMutationObserver.prototype;
-      window.MutationObserver.__nativeObserver = NativeMutationObserver;
-    }
-
-    window.__fdListenerGuardStats = function(){
-      return { listeners: listenerKeys.size, intervals: intervalKeys.size };
-    };
-  })();
-  </script>
+  /* SAFE NO-OP: guard lama dimatikan karena meng-overwrite EventTarget/setInterval secara global
+     dan berpotensi membuat tombol/listener tidak bekerja stabil di mobile. */
+  window.__FD_ANTI_DOUBLE_LISTENER_GUARD_V1__ = true;
+</script>
 
   <script id="session-restore-pre-guard">
     (function() {
@@ -16401,11 +16295,10 @@
   function isDashboardVisible(){
     var dash = getDashboard();
     if (!dash) return false;
-    try {
-      return getComputedStyle(dash).display !== "none";
-    } catch(e) {
-      return dash.style.display !== "none";
-    }
+    var inlineStyle = String(dash.getAttribute("style") || "").toLowerCase().replace(/\s+/g, "");
+    if (inlineStyle.indexOf("display:none") !== -1) return false;
+    if (inlineStyle.indexOf("display:grid") !== -1 || inlineStyle.indexOf("display:flex") !== -1 || inlineStyle.indexOf("display:block") !== -1) return true;
+    return document.body.classList.contains("fd-dashboard-visible") || document.body.classList.contains("dashboard-active");
   }
 
   function scrollChatBottom(repeat){
@@ -17110,5 +17003,762 @@ if (!window.__FD_FINAL_SINGLE_MAINTENANCE_ENGINE_20260614__) {
 }
 </script>
 
+
+
+<!-- =========================================================
+     FD FINAL MOBILE ACCESS + BUTTON HOTFIX 20260614
+     Fix utama:
+     - CSS lama mobile tidak boleh memaksa dashboard tampil sebelum login.
+     - Drawer mobile tidak boleh menimpa semua tombol.
+     - Tombol menu/modal/chat diberi binding aman agar tap mobile stabil.
+     ========================================================= -->
+<style id="FD_FINAL_MOBILE_ACCESS_BUTTON_FIX_20260614_STYLE">
+  /* Default dashboard tetap tersembunyi sampai JS login/session benar-benar mengaktifkan display:grid. */
+  #dashboardPage[style*="display: none"],
+  #dashboardPage[style*="display:none"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  @media (max-width: 680px) {
+    html, body {
+      width: 100% !important;
+      min-width: 0 !important;
+      overflow: hidden !important;
+      touch-action: manipulation;
+    }
+
+    body:not(.dashboard-active):not(.fd-dashboard-visible) #dashboardPage:not([style*="display: grid"]):not([style*="display:grid"]):not([style*="display: flex"]):not([style*="display:flex"]):not([style*="display: block"]):not([style*="display:block"]) {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    body:not(.dashboard-active):not(.fd-dashboard-visible) #loginPage:not([style*="display: none"]):not([style*="display:none"]) {
+      display: grid !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+
+    html.session-restoring body:not(.fd-dashboard-visible) #loginPage {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    body.dashboard-active #dashboardPage,
+    body.fd-dashboard-visible #dashboardPage,
+    #dashboardPage[style*="display: grid"],
+    #dashboardPage[style*="display:grid"] {
+      display: grid !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      grid-template-columns: 1fr !important;
+      grid-template-rows: minmax(0, 1fr) !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      min-height: 100dvh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+    }
+
+    #dashboardPage[style*="display: none"],
+    #dashboardPage[style*="display:none"] {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    body.dashboard-active #dashboardPage .chat-main-window,
+    body.fd-dashboard-visible #dashboardPage .chat-main-window,
+    #dashboardPage[style*="display: grid"] .chat-main-window,
+    #dashboardPage[style*="display:grid"] .chat-main-window {
+      grid-column: 1 / -1 !important;
+      grid-row: 1 / -1 !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    #dashboardPage .mobile-sidebar-toggle,
+    #dashboardPage .mobile-sidebar-close,
+    #dashboardPage button,
+    #dashboardPage input,
+    #dashboardPage label,
+    #dashboardPage .clip-btn,
+    #dashboardPage .chat-item-card,
+    #dashboardPage .tiny-profile-btn,
+    #dashboardPage .modal-btn {
+      pointer-events: auto !important;
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: rgba(40,223,255,.18);
+    }
+
+    #dashboardPage .mobile-sidebar-toggle {
+      display: inline-grid !important;
+      place-items: center !important;
+      position: relative !important;
+      z-index: 160 !important;
+      flex: 0 0 40px !important;
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px !important;
+      min-height: 40px !important;
+    }
+
+    #dashboardPage .sidebar {
+      display: flex !important;
+      position: fixed !important;
+      left: 0 !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      width: min(88vw, 360px) !important;
+      max-width: 360px !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      min-height: 100dvh !important;
+      z-index: 150 !important;
+      transform: translate3d(-108%, 0, 0) !important;
+      transition: transform .18s ease !important;
+      overflow: hidden !important;
+      border-right: 1px solid rgba(40,223,255,.18) !important;
+      border-bottom: 0 !important;
+      box-shadow: 24px 0 70px rgba(0,0,0,.46) !important;
+    }
+
+    #dashboardPage.mobile-sidebar-open .sidebar {
+      transform: translate3d(0, 0, 0) !important;
+    }
+
+    #dashboardPage .mobile-sidebar-backdrop {
+      display: none !important;
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 140 !important;
+      background: rgba(0,0,0,.50) !important;
+      pointer-events: auto !important;
+    }
+
+    #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
+      display: block !important;
+    }
+
+    #dashboardPage .sidebar-header {
+      flex: 0 0 auto !important;
+      padding: 14px 14px 12px !important;
+      gap: 12px !important;
+      position: relative !important;
+      bottom: auto !important;
+    }
+
+    #dashboardPage .chat-list-container {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+    }
+
+    body.mobile-nav-lock {
+      overflow: hidden !important;
+      touch-action: manipulation !important;
+    }
+
+    #dashboardPage:not(.mobile-sidebar-open) .mobile-sidebar-backdrop {
+      pointer-events: none !important;
+    }
+
+    .modal-overlay[style*="display: grid"],
+    .modal-overlay[style*="display:grid"] {
+      display: grid !important;
+      pointer-events: auto !important;
+      z-index: 1000 !important;
+    }
+
+    .modal-overlay[style*="display: none"],
+    .modal-overlay[style*="display:none"] {
+      display: none !important;
+      pointer-events: none !important;
+    }
+  }
+</style>
+
+<script id="FD_FINAL_MOBILE_ACCESS_BUTTON_FIX_20260614_SCRIPT">
+(function(){
+  "use strict";
+  if (window.__FD_FINAL_MOBILE_ACCESS_BUTTON_FIX_20260614__) return;
+  window.__FD_FINAL_MOBILE_ACCESS_BUTTON_FIX_20260614__ = true;
+
+  function byId(id){ return document.getElementById(id); }
+  function normStyle(el){ return String(el && el.getAttribute("style") || "").toLowerCase().replace(/\s+/g, ""); }
+
+  function isDashInlineOpen(dash){
+    var s = normStyle(dash);
+    if (s.indexOf("display:none") !== -1) return false;
+    if (s.indexOf("display:grid") !== -1 || s.indexOf("display:flex") !== -1 || s.indexOf("display:block") !== -1) return true;
+    return false;
+  }
+
+  function syncDashboardVisibilityClass(){
+    var dash = byId("dashboardPage");
+    var login = byId("loginPage");
+    var open = isDashInlineOpen(dash);
+
+    document.body.classList.toggle("fd-dashboard-visible", open);
+    document.body.classList.toggle("dashboard-active", open);
+
+    if (dash) {
+      dash.classList.toggle("is-mobile-authenticated", open);
+      if (!open) dash.classList.remove("mobile-sidebar-open", "mobile-chat-active");
+    }
+    if (!open) document.body.classList.remove("mobile-nav-lock");
+
+    if (login && !open && !document.documentElement.classList.contains("session-restoring")) {
+      login.style.pointerEvents = "auto";
+      login.style.visibility = "visible";
+    }
+  }
+
+  function openModal(id){
+    var modal = byId(id);
+    if (!modal) return;
+    modal.style.display = "grid";
+    modal.setAttribute("aria-hidden", "false");
+  }
+  function closeModal(id){
+    var modal = byId(id);
+    if (!modal) return;
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function callSafe(fnName, fallback){
+    try {
+      if (typeof window[fnName] === "function") return window[fnName]();
+      if (typeof fallback === "function") return fallback();
+    } catch (err) {
+      console.error("Aksi tombol gagal:", fnName, err);
+    }
+  }
+
+  function openSidebar(){
+    var dash = byId("dashboardPage");
+    if (!dash) return;
+    dash.classList.add("mobile-sidebar-open", "is-mobile-authenticated");
+    document.body.classList.add("mobile-nav-lock");
+  }
+  function closeSidebar(){
+    var dash = byId("dashboardPage");
+    if (dash) dash.classList.remove("mobile-sidebar-open");
+    document.body.classList.remove("mobile-nav-lock");
+  }
+  function toggleSidebar(){
+    var dash = byId("dashboardPage");
+    if (!dash) return;
+    if (dash.classList.contains("mobile-sidebar-open")) closeSidebar();
+    else openSidebar();
+  }
+
+  // Pastikan fungsi mobile selalu tersedia, walaupun patch lain gagal lebih dulu.
+  window.openMobileSidebar = window.openMobileSidebar || openSidebar;
+  window.closeMobileSidebar = window.closeMobileSidebar || closeSidebar;
+  window.toggleMobileSidebar = window.toggleMobileSidebar || toggleSidebar;
+
+  // Fungsi ini sebelumnya dipanggil tombol mobile profil, tetapi tidak selalu tersedia.
+  window.openMobileProfilePhotoPicker = window.openMobileProfilePhotoPicker || function(){
+    var input = byId("profileMobileAvatarInput") || byId("uploadAvatarInput");
+    if (input) input.click();
+  };
+
+  function bindButton(id, handler){
+    var el = byId(id);
+    if (!el || el.dataset.fdMobileFixBound === "1") return;
+    el.dataset.fdMobileFixBound = "1";
+    el.onclick = function(event){
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      return handler(event);
+    };
+  }
+
+  function bindForm(){
+    var form = byId("mainLoginForm");
+    if (!form || form.dataset.fdMobileFixBound === "1") return;
+    form.dataset.fdMobileFixBound = "1";
+    form.onsubmit = function(event){
+      if (typeof window.executeLoginValidation === "function") return window.executeLoginValidation(event);
+      if (event) event.preventDefault();
+      alert("Script login belum siap. Cek koneksi internet lalu refresh halaman.");
+    };
+  }
+
+  function bindCriticalButtons(){
+    bindForm();
+    bindButton("mobileSidebarToggle", function(){
+      if (typeof window.toggleMobileSidebar === "function" && window.toggleMobileSidebar !== toggleSidebar) return window.toggleMobileSidebar();
+      return toggleSidebar();
+    });
+    bindButton("mobileSidebarClose", function(){
+      if (typeof window.closeMobileSidebar === "function" && window.closeMobileSidebar !== closeSidebar) return window.closeMobileSidebar();
+      return closeSidebar();
+    });
+    var backdrop = byId("mobileSidebarBackdrop");
+    if (backdrop && backdrop.dataset.fdMobileFixBound !== "1") {
+      backdrop.dataset.fdMobileFixBound = "1";
+      backdrop.onclick = function(event){
+        if (event && event.target !== backdrop) return;
+        event && event.preventDefault && event.preventDefault();
+        closeSidebar();
+      };
+    }
+
+    bindButton("changePasswordActionBtn", function(){ return callSafe("openChangePasswordModal", function(){ openModal("passwordModal"); }); });
+    bindButton("themeActionBtn", function(){ return callSafe("openThemeSettingsModal", function(){ openModal("themeModal"); }); });
+    bindButton("profileActionBtn", function(){ return callSafe("openMyProfileModal", function(){ openModal("profileModal"); }); });
+    bindButton("adminPanelTrigger", function(){ return callSafe("openAdminManagementModal", function(){ openModal("adminModal"); }); });
+
+    var sendBtn = byId("sendOrSaveActionButton");
+    if (sendBtn && sendBtn.dataset.fdMobileFixBound !== "1") {
+      sendBtn.dataset.fdMobileFixBound = "1";
+      sendBtn.onclick = function(event){
+        event && event.preventDefault && event.preventDefault();
+        event && event.stopPropagation && event.stopPropagation();
+        if (typeof window.commitMessageToFirebase === "function") return window.commitMessageToFirebase();
+        alert("Fungsi kirim pesan belum siap. Cek koneksi internet lalu refresh halaman.");
+      };
+    }
+  }
+
+  function boot(){
+    syncDashboardVisibilityClass();
+    bindCriticalButtons();
+
+    var dash = byId("dashboardPage");
+    if (dash && window.MutationObserver) {
+      try {
+        new MutationObserver(function(){
+          syncDashboardVisibilityClass();
+          bindCriticalButtons();
+        }).observe(dash, { attributes: true, attributeFilter: ["style", "class"] });
+      } catch(e) {}
+    }
+
+    var login = byId("loginPage");
+    if (login && window.MutationObserver) {
+      try { new MutationObserver(bindCriticalButtons).observe(login, { childList: true, subtree: true }); } catch(e) {}
+    }
+
+    [250, 700, 1500, 3000].forEach(function(delay){
+      setTimeout(function(){ syncDashboardVisibilityClass(); bindCriticalButtons(); }, delay);
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
+  else boot();
+
+  window.addEventListener("resize", function(){ setTimeout(syncDashboardVisibilityClass, 80); }, { passive: true });
+  window.addEventListener("orientationchange", function(){ setTimeout(function(){ closeSidebar(); syncDashboardVisibilityClass(); }, 180); }, { passive: true });
+})();
+</script>
+
+
+
+<!-- =========================================================
+     FINAL MOBILE CROSSCHECK OK — akses mobile + tombol stabil
+     Tujuan: memastikan dashboard tidak menimpa login sebelum waktunya,
+     drawer mobile tidak memblokir tombol, dan tap tombol utama stabil.
+     ========================================================= -->
+<style id="FD_FINAL_MOBILE_CROSSCHECK_OK_20260614_STYLE">
+  @media (max-width: 680px) {
+    html, body {
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow: hidden !important;
+      overscroll-behavior: none !important;
+      touch-action: manipulation;
+    }
+
+    /* Jangan izinkan patch mobile lama memaksa dashboard tampil sebelum login/session valid. */
+    #dashboardPage[style*="display: none"],
+    #dashboardPage[style*="display:none"] {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    body:not(.dashboard-active):not(.fd-dashboard-visible) #dashboardPage:not([style*="display: grid"]):not([style*="display:grid"]):not([style*="display: flex"]):not([style*="display:flex"]):not([style*="display: block"]):not([style*="display:block"]) {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    body:not(.dashboard-active):not(.fd-dashboard-visible) #loginPage:not([style*="display: none"]):not([style*="display:none"]) {
+      display: grid !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      z-index: 2 !important;
+    }
+
+    body.dashboard-active #dashboardPage,
+    body.fd-dashboard-visible #dashboardPage,
+    #dashboardPage[style*="display: grid"],
+    #dashboardPage[style*="display:grid"],
+    #dashboardPage[style*="display: flex"],
+    #dashboardPage[style*="display:flex"],
+    #dashboardPage[style*="display: block"],
+    #dashboardPage[style*="display:block"] {
+      display: grid !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      grid-template-columns: 1fr !important;
+      grid-template-rows: minmax(0, 1fr) !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      min-height: 100dvh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+    }
+
+    body.dashboard-active #loginPage,
+    body.fd-dashboard-visible #loginPage {
+      pointer-events: none !important;
+    }
+
+    #dashboardPage .chat-main-window {
+      grid-column: 1 / -1 !important;
+      grid-row: 1 / -1 !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    #dashboardPage .chat-main-header,
+    #dashboardPage .chat-footer-panel,
+    #dashboardPage #imagePreviewBar,
+    #dashboardPage .edit-state-indicator-bar,
+    #dashboardPage #replyStatusBar,
+    #dashboardPage #editStatusBar {
+      flex: 0 0 auto !important;
+    }
+
+    #dashboardPage .message-area {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: contain !important;
+    }
+
+    #dashboardPage .mobile-sidebar-toggle,
+    #dashboardPage button,
+    #dashboardPage input,
+    #dashboardPage select,
+    #dashboardPage textarea,
+    #dashboardPage label,
+    #dashboardPage .chat-item-card,
+    #dashboardPage .tiny-profile-btn,
+    #dashboardPage .clip-btn,
+    #dashboardPage .modal-btn,
+    #dashboardPage .dashboard-theme-card {
+      pointer-events: auto !important;
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: rgba(40,223,255,.18) !important;
+    }
+
+    #dashboardPage .mobile-sidebar-toggle {
+      display: inline-grid !important;
+      place-items: center !important;
+      position: relative !important;
+      z-index: 180 !important;
+      flex: 0 0 40px !important;
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px !important;
+      min-height: 40px !important;
+    }
+
+    #dashboardPage .sidebar {
+      display: flex !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      bottom: 0 !important;
+      width: min(88vw, 360px) !important;
+      max-width: 360px !important;
+      height: 100dvh !important;
+      min-height: 100dvh !important;
+      max-height: 100dvh !important;
+      z-index: 170 !important;
+      transform: translate3d(-108%, 0, 0) !important;
+      transition: transform .18s ease !important;
+      overflow: hidden !important;
+      border-right: 1px solid rgba(40,223,255,.18) !important;
+      border-bottom: 0 !important;
+      box-shadow: 24px 0 70px rgba(0,0,0,.46) !important;
+    }
+
+    #dashboardPage.mobile-sidebar-open .sidebar {
+      transform: translate3d(0, 0, 0) !important;
+    }
+
+    #dashboardPage .mobile-sidebar-backdrop {
+      display: none !important;
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 160 !important;
+      background: rgba(0,0,0,.50) !important;
+      pointer-events: none !important;
+      touch-action: manipulation !important;
+    }
+
+    #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
+      display: block !important;
+      pointer-events: auto !important;
+    }
+
+    #dashboardPage .sidebar-header {
+      flex: 0 0 auto !important;
+    }
+
+    #dashboardPage .chat-list-container {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+    }
+
+    .modal-overlay[style*="display: grid"],
+    .modal-overlay[style*="display:grid"] {
+      display: grid !important;
+      pointer-events: auto !important;
+      z-index: 1000 !important;
+    }
+
+    .modal-overlay[style*="display: none"],
+    .modal-overlay[style*="display:none"] {
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    .modal-box {
+      max-height: calc(100dvh - 34px) !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    body.mobile-nav-lock {
+      overflow: hidden !important;
+      touch-action: manipulation !important;
+    }
+  }
+</style>
+
+<script id="FD_FINAL_MOBILE_CROSSCHECK_OK_20260614_SCRIPT">
+(function(){
+  "use strict";
+  if (window.__FD_FINAL_MOBILE_CROSSCHECK_OK_20260614__) return;
+  window.__FD_FINAL_MOBILE_CROSSCHECK_OK_20260614__ = true;
+
+  function byId(id){ return document.getElementById(id); }
+  function normStyle(el){ return String(el && el.getAttribute("style") || "").toLowerCase().replace(/\s+/g, ""); }
+  function isMobileLike(){ return window.matchMedia && window.matchMedia("(max-width: 680px)").matches; }
+
+  function dashboardIsOpen(){
+    var dash = byId("dashboardPage");
+    if (!dash) return false;
+    var s = normStyle(dash);
+    if (s.indexOf("display:none") !== -1) return false;
+    if (s.indexOf("display:grid") !== -1 || s.indexOf("display:flex") !== -1 || s.indexOf("display:block") !== -1) return true;
+    return dash.classList.contains("is-mobile-authenticated") || document.body.classList.contains("fd-dashboard-visible") || document.body.classList.contains("dashboard-active");
+  }
+
+  function syncMobileState(){
+    var dash = byId("dashboardPage");
+    var login = byId("loginPage");
+    var open = dashboardIsOpen();
+
+    document.body.classList.toggle("fd-dashboard-visible", open);
+    document.body.classList.toggle("dashboard-active", open);
+
+    if (dash) {
+      dash.classList.toggle("is-mobile-authenticated", open);
+      if (!open) {
+        dash.classList.remove("mobile-sidebar-open", "mobile-chat-active");
+        document.body.classList.remove("mobile-nav-lock");
+      }
+    }
+
+    if (login && !open && !document.documentElement.classList.contains("session-restoring")) {
+      login.style.pointerEvents = "auto";
+      login.style.visibility = "visible";
+    }
+  }
+
+  function openModal(id){
+    var modal = byId(id);
+    if (!modal) return;
+    modal.style.display = "grid";
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeModal(id){
+    var modal = byId(id);
+    if (!modal) return;
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function callSafe(fnName, fallback){
+    try {
+      if (typeof window[fnName] === "function") return window[fnName]();
+      if (typeof fallback === "function") return fallback();
+    } catch (err) {
+      console.error("Aksi tombol gagal:", fnName, err);
+    }
+  }
+
+  function openSidebar(){
+    var dash = byId("dashboardPage");
+    if (!dash) return;
+    dash.classList.add("mobile-sidebar-open", "is-mobile-authenticated");
+    document.body.classList.add("mobile-nav-lock", "fd-dashboard-visible", "dashboard-active");
+  }
+
+  function closeSidebar(){
+    var dash = byId("dashboardPage");
+    if (dash) dash.classList.remove("mobile-sidebar-open");
+    document.body.classList.remove("mobile-nav-lock");
+  }
+
+  function toggleSidebar(){
+    var dash = byId("dashboardPage");
+    if (!dash) return;
+    if (dash.classList.contains("mobile-sidebar-open")) closeSidebar();
+    else openSidebar();
+  }
+
+  // Paksa fungsi sidebar mobile tersedia paling akhir, supaya tidak tertimpa patch lama.
+  window.openMobileSidebar = openSidebar;
+  window.closeMobileSidebar = closeSidebar;
+  window.toggleMobileSidebar = toggleSidebar;
+
+  window.openMobileProfilePhotoPicker = window.openMobileProfilePhotoPicker || function(){
+    var input = byId("profileMobileAvatarInput") || byId("uploadAvatarInput");
+    if (input) input.click();
+  };
+
+  function ensureButtonTypes(){
+    document.querySelectorAll("button:not([type])").forEach(function(btn){
+      // Tombol login sudah type=submit. Tombol lain dibuat type=button agar tidak memicu submit tak sengaja.
+      btn.setAttribute("type", "button");
+    });
+  }
+
+  function bindTap(el, key, handler){
+    if (!el || el.dataset[key] === "1") return;
+    el.dataset[key] = "1";
+    var last = 0;
+    var wrapped = function(event){
+      var now = Date.now();
+      if (now - last < 320) {
+        if (event) {
+          event.preventDefault && event.preventDefault();
+          event.stopImmediatePropagation && event.stopImmediatePropagation();
+        }
+        return false;
+      }
+      last = now;
+      if (event) {
+        event.preventDefault && event.preventDefault();
+        event.stopImmediatePropagation && event.stopImmediatePropagation();
+      }
+      return handler(event);
+    };
+    el.addEventListener("click", wrapped, true);
+    el.addEventListener("touchend", wrapped, { capture: true, passive: false });
+  }
+
+  function bindCriticalButtons(){
+    ensureButtonTypes();
+
+    bindTap(byId("mobileSidebarToggle"), "fdMobileCrossTap", function(){ return toggleSidebar(); });
+    bindTap(byId("mobileSidebarClose"), "fdMobileCrossTap", function(){ return closeSidebar(); });
+    bindTap(byId("mobileSidebarBackdrop"), "fdMobileCrossTap", function(){ return closeSidebar(); });
+
+    bindTap(byId("changePasswordActionBtn"), "fdMobileCrossTap", function(){ return callSafe("openChangePasswordModal", function(){ openModal("passwordModal"); }); });
+    bindTap(byId("themeActionBtn"), "fdMobileCrossTap", function(){ return callSafe("openThemeSettingsModal", function(){ openModal("themeModal"); }); });
+    bindTap(byId("profileActionBtn"), "fdMobileCrossTap", function(){ return callSafe("openMyProfileModal", function(){ openModal("profileModal"); }); });
+    bindTap(byId("adminPanelTrigger"), "fdMobileCrossTap", function(){ return callSafe("openAdminManagementModal", function(){ openModal("adminModal"); }); });
+    bindTap(byId("sendOrSaveActionButton"), "fdMobileCrossTap", function(){ return callSafe("commitMessageToFirebase"); });
+
+    document.querySelectorAll(".logout-btn").forEach(function(el){
+      bindTap(el, "fdMobileCrossTap", function(){ return callSafe("triggerSignOut"); });
+    });
+
+    document.querySelectorAll(".start-chat-btn").forEach(function(el){
+      bindTap(el, "fdMobileCrossTap", function(){ return callSafe("openStartChatModal", function(){ openModal("startChatModal"); }); });
+    });
+
+    var closeMap = {
+      "closeStartChatModal()": "startChatModal",
+      "closeUserProfileModal()": "profileModal",
+      "closeBackgroundSettingsModal()": "backgroundModal",
+      "closeThemeSettingsModal()": "themeModal",
+      "closeChangePasswordModal()": "passwordModal",
+      "closeAdminManagementModal()": "adminModal"
+    };
+    document.querySelectorAll("button[onclick]").forEach(function(el){
+      var action = String(el.getAttribute("onclick") || "").replace(/\s+/g, "");
+      Object.keys(closeMap).forEach(function(fnCall){
+        if (action === fnCall.toLowerCase() || action === fnCall) {
+          var fnName = fnCall.replace("()", "");
+          bindTap(el, "fdMobileCrossTap", function(){ return callSafe(fnName, function(){ closeModal(closeMap[fnCall]); }); });
+        }
+      });
+    });
+  }
+
+  function boot(){
+    syncMobileState();
+    bindCriticalButtons();
+
+    var dash = byId("dashboardPage");
+    if (dash && window.MutationObserver && !dash.__fdMobileCrossObserved) {
+      dash.__fdMobileCrossObserved = true;
+      try {
+        new MutationObserver(function(){
+          syncMobileState();
+          bindCriticalButtons();
+        }).observe(dash, { attributes: true, attributeFilter: ["style", "class"], childList: true, subtree: true });
+      } catch (err) {}
+    }
+
+    [120, 400, 900, 1600, 3000].forEach(function(delay){
+      setTimeout(function(){ syncMobileState(); bindCriticalButtons(); }, delay);
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
+  else boot();
+
+  window.addEventListener("resize", function(){ setTimeout(syncMobileState, 80); }, { passive: true });
+  window.addEventListener("orientationchange", function(){ setTimeout(function(){ closeSidebar(); syncMobileState(); }, 180); }, { passive: true });
+  window.addEventListener("pageshow", function(){ setTimeout(function(){ syncMobileState(); bindCriticalButtons(); }, 80); }, { passive: true });
+})();
+</script>
 </body>
 </html>
