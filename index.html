@@ -5055,6 +5055,9 @@
       }
     }
   </style>
+
+
+  
 <style id="final-gold-glossy-login-card-upgrade">
     /* FINAL OVERRIDE — Login card area: gold glossy HD premium */
     #loginPage .card {
@@ -5769,6 +5772,8 @@
   </style>
 
 
+
+
   <!-- =========================================================
        FINAL ANTI DOUBLE LISTENER GUARD — WEB + MOBILE
        Tujuan: mencegah addEventListener / setInterval / observer yang sama
@@ -6257,389 +6262,268 @@
     }
   </style>
 
-  <style id="FINAL_CLEAN_CONSOLIDATED_PATCH_V6">
-    /* =========================================================
-       FINAL CLEAN V6
-       Satu patch final untuk bagian yang benar-benar dibutuhkan:
-       logout anti-stuck, mobile drawer, scroll chat terbaru,
-       alignment room/start-chat, typing display, dan reset layer.
-       Tidak import Firebase ulang dan tidak memangkas isi chat.
-       ========================================================= */
+<style id="FD_FINAL_CONSOLIDATED_FIX_20260614_STYLE">
+  /* =========================================================
+     FINAL CONSOLIDATED FIX — 14 Juni 2026
+     Fokus: 1 maintenance engine, 1 mobile drawer engine,
+     1 typing cleanup, 1 performance cleanup. Tidak throttle kirim pesan.
+     ========================================================= */
 
-    html, body { width: 100%; min-height: 100%; }
+  .maintenance-popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    place-items: center;
+    padding: 20px;
+    background:
+      radial-gradient(520px 260px at 50% 18%, rgba(40,223,255,.16), transparent 62%),
+      rgba(0,0,0,.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .maintenance-popup-overlay.is-visible { display: grid !important; }
+  .maintenance-popup-box {
+    width: min(420px, calc(100vw - 34px));
+    border-radius: 24px;
+    padding: 28px 24px;
+    text-align: center;
+    color: #F7FBFF;
+    background:
+      linear-gradient(135deg, rgba(10, 22, 42, .96), rgba(4, 8, 18, .98)),
+      radial-gradient(260px 130px at 50% 0%, rgba(40,223,255,.16), transparent 72%);
+    border: 1px solid rgba(40,223,255,.25);
+    box-shadow: 0 26px 90px rgba(0,0,0,.68), 0 0 34px rgba(40,223,255,.12);
+  }
+  .maintenance-popup-icon {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 14px;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: rgba(40,223,255,.09);
+    border: 1px solid rgba(40,223,255,.22);
+    color: #72F0FF;
+    font-size: 25px;
+  }
+  .maintenance-popup-title {
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    color: #FFFFFF;
+  }
+  .maintenance-popup-text {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(240,248,255,.72);
+  }
 
-    body.fd-v6-logging-out,
-    body.fd-v6-logout {
-      cursor: default !important;
-    }
+  #fdMaintenanceCenterPanel textarea {
+    width: 100%;
+    min-height: 78px;
+    resize: vertical;
+    border: 1px solid rgba(40,223,255,.18);
+    border-radius: 14px;
+    padding: 12px 13px;
+    outline: none;
+    background: rgba(1,5,14,.72);
+    color: #F7FBFF;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  #fdMaintenanceCenterPanel textarea:focus {
+    border-color: rgba(40,223,255,.48);
+    box-shadow: 0 0 0 4px rgba(40,223,255,.07);
+  }
+  .fd-maintenance-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .fd-maintenance-status {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 30px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .04em;
+    color: rgba(240,248,255,.76);
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .fd-maintenance-status::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #59FF84;
+    box-shadow: 0 0 12px rgba(89,255,132,.55);
+  }
+  .fd-maintenance-status.is-active {
+    color: #FFDDE7;
+    border-color: rgba(255,78,122,.25);
+    background: rgba(255,78,122,.08);
+  }
+  .fd-maintenance-status.is-active::before {
+    background: #FF4E7A;
+    box-shadow: 0 0 12px rgba(255,78,122,.62);
+  }
 
-    body.fd-v6-logout #dashboardPage {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
+  #messageFlowBox {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+  #messageFlowBox.chat-bottom-prep {
+    visibility: hidden;
+    scroll-behavior: auto !important;
+  }
+  #messageFlowBox.chat-bottom-ready {
+    visibility: visible;
+  }
 
-    body.fd-v6-logout #loginPage {
-      display: grid !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
+  #typingLiveLine,
+  .typing-live-line,
+  #typingIndicator,
+  .typing-indicator {
+    display: none !important;
+  }
+  .single-typing-indicator {
+    color: #72F0FF;
+    font-weight: 800;
+    text-shadow: 0 0 10px rgba(40,223,255,.35);
+  }
 
-    body.fd-v6-logout .modal-overlay:not(#maintenanceDashboardPopup),
-    body.fd-v6-logout .image-lightbox-overlay,
-    body.fd-v6-logout .desktop-notification-card,
-    body.fd-v6-logout #imagePreviewBar,
-    body.fd-v6-logout #emojiGifPickerPanel {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-
-    #dashboardPage {
-      min-width: 0;
-      min-height: 0;
-    }
-
-    .chat-main-window,
-    .message-area,
-    .sidebar,
-    .chat-list-container,
-    #activeChatRoomsBox {
-      min-width: 0;
-    }
-
-    .message-area {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      overscroll-behavior: contain;
-      scroll-behavior: smooth;
-    }
-
-    /* Start Chat dan label Personal Room dibuat rata, tidak keluar dari bubble/header. */
-    .section-label {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      gap: 12px !important;
-      min-width: 0 !important;
-    }
-
-    .section-label > span {
-      min-width: 0 !important;
-      flex: 1 1 auto !important;
-      white-space: nowrap !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-    }
-
-    .start-chat-btn {
-      flex: 0 0 auto !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: 4px !important;
-      min-width: 92px !important;
-      min-height: 38px !important;
-      line-height: 1 !important;
-      white-space: nowrap !important;
-      text-align: center !important;
-      vertical-align: middle !important;
-    }
-
-    .start-chat-plus,
-    .start-chat-text {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      line-height: 1 !important;
-    }
-
-    /* Room card: avatar, nama, role/status, profil/hapus/badge dibuat satu grid yang stabil. */
-    .chat-item-card {
-      grid-template-columns: 56px minmax(0, 1fr) 82px !important;
-      align-items: center !important;
-      gap: 12px !important;
-      overflow: visible !important;
-    }
-
-    .chat-item-card > div:nth-child(2) {
-      min-width: 0 !important;
-      position: relative !important;
-      z-index: 2 !important;
-    }
-
-    .chat-item-name {
-      min-width: 0 !important;
-      max-width: 100% !important;
-      white-space: nowrap !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-    }
-
-    .chat-item-subline {
-      min-width: 0 !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 8px !important;
-      flex-wrap: wrap !important;
-    }
-
-    .chat-item-actions {
-      position: relative !important;
-      z-index: 3 !important;
-      width: 82px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: flex-end !important;
-      justify-content: center !important;
-      gap: 8px !important;
-      pointer-events: auto !important;
-    }
-
-    .chat-item-actions .tiny-profile-btn,
-    .chat-item-actions .delete-room-btn,
-    .chat-item-actions .remove-chat-room-btn,
-    .chat-item-actions .unread-badge-alert {
-      width: 76px !important;
-      min-width: 76px !important;
-      max-width: 76px !important;
-      min-height: 28px !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      line-height: 1 !important;
-      white-space: nowrap !important;
-      text-align: center !important;
-    }
-
-    .chat-item-actions .unread-badge-alert {
-      position: static !important;
-      transform: none !important;
-      inset: auto !important;
-      border-radius: 999px !important;
-      padding: 0 8px !important;
-    }
-
-    .status-indicator,
-    .role-pill,
-    .user-role-badge {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      line-height: 1.2 !important;
-    }
-
-    /* Satu indikator typing saja, di header/status. Bagian bawah disembunyikan agar input tidak terdorong. */
-    #typingLiveLine,
-    .typing-live-line,
-    #typingIndicator,
-    .typing-indicator {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      height: 0 !important;
-      min-height: 0 !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      overflow: hidden !important;
-      pointer-events: none !important;
-    }
-
-    #topHeaderStatus .single-typing-indicator,
-    #topHeaderStatus .typing-single-color,
-    #dashboardPage .presence-typing,
-    #dashboardPage .status-indicator.presence-typing {
-      color: var(--theme-accent, #65EEFF) !important;
-      text-shadow: none !important;
-      -webkit-text-stroke: 0 !important;
-      filter: none !important;
-      background: transparent !important;
-      font-style: italic !important;
-      font-weight: 800 !important;
-    }
-
-    .presence-typing::after,
-    .typing-live-dot,
-    #topHeaderStatus .typing-live-dot {
-      content: none !important;
-      display: none !important;
-      animation: none !important;
-      box-shadow: none !important;
-    }
-
-    /* Mobile: sidebar jadi drawer, area chat tetap bisa diklik. */
-    .mobile-sidebar-backdrop,
+  @media (min-width: 681px) {
+    .mobile-sidebar-toggle,
     .mobile-sidebar-close,
+    .mobile-sidebar-backdrop {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 680px) {
+    html, body { overflow: hidden !important; }
+    #dashboardPage {
+      grid-template-columns: 1fr !important;
+    }
+    #dashboardPage .sidebar {
+      display: flex !important;
+      position: fixed !important;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: min(88vw, 360px);
+      max-width: 360px;
+      z-index: 120;
+      transform: translateX(-108%);
+      transition: transform .18s ease;
+      will-change: transform;
+      box-shadow: 24px 0 70px rgba(0,0,0,.45);
+    }
+    #dashboardPage.mobile-sidebar-open .sidebar {
+      transform: translateX(0);
+    }
+    .mobile-sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      background: rgba(0,0,0,.52);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+    #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
+      display: block !important;
+    }
     .mobile-sidebar-toggle {
-      -webkit-tap-highlight-color: transparent;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid rgba(40,223,255,.22);
+      background: rgba(40,223,255,.07);
+      color: #72F0FF;
+      display: grid !important;
+      place-items: center;
+      flex: 0 0 auto;
+      cursor: pointer;
     }
-
-    @media (min-width: 681px) {
-      .mobile-sidebar-backdrop,
-      .mobile-sidebar-close,
-      .mobile-sidebar-toggle {
-        display: none !important;
-      }
-      #dashboardPage .sidebar {
-        transform: none !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-      }
+    .mobile-sidebar-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      display: grid !important;
+      place-items: center;
+      cursor: pointer;
+      z-index: 5;
     }
-
-    @media (max-width: 680px) {
-      html, body {
-        height: 100%;
-        overflow: hidden;
-      }
-
-      #dashboardPage {
-        grid-template-columns: 1fr !important;
-        width: 100vw !important;
-        height: 100dvh !important;
-        overflow: hidden !important;
-      }
-
-      #dashboardPage .sidebar {
-        display: flex !important;
-        position: fixed !important;
-        left: 0 !important;
-        top: 0 !important;
-        bottom: 0 !important;
-        width: min(86vw, 340px) !important;
-        max-width: 340px !important;
-        height: 100dvh !important;
-        z-index: 320 !important;
-        transform: translateX(-104%) !important;
-        transition: transform .22s ease !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-      }
-
-      #dashboardPage .sidebar.mobile-open,
-      body.mobile-sidebar-active #dashboardPage .sidebar {
-        transform: translateX(0) !important;
-      }
-
-      .mobile-sidebar-backdrop {
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 310;
-        background: rgba(0,0,0,.58);
-        backdrop-filter: blur(3px);
-        -webkit-backdrop-filter: blur(3px);
-        pointer-events: auto;
-      }
-
-      body.mobile-sidebar-active .mobile-sidebar-backdrop,
-      #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
-        display: block !important;
-      }
-
-      .mobile-sidebar-toggle {
-        display: inline-grid !important;
-        place-items: center !important;
-        width: 38px !important;
-        height: 38px !important;
-        flex: 0 0 auto !important;
-        border-radius: 12px !important;
-        border: 1px solid rgba(255,255,255,.12) !important;
-        background: rgba(255,255,255,.055) !important;
-        color: var(--theme-accent, #65EEFF) !important;
-        font-size: 20px !important;
-        cursor: pointer !important;
-      }
-
-      .mobile-sidebar-close {
-        display: inline-grid !important;
-        place-items: center !important;
-        position: absolute !important;
-        right: 12px !important;
-        top: 12px !important;
-        width: 34px !important;
-        height: 34px !important;
-        z-index: 4 !important;
-        border-radius: 12px !important;
-        border: 1px solid rgba(255,255,255,.12) !important;
-        background: rgba(0,0,0,.22) !important;
-        color: #fff !important;
-        font-size: 22px !important;
-        cursor: pointer !important;
-      }
-
-      .chat-main-window {
-        width: 100vw !important;
-        height: 100dvh !important;
-        min-height: 0 !important;
-      }
-
-      .chat-main-header {
-        min-height: 62px !important;
-        padding: 12px 12px !important;
-      }
-
-      .message-area {
-        padding: 16px 12px !important;
-        gap: 12px !important;
-      }
-
-      .chat-footer-panel {
-        padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) !important;
-        gap: 8px !important;
-      }
-
-      .bubble {
-        max-width: min(82vw, 520px) !important;
-      }
-
-      .msg-controls {
-        position: static !important;
-        transform: none !important;
-        display: inline-flex !important;
-        padding: 4px 0 0 !important;
-        opacity: .82;
-      }
-
-      .chat-item-card {
-        grid-template-columns: 48px minmax(0, 1fr) 68px !important;
-        gap: 9px !important;
-        padding: 12px !important;
-      }
-
-      .chat-item-card .partner-avatar-img {
-        width: 46px !important;
-        height: 46px !important;
-      }
-
-      .chat-item-actions {
-        width: 68px !important;
-      }
-
-      .chat-item-actions .tiny-profile-btn,
-      .chat-item-actions .delete-room-btn,
-      .chat-item-actions .remove-chat-room-btn,
-      .chat-item-actions .unread-badge-alert {
-        width: 64px !important;
-        min-width: 64px !important;
-        max-width: 64px !important;
-        font-size: 9.5px !important;
-      }
-
-      .section-label {
-        align-items: center !important;
-      }
-
-      .start-chat-btn {
-        min-width: 88px !important;
-        min-height: 36px !important;
-        font-size: 10px !important;
-      }
+    .chat-main-header {
+      min-height: 64px !important;
+      padding: 12px 12px !important;
     }
-  </style>
+    .message-area {
+      padding: 14px 11px !important;
+      gap: 12px !important;
+      scroll-behavior: auto !important;
+    }
+    .bubble {
+      max-width: 84% !important;
+      padding: 10px 13px !important;
+      font-size: 13px !important;
+      line-height: 1.45 !important;
+    }
+    .msg-avatar {
+      width: 28px !important;
+      height: 28px !important;
+    }
+    .chat-footer-panel {
+      padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) !important;
+      gap: 8px !important;
+    }
+    .chat-footer-panel input[type="text"] {
+      min-width: 0;
+      font-size: 16px !important;
+    }
+    .emoji-gif-picker {
+      max-width: calc(100vw - 20px);
+      left: 10px !important;
+      right: 10px !important;
+    }
+    body.mobile-nav-lock {
+      overflow: hidden !important;
+      touch-action: none;
+    }
+    .fd-final-light-mode #dashboardPage .lp-fx-item:nth-child(n+9),
+    .fd-final-light-mode #dashboardPage .chat-love-bg-particle:nth-child(n+9),
+    .fd-final-light-mode #dashboardPage .prelogin-love-particle:nth-child(n+13),
+    .fd-final-light-mode #dashboardPage .login-love-particle:nth-child(n+13) {
+      display: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lp-fx-item,
+    .login-love-particle,
+    .prelogin-love-particle,
+    .chat-love-bg-particle {
+      animation: none !important;
+    }
+  }
+</style>
 
 </head>
 
@@ -6785,7 +6669,7 @@
       <div class="chat-list-container">
         <div class="section-label">
           <span>Personal Room</span>
-          <button class="start-chat-btn" onclick="openStartChatModal()"><span class="start-chat-plus" aria-hidden="true">+</span><span class="start-chat-text">Start Chat</span></button>
+          <button class="start-chat-btn" onclick="openStartChatModal()" aria-label="Start Chat"><span class="start-chat-icon" aria-hidden="true">+</span><span class="start-chat-text">Start Chat</span></button>
         </div>
         <div id="activeChatRoomsBox"></div>
       </div>
@@ -11000,6 +10884,9 @@
     });
 
 </script>
+
+
+  
 <style id="final-theme-picker-admin-colors-upgrade">
     #backgroundModal { display: none !important; }
 
@@ -11358,7 +11245,17 @@
       /* FIX: background modal tidak ditimpa oleh theme modal. */
     })();
   </script>
-<style id="final-lightweight-love-after-login-style">
+
+
+  <style id="final-switch-chat-scroll-bottom-fix">
+    /* Saat pindah chat, area pesan selalu diarahkan ke pesan terbaru */
+    #messageFlowBox {
+      scroll-behavior: smooth;
+    }
+  </style>
+
+
+  <style id="final-lightweight-love-after-login-style">
     /* Efek love kecil setelah login — ringan, capped, tidak mengganggu klik */
     #afterLoginLoveLayer {
       position: fixed;
@@ -12434,6 +12331,9 @@
       color: var(--theme-heading-text) !important;
     }
   </style>
+
+
+  
 <style id="safe-final-owner-security-mobile-polish">
     /* Owner block panel + Security readable colors */
     html:not([data-dashboard-theme]),
@@ -13912,224 +13812,6 @@
   <!-- =========================================================
        FINAL PATCH: LIGHTWEIGHT MOBILE/WEB + OWNER MAINTENANCE
        ========================================================= -->
-  <style id="final-lightweight-maintenance-owner-patch-style">
-    :root {
-      --theme-accent-2: #8B5CFF;
-      --theme-accent-3: #FFE39A;
-      --theme-good: #74FFB2;
-      --theme-warn: #FFB86B;
-      --theme-danger: #FF5D82;
-    }
-
-    /* Warna tema dibuat lebih hidup namun tetap premium, tidak terlalu ramai. */
-    html[data-dashboard-theme] #dashboardPage,
-    #dashboardPage {
-      background:
-        radial-gradient(820px 440px at 8% 4%, color-mix(in srgb, var(--theme-accent, #28DFFF) 10%, transparent), transparent 62%),
-        radial-gradient(780px 420px at 100% 0%, color-mix(in srgb, var(--theme-accent-2, #8B5CFF) 9%, transparent), transparent 60%),
-        radial-gradient(560px 320px at 58% 105%, color-mix(in srgb, var(--theme-accent-3, #FFE39A) 5%, transparent), transparent 65%),
-        var(--dash-bg, #020611) !important;
-    }
-
-    .sidebar,
-    .chat-main-header,
-    .chat-footer-panel,
-    .modal-box,
-    .admin-section-card,
-    .chat-item-card {
-      border-color: color-mix(in srgb, var(--theme-accent, #28DFFF) 18%, rgba(255,255,255,.08)) !important;
-    }
-
-    .role-pill.admin,
-    .user-role-badge.admin-badge {
-      background: linear-gradient(135deg, var(--theme-accent-3, #FFE39A), var(--theme-accent, #28DFFF)) !important;
-      color: #061221 !important;
-    }
-
-    .role-pill.user,
-    .user-role-badge.user-badge {
-      color: color-mix(in srgb, var(--theme-accent, #28DFFF) 72%, #FFFFFF) !important;
-      background: color-mix(in srgb, var(--theme-accent, #28DFFF) 10%, transparent) !important;
-    }
-
-    /* Optimasi performa web dan mobile: kurangi repaint berat dari blur, shadow, animasi, grid, dan hover. */
-    .message-area,
-    .chat-list-container,
-    .user-list-admin,
-    .role-list-admin,
-    .user-list-startchat {
-      content-visibility: auto;
-      contain-intrinsic-size: 720px;
-      overscroll-behavior: contain;
-      scrollbar-gutter: stable;
-    }
-
-    .bubble,
-    .chat-item-card,
-    .desktop-notification-card,
-    .modal-box,
-    .admin-section-card {
-      backface-visibility: hidden;
-      transform: translateZ(0);
-    }
-
-    @media (hover: none), (pointer: coarse), (max-width: 920px) {
-      html, body { overscroll-behavior: none; }
-      .fx, .grid, .noise,
-      #dashboardPage::after,
-      .chat-main-window::after,
-      .sidebar::before,
-      .chat-item-card::before,
-      #dashboardPage::before,
-      .chat-main-window::before {
-        opacity: .08 !important;
-        filter: none !important;
-        transform: none !important;
-      }
-
-      .card,
-      .sidebar,
-      .chat-main-header,
-      .chat-footer-panel,
-      .modal-overlay,
-      .modal-box,
-      .bubble,
-      .desktop-notification-card,
-      #imagePreviewBar,
-      .image-lightbox-overlay {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-      }
-
-      .bubble:hover,
-      .chat-item-card:hover,
-      .action-link-btn:hover,
-      .tiny-profile-btn:hover,
-      .send-action-btn:hover {
-        transform: none !important;
-      }
-
-      .message-area { scroll-behavior: auto !important; padding: 14px 12px !important; gap: 10px !important; }
-      .bubble { max-width: 86% !important; padding: 10px 13px !important; box-shadow: 0 6px 16px rgba(0,0,0,.18) !important; }
-      .bubble img { max-height: 180px !important; }
-      .chat-main-header { min-height: 58px !important; padding: 10px 12px !important; }
-      .chat-footer-panel { padding: 10px 12px calc(10px + env(safe-area-inset-bottom)) !important; gap: 8px !important; }
-      .chat-footer-panel input[type="text"] { height: 40px !important; font-size: 13px !important; }
-      .clip-btn, .send-action-btn { width: 38px !important; height: 38px !important; }
-      .msg-avatar { width: 28px !important; height: 28px !important; }
-      .msg-controls { display: none !important; }
-      .login-love-particle,
-      .prelogin-love-particle,
-      .chat-love-bg-particle,
-      #loginPage .gold-love-points .love-point {
-        animation-duration: 9s !important;
-        text-shadow: none !important;
-        filter: none !important;
-      }
-    }
-
-    @media (max-width: 680px) {
-      #dashboardPage { grid-template-columns: 1fr !important; }
-      .sidebar { box-shadow: 10px 0 28px rgba(0,0,0,.30) !important; }
-      .sh-actions { gap: 6px !important; }
-      .action-link-btn { height: 56px !important; border-radius: 14px !important; }
-      .action-ico { font-size: 15px !important; }
-      .chat-item-card { box-shadow: 0 8px 18px rgba(0,0,0,.18) !important; }
-      #desktopNotificationStack { right: 10px !important; bottom: 10px !important; width: calc(100vw - 20px) !important; }
-    }
-
-    @media (prefers-reduced-motion: reduce), (max-width: 480px) {
-      *, *::before, *::after {
-        animation-duration: .001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .001ms !important;
-        scroll-behavior: auto !important;
-      }
-    }
-
-    .maintenance-owner-card {
-      display: grid;
-      gap: 12px;
-      margin-top: 12px;
-      padding: 15px;
-      border-radius: 18px;
-      background:
-        linear-gradient(135deg, color-mix(in srgb, var(--theme-danger, #FF5D82) 10%, transparent), color-mix(in srgb, var(--theme-accent, #28DFFF) 8%, transparent)),
-        rgba(255,255,255,.025);
-      border: 1px solid color-mix(in srgb, var(--theme-warn, #FFB86B) 24%, rgba(255,255,255,.08));
-    }
-    .maintenance-status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      width: fit-content;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: .06em;
-      color: #061221;
-      background: linear-gradient(135deg, var(--theme-good, #74FFB2), var(--theme-accent, #28DFFF));
-    }
-    .maintenance-status-pill.is-active {
-      background: linear-gradient(135deg, var(--theme-danger, #FF5D82), var(--theme-warn, #FFB86B));
-      color: #fff;
-    }
-    .maintenance-owner-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .maintenance-toggle-btn {
-      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 28%, rgba(255,255,255,.08));
-      border-radius: 12px;
-      padding: 10px 13px;
-      color: #fff;
-      font-weight: 850;
-      cursor: pointer;
-      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-accent, #28DFFF) 20%, #071122), color-mix(in srgb, var(--theme-accent-2, #8B5CFF) 18%, #071122));
-    }
-    .maintenance-toggle-btn.danger {
-      background: linear-gradient(135deg, color-mix(in srgb, var(--theme-danger, #FF5D82) 32%, #160814), color-mix(in srgb, var(--theme-warn, #FFB86B) 22%, #160814));
-    }
-
-    .maintenance-popup-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      display: none;
-      place-items: center;
-      padding: 22px;
-      background:
-        radial-gradient(760px 360px at 50% 8%, color-mix(in srgb, var(--theme-danger, #FF5D82) 18%, transparent), transparent 64%),
-        radial-gradient(620px 340px at 100% 0%, color-mix(in srgb, var(--theme-accent, #28DFFF) 14%, transparent), transparent 62%),
-        rgba(1,4,12,.86);
-    }
-    .maintenance-popup-overlay.is-visible { display: grid; }
-    .maintenance-popup-box {
-      width: min(460px, 94vw);
-      border-radius: 28px;
-      padding: 28px;
-      color: var(--theme-text, #F7FBFF);
-      background:
-        linear-gradient(135deg, rgba(13,24,44,.96), rgba(8,8,20,.98)),
-        radial-gradient(260px 140px at 50% 0%, color-mix(in srgb, var(--theme-warn, #FFB86B) 12%, transparent), transparent 72%);
-      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 24%, rgba(255,255,255,.10));
-      box-shadow: 0 28px 90px rgba(0,0,0,.58), 0 0 38px color-mix(in srgb, var(--theme-accent, #28DFFF) 10%, transparent);
-      text-align: center;
-    }
-    .maintenance-popup-icon {
-      width: 62px;
-      height: 62px;
-      margin: 0 auto 14px;
-      display: grid;
-      place-items: center;
-      border-radius: 22px;
-      background: linear-gradient(135deg, var(--theme-danger, #FF5D82), var(--theme-warn, #FFB86B), var(--theme-accent, #28DFFF));
-      color: #061221;
-      font-size: 28px;
-      font-weight: 900;
-      box-shadow: 0 0 24px color-mix(in srgb, var(--theme-warn, #FFB86B) 22%, transparent);
-    }
-    .maintenance-popup-title { font-size: 20px; font-weight: 950; letter-spacing: -.02em; margin-bottom: 9px; }
-    .maintenance-popup-text { font-size: 13.5px; line-height: 1.6; color: color-mix(in srgb, var(--theme-text, #F7FBFF) 72%, transparent); }
-  </style>
 <!-- =========================================================
        EXTRA PATCH: FAST SEND + ULTRA LIGHT DASHBOARD MOBILE/WEB
        ========================================================= -->
@@ -14564,641 +14246,7 @@
        FINAL REQUEST PATCH — LIGHT DYNAMIC THEME ENGINE + SESSION + TYPING + MAINTENANCE CENTER
        Catatan: patch ini sengaja ditaruh paling bawah agar override aman tanpa menghapus fungsi utama.
        ========================================================= -->
-  <style id="final-request-light-engine-style">
-    /* THEME ENGINE RINGAN: hanya Neon dan Red. Tema lama disembunyikan agar dashboard tidak berat/monoton. */
-    .dashboard-theme-card:not([data-dashboard-theme="neon-tokyo"]):not([data-dashboard-theme="cyber-red"]) {
-      display: none !important;
-    }
-    .dashboard-theme-options {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-    .dashboard-theme-card[data-dashboard-theme="neon-tokyo"] .dashboard-theme-info b::after { content: " — Dynamic Neon"; font-weight: 650; opacity: .72; }
-    .dashboard-theme-card[data-dashboard-theme="cyber-red"] .dashboard-theme-info b::after { content: " — Dynamic Red"; font-weight: 650; opacity: .72; }
 
-    html[data-dashboard-theme="neon-tokyo"] {
-      --theme-name: "neon";
-      --theme-bg-1: #020713;
-      --theme-bg-2: #07152A;
-      --theme-panel: rgba(5, 14, 30, .90);
-      --theme-panel-2: rgba(9, 28, 54, .82);
-      --theme-accent: #28DFFF;
-      --theme-accent-2: #8B5CFF;
-      --theme-accent-3: #72FFCF;
-      --theme-text: #F4FBFF;
-      --theme-muted: rgba(215,235,250,.70);
-      --theme-bubble-in: linear-gradient(135deg, rgba(8, 24, 45, .78), rgba(5, 10, 24, .94));
-      --theme-bubble-out: linear-gradient(135deg, rgba(26, 95, 152, .86), rgba(42, 30, 94, .95));
-      --theme-bubble-in-border: rgba(40,223,255,.18);
-      --theme-bubble-out-border: rgba(114,255,207,.30);
-    }
-    html[data-dashboard-theme="cyber-red"] {
-      --theme-name: "red";
-      --theme-bg-1: #100207;
-      --theme-bg-2: #260712;
-      --theme-panel: rgba(28, 6, 15, .91);
-      --theme-panel-2: rgba(55, 10, 24, .78);
-      --theme-accent: #FF4E7A;
-      --theme-accent-2: #FF9A3D;
-      --theme-accent-3: #FFD1A3;
-      --theme-text: #FFF6F8;
-      --theme-muted: rgba(255,222,228,.68);
-      --theme-bubble-in: linear-gradient(135deg, rgba(42, 10, 20, .80), rgba(14, 4, 10, .95));
-      --theme-bubble-out: linear-gradient(135deg, rgba(163, 31, 58, .88), rgba(84, 15, 26, .96));
-      --theme-bubble-in-border: rgba(255,78,122,.20);
-      --theme-bubble-out-border: rgba(255,154,61,.30);
-    }
-
-    html[data-dashboard-theme="neon-tokyo"] #dashboardPage,
-    html[data-dashboard-theme="cyber-red"] #dashboardPage {
-      background:
-        radial-gradient(760px 390px at 7% 0%, color-mix(in srgb, var(--theme-accent) 12%, transparent), transparent 62%),
-        radial-gradient(720px 360px at 100% 4%, color-mix(in srgb, var(--theme-accent-2) 10%, transparent), transparent 60%),
-        linear-gradient(135deg, var(--theme-bg-1), var(--theme-bg-2) 55%, var(--theme-bg-1)) !important;
-    }
-    html[data-dashboard-theme="neon-tokyo"] .sidebar,
-    html[data-dashboard-theme="cyber-red"] .sidebar,
-    html[data-dashboard-theme="neon-tokyo"] .chat-main-header,
-    html[data-dashboard-theme="cyber-red"] .chat-main-header,
-    html[data-dashboard-theme="neon-tokyo"] .chat-footer-panel,
-    html[data-dashboard-theme="cyber-red"] .chat-footer-panel,
-    html[data-dashboard-theme="neon-tokyo"] .modal-box,
-    html[data-dashboard-theme="cyber-red"] .modal-box,
-    html[data-dashboard-theme="neon-tokyo"] .admin-section-card,
-    html[data-dashboard-theme="cyber-red"] .admin-section-card {
-      background: linear-gradient(135deg, var(--theme-panel-2), var(--theme-panel)) !important;
-      border-color: color-mix(in srgb, var(--theme-accent) 18%, rgba(255,255,255,.08)) !important;
-    }
-
-    /* ADAPTIVE BUBBLE SYSTEM: bentuk bubble ikut tema, tidak hanya ganti warna. */
-    html[data-dashboard-theme="neon-tokyo"] .incoming-row .bubble,
-    html[data-dashboard-theme="cyber-red"] .incoming-row .bubble {
-      background: var(--theme-bubble-in) !important;
-      border-color: var(--theme-bubble-in-border) !important;
-      color: var(--theme-text) !important;
-    }
-    html[data-dashboard-theme="neon-tokyo"] .outgoing-row .bubble,
-    html[data-dashboard-theme="cyber-red"] .outgoing-row .bubble {
-      background: var(--theme-bubble-out) !important;
-      border-color: var(--theme-bubble-out-border) !important;
-      color: #fff !important;
-    }
-    html[data-dashboard-theme="neon-tokyo"] .bubble {
-      border-radius: 22px 22px 22px 7px !important;
-      box-shadow: 0 8px 24px rgba(0,0,0,.22), 0 0 14px color-mix(in srgb, var(--theme-accent) 7%, transparent) !important;
-    }
-    html[data-dashboard-theme="neon-tokyo"] .outgoing-row .bubble { border-radius: 22px 22px 7px 22px !important; }
-    html[data-dashboard-theme="cyber-red"] .bubble {
-      border-radius: 18px !important;
-      box-shadow: 0 8px 22px rgba(0,0,0,.24), inset 3px 0 0 color-mix(in srgb, var(--theme-accent) 45%, transparent) !important;
-    }
-    html[data-dashboard-theme="cyber-red"] .outgoing-row .bubble { inset: auto; }
-
-    .typing-live-line {
-      display: none !important;
-      align-items: center;
-      gap: 8px;
-      padding: 0 !important;
-      color: color-mix(in srgb, var(--theme-accent, #28DFFF) 82%, #fff 18%);
-      font-size: 12px;
-      font-weight: 650;
-      z-index: 6;
-    }
-    .typing-live-line.is-visible { display: none !important; }
-    .typing-live-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 10px 0 0 currentColor, 20px 0 0 currentColor; opacity: .72; }
-
-    .session-manager-card, .maintenance-center-card {
-      display: grid;
-      gap: 12px;
-      margin-top: 12px;
-      padding: 15px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.025);
-      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 18%, rgba(255,255,255,.08));
-    }
-    .session-row-lite {
-      display: grid;
-      grid-template-columns: minmax(0,1fr) auto;
-      gap: 10px;
-      align-items: center;
-      padding: 10px 12px;
-      border-radius: 13px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.045);
-    }
-    .session-row-lite b { display: block; font-size: 13px; color: var(--theme-text, #F7FBFF); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .session-row-lite small { display: block; margin-top: 3px; font-size: 10.5px; color: var(--theme-muted, rgba(240,244,248,.55)); }
-    .session-force-btn, .maintenance-save-btn {
-      min-height: 34px;
-      padding: 0 11px;
-      border-radius: 10px;
-      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 22%, rgba(255,255,255,.08));
-      background: color-mix(in srgb, var(--theme-accent, #28DFFF) 9%, transparent);
-      color: color-mix(in srgb, var(--theme-accent, #28DFFF) 75%, #fff 25%);
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .session-force-btn.danger, .maintenance-save-btn.danger {
-      border-color: rgba(255,78,122,.30);
-      background: rgba(255,78,122,.09);
-      color: #FF8EA7;
-    }
-    .maintenance-center-card textarea {
-      width: 100%;
-      min-height: 86px;
-      resize: vertical;
-      border: 1px solid color-mix(in srgb, var(--theme-accent, #28DFFF) 16%, rgba(255,255,255,.08));
-      border-radius: 14px;
-      background: rgba(0,0,0,.22);
-      color: var(--theme-text, #fff);
-      padding: 11px 12px;
-      outline: none;
-      font: inherit;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-    .maintenance-meta-line { font-size: 11.5px; color: var(--theme-muted, rgba(240,244,248,.58)); line-height: 1.5; }
-    .maintenance-popup-meta { margin-top: 12px; font-size: 12px; line-height: 1.55; color: color-mix(in srgb, var(--theme-accent-3, #FFE39A) 72%, #fff 28%); }
-
-    @media (max-width: 680px), (hover:none) {
-      .dashboard-theme-options { grid-template-columns: 1fr !important; }
-      #dashboardPage::after, .chat-main-window::after, .sidebar::before { display: none !important; }
-      .bubble { box-shadow: 0 5px 14px rgba(0,0,0,.18) !important; }
-      .typing-live-line { display: none !important; padding: 0 !important; }
-      .session-row-lite { grid-template-columns: 1fr; }
-      .session-force-btn { width: 100%; }
-    }
-  </style>
-
-  <script type="module" id="final-request-light-engine-script">
-    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const app = getApps().length ? getApp() : initializeApp({
-      apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
-      authDomain: "fandah-c08fc.firebaseapp.com",
-      projectId: "fandah-c08fc",
-      storageBucket: "fandah-c08fc.firebasestorage.app",
-      messagingSenderId: "624734789171",
-      appId: "1:624734789171:web:7ba9ab16730acb5cfc8d46",
-      measurementId: "G-DN9Y49Q8QQ"
-    });
-    const dbLite = getFirestore(app);
-
-    const THEME_KEY = "dashboard_latar_theme_v2";
-    const SESSION_KEY = "fandah_dashboard_login_session_v1";
-    const SESSION_ID_KEY = "fandah_dashboard_session_id_v3";
-    const MAINT_REF = doc(dbLite, "app_settings", "maintenance_dashboard");
-    const DEFAULT_MAINT_MESSAGE = "Dashboard sedang maintenance. Estimasi tidak dapat dipastikan, silakan menunggu sesaat.";
-    const OWNER_NAME = "OWNER";
-    const LEGACY_OWNER_NAME = "Fadly";
-    const ALLOWED_THEMES = ["neon-tokyo", "cyber-red"];
-    let typingTimer = null;
-    let lastTypingWrite = 0;
-    let sessionTimer = null;
-    let sessionsUnsub = null;
-    let ownSessionUnsub = null;
-    let maintenanceStateLite = { active: false, message: DEFAULT_MAINT_MESSAGE, activatedAtMs: 0 };
-
-    function normalizeUser(name) {
-      const raw = String(name || "").trim();
-      if (raw.toLowerCase() === LEGACY_OWNER_NAME.toLowerCase()) return OWNER_NAME;
-      if (raw.toLowerCase() === OWNER_NAME.toLowerCase()) return OWNER_NAME;
-      return raw;
-    }
-    function isOwner(name) { return normalizeUser(name) === OWNER_NAME; }
-    function readSession() {
-      try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "null") || null; } catch { return null; }
-    }
-    function currentUser() { return normalizeUser(window.loggedInUser || readSession()?.username || ""); }
-    function getSessionId() {
-      let id = "";
-      try { id = localStorage.getItem(SESSION_ID_KEY) || ""; } catch {}
-      if (!id) {
-        id = "sess_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 9);
-        try { localStorage.setItem(SESSION_ID_KEY, id); } catch {}
-      }
-      return id;
-    }
-    function formatDateTime(ms) {
-      if (!ms) return "Belum aktif";
-      try { return new Date(ms).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" }); } catch { return new Date(ms).toString(); }
-    }
-    function escapeHtml(text) {
-      return String(text ?? "").replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
-    }
-
-    /* 10. Dynamic Theme Engine: hanya Neon + Red, legacy otomatis dipetakan supaya tidak blank/rusak. */
-    function safeTheme(theme) {
-      const map = {
-        "cyber-crypto": "neon-tokyo",
-        "cyber-luxury": "neon-tokyo",
-        "gold-luxury": "neon-tokyo",
-        "midnight-blue-premium": "neon-tokyo",
-        "arctic-frost": "neon-tokyo",
-        "matrix-green": "neon-tokyo",
-        "ocean-blue": "neon-tokyo",
-        "emerald-green": "neon-tokyo",
-        "violet-neon": "neon-tokyo",
-        "ruby-red": "cyber-red"
-      };
-      const t = map[theme] || theme;
-      return ALLOWED_THEMES.includes(t) ? t : "neon-tokyo";
-    }
-    function applyTheme(theme) {
-      const finalTheme = safeTheme(theme);
-      document.documentElement.setAttribute("data-dashboard-theme", finalTheme);
-      document.querySelectorAll(".dashboard-theme-card[data-dashboard-theme]").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.dashboardTheme === finalTheme);
-      });
-      try { localStorage.setItem(THEME_KEY, finalTheme); } catch {}
-    }
-    function simplifyThemeModal() {
-      const options = document.getElementById("dashboardThemeOptions");
-      if (!options) return;
-      options.querySelectorAll(".dashboard-theme-card[data-dashboard-theme]").forEach(btn => {
-        const theme = btn.dataset.dashboardTheme;
-        if (!ALLOWED_THEMES.includes(theme)) btn.remove();
-      });
-      const neon = options.querySelector('[data-dashboard-theme="neon-tokyo"] .dashboard-theme-info b');
-      const red = options.querySelector('[data-dashboard-theme="cyber-red"] .dashboard-theme-info b');
-      if (neon) neon.textContent = "Dynamic Neon";
-      if (red) red.textContent = "Dynamic Red";
-    }
-    window.setDashboardTheme = function(themeName) { applyTheme(themeName); };
-    window.openThemeSettingsModal = function() {
-      simplifyThemeModal();
-      applyTheme(document.documentElement.getAttribute("data-dashboard-theme") || localStorage.getItem(THEME_KEY) || "neon-tokyo");
-      const modal = document.getElementById("themeModal");
-      if (modal) modal.style.display = "grid";
-    };
-    /* FIX: background modal tetap memakai fungsi original, tidak diganti theme modal. */
-
-    /* Update Typing Indicator realtime: status tetap dikirim realtime, tetapi teks bawah chat dihapus agar tidak mengganggu. */
-    function ensureTypingLine() {
-      const oldLine = document.getElementById("typingLiveLine");
-      if (oldLine) oldLine.remove();
-      return null;
-    }
-    function setTypingLineVisible(name, visible) {
-      const oldLine = document.getElementById("typingLiveLine");
-      if (oldLine) oldLine.remove();
-    }
-    async function writeTyping(status, options = {}) {
-      const user = currentUser();
-      if (!user) return;
-      const partner = normalizeUser(window.passivePartner || "");
-      const now = Date.now();
-      await setDoc(doc(dbLite, "user_presence", user), {
-        status,
-        activeRoom: partner,
-        isWindowActive: true,
-        typingUntilMs: status === "typing" ? (options.typingUntilMs || now + 3000) : 0,
-        lastSeenMs: now,
-        last_changed: serverTimestamp()
-      }, { merge: true });
-    }
-    window.handleTypingState = function realtimeTypingIndicator() {
-      const input = document.getElementById("typedMessageInput");
-      const user = currentUser();
-      const partner = normalizeUser(window.passivePartner || "");
-      if (!user || !input || !partner) return;
-      const now = Date.now();
-      const hasText = input.value.trim().length > 0;
-
-      clearTimeout(typingTimer);
-
-      if (!hasText) {
-        lastTypingWrite = 0;
-        writeTyping("online", { typingUntilMs: 0 }).catch(() => {});
-        return;
-      }
-
-      // Realtime: indikator muncul hampir langsung saat mulai mengetik.
-      if (now - lastTypingWrite > 420) {
-        lastTypingWrite = now;
-        writeTyping("typing", { typingUntilMs: now + 3000 }).catch(() => {});
-      }
-
-      // Status otomatis balik online setelah user berhenti mengetik.
-      typingTimer = setTimeout(() => {
-        lastTypingWrite = 0;
-        writeTyping("online", { typingUntilMs: 0 }).catch(() => {});
-      }, 1500);
-    };
-    let partnerTypingTicker = null;
-    function isPartnerTypingNow(partner, cached) {
-      if (!partner || !cached) return false;
-      return String(cached.status || "").toLowerCase() === "typing" &&
-             normalizeUser(cached.activeRoom || "") === currentUser() &&
-             Number(cached.typingUntilMs || 0) > Date.now();
-    }
-    function listenPartnerTyping() {
-      if (partnerTypingTicker) clearInterval(partnerTypingTicker);
-      partnerTypingTicker = setInterval(() => {
-        const partner = normalizeUser(window.passivePartner || "");
-        if (!partner) { setTypingLineVisible("", false); return; }
-        const cached = window.cachePresenceStates?.[partner] || null;
-        setTypingLineVisible(partner, isPartnerTypingNow(partner, cached));
-      }, 900);
-    }
-
-    /* 14. Session Manager: owner bisa lihat session aktif dan force logout. */
-    async function heartbeatSession() {
-      const user = currentUser();
-      if (!user) return;
-      const sid = getSessionId();
-      /* Lebih ringan: tidak melakukan getDoc setiap heartbeat.
-         Field forceLogoutAtMs tetap aman karena setDoc merge tidak menghapus field lama. */
-      await setDoc(doc(dbLite, "dashboard_sessions", sid), {
-        sessionId: sid,
-        username: user,
-        userAgent: navigator.userAgent.slice(0, 140),
-        platform: navigator.platform || "Unknown",
-        lastActiveMs: Date.now(),
-        createdAtMs: Number(readSession()?.createdAt || Date.now()),
-        online: true,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    }
-    function startSessionHeartbeat() {
-      if (sessionTimer) clearInterval(sessionTimer);
-      heartbeatSession().catch(() => {});
-      sessionTimer = setInterval(() => heartbeatSession().catch(() => {}), 45000);
-      const sid = getSessionId();
-      if (ownSessionUnsub) ownSessionUnsub();
-      ownSessionUnsub = onSnapshot(doc(dbLite, "dashboard_sessions", sid), async snap => {
-        const data = snap.exists() ? snap.data() : null;
-        if (data?.forceLogoutAtMs && data.forceLogoutAtMs > Number(readSession()?.createdAt || 0)) {
-          if (typeof window.triggerSignOut === "function") await window.triggerSignOut({ reason: "session_manager", skipSessionBroadcast: false });
-        }
-      }, () => {});
-    }
-    function ensureSessionManagerPanel() {
-      const ownerCard = document.getElementById("ownerToolsCard");
-      if (!ownerCard || document.getElementById("sessionManagerCard")) return;
-      const card = document.createElement("div");
-      card.id = "sessionManagerCard";
-      card.className = "session-manager-card";
-      card.innerHTML = `
-        <div class="admin-section-title">Owner Tools — Session Manager</div>
-        <div class="owner-tools-desc">Melihat sesi aktif dan memaksa logout user dari dashboard. Data dibuat ringan dengan heartbeat 45 detik.</div>
-        <div id="sessionManagerList"><div class="maintenance-meta-line">Memuat session...</div></div>
-      `;
-      ownerCard.appendChild(card);
-      listenSessionsForOwner();
-    }
-    function listenSessionsForOwner() {
-      if (sessionsUnsub || !isOwner(currentUser())) return;
-      sessionsUnsub = onSnapshot(collection(dbLite, "dashboard_sessions"), snap => {
-        const list = document.getElementById("sessionManagerList");
-        if (!list) return;
-        const rows = [];
-        snap.forEach(d => {
-          const data = d.data() || {};
-          const age = Date.now() - Number(data.lastActiveMs || 0);
-          if (age <= 120000) rows.push({ id: d.id, ...data, age });
-        });
-        rows.sort((a,b) => Number(b.lastActiveMs || 0) - Number(a.lastActiveMs || 0));
-        list.innerHTML = rows.length ? rows.map(row => `
-          <div class="session-row-lite">
-            <div>
-              <b>${escapeHtml(row.username || "Unknown")}</b>
-              <small>${escapeHtml(row.platform || "Device")} • aktif ${Math.max(1, Math.round(row.age/1000))} detik lalu</small>
-            </div>
-            <button class="session-force-btn danger" type="button" onclick="forceLogoutDashboardSession('${escapeHtml(row.id)}')">Force Logout</button>
-          </div>
-        `).join("") : '<div class="maintenance-meta-line">Belum ada session aktif.</div>';
-      }, () => {});
-    }
-    window.forceLogoutDashboardSession = async function(sessionId) {
-      if (!isOwner(currentUser())) return alert("Hanya OWNER yang dapat force logout session.");
-      if (!confirm("Force logout session ini?")) return;
-      await setDoc(doc(dbLite, "dashboard_sessions", sessionId), { forceLogoutAtMs: Date.now(), forcedBy: OWNER_NAME, updatedAt: serverTimestamp() }, { merge: true });
-    };
-
-    /* 8. Maintenance Center: edit pesan + jadwal otomatis dari jam/tanggal saat aktif. */
-    function ensureMaintenancePopupLite() {
-      let overlay = document.getElementById("maintenanceDashboardPopup");
-      if (!overlay) {
-        overlay = document.createElement("div");
-        overlay.id = "maintenanceDashboardPopup";
-        overlay.className = "maintenance-popup-overlay";
-        document.body.appendChild(overlay);
-      }
-      overlay.innerHTML = `
-        <div class="maintenance-popup-box" role="alert" aria-live="assertive">
-          <div class="maintenance-popup-icon">⚙</div>
-          <div class="maintenance-popup-title">MAINTENANCE DASHBOARD</div>
-          <div class="maintenance-popup-text" id="maintenanceDashboardPopupText">${escapeHtml(maintenanceStateLite.message || DEFAULT_MAINT_MESSAGE)}</div>
-          <div class="maintenance-popup-meta" id="maintenanceDashboardPopupMeta">
-            Jadwal maintenance dimulai: ${escapeHtml(formatDateTime(maintenanceStateLite.activatedAtMs))}<br>
-            Estimasi tidak dapat dipastikan, silakan menunggu sesaat.
-          </div>
-        </div>`;
-      return overlay;
-    }
-    window.showMaintenancePopup = function(message) {
-      maintenanceStateLite.message = message || maintenanceStateLite.message || DEFAULT_MAINT_MESSAGE;
-      const overlay = ensureMaintenancePopupLite();
-      overlay.classList.add("is-visible");
-    };
-    function hideMaintenancePopupLite() { document.getElementById("maintenanceDashboardPopup")?.classList.remove("is-visible"); }
-    function ensureMaintenanceCenterPanel() {
-      const ownerCard = document.getElementById("ownerToolsCard");
-      if (!ownerCard || document.getElementById("maintenanceCenterCard")) return;
-      const card = document.createElement("div");
-      card.id = "maintenanceCenterCard";
-      card.className = "maintenance-center-card";
-      card.innerHTML = `
-        <div class="admin-section-title">Owner Tools — Maintenance Center</div>
-        <div class="owner-tools-desc">Atur pesan maintenance. Jadwal otomatis dihitung dari jam dan tanggal saat maintenance diaktifkan.</div>
-        <textarea id="maintenanceMessageInput" placeholder="Tulis pesan maintenance...">${escapeHtml(maintenanceStateLite.message || DEFAULT_MAINT_MESSAGE)}</textarea>
-        <div class="maintenance-meta-line" id="maintenanceScheduleInfo">Jadwal maintenance: ${escapeHtml(formatDateTime(maintenanceStateLite.activatedAtMs))}</div>
-        <div class="maintenance-meta-line">Estimasi: tidak dapat dipastikan, silakan menunggu sesaat.</div>
-        <div class="maintenance-owner-actions">
-          <button type="button" class="maintenance-save-btn" onclick="saveMaintenanceMessageOnly()">Simpan Pesan</button>
-          <button type="button" class="maintenance-save-btn danger" onclick="activateMaintenanceDashboardOwnerOnly()">Aktifkan Maintenance</button>
-          <button type="button" class="maintenance-save-btn" onclick="deactivateMaintenanceDashboardOwnerOnly()">Nonaktifkan</button>
-        </div>
-      `;
-      ownerCard.appendChild(card);
-      renderMaintenanceCenterState();
-    }
-    function renderMaintenanceCenterState() {
-      const input = document.getElementById("maintenanceMessageInput");
-      const info = document.getElementById("maintenanceScheduleInfo");
-      if (input && document.activeElement !== input) input.value = maintenanceStateLite.message || DEFAULT_MAINT_MESSAGE;
-      if (info) info.textContent = "Jadwal maintenance: " + formatDateTime(maintenanceStateLite.activatedAtMs);
-      const status = document.getElementById("maintenanceOwnerStatus");
-      if (status) {
-        status.textContent = maintenanceStateLite.active ? "MAINTENANCE AKTIF" : "NORMAL AKTIF";
-        status.classList.toggle("is-active", !!maintenanceStateLite.active);
-      }
-    }
-    window.saveMaintenanceMessageOnly = async function() {
-      if (!isOwner(currentUser())) return alert("Hanya OWNER yang dapat mengubah pesan maintenance.");
-      const msg = document.getElementById("maintenanceMessageInput")?.value?.trim() || DEFAULT_MAINT_MESSAGE;
-      await setDoc(MAINT_REF, { message: msg, updatedBy: OWNER_NAME, updatedAtMs: Date.now(), updatedAt: serverTimestamp() }, { merge: true });
-      alert("Pesan maintenance berhasil disimpan.");
-    };
-    window.activateMaintenanceDashboardOwnerOnly = async function() {
-      if (!isOwner(currentUser())) return alert("Fitur maintenance hanya untuk OWNER.");
-      const msg = document.getElementById("maintenanceMessageInput")?.value?.trim() || DEFAULT_MAINT_MESSAGE;
-      if (!confirm("Aktifkan MAINTENANCE DASHBOARD dan logout semua user?")) return;
-      await setDoc(MAINT_REF, {
-        active: true,
-        message: msg,
-        activatedAtMs: Date.now(),
-        scheduleText: "Maintenance dimulai pada jam dan tanggal saat fitur diaktifkan.",
-        estimateText: "Estimasi tidak dapat dipastikan, silakan menunggu sesaat.",
-        updatedBy: OWNER_NAME,
-        updatedAtMs: Date.now(),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    };
-    window.deactivateMaintenanceDashboardOwnerOnly = async function() {
-      if (!isOwner(currentUser())) return alert("Fitur maintenance hanya untuk OWNER.");
-      await setDoc(MAINT_REF, { active: false, updatedBy: OWNER_NAME, updatedAtMs: Date.now(), updatedAt: serverTimestamp() }, { merge: true });
-      hideMaintenancePopupLite();
-    };
-
-    function patchAdminOpen() {
-      if (typeof window.openAdminManagementModal === "function" && !window.openAdminManagementModal.__finalRequestPatched) {
-        const original = window.openAdminManagementModal;
-        window.openAdminManagementModal = function(...args) {
-          const result = original.apply(this, args);
-          setTimeout(() => {
-            if (isOwner(currentUser())) {
-              ensureMaintenanceCenterPanel();
-              ensureSessionManagerPanel();
-            }
-            renderMaintenanceCenterState();
-          }, 80);
-          return result;
-        };
-        window.openAdminManagementModal.__finalRequestPatched = true;
-      }
-    }
-    function bootFinalRequestPatch() {
-      simplifyThemeModal();
-      applyTheme(localStorage.getItem(THEME_KEY) || document.documentElement.getAttribute("data-dashboard-theme") || "neon-tokyo");
-      listenPartnerTyping();
-      startSessionHeartbeat();
-      patchAdminOpen();
-      let tries = 0;
-      const retry = setInterval(() => {
-        tries += 1;
-        patchAdminOpen();
-        simplifyThemeModal();
-        if (isOwner(currentUser())) { ensureMaintenanceCenterPanel(); ensureSessionManagerPanel(); }
-        if (tries > 40) clearInterval(retry);
-      }, 300);
-      onSnapshot(MAINT_REF, async snap => {
-        const data = snap.exists() ? (snap.data() || {}) : {};
-        maintenanceStateLite = {
-          active: data.active === true,
-          message: data.message || DEFAULT_MAINT_MESSAGE,
-          activatedAtMs: Number(data.activatedAtMs || data.updatedAtMs || 0)
-        };
-        renderMaintenanceCenterState();
-        if (maintenanceStateLite.active && !isOwner(currentUser()) && currentUser()) {
-          if (typeof window.triggerSignOut === "function") await window.triggerSignOut({ reason: "maintenance", skipSessionBroadcast: true });
-          window.showMaintenancePopup(maintenanceStateLite.message);
-        }
-        if (!maintenanceStateLite.active) hideMaintenancePopupLite();
-      }, () => {});
-    }
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootFinalRequestPatch, { once: true });
-    else bootFinalRequestPatch();
-  </script>
-
-
-  <style id="final-stability-performance-crosscheck-fix">
-    /* FINAL CROSSCHECK PERFORMANCE FIX
-       Tujuan: dashboard tetap lancar di web dan mobile tanpa menghapus fitur utama. */
-    :root {
-      --safe-shadow-soft: 0 10px 28px rgba(0,0,0,.22);
-      --safe-transition: 120ms ease;
-    }
-
-    .chat-item-card, .bubble, .modal-box, .chat-main-header, .chat-footer-panel, .sidebar, .desktop-notification-card {
-      transition-duration: var(--safe-transition) !important;
-    }
-
-    .message-area {
-      contain: layout paint;
-      will-change: scroll-position;
-      overscroll-behavior: contain;
-    }
-
-    .bubble, .chat-item-card {
-      will-change: auto !important;
-      transform: translateZ(0);
-    }
-
-    @media (max-width: 768px), (pointer: coarse) {
-      html, body { overscroll-behavior: none; }
-
-      .fx, .grid, .noise, #dashboardPage::after, .chat-main-window::after, .sidebar::before, .sidebar::after,
-      .chat-item-card::before, .action-link-btn::before, .action-link-btn::after {
-        display: none !important;
-      }
-
-      .sidebar, .chat-main-header, .chat-footer-panel, .modal-overlay, .modal-box, #imagePreviewBar,
-      .bubble, .desktop-notification-card {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        box-shadow: var(--safe-shadow-soft) !important;
-      }
-
-      .chat-item-card, .bubble, .send-action-btn, .clip-btn, .action-link-btn, .avatar-wrapper, .partner-avatar-img {
-        filter: none !important;
-        text-shadow: none !important;
-      }
-
-      .message-area {
-        padding: 14px 12px !important;
-        gap: 10px !important;
-        scroll-behavior: auto !important;
-      }
-
-      .bubble {
-        max-width: 86% !important;
-        padding: 10px 13px !important;
-        font-size: 13px !important;
-        box-shadow: 0 6px 16px rgba(0,0,0,.18) !important;
-      }
-
-      .chat-footer-panel {
-        padding: 10px 12px calc(10px + env(safe-area-inset-bottom)) !important;
-        gap: 9px !important;
-      }
-
-      .chat-footer-panel input[type="text"] {
-        height: 40px !important;
-        font-size: 13px !important;
-      }
-
-      .send-action-btn, .clip-btn {
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-      }
-
-      .desktop-notification-card, .unread-badge-alert {
-        animation: none !important;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-        scroll-behavior: auto !important;
-      }
-    }
-  </style>
 <style id="front-fixed-luffy-background-lite">
     /* BACKGROUND DEPAN/LOGIN FIXED - fitur upload dihapus agar tidak delay/lag.
        Gambar dari user dipasang langsung sebagai background ringan tanpa Firebase Storage,
@@ -16241,116 +15289,7 @@
       line-height: 1.6 !important;
     }
   </style>
-
-  <script id="final-register-maintenance-theme-patch-script">
-    (function() {
-      "use strict";
-
-      function ensureRegisterAdminPopup() {
-        let overlay = document.getElementById("registerAdminPopup");
-        if (overlay) return overlay;
-
-        overlay = document.createElement("div");
-        overlay.id = "registerAdminPopup";
-        overlay.className = "register-admin-popup-overlay";
-        overlay.innerHTML = `
-          <div class="register-admin-popup-box" role="alertdialog" aria-modal="true" aria-labelledby="registerAdminPopupTitle">
-            <div class="register-admin-popup-icon">!</div>
-            <div class="register-admin-popup-title" id="registerAdminPopupTitle">REGISTER</div>
-            <div class="register-admin-popup-text">SILAHKAN HUBUNGI ADMIN TERLEBIH DAHULU</div>
-            <button type="button" class="register-admin-popup-btn" id="registerAdminPopupClose">Mengerti</button>
-          </div>
-        `;
-
-        overlay.addEventListener("click", function(event) {
-          if (event.target === overlay) overlay.classList.remove("is-visible");
-        });
-
-        document.body.appendChild(overlay);
-        document.getElementById("registerAdminPopupClose")?.addEventListener("click", function() {
-          overlay.classList.remove("is-visible");
-        });
-
-        return overlay;
-      }
-
-      function showRegisterAdminPopup(event) {
-        event?.preventDefault?.();
-        event?.stopPropagation?.();
-        ensureRegisterAdminPopup().classList.add("is-visible");
-      }
-
-      function installRegisterHereButton() {
-        const meta = document.querySelector("#loginPage .login-footnote .meta") || document.querySelector("#loginPage .meta");
-        if (!meta || meta.dataset.registerPatchInstalled === "1") return;
-
-        meta.dataset.registerPatchInstalled = "1";
-        meta.textContent = "";
-
-        const registerBtn = document.createElement("button");
-        registerBtn.type = "button";
-        registerBtn.className = "register-admin-link";
-        registerBtn.textContent = "Register here";
-        registerBtn.addEventListener("click", showRegisterAdminPopup);
-
-        meta.appendChild(registerBtn);
-      }
-
-      function applyThemeToMaintenancePopupNow() {
-        const popup = document.getElementById("maintenanceDashboardPopup");
-        if (!popup) return;
-        popup.setAttribute("data-follow-theme", document.documentElement.getAttribute("data-dashboard-theme") || "default");
-      }
-
-      const oldShowMaintenance = window.showMaintenancePopup;
-      window.showMaintenancePopup = function(message) {
-        if (typeof oldShowMaintenance === "function") {
-          oldShowMaintenance.call(this, message);
-        } else {
-          let overlay = document.getElementById("maintenanceDashboardPopup");
-          if (!overlay) {
-            overlay = document.createElement("div");
-            overlay.id = "maintenanceDashboardPopup";
-            overlay.className = "maintenance-popup-overlay";
-            overlay.innerHTML = `
-              <div class="maintenance-popup-box" role="alert" aria-live="assertive">
-                <div class="maintenance-popup-icon">⚙</div>
-                <div class="maintenance-popup-title">MAINTENANCE DASHBOARD</div>
-                <div class="maintenance-popup-text" id="maintenanceDashboardPopupText">Dashboard sedang maintenance. Silakan coba lagi nanti.</div>
-              </div>
-            `;
-            document.body.appendChild(overlay);
-          }
-          const text = document.getElementById("maintenanceDashboardPopupText");
-          if (text) text.textContent = message || "Dashboard sedang maintenance. Silakan coba lagi nanti.";
-          overlay.classList.add("is-visible");
-        }
-        applyThemeToMaintenancePopupNow();
-      };
-
-      const observer = new MutationObserver(function() {
-        installRegisterHereButton();
-        applyThemeToMaintenancePopupNow();
-      });
-
-      function bootRegisterMaintenancePatch() {
-        installRegisterHereButton();
-        ensureRegisterAdminPopup();
-        applyThemeToMaintenancePopupNow();
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-dashboard-theme"] });
-        observer.observe(document.body, { childList: true, subtree: true });
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", bootRegisterMaintenancePatch, { once: true });
-      } else {
-        bootRegisterMaintenancePatch();
-      }
-    })();
-  </script>
-
-
-  <!-- =========================================================
+<!-- =========================================================
        LIGHTWEIGHT LOVE + PIRATES FLOATING FX PATCH
        Efek ringan: love, logo pirates, dan bintang kecil bergerak
        untuk halaman depan dashboard/login serta halaman percakapan chat.
@@ -16451,111 +15390,6 @@
     }
   </style>
 
-  <script id="lightweight-love-pirates-fx-patch-script">
-    (function () {
-      "use strict";
-
-      const FX_CONFIG = {
-        login: { id: "loginLovePiratesFx", selector: "#loginPage", countDesktop: 34, countMobile: 18 },
-        dashboard: { id: "dashboardLovePiratesFx", selector: "#dashboardPage", countDesktop: 26, countMobile: 14 },
-        chat: { id: "chatLovePiratesFx", selector: ".chat-main-window", countDesktop: 24, countMobile: 12 }
-      };
-
-      const ICONS = [
-        { text: "♥", cls: "love", weight: 4 },
-        { text: "♡", cls: "love", weight: 3 },
-        { text: "🏴‍☠️", cls: "pirate", weight: 2 },
-        { text: "☠️", cls: "pirate", weight: 2 },
-        { text: "✦", cls: "star", weight: 4 },
-        { text: "✧", cls: "star", weight: 4 }
-      ];
-      const weightedIcons = ICONS.flatMap(item => Array.from({ length: item.weight }, () => item));
-      const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      function isMobileFx() {
-        return window.matchMedia && window.matchMedia("(max-width: 680px)").matches;
-      }
-
-      function pickIcon(index) {
-        return weightedIcons[index % weightedIcons.length];
-      }
-
-      function makeItem(index, total) {
-        const icon = pickIcon(index);
-        const item = document.createElement("span");
-        const directionDown = index % 2 === 0;
-        const lane = (index + 0.5) / total;
-        const jitter = ((index * 37) % 15) - 7;
-        const size = icon.cls === "pirate" ? 16 + (index % 4) : 10 + (index % 8);
-        const duration = 18 + (index % 11) + (isMobileFx() ? 5 : 0);
-        const delay = -1 * ((index * 1.73) % duration);
-        const drift = ((index % 2 ? -1 : 1) * (10 + (index % 5) * 6));
-        const opacity = icon.cls === "pirate" ? .23 : .30;
-
-        item.className = "lp-fx-item " + icon.cls + " " + (directionDown ? "lp-fx-down" : "lp-fx-up");
-        item.textContent = icon.text;
-        item.setAttribute("aria-hidden", "true");
-        item.style.setProperty("--x", Math.max(2, Math.min(98, lane * 100 + jitter)) + "%");
-        item.style.setProperty("--s", size + "px");
-        item.style.setProperty("--d", duration + "s");
-        item.style.setProperty("--delay", delay + "s");
-        item.style.setProperty("--drift", drift + "px");
-        item.style.setProperty("--o", opacity);
-        return item;
-      }
-
-      function ensureField(key) {
-        if (reduceMotion) return;
-        const cfg = FX_CONFIG[key];
-        const target = document.querySelector(cfg.selector);
-        if (!target || document.getElementById(cfg.id)) return;
-
-        const field = document.createElement("div");
-        field.id = cfg.id;
-        field.className = "lp-fx-field";
-        field.setAttribute("aria-hidden", "true");
-
-        const count = isMobileFx() ? cfg.countMobile : cfg.countDesktop;
-        const fragment = document.createDocumentFragment();
-        for (let i = 0; i < count; i++) fragment.appendChild(makeItem(i, count));
-        field.appendChild(fragment);
-        target.insertBefore(field, target.firstChild);
-      }
-
-      function bootLovePiratesFx() {
-        ensureField("login");
-        ensureField("dashboard");
-        ensureField("chat");
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", bootLovePiratesFx, { once: true });
-      } else {
-        bootLovePiratesFx();
-      }
-
-      let resizeTimer = null;
-      window.addEventListener("resize", function () {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function () {
-          ["loginLovePiratesFx", "dashboardLovePiratesFx", "chatLovePiratesFx"].forEach(function (id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-          });
-          bootLovePiratesFx();
-        }, 240);
-      }, { passive: true });
-
-      const observer = new MutationObserver(function () {
-        bootLovePiratesFx();
-      });
-
-      if (document.body) observer.observe(document.body, { childList: true, subtree: true });
-    })();
-  </script>
-
-
-
 <style id="final-presence-theme-readable-upgrade">
   /* THEME KHUSUS SETELAH LOGIN: Crimson Pirate — bubble & font dibuat lebih jelas. */
   .dashboard-theme-card[data-dashboard-theme="one-piece-crimson"] { display: flex !important; }
@@ -16632,6 +15466,70 @@
 
   @media(max-width:680px){ .dashboard-theme-options { grid-template-columns: 1fr !important; } }
 </style>
+
+<script id="final-theme-presence-accurate-patch">
+(function(){
+  'use strict';
+  const EXTRA_THEME = 'one-piece-crimson';
+  const THEME_KEY = 'dashboard_latar_theme_v2';
+
+  function ensureExtraThemeCard(){
+    const box = document.getElementById('dashboardThemeOptions');
+    if (!box || box.querySelector('[data-dashboard-theme="'+EXTRA_THEME+'"]')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dashboard-theme-card';
+    btn.dataset.dashboardTheme = EXTRA_THEME;
+    btn.setAttribute('onclick', "setDashboardTheme('"+EXTRA_THEME+"')");
+    btn.innerHTML = '<span class="theme-swatch" style="background:linear-gradient(135deg,#130207,#FF3B4F 55%,#FFD36A);"></span><span class="dashboard-theme-info"><b>Crimson Pirate</b><small>Tema merah bajak laut, bubble jelas</small></span>';
+    box.appendChild(btn);
+  }
+
+  const oldSetTheme = window.setDashboardTheme;
+  window.setDashboardTheme = function(themeName){
+    if (themeName === EXTRA_THEME) {
+      document.documentElement.setAttribute('data-dashboard-theme', EXTRA_THEME);
+      document.querySelectorAll('.dashboard-theme-card[data-dashboard-theme]').forEach(function(btn){
+        btn.classList.toggle('active', btn.dataset.dashboardTheme === EXTRA_THEME);
+      });
+      try { localStorage.setItem(THEME_KEY, EXTRA_THEME); } catch(e) {}
+      return;
+    }
+    if (typeof oldSetTheme === 'function') return oldSetTheme.apply(this, arguments);
+  };
+
+  const oldOpenTheme = window.openThemeSettingsModal;
+  window.openThemeSettingsModal = function(){
+    if (typeof oldOpenTheme === 'function') oldOpenTheme.apply(this, arguments);
+    ensureExtraThemeCard();
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === EXTRA_THEME) window.setDashboardTheme(EXTRA_THEME);
+  };
+
+  function init(){
+    ensureExtraThemeCard();
+    try { if (localStorage.getItem(THEME_KEY) === EXTRA_THEME) window.setDashboardTheme(EXTRA_THEME); } catch(e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once:true });
+  else init();
+
+  // Koreksi indikator typing dari cache presence jika patch module lama belum sempat render.
+  function partnerTypingActive(){
+    const partner = window.passivePartner || '';
+    const me = window.loggedInUser || '';
+    const states = window.cachePresenceStates || {};
+    const st = states[partner];
+    if (!partner || !me || !st) return false;
+    return String(st.status || '').toLowerCase() === 'typing'
+      && String(st.activeRoom || '') === String(me)
+      && Number(st.typingUntilMs || 0) > Date.now()
+      && Number(st.lastSeenMs || 0) > Date.now() - 70000;
+  }
+  // DISABLE: typing header sudah ditangani unified cleanup ticker agar tidak berat.
+  // setInterval(function(){ ... }, 700);
+})();
+</script>
+
 <style id="fix-dashboard-theme-button-visible-final">
   /* FINAL FIX: tombol Tema setelah login wajib muncul di menu Sandi / Tema / Profil / Admin / Keluar */
   #themeActionBtn {
@@ -16657,8 +15555,112 @@
   }
 </style>
 <!-- FINAL PATCH: Hapus indikator typing bawah chat agar tidak mengganggu area input. Presence/online/offline tetap berjalan. -->
+<style id="remove-bottom-typing-indicator-final">
+  #typingLiveLine, .typing-live-line, #typingIndicator, .typing-indicator {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+</style>
 <!-- FINAL PATCH: Typing indicator satu saja, tidak double warna merah/ungu. -->
+<style id="final-single-typing-indicator-only-style">
+  /* Indikator bawah tetap dihapus agar tidak mengganggu area input */
+  #typingLiveLine,
+  .typing-live-line,
+  #typingIndicator,
+  .typing-indicator {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Hapus dot/pseudo tambahan yang membuat typing terlihat seperti dua indikator */
+  .presence-typing::after,
+  .typing-live-dot,
+  #topHeaderStatus .typing-live-dot {
+    content: none !important;
+    display: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Satu warna indikator typing: merah-gold sesuai tema dashboard */
+  #topHeaderStatus .single-typing-indicator {
+    color: var(--theme-accent-2, #FFD36A) !important;
+    font-style: italic !important;
+    font-weight: 800 !important;
+    letter-spacing: .01em !important;
+    text-shadow: 0 0 10px rgba(255, 80, 90, .22) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  #topHeaderStatus .single-typing-indicator::before {
+    content: "●";
+    color: var(--theme-accent, #FF3B4F) !important;
+    text-shadow: 0 0 10px currentColor !important;
+  }
+</style>
 <!-- FINAL FIX: Typing indicator satu warna saja, tidak merah+ungu/double glow. -->
+<style id="final-fix-typing-one-color-only">
+  /* Sembunyikan semua indikator typing bawah/duplikat */
+  #typingLiveLine,
+  .typing-live-line,
+  #typingIndicator,
+  .typing-indicator {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Typing di header dan daftar room hanya pakai satu warna */
+  #topHeaderStatus .single-typing-indicator,
+  #topHeaderStatus .typing-single-color,
+  #dashboardPage .presence-typing,
+  #dashboardPage .status-indicator.presence-typing {
+    color: var(--theme-accent, #FF3B4F) !important;
+    text-shadow: none !important;
+    -webkit-text-stroke: 0 !important;
+    filter: none !important;
+    background: transparent !important;
+    font-style: italic !important;
+    font-weight: 800 !important;
+  }
+
+  /* Hilangkan dot/pseudo yang membuat warna terlihat double */
+  #topHeaderStatus .single-typing-indicator::before,
+  #topHeaderStatus .single-typing-indicator::after,
+  #topHeaderStatus .typing-single-color::before,
+  #topHeaderStatus .typing-single-color::after,
+  #dashboardPage .presence-typing::before,
+  #dashboardPage .presence-typing::after,
+  #dashboardPage .typing-live-dot {
+    content: none !important;
+    display: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+  }
+</style>
 <!-- FINAL PERFORMANCE STABILITY PATCH - anti delay/lag, single listener, render limit, mobile light -->
 <!-- FINAL PATCH REQUEST USER — Luffy fit + logo bajak laut gambar ketiga -->
 <style id="FINAL_USER_LUFFY_FULL_FIT_AND_PIRATE_LOGO_PATCH">
@@ -16892,246 +15894,6 @@
      - Blur, shadow, animasi, particle, dan render chat dibuat hemat
      - Tidak menghapus fitur utama
 ========================================================= -->
-<style id="FINAL_LIGHTWEIGHT_DASHBOARD_WEB_MOBILE_PATCH">
-  /* 1) Kurangi beban GPU di dashboard tanpa merusak tema */
-  #dashboardPage,
-  .chat-main-window,
-  .sidebar,
-  .chat-main-header,
-  .chat-footer-panel,
-  .modal-box,
-  .bubble,
-  .chat-item-card,
-  .desktop-notification-card {
-    will-change: auto !important;
-  }
-
-  /* 2) Blur terlalu besar sering bikin lag, jadi dibuat lebih ringan */
-  .sidebar,
-  .chat-main-header,
-  .chat-footer-panel,
-  .modal-box,
-  .desktop-notification-card,
-  .bubble {
-    backdrop-filter: blur(6px) !important;
-    -webkit-backdrop-filter: blur(6px) !important;
-  }
-
-  /* 3) Shadow besar dikurangi agar scrolling chat lebih stabil */
-  .bubble {
-    box-shadow: 0 6px 18px rgba(0,0,0,.18) !important;
-  }
-
-  .chat-item-card {
-    box-shadow: 0 8px 22px rgba(0,0,0,.18) !important;
-  }
-
-  .sidebar {
-    box-shadow: 12px 0 38px rgba(0,0,0,.22) !important;
-  }
-
-  .chat-main-header,
-  .chat-footer-panel {
-    box-shadow: 0 8px 22px rgba(0,0,0,.16) !important;
-  }
-
-  /* 4) Area chat dibuat lebih hemat saat jumlah pesan banyak */
-  .message-area {
-    contain: layout paint style !important;
-    scroll-behavior: auto !important;
-    overscroll-behavior: contain !important;
-  }
-
-  .msg-row {
-    contain: layout paint !important;
-  }
-
-  .bubble img,
-  .partner-avatar-img,
-  .avatar-wrapper img,
-  .desktop-notification-avatar {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
-
-  /* 5) Hover transform dimatikan saat dashboard aktif agar tidak berat */
-  body.dashboard-active .bubble:hover,
-  body.dashboard-active .chat-item-card:hover,
-  body.dashboard-active .action-link-btn:hover,
-  body.dashboard-active .send-action-btn:hover,
-  body.dashboard-active .clip-btn:hover {
-    transform: none !important;
-  }
-
-  /* 6) Efek background tetap ada, tapi animasinya dibuat jauh lebih pelan */
-  body.dashboard-active .login-love-particle,
-  body.dashboard-active .prelogin-love-particle,
-  body.dashboard-active .chat-love-bg-particle,
-  body.dashboard-active .love-point,
-  body.dashboard-active .floating-heart,
-  body.dashboard-active .floating-star,
-  body.dashboard-active .heart-fx,
-  body.dashboard-active .love-fx,
-  body.dashboard-active .star-fx,
-  body.dashboard-active .pirate-fx {
-    animation-duration: 12s !important;
-    animation-timing-function: linear !important;
-  }
-
-  /* 7) Kurangi layer dekoratif yang berat saat sudah masuk dashboard */
-  body.dashboard-active #dashboardPage::after,
-  body.dashboard-active .chat-main-window::after,
-  body.dashboard-active .sidebar::before,
-  body.dashboard-active .grid,
-  body.dashboard-active .noise {
-    opacity: .04 !important;
-    animation: none !important;
-  }
-
-  /* 8) Desktop tetap bagus, tapi particle dibatasi secara visual */
-  body.dashboard-active .login-love-particle:nth-child(n+25),
-  body.dashboard-active .prelogin-love-particle:nth-child(n+25),
-  body.dashboard-active .chat-love-bg-particle:nth-child(n+25),
-  body.dashboard-active .love-point:nth-child(n+25) {
-    display: none !important;
-  }
-
-  /* 9) Optimasi khusus mobile */
-  @media (max-width: 680px), (hover: none), (pointer: coarse) {
-    html, body {
-      overflow: hidden !important;
-      touch-action: manipulation;
-    }
-
-    #dashboardPage {
-      grid-template-columns: 1fr !important;
-      background: #030713 !important;
-    }
-
-    #dashboardPage::after,
-    .chat-main-window::after,
-    .sidebar::before,
-    .grid,
-    .noise,
-    body.dashboard-active .fx,
-    body.dashboard-active .login-love-particle,
-    body.dashboard-active .prelogin-love-particle,
-    body.dashboard-active .chat-love-bg-particle,
-    body.dashboard-active .love-point,
-    body.dashboard-active .floating-heart,
-    body.dashboard-active .floating-star,
-    body.dashboard-active .heart-fx,
-    body.dashboard-active .love-fx,
-    body.dashboard-active .star-fx,
-    body.dashboard-active .pirate-fx {
-      display: none !important;
-      animation: none !important;
-      transition: none !important;
-    }
-
-    .sidebar,
-    .chat-main-header,
-    .chat-footer-panel,
-    .modal-box,
-    .desktop-notification-card,
-    .bubble {
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,.20) !important;
-    }
-
-    .chat-main-header {
-      min-height: 62px !important;
-      padding: 10px 12px !important;
-    }
-
-    .message-area {
-      padding: 12px !important;
-      gap: 10px !important;
-      scroll-behavior: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-    }
-
-    .msg-row {
-      gap: 8px !important;
-    }
-
-    .msg-avatar {
-      width: 28px !important;
-      height: 28px !important;
-    }
-
-    .bubble {
-      max-width: 82% !important;
-      padding: 10px 13px !important;
-      font-size: 13px !important;
-      line-height: 1.45 !important;
-      border-radius: 16px !important;
-    }
-
-    .bubble img {
-      max-height: 190px !important;
-    }
-
-    .chat-footer-panel {
-      padding: 10px 12px !important;
-      gap: 9px !important;
-    }
-
-    .chat-footer-panel input[type="text"] {
-      height: 40px !important;
-      font-size: 13px !important;
-    }
-
-    .send-action-btn,
-    .clip-btn {
-      width: 38px !important;
-      height: 38px !important;
-      min-width: 38px !important;
-    }
-
-    .desktop-notification-card {
-      animation: none !important;
-      transform: none !important;
-      opacity: 1 !important;
-    }
-  }
-
-  /* 10) Untuk perangkat sangat kecil, tampilan dibuat lebih hemat lagi */
-  @media (max-width: 420px) {
-    .bubble {
-      max-width: 88% !important;
-      font-size: 12.8px !important;
-    }
-
-    .message-area {
-      padding: 10px !important;
-    }
-
-    .chat-footer-panel {
-      padding: 9px 10px !important;
-    }
-
-    #topHeaderTitle {
-      font-size: 14px !important;
-    }
-
-    #topHeaderStatus {
-      font-size: 11px !important;
-    }
-  }
-
-  /* 11) Ikuti setting user yang mengurangi animasi */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation: none !important;
-      transition: none !important;
-      scroll-behavior: auto !important;
-    }
-  }
-</style>
 <!-- END FINAL OPTIMASI RINGAN WEB & MOBILE -->
 
 
@@ -17295,6 +16057,40 @@
     #loginPage .luffy-stat-ico { display: none !important; }
   }
 </style>
+<script id="FINAL_CROSSCHECK_SAFE_CLEANUP_PATCH">
+(function(){
+  "use strict";
+  function removeDuplicateBySelector(selector){
+    var nodes = document.querySelectorAll(selector);
+    if (!nodes || nodes.length <= 1) return;
+    for (var i = 1; i < nodes.length; i++) {
+      if (nodes[i] && nodes[i].parentNode) nodes[i].parentNode.removeChild(nodes[i]);
+    }
+  }
+  function safeCrosscheck(){
+    var login = document.getElementById("loginPage");
+    if (!login) return;
+    removeDuplicateBySelector("#loginPage .luffy-login-stats");
+    removeDuplicateBySelector("#loginPage .luffy-update-pill");
+    removeDuplicateBySelector("#loginPage .luffy-copy");
+    removeDuplicateBySelector("#loginPage .portal-head");
+    var stats = login.querySelector(".luffy-login-stats");
+    var card = login.querySelector(".card");
+    var pill = login.querySelector(".luffy-update-pill");
+    if (stats && card && (stats.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_PRECEDING)) login.insertBefore(stats, card);
+    if (pill && card && (pill.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_PRECEDING)) login.insertBefore(pill, card);
+    if (stats) {
+      stats.style.willChange = "auto";
+      stats.style.backfaceVisibility = "hidden";
+    }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", safeCrosscheck, { once: true });
+  else safeCrosscheck();
+  window.addEventListener("load", safeCrosscheck, { once: true });
+  setTimeout(safeCrosscheck, 400);
+  setTimeout(safeCrosscheck, 1200);
+})();
+</script>
 <!-- END FINAL ALIGNMENT STATS PATCH -->
 
 <!-- FINAL FIX LOGIN PIRATE LOGO DIRECT IMG
@@ -17460,335 +16256,1098 @@
 
 
 <!-- FINAL CEK ULANG MOBILE/WEB LIGHT MODE + UNIFIED CLEANUP TICKER -->
+
+<script id="FD_FINAL_UI_STABILITY_20260614_SCRIPT">
+(function(){
+  "use strict";
+  if (window.__FD_FINAL_UI_STABILITY_20260614__) return;
+  window.__FD_FINAL_UI_STABILITY_20260614__ = true;
+
+  var CLEANUP_INTERVAL_MS = 15000;
+  var resizeTimer = null;
+  var cleanupPending = false;
+
+  function isMobileLike(){
+    try {
+      return !!(window.matchMedia && (
+        window.matchMedia("(max-width: 680px)").matches ||
+        window.matchMedia("(pointer: coarse)").matches
+      ));
+    } catch(e) {
+      return window.innerWidth <= 680;
+    }
+  }
+
+  function getDashboard(){
+    return document.getElementById("dashboardPage");
+  }
+
+  function getChatBox(){
+    return document.getElementById("messageFlowBox") || document.querySelector(".message-area");
+  }
+
+  function isDashboardVisible(){
+    var dash = getDashboard();
+    if (!dash) return false;
+    try {
+      return getComputedStyle(dash).display !== "none";
+    } catch(e) {
+      return dash.style.display !== "none";
+    }
+  }
+
+  function scrollChatBottom(repeat){
+    var box = getChatBox();
+    if (!box) return;
+    var run = function(){
+      try {
+        box.scrollTop = box.scrollHeight;
+      } catch(e) {}
+    };
+    run();
+    (window.requestAnimationFrame || function(cb){ return setTimeout(cb, 16); })(run);
+    if (repeat) [80, 180, 420, 760].forEach(function(delay){ setTimeout(run, delay); });
+  }
+
+  function openMobileSidebar(){
+    var dash = getDashboard();
+    if (!dash) return;
+    dash.classList.add("mobile-sidebar-open", "is-mobile-authenticated");
+    document.body.classList.add("mobile-nav-lock");
+  }
+
+  function closeMobileSidebar(){
+    var dash = getDashboard();
+    if (dash) dash.classList.remove("mobile-sidebar-open");
+    document.body.classList.remove("mobile-nav-lock");
+  }
+
+  window.openMobileSidebar = openMobileSidebar;
+  window.closeMobileSidebar = closeMobileSidebar;
+  window.toggleMobileSidebar = function(){
+    var dash = getDashboard();
+    if (!dash) return;
+    if (dash.classList.contains("mobile-sidebar-open")) closeMobileSidebar();
+    else openMobileSidebar();
+  };
+
+  window.forceFinalChatBottom = function(){
+    scrollChatBottom(true);
+  };
+
+  window.loadOlderMessagesBatch = function(){
+    var state = window.__chatVirtualState || (window.__chatVirtualState = { roomKey: "", visibleCount: isMobileLike() ? 70 : 130 });
+    var addCount = isMobileLike() ? 50 : 90;
+    state.visibleCount = Math.min((Number(state.visibleCount || 0) || (isMobileLike() ? 70 : 130)) + addCount, 700);
+    window.__chatVirtualLoadingOlder = true;
+
+    var partner = String(window.passivePartner || "").trim();
+    if (!partner) {
+      var active = document.querySelector(".chat-item-card.active[data-chat-partner]");
+      partner = active ? String(active.getAttribute("data-chat-partner") || "").trim() : "";
+    }
+
+    if (partner && typeof window.selectActiveChatRoom === "function") {
+      window.selectActiveChatRoom(partner);
+    }
+  };
+
+  function syncDashboardState(){
+    var dash = getDashboard();
+    var visible = isDashboardVisible();
+    document.body.classList.toggle("dashboard-active", visible);
+    document.body.classList.toggle("fd-final-light-mode", isMobileLike());
+    if (dash) {
+      dash.classList.toggle("is-mobile-authenticated", visible);
+      if (!visible) dash.classList.remove("mobile-sidebar-open", "mobile-chat-active");
+    }
+    if (!visible) document.body.classList.remove("mobile-nav-lock");
+  }
+
+  function ensureThemeButtonVisible(){
+    var themeBtn = document.getElementById("themeActionBtn");
+    if (!themeBtn) return;
+    themeBtn.style.display = "flex";
+    themeBtn.style.visibility = "visible";
+    themeBtn.style.opacity = "1";
+    themeBtn.onclick = function(){
+      if (typeof window.openThemeSettingsModal === "function") window.openThemeSettingsModal();
+      else {
+        var modal = document.getElementById("themeModal");
+        if (modal) modal.style.display = "grid";
+      }
+    };
+  }
+  window.ensureThemeButtonVisible = ensureThemeButtonVisible;
+
+  function removeBottomTypingIndicators(){
+    try {
+      document.querySelectorAll("#typingLiveLine,.typing-live-line,#typingIndicator,.typing-indicator").forEach(function(el){ el.remove(); });
+    } catch(e) {}
+  }
+
+  function normalizeTypingHeader(){
+    var top = document.getElementById("topHeaderStatus");
+    if (!top) return;
+    var text = String(top.textContent || "").toLowerCase();
+    if (text.indexOf("mengetik") !== -1 && !top.querySelector(".single-typing-indicator")) {
+      top.innerHTML = '<span class="single-typing-indicator">Sedang mengetik...</span>';
+    }
+  }
+
+  function limitElements(selector, max){
+    var nodes;
+    try { nodes = Array.prototype.slice.call(document.querySelectorAll(selector)); } catch(e) { return; }
+    if (!nodes || nodes.length <= max) return;
+    nodes.slice(0, nodes.length - max).forEach(function(node){
+      try { node.remove(); } catch(e) {}
+    });
+  }
+
+  function cleanupUi(){
+    syncDashboardState();
+    ensureThemeButtonVisible();
+    removeBottomTypingIndicators();
+    normalizeTypingHeader();
+
+    var particleMax = isMobileLike() ? 22 : 70;
+    limitElements(".login-love-particle", particleMax);
+    limitElements(".prelogin-love-particle", particleMax);
+    limitElements(".chat-love-bg-particle", particleMax);
+    limitElements(".lp-fx-field .lp-fx-item", isMobileLike() ? 30 : 90);
+    limitElements("#desktopNotificationStack .desktop-notification-card", 3);
+
+    var popups = document.querySelectorAll("#maintenanceDashboardPopup");
+    if (popups.length > 1) Array.prototype.slice.call(popups, 1).forEach(function(el){ try { el.remove(); } catch(e) {} });
+  }
+
+  function scheduleCleanup(delay){
+    if (cleanupPending) return;
+    cleanupPending = true;
+    setTimeout(function(){
+      cleanupPending = false;
+      cleanupUi();
+    }, delay || 80);
+  }
+
+  function patchSelectRoom(){
+    if (typeof window.selectActiveChatRoom !== "function" || window.selectActiveChatRoom.__fdFinalStable) return false;
+    var original = window.selectActiveChatRoom;
+    window.selectActiveChatRoom = function(){
+      var result = original.apply(this, arguments);
+      var dash = getDashboard();
+      if (dash) dash.classList.add("mobile-chat-active", "is-mobile-authenticated");
+      if (isMobileLike()) setTimeout(closeMobileSidebar, 80);
+      scrollChatBottom(true);
+      return result;
+    };
+    window.selectActiveChatRoom.__fdFinalStable = true;
+    return true;
+  }
+
+  function patchSendNoThrottle(){
+    if (typeof window.commitMessageToFirebase !== "function" || window.commitMessageToFirebase.__fdFinalNoThrottle) return false;
+    var original = window.commitMessageToFirebase;
+    window.commitMessageToFirebase = function(){
+      var result = original.apply(this, arguments);
+      Promise.resolve(result).finally(function(){
+        scrollChatBottom(true);
+        scheduleCleanup(120);
+      });
+      return result;
+    };
+    window.commitMessageToFirebase.__fdFinalNoThrottle = true;
+    return true;
+  }
+
+  function patchSignOut(){
+    if (typeof window.triggerSignOut !== "function" || window.triggerSignOut.__fdFinalMobileClean) return false;
+    var original = window.triggerSignOut;
+    window.triggerSignOut = async function(){
+      var result = await original.apply(this, arguments);
+      closeMobileSidebar();
+      syncDashboardState();
+      return result;
+    };
+    window.triggerSignOut.__fdFinalMobileClean = true;
+    return true;
+  }
+
+  function patchRuntimeFunctions(){
+    patchSelectRoom();
+    patchSendNoThrottle();
+    patchSignOut();
+  }
+
+  function buildFxItem(index, total){
+    var icons = [
+      { text: "♥", cls: "love" }, { text: "♡", cls: "love" },
+      { text: "🏴‍☠️", cls: "pirate" }, { text: "☠️", cls: "pirate" },
+      { text: "✦", cls: "star" }, { text: "✧", cls: "star" }
+    ];
+    var icon = icons[index % icons.length];
+    var item = document.createElement("span");
+    var mobile = isMobileLike();
+    var directionDown = index % 2 === 0;
+    var lane = (index + 0.5) / Math.max(1, total);
+    var jitter = ((index * 37) % 13) - 6;
+    var size = icon.cls === "pirate" ? (mobile ? 13 : 15) : (mobile ? 9 : 11);
+    var duration = (mobile ? 24 : 19) + (index % 9);
+    var delay = -1 * ((index * 1.7) % duration);
+    var drift = ((index % 2 ? -1 : 1) * (8 + (index % 4) * 5));
+    item.className = "lp-fx-item " + icon.cls + " " + (directionDown ? "lp-fx-down" : "lp-fx-up");
+    item.textContent = icon.text;
+    item.setAttribute("aria-hidden", "true");
+    item.style.setProperty("--x", Math.max(3, Math.min(97, lane * 100 + jitter)) + "%");
+    item.style.setProperty("--s", size + "px");
+    item.style.setProperty("--d", duration + "s");
+    item.style.setProperty("--delay", delay + "s");
+    item.style.setProperty("--drift", drift + "px");
+    item.style.setProperty("--o", icon.cls === "pirate" ? ".22" : ".30");
+    return item;
+  }
+
+  function ensureFxField(id, selector, desktopCount, mobileCount){
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var target = document.querySelector(selector);
+    if (!target || document.getElementById(id)) return;
+    var field = document.createElement("div");
+    field.id = id;
+    field.className = "lp-fx-field";
+    field.setAttribute("aria-hidden", "true");
+    var count = isMobileLike() ? mobileCount : desktopCount;
+    var fragment = document.createDocumentFragment();
+    for (var i = 0; i < count; i++) fragment.appendChild(buildFxItem(i, count));
+    field.appendChild(fragment);
+    target.insertBefore(field, target.firstChild);
+  }
+
+  function bootLovePirateStarFx(){
+    ensureFxField("loginLovePiratesFx", "#loginPage", 24, 12);
+    ensureFxField("dashboardLovePiratesFx", "#dashboardPage", 14, 8);
+    ensureFxField("chatLovePiratesFx", ".chat-main-window", 12, 6);
+  }
+
+  function rebuildFxOnResize(){
+    ["loginLovePiratesFx","dashboardLovePiratesFx","chatLovePiratesFx"].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.remove();
+    });
+    bootLovePirateStarFx();
+  }
+
+
+  function ensureRegisterAdminPopup(){
+    var overlay = document.getElementById("registerAdminPopup");
+    if (overlay) return overlay;
+    overlay = document.createElement("div");
+    overlay.id = "registerAdminPopup";
+    overlay.className = "register-admin-popup-overlay";
+    overlay.innerHTML = '' +
+      '<div class="register-admin-popup-box" role="alertdialog" aria-modal="true" aria-labelledby="registerAdminPopupTitle">' +
+        '<div class="register-admin-popup-icon">!</div>' +
+        '<div class="register-admin-popup-title" id="registerAdminPopupTitle">REGISTER</div>' +
+        '<div class="register-admin-popup-text">SILAHKAN HUBUNGI ADMIN TERLEBIH DAHULU</div>' +
+        '<button type="button" class="register-admin-popup-btn" id="registerAdminPopupClose">Mengerti</button>' +
+      '</div>';
+    overlay.addEventListener("click", function(event){
+      if (event.target === overlay) overlay.classList.remove("is-visible");
+    });
+    document.body.appendChild(overlay);
+    var close = document.getElementById("registerAdminPopupClose");
+    if (close) close.addEventListener("click", function(){ overlay.classList.remove("is-visible"); });
+    return overlay;
+  }
+
+  window.openRegisterAdminPopup = function(event){
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    ensureRegisterAdminPopup().classList.add("is-visible");
+  };
+
+  function installRegisterHereButton(){
+    var meta = document.querySelector("#loginPage .login-footnote .meta") || document.querySelector("#loginPage .meta");
+    if (!meta || meta.dataset.registerPatchInstalled === "1") return;
+    meta.dataset.registerPatchInstalled = "1";
+    meta.textContent = "";
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "register-admin-link";
+    btn.textContent = "Register here";
+    btn.addEventListener("click", window.openRegisterAdminPopup);
+    meta.appendChild(btn);
+    ensureRegisterAdminPopup();
+  }
+
+  function boot(){
+    patchRuntimeFunctions();
+    syncDashboardState();
+    ensureThemeButtonVisible();
+    installRegisterHereButton();
+    bootLovePirateStarFx();
+    cleanupUi();
+
+    var tries = 0;
+    var patchTimer = setInterval(function(){
+      tries += 1;
+      patchRuntimeFunctions();
+      ensureThemeButtonVisible();
+      if (tries >= 45 || (patchSelectRoom() && patchSendNoThrottle() && patchSignOut())) clearInterval(patchTimer);
+    }, 350);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
+  }
+
+  document.addEventListener("visibilitychange", function(){
+    if (!document.hidden) {
+      syncDashboardState();
+      scrollChatBottom(false);
+      scheduleCleanup(60);
+    }
+  }, { passive: true });
+
+  window.addEventListener("load", function(){ scheduleCleanup(60); scrollChatBottom(false); }, { once: true, passive: true });
+  window.addEventListener("focus", function(){ scheduleCleanup(80); scrollChatBottom(false); }, { passive: true });
+  window.addEventListener("resize", function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){
+      rebuildFxOnResize();
+      scheduleCleanup(60);
+      scrollChatBottom(false);
+    }, 220);
+  }, { passive: true });
+  window.addEventListener("orientationchange", function(){
+    setTimeout(function(){
+      rebuildFxOnResize();
+      closeMobileSidebar();
+      scrollChatBottom(true);
+      scheduleCleanup(60);
+    }, 260);
+  }, { passive: true });
+
+  setInterval(cleanupUi, CLEANUP_INTERVAL_MS);
+})();
+</script>
+
+
+<script type="module" id="FD_FINAL_SINGLE_MAINTENANCE_ENGINE_20260614_MODULE">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+if (!window.__FD_FINAL_SINGLE_MAINTENANCE_ENGINE_20260614__) {
+  window.__FD_FINAL_SINGLE_MAINTENANCE_ENGINE_20260614__ = true;
+
+  const app = getApps().length ? getApp() : initializeApp({
+    apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
+    authDomain: "fandah-c08fc.firebaseapp.com",
+    projectId: "fandah-c08fc",
+    storageBucket: "fandah-c08fc.firebasestorage.app",
+    messagingSenderId: "624734789171",
+    appId: "1:624734789171:web:7ba9ab16730acb5cfc8d46",
+    measurementId: "G-DN9Y49Q8QQ"
+  });
+
+  const db = getFirestore(app);
+  const MAINTENANCE_REF = doc(db, "app_settings", "maintenance_dashboard");
+  const SESSION_KEY = "fandah_dashboard_login_session_v1";
+  const SESSION_ID_KEY = "fandah_dashboard_session_id_v3";
+  const OWNER_NAME = "OWNER";
+  const LEGACY_OWNER = "Fadly";
+  const DEFAULT_MESSAGE = "Dashboard sedang maintenance. Silakan coba lagi nanti.";
+
+  let maintenanceState = { active: false, message: DEFAULT_MESSAGE, updatedAtMs: 0 };
+  let loginPatchReady = false;
+  let adminPatchReady = false;
+  let lastLoginAttemptWasBlocked = false;
+
+  function normalizeUser(name) {
+    const raw = String(name || "").trim();
+    if (raw.toLowerCase() === LEGACY_OWNER.toLowerCase()) return OWNER_NAME;
+    if (raw.toLowerCase() === OWNER_NAME.toLowerCase()) return OWNER_NAME;
+    return raw;
+  }
+
+  function isOwner(name) {
+    return normalizeUser(name) === OWNER_NAME;
+  }
+
+  function readSessionUser() {
+    try {
+      const data = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+      return normalizeUser(data && data.username);
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function currentUser() {
+    return normalizeUser(window.loggedInUser || readSessionUser() || "");
+  }
+
+  function clearSessionOnly() {
+    try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    try { localStorage.removeItem(SESSION_ID_KEY); } catch (e) {}
+  }
+
+  function ensureMaintenancePopup() {
+    let overlay = document.getElementById("maintenanceDashboardPopup");
+    if (overlay) return overlay;
+
+    overlay = document.createElement("div");
+    overlay.id = "maintenanceDashboardPopup";
+    overlay.className = "maintenance-popup-overlay";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.innerHTML = `
+      <div class="maintenance-popup-box" role="alertdialog" aria-live="assertive" aria-modal="true">
+        <div class="maintenance-popup-icon">⚙</div>
+        <div class="maintenance-popup-title">MAINTENANCE DASHBOARD</div>
+        <div class="maintenance-popup-text" id="maintenanceDashboardPopupText">${DEFAULT_MESSAGE}</div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function showMaintenancePopup(message) {
+    const overlay = ensureMaintenancePopup();
+    const msg = String(message || DEFAULT_MESSAGE);
+    const text = overlay.querySelector("#maintenanceDashboardPopupText");
+    if (text) text.textContent = msg;
+    overlay.classList.add("is-visible");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("maintenance-active");
+  }
+
+  function hideMaintenancePopup() {
+    const overlay = document.getElementById("maintenanceDashboardPopup");
+    if (overlay) {
+      overlay.classList.remove("is-visible");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+    document.body.classList.remove("maintenance-active", "maintenance-login-attempted");
+    lastLoginAttemptWasBlocked = false;
+  }
+
+  window.showMaintenancePopup = showMaintenancePopup;
+  window.hideMaintenancePopup = hideMaintenancePopup;
+
+  function setLoginError(message) {
+    const errorBox = document.getElementById("authErrorNotification");
+    if (!errorBox) return;
+    errorBox.textContent = message || "";
+    errorBox.style.display = message ? "block" : "none";
+  }
+
+  function showLoginOnly() {
+    const dash = document.getElementById("dashboardPage");
+    const login = document.getElementById("loginPage");
+    if (dash) {
+      dash.style.display = "none";
+      dash.classList.remove("mobile-sidebar-open", "mobile-chat-active", "is-mobile-authenticated");
+    }
+    if (login) login.style.display = "grid";
+    document.body.classList.remove("mobile-nav-lock", "dashboard-active");
+  }
+
+  async function forceLogoutForMaintenance() {
+    clearSessionOnly();
+    if (typeof window.triggerSignOut === "function") {
+      try {
+        await window.triggerSignOut({ reason: "maintenance", skipSessionBroadcast: true });
+      } catch (e) {
+        showLoginOnly();
+      }
+    } else {
+      showLoginOnly();
+    }
+  }
+
+  async function fetchMaintenanceState() {
+    try {
+      const snap = await getDoc(MAINTENANCE_REF);
+      const data = snap.exists() ? (snap.data() || {}) : {};
+      maintenanceState = {
+        active: data.active === true,
+        message: String(data.message || DEFAULT_MESSAGE),
+        updatedAtMs: Number(data.updatedAtMs || data.activatedAtMs || 0)
+      };
+    } catch (e) {
+      /* fail-open supaya user tidak terkunci jika koneksi sedang bermasalah */
+    }
+    return maintenanceState;
+  }
+
+  async function enforceMaintenanceState(options = {}) {
+    const user = currentUser();
+
+    if (!maintenanceState.active) {
+      hideMaintenancePopup();
+      renderMaintenancePanel();
+      return;
+    }
+
+    if (user && !isOwner(user)) {
+      await forceLogoutForMaintenance();
+      document.body.classList.add("maintenance-login-attempted");
+      showMaintenancePopup(maintenanceState.message);
+      setLoginError("Dashboard sedang maintenance. Silakan coba lagi setelah Owner menonaktifkan maintenance.");
+      return;
+    }
+
+    if (isOwner(user)) {
+      hideMaintenancePopup();
+      renderMaintenancePanel();
+      return;
+    }
+
+    if (options.fromLoginAttempt || lastLoginAttemptWasBlocked) {
+      document.body.classList.add("maintenance-login-attempted");
+      showMaintenancePopup(maintenanceState.message);
+    } else {
+      hideMaintenancePopup();
+    }
+    renderMaintenancePanel();
+  }
+
+  function patchLoginValidation() {
+    if (loginPatchReady || typeof window.executeLoginValidation !== "function") return false;
+
+    const originalLogin = window.executeLoginValidation;
+    window.executeLoginValidation = async function(event) {
+      event && event.preventDefault && event.preventDefault();
+
+      const inputUser = document.getElementById("inputUser");
+      const attemptedUser = normalizeUser(inputUser ? inputUser.value : "");
+
+      await fetchMaintenanceState();
+
+      if (maintenanceState.active && !isOwner(attemptedUser)) {
+        lastLoginAttemptWasBlocked = true;
+        clearSessionOnly();
+        showLoginOnly();
+        setLoginError("Dashboard sedang maintenance. Silakan coba lagi setelah Owner menonaktifkan maintenance.");
+        await enforceMaintenanceState({ fromLoginAttempt: true });
+        return;
+      }
+
+      lastLoginAttemptWasBlocked = false;
+      hideMaintenancePopup();
+      return originalLogin.call(this, event);
+    };
+
+    window.executeLoginValidation.__fdFinalMaintenance = true;
+    loginPatchReady = true;
+    return true;
+  }
+
+  function panelHtml() {
+    const message = String(maintenanceState.message || DEFAULT_MESSAGE)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+    return `
+      <div class="admin-section-title">Owner Tools — Maintenance Dashboard</div>
+      <div class="owner-tools-desc">
+        Saat aktif, semua user non-owner akan logout dan login user akan diblokir dengan popup maintenance. Owner tetap bisa masuk untuk menonaktifkan fitur ini.
+      </div>
+      <textarea id="fdMaintenanceMessageInput" maxlength="240" placeholder="Pesan maintenance untuk user">${message}</textarea>
+      <div class="fd-maintenance-actions">
+        <button class="modal-btn primary" type="button" id="fdMaintenanceOnBtn">Aktifkan Maintenance</button>
+        <button class="modal-btn secondary" type="button" id="fdMaintenanceOffBtn">Nonaktifkan Maintenance</button>
+      </div>
+      <div class="fd-maintenance-status" id="fdMaintenanceStatus">NORMAL AKTIF</div>
+    `;
+  }
+
+  function ensureMaintenancePanel() {
+    const adminBox = document.querySelector("#adminModal .admin-control-modal");
+    if (!adminBox || !isOwner(currentUser())) return null;
+
+    let panel = document.getElementById("fdMaintenanceCenterPanel");
+    if (!panel) {
+      panel = document.createElement("div");
+      panel.className = "admin-section-card owner-tools-card";
+      panel.id = "fdMaintenanceCenterPanel";
+
+      const anchor = document.getElementById("ownerToolsCard");
+      if (anchor && anchor.parentNode) anchor.insertAdjacentElement("afterend", panel);
+      else {
+        const foot = adminBox.querySelector(".modal-foot");
+        if (foot) adminBox.insertBefore(panel, foot);
+        else adminBox.appendChild(panel);
+      }
+    }
+
+    panel.innerHTML = panelHtml();
+
+    const onBtn = document.getElementById("fdMaintenanceOnBtn");
+    const offBtn = document.getElementById("fdMaintenanceOffBtn");
+    if (onBtn) onBtn.addEventListener("click", () => setMaintenanceActive(true), { once: false });
+    if (offBtn) offBtn.addEventListener("click", () => setMaintenanceActive(false), { once: false });
+
+    return panel;
+  }
+
+  function renderMaintenancePanel() {
+    const panel = document.getElementById("fdMaintenanceCenterPanel") || ensureMaintenancePanel();
+    if (!panel) return;
+
+    const input = document.getElementById("fdMaintenanceMessageInput");
+    const status = document.getElementById("fdMaintenanceStatus");
+    const onBtn = document.getElementById("fdMaintenanceOnBtn");
+    const offBtn = document.getElementById("fdMaintenanceOffBtn");
+
+    if (input && document.activeElement !== input) input.value = maintenanceState.message || DEFAULT_MESSAGE;
+    if (status) {
+      status.textContent = maintenanceState.active ? "MAINTENANCE AKTIF" : "NORMAL AKTIF";
+      status.classList.toggle("is-active", !!maintenanceState.active);
+    }
+    if (onBtn) onBtn.style.display = maintenanceState.active ? "none" : "inline-flex";
+    if (offBtn) offBtn.style.display = maintenanceState.active ? "inline-flex" : "none";
+  }
+
+  async function setMaintenanceActive(active) {
+    const input = document.getElementById("fdMaintenanceMessageInput");
+    const message = String(input && input.value || DEFAULT_MESSAGE).trim() || DEFAULT_MESSAGE;
+    const now = Date.now();
+
+    maintenanceState = { active: !!active, message, updatedAtMs: now };
+    renderMaintenancePanel();
+
+    try {
+      await setDoc(MAINTENANCE_REF, {
+        active: !!active,
+        message,
+        updatedAtMs: now,
+        activatedAtMs: active ? now : 0,
+        updatedAt: serverTimestamp(),
+        updatedBy: currentUser() || OWNER_NAME
+      }, { merge: true });
+
+      if (!active) {
+        hideMaintenancePopup();
+        setLoginError("");
+      }
+    } catch (e) {
+      alert("Gagal mengubah maintenance. Cek koneksi lalu coba lagi.");
+      await fetchMaintenanceState();
+      renderMaintenancePanel();
+    }
+  }
+
+  function patchAdminOpen() {
+    if (adminPatchReady || typeof window.openAdminManagementModal !== "function") return false;
+    const originalOpen = window.openAdminManagementModal;
+    window.openAdminManagementModal = function(...args) {
+      const result = originalOpen.apply(this, args);
+      setTimeout(() => {
+        if (isOwner(currentUser())) ensureMaintenancePanel();
+        renderMaintenancePanel();
+      }, 80);
+      return result;
+    };
+    window.openAdminManagementModal.__fdFinalMaintenance = true;
+    adminPatchReady = true;
+    return true;
+  }
+
+  function bootMaintenanceEngine() {
+    ensureMaintenancePopup();
+    hideMaintenancePopup();
+
+    patchLoginValidation();
+    patchAdminOpen();
+
+    let tries = 0;
+    const patchTimer = setInterval(() => {
+      tries += 1;
+      patchLoginValidation();
+      patchAdminOpen();
+      if (isOwner(currentUser())) {
+        ensureMaintenancePanel();
+        renderMaintenancePanel();
+      }
+      if ((loginPatchReady && adminPatchReady) || tries >= 60) clearInterval(patchTimer);
+    }, 350);
+
+    onSnapshot(MAINTENANCE_REF, async (snap) => {
+      const data = snap.exists() ? (snap.data() || {}) : {};
+      maintenanceState = {
+        active: data.active === true,
+        message: String(data.message || DEFAULT_MESSAGE),
+        updatedAtMs: Number(data.updatedAtMs || data.activatedAtMs || 0)
+      };
+      await enforceMaintenanceState();
+    }, () => {
+      /* Jangan tampilkan popup kalau listener gagal; fail-open agar user tidak terkunci. */
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootMaintenanceEngine, { once: true });
+  } else {
+    bootMaintenanceEngine();
+  }
+}
+</script>
+
+
 <!-- =========================================================
-     FINAL MASTER STABILITY PATCH V3 — logout, mobile, scroll, cleanup
-     Ditambahkan oleh ChatGPT untuk menyempurnakan file final:
-     1) Logout tidak lagi stuck/overlay mengunci klik.
-     2) Mobile drawer/chat tetap bisa diklik.
-     3) Chat stay di pesan terbaru setelah kirim/terima pesan.
-     4) Maintenance popup tidak muncul liar sebelum percobaan login.
-     5) Efek love/pirate tetap ada, tetapi diringankan di mobile.
+     FD BUGFIX CLEAN FINAL — 14 Juni 2026
+     Perbaikan:
+     - Menghapus guard global listener/interval yang terlalu agresif.
+     - Menambahkan fungsi foto profil mobile yang hilang.
+     - Menstabilkan layout mobile, web kecil/minimize, bubble gambar,
+       scroll chat terbaru, dan drawer sidebar tanpa menimpa fitur utama.
      ========================================================= -->
+<style id="FD_BUGFIX_CLEAN_FINAL_20260614_STYLE">
+  html, body {
+    width: 100%;
+    min-width: 0;
+  }
 
+  #dashboardPage,
+  #dashboardPage *,
+  #dashboardPage *::before,
+  #dashboardPage *::after {
+    min-width: 0;
+  }
 
-<!-- FINAL CLEAN CONSOLIDATED PATCH V5 — non-conflict, no duplicate override -->
+  #dashboardPage {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
 
+  .sidebar,
+  .chat-main-window,
+  .chat-main-header,
+  .message-area,
+  .chat-footer-panel {
+    min-width: 0 !important;
+  }
 
+  .chat-main-window {
+    height: 100%;
+    min-height: 0 !important;
+  }
 
-<!-- V6.1 MOBILE RESTORE FINAL
-     Tujuan: mengembalikan tampilan mobile seperti versi sebelumnya yang usable.
-     Scope aman: hanya CSS mobile <=680px, tidak mengubah Firebase, login, admin, maintenance, atau fungsi chat utama.
--->
-<style id="v6-1-mobile-restore-final">
+  .chat-main-header > div,
+  .chat-item-card > div,
+  .bubble,
+  .bubble * {
+    min-width: 0;
+  }
+
+  .bubble {
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+
+  .bubble img,
+  .bubble .chat-image-thumb {
+    display: block !important;
+    max-width: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    align-self: stretch !important;
+    margin: 6px 0 2px !important;
+    vertical-align: top !important;
+  }
+
+  .bubble:has(img),
+  .bubble:has(.chat-image-thumb) {
+    width: fit-content;
+    max-width: min(74%, 560px) !important;
+  }
+
+  .message-area {
+    contain: layout style;
+    overscroll-behavior: contain;
+  }
+
+  .chat-footer-panel {
+    flex-shrink: 0 !important;
+  }
+
+  .chat-footer-panel input[type="text"] {
+    min-width: 0 !important;
+  }
+
+  .mobile-sidebar-toggle,
+  .mobile-sidebar-close {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (min-width: 681px) and (max-width: 1080px) {
+    #dashboardPage {
+      grid-template-columns: clamp(268px, 32vw, 330px) minmax(0, 1fr) !important;
+    }
+
+    .sidebar-header {
+      padding: 14px !important;
+    }
+
+    .sh-actions {
+      grid-template-columns: repeat(auto-fit, minmax(54px, 1fr)) !important;
+      gap: 7px !important;
+      padding: 9px !important;
+    }
+
+    .action-link-btn {
+      height: 62px !important;
+      padding: 7px 3px !important;
+      border-radius: 14px !important;
+      font-size: 9.5px !important;
+    }
+
+    .chat-item-card {
+      grid-template-columns: 48px minmax(0, 1fr) 66px !important;
+      gap: 9px !important;
+      padding: 11px !important;
+      border-radius: 18px !important;
+    }
+
+    .chat-item-card .partner-avatar-img {
+      width: 46px !important;
+      height: 46px !important;
+    }
+
+    .chat-item-actions {
+      width: 66px !important;
+    }
+
+    .chat-item-actions .tiny-profile-btn,
+    .chat-item-actions .unread-badge-alert {
+      width: 62px !important;
+      min-width: 62px !important;
+    }
+
+    .bubble {
+      max-width: min(74%, 620px) !important;
+    }
+  }
+
+  @media (max-height: 560px) and (min-width: 681px) {
+    #dashboardPage {
+      grid-template-columns: 300px minmax(0, 1fr) !important;
+    }
+
+    .sidebar-header {
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+      gap: 9px !important;
+    }
+
+    .sh-top {
+      min-height: 66px !important;
+      padding: 9px !important;
+      border-radius: 18px !important;
+    }
+
+    .avatar-wrapper {
+      width: 46px !important;
+      height: 46px !important;
+    }
+
+    #myProfileName {
+      font-size: 14px !important;
+      margin-bottom: 5px !important;
+    }
+
+    .sh-actions {
+      gap: 6px !important;
+      padding: 7px !important;
+      border-radius: 17px !important;
+    }
+
+    .action-link-btn {
+      height: 50px !important;
+      border-radius: 12px !important;
+      font-size: 9px !important;
+      gap: 3px !important;
+    }
+
+    .action-ico {
+      width: 19px !important;
+      height: 19px !important;
+      font-size: 14px !important;
+    }
+
+    .message-area {
+      padding: 14px 18px !important;
+      gap: 10px !important;
+    }
+
+    .chat-main-header {
+      min-height: 58px !important;
+      padding: 10px 16px !important;
+    }
+
+    .chat-footer-panel {
+      padding: 10px 16px !important;
+    }
+  }
+
   @media (max-width: 680px) {
     html,
     body {
-      width: 100% !important;
+      width: 100vw !important;
       height: 100dvh !important;
       min-height: 100dvh !important;
       overflow: hidden !important;
-      overscroll-behavior: none !important;
+      overscroll-behavior: none;
     }
 
-    /* KEMBALIKAN MODE MOBILE LAMA: sidebar/list chat berada di bagian atas, bukan drawer tersembunyi. */
     #dashboardPage {
-      --mobile-sidebar-size: min(34dvh, 255px) !important;
-      display: grid !important;
-      grid-template-columns: 1fr !important;
-      grid-template-rows: var(--mobile-sidebar-size) minmax(0, 1fr) !important;
       width: 100vw !important;
       height: 100dvh !important;
       min-height: 100dvh !important;
       max-height: 100dvh !important;
+      grid-template-columns: 1fr !important;
+      grid-template-rows: minmax(0, 1fr) !important;
       overflow: hidden !important;
     }
 
-    #dashboardPage.mobile-chat-active {
-      --mobile-sidebar-size: min(30dvh, 230px) !important;
-    }
-
-    #dashboardPage .sidebar,
-    body.mobile-sidebar-active #dashboardPage .sidebar,
-    #dashboardPage .sidebar.mobile-open {
-      grid-row: 1 !important;
-      position: relative !important;
-      left: auto !important;
-      right: auto !important;
-      top: auto !important;
-      bottom: auto !important;
-      transform: none !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-      z-index: 10 !important;
+    #dashboardPage .sidebar {
       display: flex !important;
-      flex-direction: column !important;
-      width: 100% !important;
-      max-width: none !important;
-      height: var(--mobile-sidebar-size) !important;
-      min-height: 0 !important;
-      max-height: var(--mobile-sidebar-size) !important;
+      position: fixed !important;
+      left: 0 !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      width: min(88vw, 360px) !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      z-index: 120 !important;
+      transform: translateX(-108%) !important;
+      transition: transform .18s ease !important;
       overflow: hidden !important;
-      border-right: 0 !important;
-      border-bottom: 1px solid rgba(40, 223, 255, .14) !important;
     }
 
-    /* Drawer button disembunyikan karena sidebar mobile sudah tampil permanen di atas seperti versi sebelumnya. */
-    #mobileSidebarToggle,
-    #mobileSidebarClose,
-    #mobileSidebarBackdrop,
-    .mobile-sidebar-toggle,
-    .mobile-sidebar-close,
-    .mobile-sidebar-backdrop {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-
-    #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop,
-    body.mobile-sidebar-active .mobile-sidebar-backdrop {
-      display: none !important;
+    #dashboardPage.mobile-sidebar-open .sidebar {
+      transform: translateX(0) !important;
     }
 
     .sidebar-header {
       flex: 0 0 auto !important;
-      padding: 8px 10px 7px !important;
-      gap: 7px !important;
-    }
-
-    .sh-top {
-      min-height: 58px !important;
-      padding: 7px 9px !important;
-      border-radius: 15px !important;
-    }
-
-    .avatar-wrapper {
-      width: 40px !important;
-      height: 40px !important;
-      min-width: 40px !important;
-    }
-
-    #myProfileName {
-      font-size: 12.5px !important;
-      margin: 0 0 3px !important;
-      max-width: 170px !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
-    }
-
-    .user-role-badge {
-      min-height: 16px !important;
-      padding: 2px 6px !important;
-      font-size: 7.5px !important;
-      line-height: 1.1 !important;
-    }
-
-    .sh-actions {
-      display: grid !important;
-      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-      gap: 5px !important;
-      padding: 5px !important;
-      border-radius: 14px !important;
-    }
-
-    .action-link-btn {
-      height: 44px !important;
-      min-height: 44px !important;
-      padding: 4px 2px !important;
-      border-radius: 11px !important;
-      gap: 3px !important;
-      font-size: 7.8px !important;
-      line-height: 1 !important;
-    }
-
-    .action-ico {
-      width: 15px !important;
-      height: 15px !important;
-      font-size: 11px !important;
+      padding: 14px !important;
+      padding-right: 54px !important;
     }
 
     .chat-list-container {
       flex: 1 1 auto !important;
       min-height: 0 !important;
       overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior: contain !important;
-      padding: 7px 9px 9px !important;
-      gap: 7px !important;
+      -webkit-overflow-scrolling: touch;
+      padding: 12px 12px 18px !important;
     }
 
-    .section-label {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      gap: 8px !important;
-      padding: 0 1px 1px !important;
-      font-size: 8.5px !important;
-      letter-spacing: .10em !important;
+    .mobile-sidebar-backdrop {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 110 !important;
+      background: rgba(0,0,0,.55) !important;
+      backdrop-filter: blur(5px) !important;
+      -webkit-backdrop-filter: blur(5px) !important;
     }
 
-    .section-label > span {
-      min-width: 0 !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
+    #dashboardPage:not(.mobile-sidebar-open) .mobile-sidebar-backdrop {
+      display: none !important;
     }
 
-    .start-chat-btn {
-      flex: 0 0 auto !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      min-width: 74px !important;
-      min-height: 26px !important;
-      padding: 0 8px !important;
-      font-size: 8.6px !important;
-      line-height: 1 !important;
-      white-space: nowrap !important;
+    #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
+      display: block !important;
     }
 
-    #activeChatRoomsBox {
-      gap: 7px !important;
-    }
-
-    .chat-item-card {
-      grid-template-columns: 38px minmax(0, 1fr) 70px !important;
-      gap: 8px !important;
-      padding: 8px !important;
-      border-radius: 14px !important;
-      min-height: 54px !important;
-      align-items: center !important;
-    }
-
-    .chat-item-card .partner-avatar-img {
+    .mobile-sidebar-toggle {
+      display: grid !important;
+      place-items: center !important;
       width: 38px !important;
       height: 38px !important;
-      min-width: 38px !important;
+      flex: 0 0 38px !important;
+      border-radius: 12px !important;
     }
 
-    .chat-item-name {
-      font-size: 11.4px !important;
-      margin-bottom: 3px !important;
-      min-width: 0 !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
-    }
-
-    .chat-item-subline {
-      gap: 5px !important;
-      min-width: 0 !important;
-      flex-wrap: wrap !important;
-    }
-
-    .role-pill {
-      min-height: 16px !important;
-      padding: 1px 6px !important;
-      font-size: 7.4px !important;
-      line-height: 1.1 !important;
-    }
-
-    .status-indicator,
-    .chat-item-status {
-      font-size: 8.8px !important;
-      line-height: 1.1 !important;
-    }
-
-    .chat-item-actions {
-      width: 70px !important;
-      gap: 4px !important;
-      align-items: flex-end !important;
-    }
-
-    .chat-item-actions .tiny-profile-btn,
-    .chat-item-actions .tiny-delete-chat-btn,
-    .chat-item-actions .delete-room-btn,
-    .chat-item-actions .remove-chat-room-btn,
-    .chat-item-actions .unread-badge-alert {
-      width: 66px !important;
-      min-width: 66px !important;
-      max-width: 66px !important;
-      min-height: 24px !important;
-      font-size: 8.2px !important;
-      line-height: 1 !important;
-      padding: 0 6px !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      white-space: nowrap !important;
+    .mobile-sidebar-close {
+      display: grid !important;
+      place-items: center !important;
+      position: absolute !important;
+      top: 12px !important;
+      right: 12px !important;
+      width: 34px !important;
+      height: 34px !important;
+      z-index: 9 !important;
     }
 
     .chat-main-window {
-      grid-row: 2 !important;
-      width: 100% !important;
-      height: 100% !important;
+      width: 100vw !important;
+      height: 100dvh !important;
       min-height: 0 !important;
-      max-height: 100% !important;
+      max-height: 100dvh !important;
       overflow: hidden !important;
       display: flex !important;
       flex-direction: column !important;
-      position: relative !important;
     }
 
     .chat-main-header {
       flex: 0 0 auto !important;
-      min-height: 52px !important;
-      padding: 8px 11px !important;
-      gap: 9px !important;
+      min-height: 62px !important;
+      padding: 10px 12px !important;
+      gap: 10px !important;
     }
 
     .chat-main-header .partner-avatar-img {
-      width: 34px !important;
-      height: 34px !important;
-      min-width: 34px !important;
+      width: 38px !important;
+      height: 38px !important;
+      flex: 0 0 38px !important;
     }
 
     #topHeaderTitle {
-      font-size: 12.5px !important;
-      line-height: 1.2 !important;
+      font-size: 14px !important;
+      max-width: calc(100vw - 122px) !important;
     }
 
     #topHeaderStatus {
-      font-size: 10px !important;
-      line-height: 1.2 !important;
+      font-size: 11px !important;
     }
 
     .message-area {
       flex: 1 1 auto !important;
       min-height: 0 !important;
       height: auto !important;
-      max-height: none !important;
+      padding: 12px 10px !important;
+      gap: 10px !important;
       overflow-y: auto !important;
       overflow-x: hidden !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior-y: contain !important;
-      touch-action: pan-y !important;
-      padding: 12px 10px calc(18px + env(safe-area-inset-bottom)) !important;
-      gap: 11px !important;
-      scroll-behavior: smooth !important;
-      content-visibility: visible !important;
+      scroll-behavior: auto !important;
+      -webkit-overflow-scrolling: touch;
     }
 
     .msg-row {
       gap: 7px !important;
+      align-items: flex-end !important;
     }
 
     .msg-avatar {
-      display: block !important;
-      width: 26px !important;
-      height: 26px !important;
-      min-width: 26px !important;
-      flex: 0 0 26px !important;
+      width: 27px !important;
+      height: 27px !important;
+      flex: 0 0 27px !important;
     }
 
     .bubble {
-      max-width: 88% !important;
-      padding: 10px 11px !important;
-      font-size: 12.4px !important;
-      line-height: 1.45 !important;
-      border-radius: 16px !important;
+      max-width: calc(100vw - 66px) !important;
+      padding: 9px 12px !important;
+      font-size: 12.8px !important;
+      line-height: 1.42 !important;
+      border-radius: 17px !important;
     }
 
     .incoming-row .bubble {
@@ -17799,1064 +17358,524 @@
       border-bottom-right-radius: 5px !important;
     }
 
-    .bubble img {
-      max-height: 210px !important;
+    .bubble:has(img),
+    .bubble:has(.chat-image-thumb) {
+      max-width: calc(100vw - 70px) !important;
     }
 
-    .reply-state-indicator-bar,
-    .edit-state-indicator-bar,
-    #imagePreviewBar {
-      flex: 0 0 auto !important;
-    }
-
-    .chat-footer-panel {
-      flex: 0 0 auto !important;
-      padding: 8px 10px calc(9px + env(safe-area-inset-bottom)) !important;
-      gap: 7px !important;
-      position: relative !important;
-      bottom: auto !important;
-    }
-
-    .clip-btn,
-    .emoji-trigger-btn,
-    .send-action-btn {
-      width: 34px !important;
-      height: 34px !important;
-      min-width: 34px !important;
-      flex: 0 0 34px !important;
-    }
-
-    .gif-trigger-btn {
-      width: 40px !important;
-      height: 34px !important;
-      min-width: 40px !important;
-      flex: 0 0 40px !important;
-      font-size: 9px !important;
-    }
-
-    .chat-footer-panel input[type="text"] {
-      min-width: 0 !important;
-      height: 36px !important;
-      padding: 0 12px !important;
-      font-size: 12px !important;
-    }
-  }
-
-  @media (max-width: 680px) and (max-height: 720px) {
-    #dashboardPage {
-      --mobile-sidebar-size: min(28dvh, 205px) !important;
-    }
-
-    #dashboardPage.mobile-chat-active {
-      --mobile-sidebar-size: min(25dvh, 190px) !important;
-    }
-
-    .action-link-btn {
-      height: 38px !important;
-      min-height: 38px !important;
-    }
-
-    .sh-top {
-      min-height: 52px !important;
-    }
-  }
-</style>
-<!-- END V6.1 MOBILE RESTORE FINAL -->
-
-<!-- V6.2 WEB MINIMIZE RESPONSIVE FINAL
-     Tujuan:
-     - Memperbaiki bentuk dashboard saat browser web diperkecil/minimize.
-     - Width 681px-900px memakai layout compact atas-bawah seperti mobile, agar sidebar tidak menekan chat.
-     - Width 901px-1180px tetap layout web kiri-kanan, tetapi sidebar/card/header dipadatkan.
-     Scope aman:
-     - Hanya CSS responsive untuk #dashboardPage dan #loginPage.
-     - Tidak mengubah Firebase, login logic, admin/owner, maintenance, efek, atau fungsi chat.
--->
-<style id="v6-2-web-minimize-responsive-final">
-  /* Desktop yang diperkecil tetapi belum masuk mode mobile asli */
-  @media (min-width: 681px) and (max-width: 900px) {
-    html,
-    body {
-      width: 100% !important;
-      height: 100dvh !important;
-      min-height: 100dvh !important;
-      overflow: hidden !important;
-      overscroll-behavior: none !important;
-    }
-
-    #dashboardPage {
-      --web-min-sidebar-size: clamp(188px, 30dvh, 260px) !important;
-      display: grid !important;
-      grid-template-columns: 1fr !important;
-      grid-template-rows: var(--web-min-sidebar-size) minmax(0, 1fr) !important;
-      width: 100vw !important;
-      height: 100dvh !important;
-      min-height: 100dvh !important;
-      max-height: 100dvh !important;
-      overflow: hidden !important;
-    }
-
-    #dashboardPage .sidebar,
-    body.mobile-sidebar-active #dashboardPage .sidebar,
-    #dashboardPage .sidebar.mobile-open {
-      grid-row: 1 !important;
-      position: relative !important;
-      left: auto !important;
-      right: auto !important;
-      top: auto !important;
-      bottom: auto !important;
-      transform: none !important;
-      display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-      width: 100% !important;
-      max-width: none !important;
-      height: var(--web-min-sidebar-size) !important;
-      min-height: 0 !important;
-      max-height: var(--web-min-sidebar-size) !important;
-      overflow: hidden !important;
-      border-right: 0 !important;
-      border-bottom: 1px solid rgba(40, 223, 255, .16) !important;
-      z-index: 10 !important;
-    }
-
-    #mobileSidebarToggle,
-    #mobileSidebarClose,
-    #mobileSidebarBackdrop,
-    .mobile-sidebar-toggle,
-    .mobile-sidebar-close,
-    .mobile-sidebar-backdrop {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-
-    .sidebar-header {
-      flex: 0 0 auto !important;
-      padding: 9px 12px 8px !important;
-      gap: 7px !important;
-    }
-
-    .sh-top {
-      min-height: 58px !important;
-      padding: 8px 10px !important;
-      border-radius: 16px !important;
-    }
-
-    .user-profile {
-      min-width: 0 !important;
-    }
-
-    .avatar-wrapper {
-      width: 42px !important;
-      height: 42px !important;
-      min-width: 42px !important;
-    }
-
-    #myProfileName {
-      font-size: 13px !important;
-      line-height: 1.15 !important;
-      margin: 0 0 4px !important;
-      max-width: 220px !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
-    }
-
-    .user-role-badge {
-      min-height: 17px !important;
-      padding: 2px 7px !important;
-      font-size: 8px !important;
-      line-height: 1.1 !important;
-    }
-
-    .sh-actions {
-      display: grid !important;
-      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-      gap: 6px !important;
-      padding: 6px !important;
-      border-radius: 15px !important;
-    }
-
-    .action-link-btn {
-      height: 46px !important;
-      min-height: 46px !important;
-      padding: 5px 3px !important;
-      border-radius: 12px !important;
-      gap: 3px !important;
-      font-size: 8.2px !important;
-      line-height: 1 !important;
-    }
-
-    .action-ico {
-      width: 16px !important;
-      height: 16px !important;
-      font-size: 12px !important;
-    }
-
-    .chat-list-container {
-      flex: 1 1 auto !important;
-      min-height: 0 !important;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior: contain !important;
-      padding: 8px 10px 10px !important;
-      gap: 8px !important;
-    }
-
-    .section-label {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      gap: 10px !important;
-      padding: 0 2px 1px !important;
-      font-size: 9px !important;
-      letter-spacing: .10em !important;
-    }
-
-    .section-label > span {
-      min-width: 0 !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
-    }
-
-    .start-chat-btn {
-      flex: 0 0 auto !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      min-width: 82px !important;
-      min-height: 28px !important;
-      padding: 0 9px !important;
-      font-size: 9px !important;
-      line-height: 1 !important;
-      white-space: nowrap !important;
-    }
-
-    #activeChatRoomsBox {
-      gap: 8px !important;
-    }
-
-    .chat-item-card {
-      grid-template-columns: 42px minmax(0, 1fr) 74px !important;
-      gap: 9px !important;
-      padding: 9px !important;
-      border-radius: 15px !important;
-      min-height: 58px !important;
-      align-items: center !important;
-    }
-
-    .chat-item-card .partner-avatar-img {
-      width: 42px !important;
-      height: 42px !important;
-      min-width: 42px !important;
-    }
-
-    .chat-item-card > div:nth-child(2) {
-      min-width: 0 !important;
-    }
-
-    .chat-item-name {
-      font-size: 12px !important;
-      margin-bottom: 4px !important;
-      min-width: 0 !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
-    }
-
-    .chat-item-subline {
-      gap: 5px !important;
-      min-width: 0 !important;
-      flex-wrap: wrap !important;
-    }
-
-    .role-pill {
-      min-height: 17px !important;
-      padding: 2px 7px !important;
-      font-size: 7.8px !important;
-      line-height: 1.1 !important;
-    }
-
-    .status-indicator,
-    .chat-item-status {
-      font-size: 9.3px !important;
-      line-height: 1.1 !important;
-    }
-
-    .chat-item-actions {
-      width: 74px !important;
-      gap: 4px !important;
-      align-items: flex-end !important;
-    }
-
-    .chat-item-actions .tiny-profile-btn,
-    .chat-item-actions .tiny-delete-chat-btn,
-    .chat-item-actions .delete-room-btn,
-    .chat-item-actions .remove-chat-room-btn,
-    .chat-item-actions .unread-badge-alert {
-      width: 70px !important;
-      min-width: 70px !important;
-      max-width: 70px !important;
-      min-height: 24px !important;
-      padding: 0 6px !important;
-      font-size: 8.4px !important;
-      line-height: 1 !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      white-space: nowrap !important;
-    }
-
-    .chat-main-window {
-      grid-row: 2 !important;
-      width: 100% !important;
-      height: 100% !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      max-height: 100% !important;
-      overflow: hidden !important;
-      display: flex !important;
-      flex-direction: column !important;
-      position: relative !important;
-    }
-
-    .chat-main-header {
-      flex: 0 0 auto !important;
-      min-height: 56px !important;
-      padding: 9px 14px !important;
-      gap: 10px !important;
-    }
-
-    .chat-main-header .partner-avatar-img {
-      width: 36px !important;
-      height: 36px !important;
-      min-width: 36px !important;
-    }
-
-    #topHeaderTitle {
-      font-size: 13px !important;
-      line-height: 1.2 !important;
-      max-width: calc(100vw - 110px) !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
-    }
-
-    #topHeaderStatus {
-      font-size: 10.5px !important;
-      line-height: 1.2 !important;
-    }
-
-    .message-area {
-      flex: 1 1 auto !important;
-      min-height: 0 !important;
-      height: auto !important;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      padding: 14px 12px calc(18px + env(safe-area-inset-bottom)) !important;
-      gap: 12px !important;
-      scroll-behavior: smooth !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior-y: contain !important;
-    }
-
-    .msg-row {
-      gap: 8px !important;
-    }
-
-    .msg-avatar {
-      display: block !important;
-      width: 28px !important;
-      height: 28px !important;
-      min-width: 28px !important;
-      flex: 0 0 28px !important;
-    }
-
-    .bubble {
-      max-width: 84% !important;
-      padding: 10px 12px !important;
-      font-size: 12.7px !important;
-      line-height: 1.45 !important;
-      border-radius: 16px !important;
-      word-break: break-word !important;
-      overflow-wrap: anywhere !important;
-    }
-
-    .bubble img {
+    .bubble img,
+    .bubble .chat-image-thumb {
       max-height: 220px !important;
     }
 
-    .reply-state-indicator-bar,
-    .edit-state-indicator-bar,
-    #imagePreviewBar {
-      flex: 0 0 auto !important;
+    .msg-controls {
+      display: none !important;
     }
 
     .chat-footer-panel {
       flex: 0 0 auto !important;
-      padding: 9px 12px calc(10px + env(safe-area-inset-bottom)) !important;
-      gap: 8px !important;
-      position: relative !important;
-      bottom: auto !important;
+      padding: 9px 9px calc(9px + env(safe-area-inset-bottom)) !important;
+      gap: 7px !important;
     }
 
     .clip-btn,
-    .emoji-trigger-btn,
     .send-action-btn {
-      width: 36px !important;
-      height: 36px !important;
-      min-width: 36px !important;
-      flex: 0 0 36px !important;
-    }
-
-    .gif-trigger-btn {
-      width: 42px !important;
-      height: 36px !important;
-      min-width: 42px !important;
-      flex: 0 0 42px !important;
-      font-size: 9.5px !important;
+      width: 40px !important;
+      height: 40px !important;
+      flex: 0 0 40px !important;
     }
 
     .chat-footer-panel input[type="text"] {
+      height: 40px !important;
       min-width: 0 !important;
-      height: 38px !important;
+      font-size: 16px !important;
       padding: 0 13px !important;
-      font-size: 12.4px !important;
-    }
-  }
-
-  /* Web tetap kiri-kanan, tapi dibuat compact saat browser diperkecil */
-  @media (min-width: 901px) and (max-width: 1180px) {
-    #dashboardPage {
-      grid-template-columns: minmax(292px, 31vw) minmax(0, 1fr) !important;
-      width: 100vw !important;
-      height: 100dvh !important;
-      overflow: hidden !important;
     }
 
-    #dashboardPage .sidebar {
-      min-width: 0 !important;
-      overflow: hidden !important;
-    }
-
-    .sidebar-header {
-      padding: 13px 12px 12px !important;
-      gap: 10px !important;
-    }
-
-    .sh-top {
-      min-height: 70px !important;
-      padding: 10px !important;
-      border-radius: 18px !important;
-    }
-
-    .avatar-wrapper {
-      width: 48px !important;
-      height: 48px !important;
-      min-width: 48px !important;
-    }
-
-    #myProfileName {
-      font-size: 14px !important;
-      max-width: 155px !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
-    }
-
-    .sh-actions {
-      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-      gap: 6px !important;
-      padding: 7px !important;
-      border-radius: 17px !important;
-    }
-
-    .action-link-btn {
-      height: 54px !important;
-      min-height: 54px !important;
-      padding: 6px 3px !important;
-      border-radius: 13px !important;
-      gap: 4px !important;
-      font-size: 8.4px !important;
-    }
-
-    .action-ico {
-      width: 18px !important;
-      height: 18px !important;
-      font-size: 13px !important;
-    }
-
-    .chat-list-container {
-      padding: 12px 10px 14px !important;
-      gap: 10px !important;
-    }
-
-    .section-label {
-      padding: 0 2px 2px !important;
-      font-size: 9.5px !important;
-      letter-spacing: .12em !important;
-    }
-
-    .start-chat-btn {
-      min-height: 28px !important;
-      padding: 0 9px !important;
-      font-size: 9px !important;
-      white-space: nowrap !important;
-    }
-
-    .chat-item-card {
-      grid-template-columns: 46px minmax(0, 1fr) 68px !important;
+    #imagePreviewBar {
+      padding: 9px 10px !important;
       gap: 9px !important;
-      padding: 10px !important;
-      border-radius: 17px !important;
-      min-height: 68px !important;
     }
 
-    .chat-item-card .partner-avatar-img {
-      width: 46px !important;
-      height: 46px !important;
-      min-width: 46px !important;
+    #imagePreviewBar img {
+      width: 52px !important;
+      height: 52px !important;
     }
 
-    .chat-item-name {
-      font-size: 12.8px !important;
-      margin-bottom: 5px !important;
-      min-width: 0 !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
+    .modal-overlay {
+      padding: 12px !important;
+      align-items: center !important;
     }
 
-    .role-pill {
-      min-height: 18px !important;
-      padding: 2px 7px !important;
-      font-size: 8px !important;
-    }
-
-    .status-indicator,
-    .chat-item-status {
-      font-size: 9.5px !important;
-    }
-
-    .chat-item-actions {
-      width: 68px !important;
-      gap: 5px !important;
-    }
-
-    .chat-item-actions .tiny-profile-btn,
-    .chat-item-actions .tiny-delete-chat-btn,
-    .chat-item-actions .delete-room-btn,
-    .chat-item-actions .remove-chat-room-btn,
-    .chat-item-actions .unread-badge-alert {
-      width: 64px !important;
-      min-width: 64px !important;
-      max-width: 64px !important;
-      min-height: 25px !important;
-      padding: 0 5px !important;
-      font-size: 8px !important;
-      white-space: nowrap !important;
-    }
-
-    .chat-main-window {
-      min-width: 0 !important;
-      min-height: 0 !important;
-      overflow: hidden !important;
-    }
-
-    .chat-main-header {
-      min-height: 66px !important;
-      padding: 12px 18px !important;
-    }
-
-    .message-area {
-      padding: 20px 18px !important;
-      gap: 15px !important;
-      overflow-x: hidden !important;
-    }
-
-    .bubble {
-      max-width: 72% !important;
-      padding: 11px 15px !important;
-      font-size: 13px !important;
-      overflow-wrap: anywhere !important;
-      word-break: break-word !important;
-    }
-
-    .chat-footer-panel {
-      padding: 13px 18px 14px !important;
-      gap: 10px !important;
-    }
-
-    .chat-footer-panel input[type="text"] {
-      min-width: 0 !important;
-    }
-  }
-
-  /* Laptop/desktop dengan tinggi jendela pendek */
-  @media (min-width: 901px) and (max-height: 720px) {
-    #dashboardPage {
-      height: 100dvh !important;
-      max-height: 100dvh !important;
-      overflow: hidden !important;
-    }
-
-    .sidebar-header {
-      padding-top: 10px !important;
-      padding-bottom: 9px !important;
-      gap: 8px !important;
-    }
-
-    .sh-top {
-      min-height: 62px !important;
-      padding: 9px !important;
-    }
-
-    .avatar-wrapper {
-      width: 44px !important;
-      height: 44px !important;
-      min-width: 44px !important;
-    }
-
-    .sh-actions {
-      padding: 6px !important;
-      gap: 6px !important;
-    }
-
-    .action-link-btn {
-      height: 48px !important;
-      min-height: 48px !important;
-    }
-
-    .chat-list-container {
-      padding-top: 9px !important;
-      padding-bottom: 10px !important;
-    }
-
-    .chat-item-card {
-      padding-top: 9px !important;
-      padding-bottom: 9px !important;
-      min-height: 62px !important;
-    }
-
-    .chat-main-header {
-      min-height: 58px !important;
-      padding-top: 9px !important;
-      padding-bottom: 9px !important;
-    }
-
-    .message-area {
-      padding-top: 14px !important;
-      padding-bottom: 14px !important;
-      gap: 12px !important;
-    }
-
-    .chat-footer-panel {
-      padding-top: 10px !important;
-      padding-bottom: 10px !important;
-    }
-  }
-
-  /* Jika browser diperkecil sekaligus rendah, sidebar atas dipadatkan agar chat tetap usable */
-  @media (min-width: 681px) and (max-width: 900px) and (max-height: 680px) {
-    #dashboardPage {
-      --web-min-sidebar-size: clamp(168px, 28dvh, 210px) !important;
-    }
-
-    .sidebar-header {
-      padding: 7px 10px 6px !important;
-      gap: 5px !important;
-    }
-
-    .sh-top {
-      min-height: 50px !important;
-      padding: 7px 9px !important;
-    }
-
-    .avatar-wrapper {
-      width: 36px !important;
-      height: 36px !important;
-      min-width: 36px !important;
-    }
-
-    .action-link-btn {
-      height: 38px !important;
-      min-height: 38px !important;
-    }
-
-    .chat-list-container {
-      padding-top: 6px !important;
-      padding-bottom: 7px !important;
-    }
-
-    .chat-item-card {
-      min-height: 52px !important;
-      padding: 7px !important;
-    }
-  }
-
-  /* Login page saat jendela web diperkecil: jangan gepeng, gunakan scroll aman */
-  @media (min-width: 681px) and (max-width: 900px), (min-width: 901px) and (max-height: 720px) {
-    #loginPage.wrap {
-      min-height: 100dvh !important;
-      height: 100dvh !important;
+    .modal-box {
+      max-height: calc(100dvh - 24px) !important;
       overflow-y: auto !important;
-      overflow-x: hidden !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior: contain !important;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px !important;
+      border-radius: 20px !important;
+    }
+
+    #desktopNotificationStack {
+      left: 10px !important;
+      right: 10px !important;
+      bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+      width: auto !important;
+    }
+
+    body.mobile-nav-lock {
+      overflow: hidden !important;
+      touch-action: none !important;
     }
   }
 </style>
-<!-- END V6.2 WEB MINIMIZE RESPONSIVE FINAL -->
 
 
-<script id="FINAL_CLEAN_CONSOLIDATED_PATCH_V6_SCRIPT">
+
+<style id="FD_START_CHAT_ALIGN_FIX_V8_CSS">
+  /* =========================================================
+     V8 FIX — START CHAT BUTTON ALIGNMENT
+     Fokus: bubble Start Chat rapi, teks selalu center, aman web/mobile,
+     tanpa listener/animasi berat dan tidak menimpa fitur dashboard lain.
+     ========================================================= */
+  .section-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    min-width: 0 !important;
+  }
+
+  .section-label > span {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.25 !important;
+  }
+
+  .start-chat-btn {
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    min-width: 98px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 12px !important;
+    border-radius: 14px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    overflow: hidden !important;
+    font-size: 10.5px !important;
+    font-weight: 850 !important;
+    letter-spacing: -.01em !important;
+  }
+
+  .start-chat-btn[style*="display: none"],
+  .start-chat-btn[style*="display:none"] {
+    display: none !important;
+  }
+
+  .start-chat-btn .start-chat-icon {
+    width: 14px !important;
+    height: 14px !important;
+    flex: 0 0 14px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    border-radius: 999px !important;
+    font-size: 13px !important;
+    font-weight: 950 !important;
+    line-height: 1 !important;
+    transform: translateY(-.25px) !important;
+  }
+
+  .start-chat-btn .start-chat-text {
+    display: inline-block !important;
+    line-height: 1 !important;
+    transform: translateY(.15px) !important;
+  }
+
+  html[data-dashboard-theme] .start-chat-btn,
+  .start-chat-btn {
+    color: var(--theme-accent-3, #DFFBFF) !important;
+    border: 1px solid color-mix(in srgb, var(--theme-accent, #42B8FF) 30%, transparent) !important;
+    background:
+      radial-gradient(72px 38px at 20% 0%, color-mix(in srgb, var(--theme-accent-3, #FFFFFF) 12%, transparent), transparent 68%),
+      linear-gradient(135deg,
+        color-mix(in srgb, var(--theme-panel-2, rgba(66,184,255,.18)) 82%, transparent),
+        color-mix(in srgb, var(--theme-panel, rgba(20,14,34,.88)) 94%, transparent)
+      ) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.05),
+      0 0 14px color-mix(in srgb, var(--theme-accent, #42B8FF) 10%, transparent) !important;
+  }
+
+  html[data-dashboard-theme] .start-chat-btn:hover,
+  .start-chat-btn:hover {
+    color: var(--theme-out-text, #06111D) !important;
+    border-color: color-mix(in srgb, var(--theme-accent-3, #FFFFFF) 42%, transparent) !important;
+    background: linear-gradient(135deg,
+      color-mix(in srgb, var(--theme-accent-3, #FFFFFF) 88%, var(--theme-accent, #42B8FF) 12%),
+      var(--theme-accent, #42B8FF)
+    ) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  html[data-dashboard-theme] .start-chat-btn:hover .start-chat-icon,
+  .start-chat-btn:hover .start-chat-icon {
+    background: color-mix(in srgb, #000 10%, transparent) !important;
+  }
+
+  @media (max-width: 680px) {
+    .section-label {
+      gap: 8px !important;
+      padding-left: 2px !important;
+      padding-right: 2px !important;
+    }
+
+    .start-chat-btn {
+      min-width: 92px !important;
+      width: 92px !important;
+      height: 32px !important;
+      min-height: 32px !important;
+      padding: 0 10px !important;
+      border-radius: 13px !important;
+      font-size: 10px !important;
+      gap: 5px !important;
+    }
+
+    .start-chat-btn .start-chat-icon {
+      width: 13px !important;
+      height: 13px !important;
+      flex-basis: 13px !important;
+      font-size: 12px !important;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .section-label {
+      gap: 6px !important;
+    }
+
+    .section-label > span {
+      font-size: 8.6px !important;
+      letter-spacing: .09em !important;
+    }
+
+    .start-chat-btn {
+      min-width: 86px !important;
+      width: 86px !important;
+      height: 30px !important;
+      min-height: 30px !important;
+      padding: 0 8px !important;
+      font-size: 9.4px !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .start-chat-btn,
+    .start-chat-btn:hover {
+      transform: none !important;
+    }
+  }
+</style>
+
+<script id="FD_BUGFIX_CLEAN_FINAL_20260614_SCRIPT">
 (function(){
   "use strict";
-  if (window.__FINAL_CLEAN_CONSOLIDATED_PATCH_V6__) return;
-  window.__FINAL_CLEAN_CONSOLIDATED_PATCH_V6__ = true;
+  if (window.__FD_BUGFIX_CLEAN_FINAL_20260614__) return;
+  window.__FD_BUGFIX_CLEAN_FINAL_20260614__ = true;
 
-  var retryCount = 0;
-  var retryTimer = null;
-  var chatPinned = true;
-  var forceBottomUntil = 0;
-  var chatObserver = null;
+  var MOBILE_QUERY = "(max-width: 680px)";
+  var WRAP_TRIES = 0;
+  var commitWrapped = false;
+  var selectWrapped = false;
+  var lastKnownBottomLock = true;
+  var resizeTimer = 0;
 
-  function $(id){ return document.getElementById(id); }
-  function isMobile(){ return window.matchMedia && window.matchMedia("(max-width: 680px)").matches; }
-  function safe(fn){ try { return fn(); } catch (err) { console.warn("[V6 Clean]", err); } }
+  function ready(fn) {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", fn, { once: true });
+    } else {
+      fn();
+    }
+  }
 
-  function dashboardVisible(){
-    var dash = $("dashboardPage");
+  function getDashboard() {
+    return document.getElementById("dashboardPage");
+  }
+
+  function getMessageBox() {
+    return document.getElementById("messageFlowBox") || document.querySelector(".message-area");
+  }
+
+  function isMobile() {
+    try {
+      return !!(window.matchMedia && window.matchMedia(MOBILE_QUERY).matches);
+    } catch (e) {
+      return window.innerWidth <= 680;
+    }
+  }
+
+  function isDashboardVisible() {
+    var dash = getDashboard();
     if (!dash) return false;
-    var cs = window.getComputedStyle ? getComputedStyle(dash) : null;
-    return dash.style.display !== "none" && (!cs || cs.display !== "none") && dash.offsetParent !== null;
+    return window.getComputedStyle(dash).display !== "none";
   }
 
-  function messageBox(){ return $("messageFlowBox") || document.querySelector(".message-area"); }
-
-  function isNearBottom(box){
+  function isNearBottom(box) {
     if (!box) return true;
-    return (box.scrollHeight - box.scrollTop - box.clientHeight) < 140;
+    var gap = box.scrollHeight - box.scrollTop - box.clientHeight;
+    return gap < Math.max(90, Math.round(box.clientHeight * 0.18));
   }
 
-  function scrollChatBottom(immediate){
-    var box = messageBox();
+  function scrollChatBottom(force) {
+    var box = getMessageBox();
     if (!box) return;
-    var run = function(){
-      box.scrollTop = box.scrollHeight;
-      if (immediate) box.scrollTop = box.scrollHeight + 9999;
-    };
-    if (immediate) run();
-    else (window.requestAnimationFrame || window.setTimeout)(run, 16);
-  }
+    if (!force && !lastKnownBottomLock && !isNearBottom(box)) return;
 
-  function closeOverlay(el, keepMaintenance){
-    if (!el) return;
-    if (keepMaintenance && el.id === "maintenanceDashboardPopup") return;
-    el.classList.remove("is-visible", "show", "active", "open");
-    if (el.style && el.style.display && el.style.display !== "none") el.style.display = "none";
-  }
+    var oldBehavior = box.style.scrollBehavior;
+    box.style.scrollBehavior = "auto";
 
-  function clearBlockingLayers(keepMaintenance){
-    document.body.classList.remove("modal-open", "drawer-open", "sidebar-open", "no-scroll");
-    document.querySelectorAll(".modal-overlay, .image-lightbox-overlay").forEach(function(el){ closeOverlay(el, keepMaintenance); });
-    ["emojiGifPickerPanel", "imagePreviewBar"].forEach(function(id){
-      var el = $(id);
-      if (el && el.style && el.style.display && el.style.display !== "none") el.style.display = "none";
+    requestAnimationFrame(function(){
+      try { box.scrollTop = box.scrollHeight; } catch (e) {}
+      requestAnimationFrame(function(){
+        try { box.scrollTop = box.scrollHeight; } catch (e) {}
+        box.style.scrollBehavior = oldBehavior || "";
+      });
     });
   }
 
-  function hardShowLogin(keepMaintenance){
-    var login = $("loginPage");
-    var dash = $("dashboardPage");
-    closeMobileSidebar();
-    document.body.classList.add("fd-v6-logout");
-    document.body.classList.remove("dashboard-active", "fd-dashboard-active", "mobile-sidebar-active");
-    if (dash) {
-      dash.classList.remove("mobile-sidebar-open");
-      dash.style.display = "none";
-      dash.style.pointerEvents = "none";
-      dash.style.visibility = "hidden";
-    }
-    if (login) {
-      login.style.display = "grid";
-      login.style.pointerEvents = "auto";
-      login.style.visibility = "visible";
-      login.style.opacity = "1";
-    }
-    clearBlockingLayers(!!keepMaintenance);
-    setTimeout(function(){ document.body.classList.remove("fd-v6-logout"); }, keepMaintenance ? 1200 : 500);
-  }
-
-  function ensureMobileDrawerElements(){
-    var dash = $("dashboardPage");
-    if (!dash) return;
-    if (!$("mobileSidebarBackdrop")) {
-      var backdrop = document.createElement("div");
-      backdrop.id = "mobileSidebarBackdrop";
-      backdrop.className = "mobile-sidebar-backdrop";
-      backdrop.setAttribute("aria-hidden", "true");
-      backdrop.addEventListener("click", closeMobileSidebar);
-      dash.insertBefore(backdrop, dash.firstChild);
-    }
-    var header = document.querySelector(".chat-main-header");
-    if (header && !$("mobileSidebarToggle")) {
-      var toggle = document.createElement("button");
-      toggle.type = "button";
-      toggle.id = "mobileSidebarToggle";
-      toggle.className = "mobile-sidebar-toggle";
-      toggle.setAttribute("aria-label", "Buka menu");
-      toggle.textContent = "☰";
-      toggle.addEventListener("click", toggleMobileSidebar);
-      header.insertBefore(toggle, header.firstChild);
-    }
-    var sidebarHeader = document.querySelector(".sidebar-header");
-    if (sidebarHeader && !$("mobileSidebarClose")) {
-      var close = document.createElement("button");
-      close.type = "button";
-      close.id = "mobileSidebarClose";
-      close.className = "mobile-sidebar-close";
-      close.setAttribute("aria-label", "Tutup menu");
-      close.textContent = "×";
-      close.addEventListener("click", closeMobileSidebar);
-      sidebarHeader.insertBefore(close, sidebarHeader.firstChild);
-    }
-  }
-
-  function openMobileSidebar(){
-    ensureMobileDrawerElements();
-    if (!isMobile()) return;
-    var dash = $("dashboardPage");
-    var sidebar = document.querySelector("#dashboardPage .sidebar");
-    document.body.classList.add("mobile-sidebar-active");
-    if (dash) dash.classList.add("mobile-sidebar-open");
-    if (sidebar) sidebar.classList.add("mobile-open");
-  }
-
-  function closeMobileSidebar(){
-    var dash = $("dashboardPage");
-    var sidebar = document.querySelector("#dashboardPage .sidebar");
-    document.body.classList.remove("mobile-sidebar-active");
-    if (dash) dash.classList.remove("mobile-sidebar-open");
-    if (sidebar) sidebar.classList.remove("mobile-open");
-  }
-
-  function toggleMobileSidebar(){
-    if (document.body.classList.contains("mobile-sidebar-active")) closeMobileSidebar();
-    else openMobileSidebar();
-  }
-
-  function bindMobileDrawer(){
-    ensureMobileDrawerElements();
-    window.openMobileSidebar = openMobileSidebar;
-    window.closeMobileSidebar = closeMobileSidebar;
-    window.toggleMobileSidebar = toggleMobileSidebar;
-
-    var toggle = $("mobileSidebarToggle");
-    var close = $("mobileSidebarClose");
-    var backdrop = $("mobileSidebarBackdrop");
-    if (toggle && !toggle.__fdV6Bound) { toggle.__fdV6Bound = true; toggle.addEventListener("click", function(e){ e.preventDefault(); toggleMobileSidebar(); }); }
-    if (close && !close.__fdV6Bound) { close.__fdV6Bound = true; close.addEventListener("click", function(e){ e.preventDefault(); closeMobileSidebar(); }); }
-    if (backdrop && !backdrop.__fdV6Bound) { backdrop.__fdV6Bound = true; backdrop.addEventListener("click", closeMobileSidebar); }
-
-    var rooms = $("activeChatRoomsBox");
-    if (rooms && !rooms.__fdV6CloseDrawer) {
-      rooms.__fdV6CloseDrawer = true;
-      rooms.addEventListener("click", function(){
-        if (isMobile()) closeMobileSidebar();
-        forceBottomUntil = Date.now() + 1600;
-        setTimeout(function(){ scrollChatBottom(true); }, 80);
-        setTimeout(function(){ scrollChatBottom(true); }, 260);
-      }, true);
-    }
-  }
-
-  function bindChatBottomGuard(){
-    var box = messageBox();
+  function rememberBottomState() {
+    var box = getMessageBox();
     if (!box) return;
-    if (!box.__fdV6ScrollBound) {
-      box.__fdV6ScrollBound = true;
-      chatPinned = isNearBottom(box);
-      box.addEventListener("scroll", function(){ chatPinned = isNearBottom(box); }, { passive: true });
-    }
-    if (chatObserver) chatObserver.disconnect();
-    if (window.MutationObserver) {
-      chatObserver = new MutationObserver(function(){
-        if (chatPinned || Date.now() <= forceBottomUntil) scrollChatBottom(false);
-      });
-      chatObserver.observe(box, { childList: true });
+    lastKnownBottomLock = isNearBottom(box);
+  }
+
+  function patchProfilePhotoPicker() {
+    window.openMobileProfilePhotoPicker = function(event) {
+      if (event && event.preventDefault) event.preventDefault();
+      if (event && event.stopPropagation) event.stopPropagation();
+
+      var input =
+        document.getElementById("profileMobileAvatarInput") ||
+        document.getElementById("avatarFileInput") ||
+        document.querySelector(".avatar-wrapper input[type='file']") ||
+        document.querySelector("input[type='file'][accept*='image']");
+
+      if (input && typeof input.click === "function") {
+        input.click();
+        return;
+      }
+
+      alert("Input foto profil tidak ditemukan. Silakan klik avatar profil langsung.");
+    };
+  }
+
+  function openMobileSidebar() {
+    var dash = getDashboard();
+    if (!dash) return;
+    dash.classList.add("mobile-sidebar-open", "is-mobile-authenticated");
+    document.body.classList.add("mobile-nav-lock");
+  }
+
+  function closeMobileSidebar() {
+    var dash = getDashboard();
+    if (dash) dash.classList.remove("mobile-sidebar-open");
+    document.body.classList.remove("mobile-nav-lock");
+  }
+
+  function patchMobileSidebarFallbacks() {
+    if (typeof window.openMobileSidebar !== "function") window.openMobileSidebar = openMobileSidebar;
+    if (typeof window.closeMobileSidebar !== "function") window.closeMobileSidebar = closeMobileSidebar;
+    if (typeof window.toggleMobileSidebar !== "function") {
+      window.toggleMobileSidebar = function() {
+        var dash = getDashboard();
+        if (!dash) return;
+        if (dash.classList.contains("mobile-sidebar-open")) window.closeMobileSidebar();
+        else window.openMobileSidebar();
+      };
     }
   }
 
-  function patchSendOnce(){
+  function normalizeResponsiveLayout() {
+    var dash = getDashboard();
+    if (!dash) return;
+
+    if (!isMobile()) {
+      dash.classList.remove("mobile-sidebar-open");
+      document.body.classList.remove("mobile-nav-lock");
+      return;
+    }
+
+    if (isDashboardVisible()) {
+      dash.classList.add("is-mobile-authenticated");
+    }
+  }
+
+  function patchCommitSend() {
+    if (commitWrapped) return true;
     if (typeof window.commitMessageToFirebase !== "function") return false;
-    if (window.commitMessageToFirebase.__fdV6Clean) return true;
-    var original = window.commitMessageToFirebase;
-    function wrappedCommit(){
-      forceBottomUntil = Date.now() + 2200;
-      var result = original.apply(this, arguments);
-      Promise.resolve(result).finally(function(){
-        scrollChatBottom(true);
+
+    var originalCommit = window.commitMessageToFirebase;
+    if (originalCommit.__fdBugfixCleanWrapped) {
+      commitWrapped = true;
+      return true;
+    }
+
+    window.commitMessageToFirebase = function() {
+      lastKnownBottomLock = true;
+      var result;
+      try {
+        result = originalCommit.apply(this, arguments);
+      } finally {
+        setTimeout(function(){ scrollChatBottom(true); }, 0);
+        setTimeout(function(){ scrollChatBottom(true); }, 120);
+        setTimeout(function(){ scrollChatBottom(true); }, 360);
+      }
+
+      if (result && typeof result.finally === "function") {
+        return result.finally(function(){
+          scrollChatBottom(true);
+          setTimeout(function(){ scrollChatBottom(true); }, 120);
+        });
+      }
+      return result;
+    };
+
+    window.commitMessageToFirebase.__fdBugfixCleanWrapped = true;
+    commitWrapped = true;
+    return true;
+  }
+
+  function patchSelectRoom() {
+    if (selectWrapped) return true;
+    if (typeof window.selectActiveChatRoom !== "function") return false;
+
+    var originalSelect = window.selectActiveChatRoom;
+    if (originalSelect.__fdBugfixCleanWrapped) {
+      selectWrapped = true;
+      return true;
+    }
+
+    window.selectActiveChatRoom = function() {
+      lastKnownBottomLock = true;
+      var result = originalSelect.apply(this, arguments);
+      try { if (isMobile() && typeof window.closeMobileSidebar === "function") window.closeMobileSidebar(); } catch (e) {}
+      setTimeout(function(){ scrollChatBottom(true); }, 60);
+      setTimeout(function(){ scrollChatBottom(true); }, 260);
+      return result;
+    };
+
+    window.selectActiveChatRoom.__fdBugfixCleanWrapped = true;
+    selectWrapped = true;
+    return true;
+  }
+
+  function patchWhenGlobalsReady() {
+    WRAP_TRIES += 1;
+    patchCommitSend();
+    patchSelectRoom();
+
+    if ((commitWrapped && selectWrapped) || WRAP_TRIES >= 80) return;
+    setTimeout(patchWhenGlobalsReady, 250);
+  }
+
+  function bindStableEvents() {
+    var box = getMessageBox();
+    if (box && !box.__fdBugfixScrollBound) {
+      box.__fdBugfixScrollBound = true;
+      box.addEventListener("scroll", rememberBottomState, { passive: true });
+    }
+
+    document.addEventListener("input", function(event) {
+      if (event.target && event.target.id === "typedMessageInput") {
+        rememberBottomState();
+      }
+    }, true);
+
+    document.addEventListener("keydown", function(event) {
+      var target = event.target;
+      if (!target || target.id !== "typedMessageInput") return;
+      if (event.key !== "Enter" || event.shiftKey) return;
+      lastKnownBottomLock = true;
+      setTimeout(function(){ scrollChatBottom(true); }, 80);
+      setTimeout(function(){ scrollChatBottom(true); }, 260);
+    }, true);
+
+    document.addEventListener("click", function(event) {
+      if (event.target && event.target.closest && event.target.closest(".chat-item-card")) {
+        lastKnownBottomLock = true;
         setTimeout(function(){ scrollChatBottom(true); }, 120);
         setTimeout(function(){ scrollChatBottom(true); }, 320);
-      });
-      return result;
-    }
-    wrappedCommit.__fdV6Clean = true;
-    wrappedCommit.__original = original;
-    window.commitMessageToFirebase = wrappedCommit;
-    return true;
-  }
-
-  function patchLogoutOnce(){
-    if (typeof window.triggerSignOut !== "function") return false;
-    if (window.triggerSignOut.__fdV6Clean) return true;
-    var original = window.triggerSignOut;
-    async function wrappedLogout(options){
-      var keepMaintenance = !!(options && options.reason === "maintenance");
-      if (keepMaintenance) document.body.dataset.fdMaintenanceLogout = "1";
-      document.body.classList.add("fd-v6-logging-out");
-      closeMobileSidebar();
-      if (!keepMaintenance) clearBlockingLayers(false);
-      try {
-        return await original.apply(this, arguments);
-      } finally {
-        hardShowLogin(keepMaintenance);
-        setTimeout(function(){
-          document.body.classList.remove("fd-v6-logging-out");
-          if (!keepMaintenance) delete document.body.dataset.fdMaintenanceLogout;
-          syncDashboardState();
-        }, 160);
       }
-    }
-    wrappedLogout.__fdV6Clean = true;
-    wrappedLogout.__original = original;
-    window.triggerSignOut = wrappedLogout;
-    return true;
-  }
+      if (event.target && event.target.closest && event.target.closest(".mobile-sidebar-backdrop")) {
+        try { window.closeMobileSidebar(); } catch (e) {}
+      }
+    }, true);
 
-  function bindLogoutFallback(){
-    document.querySelectorAll(".logout-btn").forEach(function(btn){
-      if (btn.__fdV6LogoutFallback) return;
-      btn.__fdV6LogoutFallback = true;
-      btn.addEventListener("click", function(){
-        setTimeout(function(){
-          if (typeof window.triggerSignOut === "function") return;
-          hardShowLogin(false);
-        }, 40);
+    if (window.MutationObserver) {
+      var observer = new MutationObserver(function(mutations) {
+        var shouldScroll = false;
+        for (var i = 0; i < mutations.length; i++) {
+          if (mutations[i].type === "childList" && mutations[i].addedNodes && mutations[i].addedNodes.length) {
+            shouldScroll = true;
+            break;
+          }
+        }
+        if (shouldScroll) scrollChatBottom(false);
       });
+
+      function attachObserver() {
+        var msgBox = getMessageBox();
+        if (!msgBox || msgBox.__fdBugfixObserved) return;
+        msgBox.__fdBugfixObserved = true;
+        try { observer.observe(msgBox, { childList: true, subtree: false }); } catch (e) {}
+      }
+
+      attachObserver();
+      setTimeout(attachObserver, 800);
+      setTimeout(attachObserver, 2000);
+    }
+
+    window.addEventListener("resize", function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function(){
+        normalizeResponsiveLayout();
+        scrollChatBottom(false);
+      }, 160);
+    }, { passive: true });
+
+    window.addEventListener("orientationchange", function() {
+      setTimeout(function(){
+        normalizeResponsiveLayout();
+        scrollChatBottom(true);
+      }, 260);
+    }, { passive: true });
+
+    document.addEventListener("visibilitychange", function() {
+      if (!document.hidden) setTimeout(function(){ scrollChatBottom(false); }, 220);
     });
   }
 
-  function bindLoginAttempt(){
-    var form = $("mainLoginForm");
-    if (form && !form.__fdV6LoginAttempt) {
-      form.__fdV6LoginAttempt = true;
-      form.addEventListener("submit", function(){
-        document.body.dataset.fdLoginAttempted = "1";
-        document.body.classList.remove("fd-v6-logout", "fd-v6-logging-out");
-        delete document.body.dataset.fdMaintenanceLogout;
-      }, true);
-    }
-  }
+  window.forceFinalChatBottom = function() {
+    lastKnownBottomLock = true;
+    scrollChatBottom(true);
+  };
 
-  function hideMaintenanceBeforeAttempt(){
-    if (dashboardVisible()) return;
-    if (document.body.dataset.fdLoginAttempted === "1") return;
-    if (document.body.dataset.fdMaintenanceLogout === "1") return;
-    var popup = $("maintenanceDashboardPopup");
-    if (popup) popup.classList.remove("is-visible", "show", "active", "open");
-  }
-
-  function ensureThemeButtonVisible(){
-    var btn = $("themeActionBtn");
-    if (btn) {
-      btn.style.removeProperty("display");
-      btn.hidden = false;
-    }
-  }
-
-  function removeBottomTypingIndicator(){
-    document.querySelectorAll("#typingLiveLine, .typing-live-line, #typingIndicator, .typing-indicator").forEach(function(el){
-      el.setAttribute("aria-hidden", "true");
-    });
-  }
-
-  function capDecorationsOnce(){
-    var max = isMobile() ? 42 : 96;
-    [".gold-love-particle", ".love-particle", ".pirate-love-particle", ".star-particle", ".floating-love", ".floating-heart", ".sparkle-dot"].forEach(function(selector){
-      document.querySelectorAll(selector).forEach(function(node, index){
-        if (index >= max) node.style.display = "none";
-      });
-    });
-  }
-
-  function syncDashboardState(){
-    var dash = $("dashboardPage");
-    if (dashboardVisible()) {
-      document.body.classList.add("fd-dashboard-active");
-      document.body.classList.remove("fd-v6-logout", "fd-v6-logging-out");
-      if (dash) {
-        dash.style.pointerEvents = "";
-        dash.style.visibility = "";
-      }
-      ensureThemeButtonVisible();
-      bindChatBottomGuard();
-    } else {
-      document.body.classList.remove("fd-dashboard-active", "mobile-sidebar-active");
-      if (!isMobile()) closeMobileSidebar();
-      hideMaintenanceBeforeAttempt();
-    }
-  }
-
-  function run(){
-    bindLoginAttempt();
-    bindLogoutFallback();
-    bindMobileDrawer();
-    bindChatBottomGuard();
-    patchLogoutOnce();
-    patchSendOnce();
-    ensureThemeButtonVisible();
-    removeBottomTypingIndicator();
-    capDecorationsOnce();
-    syncDashboardState();
-  }
-
-  function retryBoot(){
-    if (retryTimer) return;
-    retryTimer = setInterval(function(){
-      retryCount += 1;
-      run();
-      var done = retryCount >= 60 || (
-        (!window.triggerSignOut || window.triggerSignOut.__fdV6Clean) &&
-        (!window.commitMessageToFirebase || window.commitMessageToFirebase.__fdV6Clean)
-      );
-      if (done) {
-        clearInterval(retryTimer);
-        retryTimer = null;
-      }
-    }, 250);
-  }
-
-  window.fdCleanV6Run = run;
-  window.fdCleanV6ScrollBottom = scrollChatBottom;
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function(){ run(); retryBoot(); }, { once: true });
-  } else {
-    run();
-    retryBoot();
-  }
-
-  window.addEventListener("load", function(){ run(); scrollChatBottom(true); }, { once: true, passive: true });
-  window.addEventListener("resize", function(){ syncDashboardState(); bindMobileDrawer(); if (!isMobile()) closeMobileSidebar(); }, { passive: true });
-  window.addEventListener("orientationchange", function(){ setTimeout(function(){ syncDashboardState(); bindMobileDrawer(); scrollChatBottom(true); }, 260); }, { passive: true });
-  document.addEventListener("visibilitychange", function(){ if (!document.hidden) run(); }, { passive: true });
+  ready(function(){
+    patchProfilePhotoPicker();
+    patchMobileSidebarFallbacks();
+    normalizeResponsiveLayout();
+    bindStableEvents();
+    patchWhenGlobalsReady();
+    setTimeout(function(){ scrollChatBottom(true); }, 80);
+    setTimeout(function(){ scrollChatBottom(true); }, 450);
+  });
 })();
 </script>
 
