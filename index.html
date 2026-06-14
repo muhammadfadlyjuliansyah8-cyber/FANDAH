@@ -5774,119 +5774,7 @@
        Tujuan: mencegah addEventListener / setInterval / observer yang sama
        terpasang berulang saat script patch berjalan beberapa kali.
        ========================================================= -->
-  <script id="final-anti-double-listener-guard">
-  (function(){
-    "use strict";
-    if (window.__FD_ANTI_DOUBLE_LISTENER_GUARD_V1__) return;
-    window.__FD_ANTI_DOUBLE_LISTENER_GUARD_V1__ = true;
-
-    var targetIds = new WeakMap();
-    var callbackIds = new WeakMap();
-    var listenerKeys = new Set();
-    var intervalKeys = new Map();
-    var observerKeys = new WeakMap();
-    var nextTargetId = 1;
-    var nextCallbackId = 1;
-
-    function getTargetId(target) {
-      if (!targetIds.has(target)) targetIds.set(target, nextTargetId++);
-      return targetIds.get(target);
-    }
-
-    function safeFnSource(fn) {
-      try { return String(fn).replace(/\s+/g, ' ').slice(0, 260); }
-      catch (e) { return 'unknown'; }
-    }
-
-    function getCallbackKey(callback) {
-      if (!callback) return 'null';
-      var type = typeof callback;
-      if (type === 'function') {
-        if (!callbackIds.has(callback)) callbackIds.set(callback, nextCallbackId++);
-        return 'fn:' + callbackIds.get(callback) + ':' + safeFnSource(callback);
-      }
-      if (callback && type === 'object' && typeof callback.handleEvent === 'function') {
-        if (!callbackIds.has(callback)) callbackIds.set(callback, nextCallbackId++);
-        return 'obj:' + callbackIds.get(callback) + ':' + safeFnSource(callback.handleEvent);
-      }
-      return type + ':' + safeFnSource(callback);
-    }
-
-    function getCapture(options) {
-      if (options === true) return '1';
-      if (options && typeof options === 'object' && options.capture) return '1';
-      return '0';
-    }
-
-    var nativeAdd = EventTarget.prototype.addEventListener;
-    var nativeRemove = EventTarget.prototype.removeEventListener;
-
-    EventTarget.prototype.addEventListener = function(type, callback, options) {
-      if (!callback || !type) return nativeAdd.call(this, type, callback, options);
-
-      var key = getTargetId(this) + '|' + type + '|' + getCapture(options) + '|' + getCallbackKey(callback);
-
-      // Untuk event global yang sering bikin bug/lag, listener identik cukup dipasang sekali.
-      // Event khusus element tetap aman karena targetId berbeda.
-      if (listenerKeys.has(key)) return;
-      listenerKeys.add(key);
-      return nativeAdd.call(this, type, callback, options);
-    };
-
-    EventTarget.prototype.removeEventListener = function(type, callback, options) {
-      try {
-        var key = getTargetId(this) + '|' + type + '|' + getCapture(options) + '|' + getCallbackKey(callback);
-        listenerKeys.delete(key);
-      } catch (e) {}
-      return nativeRemove.call(this, type, callback, options);
-    };
-
-    var nativeSetInterval = window.setInterval;
-    var nativeClearInterval = window.clearInterval;
-
-    window.setInterval = function(callback, delay) {
-      var delayNum = Number(delay || 0);
-      var source = safeFnSource(callback);
-      var key = delayNum + '|' + source;
-
-      // Hindari interval identik berjalan dobel; ini penyebab umum dashboard makin berat setelah patch bertumpuk.
-      if (intervalKeys.has(key)) return intervalKeys.get(key);
-      var id = nativeSetInterval.apply(window, arguments);
-      intervalKeys.set(key, id);
-      return id;
-    };
-
-    window.clearInterval = function(id) {
-      intervalKeys.forEach(function(value, key){ if (value === id) intervalKeys.delete(key); });
-      return nativeClearInterval.call(window, id);
-    };
-
-    if (window.MutationObserver) {
-      var NativeMutationObserver = window.MutationObserver;
-      window.MutationObserver = function(callback) {
-        var observer = new NativeMutationObserver(callback);
-        var nativeObserve = observer.observe;
-        observer.observe = function(target, options) {
-          try {
-            var key = safeFnSource(callback) + '|' + getTargetId(target) + '|' + JSON.stringify(options || {});
-            if (observerKeys.get(observer) === key) return;
-            observerKeys.set(observer, key);
-          } catch (e) {}
-          return nativeObserve.call(observer, target, options);
-        };
-        return observer;
-      };
-      window.MutationObserver.prototype = NativeMutationObserver.prototype;
-      window.MutationObserver.__nativeObserver = NativeMutationObserver;
-    }
-
-    window.__fdListenerGuardStats = function(){
-      return { listeners: listenerKeys.size, intervals: intervalKeys.size };
-    };
-  })();
-  </script>
-
-  <script id="session-restore-pre-guard">
+<script id="session-restore-pre-guard">
     (function() {
       try {
         var raw = localStorage.getItem('fandah_dashboard_login_session_v1');
@@ -5972,74 +5860,8 @@
   </style>
 
 
-  <style id="final-ultra-smooth-dashboard-performance-fix">
-    /* FINAL PERFORMANCE FIX — mengurangi delay saat mengetik dan scroll, tanpa menghapus fungsi utama. */
-    #dashboardPage *, #dashboardPage *::before, #dashboardPage *::after {
-      animation-duration: .001ms !important;
-      animation-iteration-count: 1 !important;
-    }
-    #dashboardPage .message-area {
-      scroll-behavior: auto !important;
-      contain: layout paint style;
-      will-change: scroll-position;
-      content-visibility: auto;
-      overscroll-behavior: contain;
-    }
-    #dashboardPage .bubble,
-    #dashboardPage .chat-item-card,
-    #dashboardPage .chat-main-header,
-    #dashboardPage .chat-footer-panel,
-    #dashboardPage .sidebar,
-    #dashboardPage .modal-box {
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-    }
-    #dashboardPage .bubble:hover,
-    #dashboardPage .chat-item-card:hover,
-    #dashboardPage .action-link-btn:hover {
-      transform: none !important;
-    }
-    #typedMessageInput {
-      font-size: 16px !important;
-      transform: translateZ(0);
-      will-change: contents;
-    }
-    .typing-live-dot,
-    .presence-typing::after,
-    .unread-badge-alert {
-      animation: none !important;
-    }
-    @media (max-width: 768px) {
-      #dashboardPage,
-      #dashboardPage::before,
-      #dashboardPage::after,
-      .chat-main-window,
-      .chat-main-window::before,
-      .chat-main-window::after,
-      .sidebar::before,
-      .sidebar::after {
-        background-image: none !important;
-        filter: none !important;
-        box-shadow: none !important;
-      }
-      #dashboardPage .message-area {
-        padding: 12px 10px !important;
-        gap: 8px !important;
-      }
-      #dashboardPage .bubble {
-        max-width: 82% !important;
-        box-shadow: none !important;
-        border-radius: 16px !important;
-      }
-      #dashboardPage .chat-footer-panel {
-        padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) !important;
-        gap: 8px !important;
-      }
-    }
-  </style>
-
-
-  <style id="luffy-background-full-and-responsive-text-final">
+  
+<style id="luffy-background-full-and-responsive-text-final">
     /* =========================================================
        FINAL FIX: BACKGROUND LUFFY UTUH + TULISAN RESPONSIVE
        Tujuan:
@@ -6434,6 +6256,391 @@
       -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.78), rgba(0,0,0,.28)) !important;
     }
   </style>
+
+  <style id="FINAL_CLEAN_CONSOLIDATED_PATCH_V6">
+    /* =========================================================
+       FINAL CLEAN V6
+       Satu patch final untuk bagian yang benar-benar dibutuhkan:
+       logout anti-stuck, mobile drawer, scroll chat terbaru,
+       alignment room/start-chat, typing display, dan reset layer.
+       Tidak import Firebase ulang dan tidak memangkas isi chat.
+       ========================================================= */
+
+    html, body { width: 100%; min-height: 100%; }
+
+    body.fd-v6-logging-out,
+    body.fd-v6-logout {
+      cursor: default !important;
+    }
+
+    body.fd-v6-logout #dashboardPage {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    body.fd-v6-logout #loginPage {
+      display: grid !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    body.fd-v6-logout .modal-overlay:not(#maintenanceDashboardPopup),
+    body.fd-v6-logout .image-lightbox-overlay,
+    body.fd-v6-logout .desktop-notification-card,
+    body.fd-v6-logout #imagePreviewBar,
+    body.fd-v6-logout #emojiGifPickerPanel {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    #dashboardPage {
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .chat-main-window,
+    .message-area,
+    .sidebar,
+    .chat-list-container,
+    #activeChatRoomsBox {
+      min-width: 0;
+    }
+
+    .message-area {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      overscroll-behavior: contain;
+      scroll-behavior: smooth;
+    }
+
+    /* Start Chat dan label Personal Room dibuat rata, tidak keluar dari bubble/header. */
+    .section-label {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 12px !important;
+      min-width: 0 !important;
+    }
+
+    .section-label > span {
+      min-width: 0 !important;
+      flex: 1 1 auto !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    .start-chat-btn {
+      flex: 0 0 auto !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 4px !important;
+      min-width: 92px !important;
+      min-height: 38px !important;
+      line-height: 1 !important;
+      white-space: nowrap !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+
+    .start-chat-plus,
+    .start-chat-text {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1 !important;
+    }
+
+    /* Room card: avatar, nama, role/status, profil/hapus/badge dibuat satu grid yang stabil. */
+    .chat-item-card {
+      grid-template-columns: 56px minmax(0, 1fr) 82px !important;
+      align-items: center !important;
+      gap: 12px !important;
+      overflow: visible !important;
+    }
+
+    .chat-item-card > div:nth-child(2) {
+      min-width: 0 !important;
+      position: relative !important;
+      z-index: 2 !important;
+    }
+
+    .chat-item-name {
+      min-width: 0 !important;
+      max-width: 100% !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    .chat-item-subline {
+      min-width: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      flex-wrap: wrap !important;
+    }
+
+    .chat-item-actions {
+      position: relative !important;
+      z-index: 3 !important;
+      width: 82px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      pointer-events: auto !important;
+    }
+
+    .chat-item-actions .tiny-profile-btn,
+    .chat-item-actions .delete-room-btn,
+    .chat-item-actions .remove-chat-room-btn,
+    .chat-item-actions .unread-badge-alert {
+      width: 76px !important;
+      min-width: 76px !important;
+      max-width: 76px !important;
+      min-height: 28px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1 !important;
+      white-space: nowrap !important;
+      text-align: center !important;
+    }
+
+    .chat-item-actions .unread-badge-alert {
+      position: static !important;
+      transform: none !important;
+      inset: auto !important;
+      border-radius: 999px !important;
+      padding: 0 8px !important;
+    }
+
+    .status-indicator,
+    .role-pill,
+    .user-role-badge {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1.2 !important;
+    }
+
+    /* Satu indikator typing saja, di header/status. Bagian bawah disembunyikan agar input tidak terdorong. */
+    #typingLiveLine,
+    .typing-live-line,
+    #typingIndicator,
+    .typing-indicator {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      min-height: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+    }
+
+    #topHeaderStatus .single-typing-indicator,
+    #topHeaderStatus .typing-single-color,
+    #dashboardPage .presence-typing,
+    #dashboardPage .status-indicator.presence-typing {
+      color: var(--theme-accent, #65EEFF) !important;
+      text-shadow: none !important;
+      -webkit-text-stroke: 0 !important;
+      filter: none !important;
+      background: transparent !important;
+      font-style: italic !important;
+      font-weight: 800 !important;
+    }
+
+    .presence-typing::after,
+    .typing-live-dot,
+    #topHeaderStatus .typing-live-dot {
+      content: none !important;
+      display: none !important;
+      animation: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Mobile: sidebar jadi drawer, area chat tetap bisa diklik. */
+    .mobile-sidebar-backdrop,
+    .mobile-sidebar-close,
+    .mobile-sidebar-toggle {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    @media (min-width: 681px) {
+      .mobile-sidebar-backdrop,
+      .mobile-sidebar-close,
+      .mobile-sidebar-toggle {
+        display: none !important;
+      }
+      #dashboardPage .sidebar {
+        transform: none !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+      }
+    }
+
+    @media (max-width: 680px) {
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #dashboardPage {
+        grid-template-columns: 1fr !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        overflow: hidden !important;
+      }
+
+      #dashboardPage .sidebar {
+        display: flex !important;
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        width: min(86vw, 340px) !important;
+        max-width: 340px !important;
+        height: 100dvh !important;
+        z-index: 320 !important;
+        transform: translateX(-104%) !important;
+        transition: transform .22s ease !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+      }
+
+      #dashboardPage .sidebar.mobile-open,
+      body.mobile-sidebar-active #dashboardPage .sidebar {
+        transform: translateX(0) !important;
+      }
+
+      .mobile-sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 310;
+        background: rgba(0,0,0,.58);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        pointer-events: auto;
+      }
+
+      body.mobile-sidebar-active .mobile-sidebar-backdrop,
+      #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
+        display: block !important;
+      }
+
+      .mobile-sidebar-toggle {
+        display: inline-grid !important;
+        place-items: center !important;
+        width: 38px !important;
+        height: 38px !important;
+        flex: 0 0 auto !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(255,255,255,.12) !important;
+        background: rgba(255,255,255,.055) !important;
+        color: var(--theme-accent, #65EEFF) !important;
+        font-size: 20px !important;
+        cursor: pointer !important;
+      }
+
+      .mobile-sidebar-close {
+        display: inline-grid !important;
+        place-items: center !important;
+        position: absolute !important;
+        right: 12px !important;
+        top: 12px !important;
+        width: 34px !important;
+        height: 34px !important;
+        z-index: 4 !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(255,255,255,.12) !important;
+        background: rgba(0,0,0,.22) !important;
+        color: #fff !important;
+        font-size: 22px !important;
+        cursor: pointer !important;
+      }
+
+      .chat-main-window {
+        width: 100vw !important;
+        height: 100dvh !important;
+        min-height: 0 !important;
+      }
+
+      .chat-main-header {
+        min-height: 62px !important;
+        padding: 12px 12px !important;
+      }
+
+      .message-area {
+        padding: 16px 12px !important;
+        gap: 12px !important;
+      }
+
+      .chat-footer-panel {
+        padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) !important;
+        gap: 8px !important;
+      }
+
+      .bubble {
+        max-width: min(82vw, 520px) !important;
+      }
+
+      .msg-controls {
+        position: static !important;
+        transform: none !important;
+        display: inline-flex !important;
+        padding: 4px 0 0 !important;
+        opacity: .82;
+      }
+
+      .chat-item-card {
+        grid-template-columns: 48px minmax(0, 1fr) 68px !important;
+        gap: 9px !important;
+        padding: 12px !important;
+      }
+
+      .chat-item-card .partner-avatar-img {
+        width: 46px !important;
+        height: 46px !important;
+      }
+
+      .chat-item-actions {
+        width: 68px !important;
+      }
+
+      .chat-item-actions .tiny-profile-btn,
+      .chat-item-actions .delete-room-btn,
+      .chat-item-actions .remove-chat-room-btn,
+      .chat-item-actions .unread-badge-alert {
+        width: 64px !important;
+        min-width: 64px !important;
+        max-width: 64px !important;
+        font-size: 9.5px !important;
+      }
+
+      .section-label {
+        align-items: center !important;
+      }
+
+      .start-chat-btn {
+        min-width: 88px !important;
+        min-height: 36px !important;
+        font-size: 10px !important;
+      }
+    }
+  </style>
+
 </head>
 
 <body>
@@ -11151,17 +11358,7 @@
       /* FIX: background modal tidak ditimpa oleh theme modal. */
     })();
   </script>
-
-
-  <style id="final-switch-chat-scroll-bottom-fix">
-    /* Saat pindah chat, area pesan selalu diarahkan ke pesan terbaru */
-    #messageFlowBox {
-      scroll-behavior: smooth;
-    }
-  </style>
-
-
-  <style id="final-lightweight-love-after-login-style">
+<style id="final-lightweight-love-after-login-style">
     /* Efek love kecil setelah login — ringan, capped, tidak mengganggu klik */
     #afterLoginLoveLayer {
       position: fixed;
@@ -12927,163 +13124,8 @@
       }
     }
   </style>
-<style id="final-longterm-safe-polish">
-    /* Long term polish: menjaga UI ringan tanpa mengubah jalur utama login/chat */
-    #afterLoginLoveLayer,
-    #beforeLoginLoveLayer,
-    #chatLoveBackgroundLayer {
-      pointer-events: none !important;
-      contain: layout style paint;
-    }
 
-    .login-love-particle,
-    .prelogin-love-particle,
-    .chat-love-bg-particle {
-      pointer-events: none !important;
-      user-select: none !important;
-      contain: layout style paint;
-    }
-
-    #dashboardPage,
-    .chat-main-window,
-    .message-area,
-    #messageFlowBox {
-      min-width: 0 !important;
-      min-height: 0 !important;
-    }
-
-    #messageFlowBox {
-      overscroll-behavior-y: contain;
-    }
-
-    #themeModal .modal-box,
-    #adminModal .modal-box,
-    #profileModal .modal-box,
-    #startChatModal .modal-box {
-      max-height: calc(100vh - 34px);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-
-    @media (max-width: 680px) {
-      #dashboardPage.mobile-sidebar-open .sidebar,
-      #dashboardPage.mobile-sidebar-open .chat-item-card,
-      #dashboardPage.mobile-sidebar-open #activeChatRoomsBox {
-        pointer-events: auto !important;
-      }
-
-      #dashboardPage .chat-footer-panel input[type="text"] {
-        font-size: 16px !important; /* cegah zoom otomatis Safari/iOS */
-      }
-    }
-  </style>
-
-
-  <script id="final-longterm-safe-guard">
-    (function() {
-      if (window.__finalLongTermSafeGuardReady) return;
-      window.__finalLongTermSafeGuardReady = true;
-
-      const MAX_LOGIN_LOVES = 56;
-      const MAX_PRELOGIN_LOVES = 50;
-      const MAX_CHAT_LOVES = 52;
-
-      function prune(selector, max) {
-        const nodes = Array.from(document.querySelectorAll(selector));
-        if (nodes.length <= max) return;
-        nodes.slice(0, nodes.length - max).forEach((node) => node.remove());
-      }
-
-      function cleanupParticles() {
-        prune('.login-love-particle', MAX_LOGIN_LOVES);
-        prune('.prelogin-love-particle', MAX_PRELOGIN_LOVES);
-        prune('.chat-love-bg-particle', MAX_CHAT_LOVES);
-      }
-
-      function syncLightweightState() {
-        cleanupParticles();
-
-        const dash = document.getElementById('dashboardPage');
-        const bottomNav = document.getElementById('mobileBottomNav');
-        if (dash && bottomNav) {
-          const visible = window.getComputedStyle(dash).display !== 'none';
-          const mobile = window.matchMedia && window.matchMedia('(max-width: 680px)').matches;
-          document.body.classList.toggle('mobile-bottom-nav-active', !!visible && !!mobile);
-        }
-
-        try {
-          if (typeof window.applyDashboardUiSettings === 'function') {
-            window.applyDashboardUiSettings();
-          }
-        } catch (error) {}
-      }
-
-      function bindSafeDelegation() {
-        if (document.body.dataset.longTermDelegationReady === '1') return;
-        document.body.dataset.longTermDelegationReady = '1';
-
-        document.addEventListener('click', function(event) {
-          const card = event.target.closest('.chat-item-card');
-          if (!card) return;
-          if (event.target.closest('button, input, select, a, [data-profile-open="1"], [data-delete-chat="1"]')) return;
-
-          if (window.matchMedia && !window.matchMedia('(max-width: 680px)').matches) return;
-
-          const partner = card.dataset.chatPartner;
-          if (!partner || typeof window.selectActiveChatRoom !== 'function') return;
-
-          event.preventDefault();
-          event.stopPropagation();
-          window.selectActiveChatRoom(partner);
-        }, true);
-      }
-
-      function ensureProfilePickerFallback() {
-        if (typeof window.openMobileProfilePhotoPicker === 'function' && window.openMobileProfilePhotoPicker.__longTermFallback) return;
-
-        const existing = window.openMobileProfilePhotoPicker;
-        window.openMobileProfilePhotoPicker = function() {
-          if (typeof existing === 'function') {
-            try { return existing.apply(this, arguments); } catch (error) {}
-          }
-
-          const input = document.getElementById('profileMobileAvatarInput') || document.getElementById('uploadAvatarInput');
-          if (!input) {
-            alert('Input foto profil tidak ditemukan.');
-            return;
-          }
-          input.click();
-        };
-        window.openMobileProfilePhotoPicker.__longTermFallback = true;
-      }
-
-      function boot() {
-        bindSafeDelegation();
-        ensureProfilePickerFallback();
-        syncLightweightState();
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', boot, { once: true });
-      } else {
-        boot();
-      }
-
-      document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'visible') syncLightweightState();
-      });
-
-      window.addEventListener('resize', syncLightweightState, { passive: true });
-      window.addEventListener('orientationchange', function() {
-        setTimeout(syncLightweightState, 260);
-      }, { passive: true });
-
-      setInterval(syncLightweightState, 60000);
-    })();
-  </script>
-
-
-  <style id="final-cyber-theme-font-readability-longterm-patch">
+<style id="final-cyber-theme-font-readability-longterm-patch">
     /* =========================================================
        CYBER CRYPTO + CYBER LUXURY FONT READABILITY PATCH
        - kontras font dibuat lebih kuat
@@ -14088,220 +14130,7 @@
     .maintenance-popup-title { font-size: 20px; font-weight: 950; letter-spacing: -.02em; margin-bottom: 9px; }
     .maintenance-popup-text { font-size: 13.5px; line-height: 1.6; color: color-mix(in srgb, var(--theme-text, #F7FBFF) 72%, transparent); }
   </style>
-
-  <script type="module" id="final-lightweight-maintenance-owner-patch-script">
-    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfigMaintenance = {
-      apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
-      authDomain: "fandah-c08fc.firebaseapp.com",
-      projectId: "fandah-c08fc",
-      storageBucket: "fandah-c08fc.firebasestorage.app",
-      messagingSenderId: "624734789171",
-      appId: "1:624734789171:web:7ba9ab16730acb5cfc8d46",
-      measurementId: "G-DN9Y49Q8QQ"
-    };
-
-    const maintenanceApp = getApps().length ? getApp() : initializeApp(firebaseConfigMaintenance);
-    const maintenanceDb = getFirestore(maintenanceApp);
-    const MAINTENANCE_DOC_REF = doc(maintenanceDb, "app_settings", "maintenance_dashboard");
-    const OWNER_NAME = "OWNER";
-    const LEGACY_OWNER_NAME = "Fadly";
-    let maintenanceState = { active: false, message: "Dashboard sedang maintenance. Silakan coba lagi nanti." };
-
-    function readCurrentSessionUser() {
-      try {
-        const raw = localStorage.getItem("fandah_dashboard_login_session_v1");
-        if (!raw) return "";
-        const data = JSON.parse(raw);
-        return String(data && data.username || "").trim();
-      } catch (error) { return ""; }
-    }
-
-    function normalizeLoginName(name) {
-      const raw = String(name || "").trim();
-      if (raw.toLowerCase() === LEGACY_OWNER_NAME.toLowerCase()) return OWNER_NAME;
-      if (raw.toLowerCase() === OWNER_NAME.toLowerCase()) return OWNER_NAME;
-      return raw;
-    }
-
-    function isOwnerName(name) {
-      return normalizeLoginName(name) === OWNER_NAME;
-    }
-
-    function ensureMaintenancePopup() {
-      let overlay = document.getElementById("maintenanceDashboardPopup");
-      if (overlay) return overlay;
-      overlay = document.createElement("div");
-      overlay.id = "maintenanceDashboardPopup";
-      overlay.className = "maintenance-popup-overlay";
-      overlay.innerHTML = `
-        <div class="maintenance-popup-box" role="alert" aria-live="assertive">
-          <div class="maintenance-popup-icon">⚙</div>
-          <div class="maintenance-popup-title">MAINTENANCE DASHBOARD</div>
-          <div class="maintenance-popup-text" id="maintenanceDashboardPopupText">Dashboard sedang maintenance. Silakan coba lagi nanti.</div>
-        </div>
-      `;
-      document.body.appendChild(overlay);
-      return overlay;
-    }
-
-    function showMaintenancePopup(message) {
-      const overlay = ensureMaintenancePopup();
-      const text = document.getElementById("maintenanceDashboardPopupText");
-      if (text) text.textContent = message || "Dashboard sedang maintenance. Silakan coba lagi nanti.";
-      overlay.classList.add("is-visible");
-    }
-
-    function hideMaintenancePopup() {
-      document.getElementById("maintenanceDashboardPopup")?.classList.remove("is-visible");
-    }
-
-    function updateMaintenanceOwnerPanel() {
-      const status = document.getElementById("maintenanceOwnerStatus");
-      const activateBtn = document.getElementById("maintenanceActivateBtn");
-      const deactivateBtn = document.getElementById("maintenanceDeactivateBtn");
-      if (status) {
-        status.textContent = maintenanceState.active ? "MAINTENANCE AKTIF" : "NORMAL AKTIF";
-        status.classList.toggle("is-active", !!maintenanceState.active);
-      }
-      if (activateBtn) activateBtn.style.display = maintenanceState.active ? "none" : "inline-flex";
-      if (deactivateBtn) deactivateBtn.style.display = maintenanceState.active ? "inline-flex" : "none";
-    }
-
-    function ensureMaintenanceOwnerPanel() {
-      const ownerCard = document.getElementById("ownerToolsCard");
-      if (!ownerCard || document.getElementById("maintenanceOwnerCard")) return;
-      const card = document.createElement("div");
-      card.className = "maintenance-owner-card";
-      card.id = "maintenanceOwnerCard";
-      card.innerHTML = `
-        <div class="admin-section-title">Owner Tools — Maintenance Dashboard</div>
-        <div class="owner-tools-desc">
-          Jika diaktifkan, semua user selain OWNER akan otomatis logout dan melihat pop up MAINTENANCE DASHBOARD. OWNER tetap bisa masuk untuk mengaktifkan/nonaktifkan kembali.
-        </div>
-        <span class="maintenance-status-pill" id="maintenanceOwnerStatus">NORMAL AKTIF</span>
-        <div class="maintenance-owner-actions">
-          <button type="button" class="maintenance-toggle-btn danger" id="maintenanceActivateBtn" onclick="activateMaintenanceDashboardOwnerOnly()">Aktifkan Maintenance</button>
-          <button type="button" class="maintenance-toggle-btn" id="maintenanceDeactivateBtn" onclick="deactivateMaintenanceDashboardOwnerOnly()">Nonaktifkan Maintenance</button>
-        </div>
-      `;
-      ownerCard.appendChild(card);
-      updateMaintenanceOwnerPanel();
-    }
-
-    async function enforceMaintenanceState() {
-      updateMaintenanceOwnerPanel();
-      const currentUser = readCurrentSessionUser();
-      if (maintenanceState.active) {
-        if (currentUser && !isOwnerName(currentUser) && typeof window.triggerSignOut === "function") {
-          await window.triggerSignOut({ reason: "maintenance", skipSessionBroadcast: true });
-        }
-        if (!currentUser || !isOwnerName(currentUser)) showMaintenancePopup(maintenanceState.message);
-      } else {
-        hideMaintenancePopup();
-      }
-    }
-
-    window.activateMaintenanceDashboardOwnerOnly = async function() {
-      const currentUser = readCurrentSessionUser();
-      if (!isOwnerName(currentUser)) return alert("Fitur maintenance hanya untuk OWNER.");
-      if (!confirm("Aktifkan MAINTENANCE DASHBOARD dan logout semua user?")) return;
-      await setDoc(MAINTENANCE_DOC_REF, {
-        active: true,
-        message: "Dashboard sedang maintenance. Silakan coba lagi nanti.",
-        updatedBy: OWNER_NAME,
-        updatedAtMs: Date.now(),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    };
-
-    window.deactivateMaintenanceDashboardOwnerOnly = async function() {
-      const currentUser = readCurrentSessionUser();
-      if (!isOwnerName(currentUser)) return alert("Fitur maintenance hanya untuk OWNER.");
-      await setDoc(MAINTENANCE_DOC_REF, {
-        active: false,
-        updatedBy: OWNER_NAME,
-        updatedAtMs: Date.now(),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    };
-
-    function patchLoginValidationForMaintenance() {
-      if (typeof window.executeLoginValidation !== "function" || window.executeLoginValidation.__maintenancePatched) return false;
-      const originalLogin = window.executeLoginValidation;
-      window.executeLoginValidation = async function(event) {
-        const typedUser = document.getElementById("inputUser")?.value || "";
-        try {
-          const snap = await getDoc(MAINTENANCE_DOC_REF);
-          const data = snap.exists() ? (snap.data() || {}) : {};
-          const active = data.active === true;
-          const message = data.message || "Dashboard sedang maintenance. Silakan coba lagi nanti.";
-          if (active && !isOwnerName(typedUser)) {
-            event?.preventDefault?.();
-            showMaintenancePopup(message);
-            const errorBox = document.getElementById("authErrorNotification");
-            if (errorBox) {
-              errorBox.textContent = "MAINTENANCE DASHBOARD aktif. Login user sementara ditutup.";
-              errorBox.style.display = "block";
-            }
-            return;
-          }
-        } catch (error) {}
-        return originalLogin.call(this, event);
-      };
-      window.executeLoginValidation.__maintenancePatched = true;
-      return true;
-    }
-
-    function patchAdminOpenForMaintenancePanel() {
-      if (typeof window.openAdminManagementModal !== "function" || window.openAdminManagementModal.__maintenancePatched) return false;
-      const originalOpenAdmin = window.openAdminManagementModal;
-      window.openAdminManagementModal = function(...args) {
-        const result = originalOpenAdmin.apply(this, args);
-        setTimeout(() => {
-          if (isOwnerName(readCurrentSessionUser())) ensureMaintenanceOwnerPanel();
-          updateMaintenanceOwnerPanel();
-        }, 60);
-        return result;
-      };
-      window.openAdminManagementModal.__maintenancePatched = true;
-      return true;
-    }
-
-    function bootMaintenancePatch() {
-      ensureMaintenancePopup();
-      patchLoginValidationForMaintenance();
-      patchAdminOpenForMaintenancePanel();
-      let tries = 0;
-      const timer = setInterval(() => {
-        tries += 1;
-        const okLogin = patchLoginValidationForMaintenance();
-        const okAdmin = patchAdminOpenForMaintenancePanel();
-        if ((okLogin && okAdmin) || tries > 60) clearInterval(timer);
-      }, 900);
-
-      onSnapshot(MAINTENANCE_DOC_REF, async (snap) => {
-        const data = snap.exists() ? (snap.data() || {}) : {};
-        maintenanceState = {
-          active: data.active === true,
-          message: data.message || "Dashboard sedang maintenance. Silakan coba lagi nanti."
-        };
-        if (isOwnerName(readCurrentSessionUser())) ensureMaintenanceOwnerPanel();
-        await enforceMaintenanceState();
-      }, () => {});
-    }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", bootMaintenancePatch, { once: true });
-    } else {
-      bootMaintenancePatch();
-    }
-  </script>
-
-
-  <!-- =========================================================
+<!-- =========================================================
        EXTRA PATCH: FAST SEND + ULTRA LIGHT DASHBOARD MOBILE/WEB
        ========================================================= -->
 <!-- =========================================================
@@ -14731,102 +14560,7 @@
        FINAL PATCH: PRESENCE ONLINE/OFFLINE ANTI ALT-TAB
        Offline tidak lagi berubah saat pindah tab/minimize.
        ========================================================= -->
-  <script id="final-presence-anti-alt-tab-fix">
-    (function () {
-      'use strict';
-
-      window.__ALLOW_EXPLICIT_OFFLINE__ = false;
-      window.__PRESENCE_FORCE_OFFLINE__ = false;
-
-      function currentTypingStatus() {
-        try {
-          var input = document.getElementById('typedMessageInput');
-          return input && input.value ? 'typing' : 'online';
-        } catch (e) {
-          return 'online';
-        }
-      }
-
-      function keepPresenceOnlineSoon() {
-        setTimeout(function () {
-          try {
-            if (typeof loggedInUser !== 'undefined' && loggedInUser && typeof syncOwnPresence === 'function') {
-              syncOwnPresence({
-                status: currentTypingStatus(),
-                activeRoom: (typeof passivePartner !== 'undefined' && passivePartner) ? passivePartner : '',
-                isWindowActive: true
-              });
-            }
-          } catch (e) {}
-        }, 120);
-      }
-
-      /*
-        Override terakhir untuk menangkap semua listener lama yang masih mencoba
-        mengirim offline saat visibilitychange/pagehide/beforeunload.
-      */
-      setTimeout(function () {
-        try {
-          if (typeof syncOwnPresence === 'function' && !syncOwnPresence.__antiAltTabFixed) {
-            var originalSyncOwnPresence = syncOwnPresence;
-            syncOwnPresence = function (extraState) {
-              extraState = extraState || {};
-              var explicitOffline = extraState.status === 'offline' && (
-                extraState.forceOffline === true ||
-                window.__ALLOW_EXPLICIT_OFFLINE__ === true ||
-                window.__PRESENCE_FORCE_OFFLINE__ === true
-              );
-
-              if (extraState.status === 'offline' && !explicitOffline) {
-                extraState = Object.assign({}, extraState, {
-                  status: 'online',
-                  activeRoom: (typeof passivePartner !== 'undefined' && passivePartner) ? passivePartner : '',
-                  isWindowActive: true
-                });
-              }
-
-              return originalSyncOwnPresence(extraState);
-            };
-            syncOwnPresence.__antiAltTabFixed = true;
-          }
-        } catch (e) {}
-      }, 0);
-
-      document.addEventListener('visibilitychange', keepPresenceOnlineSoon, true);
-      window.addEventListener('focus', keepPresenceOnlineSoon, true);
-      window.addEventListener('pageshow', keepPresenceOnlineSoon, true);
-      window.addEventListener('pagehide', keepPresenceOnlineSoon, true);
-
-      setTimeout(function () {
-        try {
-          if (typeof triggerSignOut === 'function' && !triggerSignOut.__presenceLogoutFixed) {
-            var originalTriggerSignOut = triggerSignOut;
-            triggerSignOut = async function () {
-              window.__ALLOW_EXPLICIT_OFFLINE__ = true;
-              window.__PRESENCE_FORCE_OFFLINE__ = true;
-              try {
-                if (typeof syncOwnPresence === 'function') {
-                  await syncOwnPresence({ status: 'offline', activeRoom: '', isWindowActive: false, forceOffline: true });
-                }
-              } catch (e) {}
-              try {
-                return await originalTriggerSignOut.apply(this, arguments);
-              } finally {
-                setTimeout(function () {
-                  window.__ALLOW_EXPLICIT_OFFLINE__ = false;
-                  window.__PRESENCE_FORCE_OFFLINE__ = false;
-                }, 1200);
-              }
-            };
-            triggerSignOut.__presenceLogoutFixed = true;
-          }
-        } catch (e) {}
-      }, 0);
-    })();
-  </script>
-
-
-  <!-- =========================================================
+<!-- =========================================================
        FINAL REQUEST PATCH — LIGHT DYNAMIC THEME ENGINE + SESSION + TYPING + MAINTENANCE CENTER
        Catatan: patch ini sengaja ditaruh paling bawah agar override aman tanpa menghapus fungsi utama.
        ========================================================= -->
@@ -15465,40 +15199,7 @@
       }
     }
   </style>
-
-
-  <script id="final-ultra-smooth-input-runtime-fix">
-    (function(){
-      "use strict";
-      var typingDelayTimer = null;
-      var lastValue = "";
-      function raf(fn){ return (window.requestAnimationFrame || function(cb){ return setTimeout(cb,16); })(fn); }
-      function callTypingNow(){
-        raf(function(){ if (typeof window.handleTypingState === "function") window.handleTypingState(); });
-      }
-      function onInputFast(e){
-        var input = e && e.target;
-        if (!input || input.id !== "typedMessageInput") return;
-        var value = input.value || "";
-        if (value === lastValue) return;
-        lastValue = value;
-        clearTimeout(typingDelayTimer);
-        callTypingNow();
-        typingDelayTimer = setTimeout(callTypingNow, 260);
-      }
-      document.addEventListener("input", onInputFast, { passive: true, capture: true });
-      document.addEventListener("keydown", function(e){
-        if (e && e.target && e.target.id === "typedMessageInput") callTypingNow();
-      }, { passive: true, capture: true });
-      document.addEventListener("blur", function(e){
-        if (e && e.target && e.target.id === "typedMessageInput") setTimeout(callTypingNow, 80);
-      }, true);
-      window.__finalUltraSmoothInputFix = true;
-    })();
-  </script>
-
-
-  <style id="front-fixed-luffy-background-lite">
+<style id="front-fixed-luffy-background-lite">
     /* BACKGROUND DEPAN/LOGIN FIXED - fitur upload dihapus agar tidak delay/lag.
        Gambar dari user dipasang langsung sebagai background ringan tanpa Firebase Storage,
        tanpa canvas compression, tanpa listener tambahan, dan tanpa animasi berat. */
@@ -16854,77 +16555,6 @@
   </script>
 
 
-<script id="final-performance-memory-virtual-patch">
-/* =========================================================
-   FINAL PATCH: Lazy render helper + memory cleanup + resize-safe bg
-   ========================================================= */
-(function(){
-  "use strict";
-
-  window.loadOlderMessagesBatch = function(){
-    const state = window.__chatVirtualState || (window.__chatVirtualState = { roomKey: "", visibleCount: 160 });
-    const isMobile = window.matchMedia && window.matchMedia("(max-width: 680px)").matches;
-    const addCount = isMobile ? 50 : 90;
-    state.visibleCount = Math.min((state.visibleCount || 130) + addCount, 500);
-    window.__chatVirtualLoadingOlder = true;
-
-    // Paksa re-render room aktif tanpa reload halaman.
-    try {
-      if (typeof window.selectActiveChatRoom === "function" && window.passivePartner) {
-        window.selectActiveChatRoom(window.passivePartner);
-      } else {
-        const activeCard = document.querySelector('.chat-item-card.active');
-        activeCard?.click?.();
-      }
-    } catch(e) {
-      console.warn("Gagal load pesan lama:", e);
-      window.__chatVirtualLoadingOlder = false;
-    }
-  };
-
-  // Cleanup memori ringan untuk penggunaan lama: hapus preview/file blob yang tidak dipakai.
-  const cleanupMemory = function(){
-    try {
-      document.querySelectorAll('img[src^="blob:"][data-revoked!="1"]').forEach(function(img){
-        if (!document.body.contains(img) || img.complete) {
-          try { URL.revokeObjectURL(img.src); } catch(e) {}
-          img.dataset.revoked = "1";
-        }
-      });
-
-      document.querySelectorAll('.desktop-notification-card.closing, .temp-preview-cleanup').forEach(function(el){
-        if (!el.isConnected) return;
-        el.remove();
-      });
-
-      if (window.performance && performance.memory) {
-        document.documentElement.dataset.heapUsedMb = String(Math.round(performance.memory.usedJSHeapSize / 1048576));
-      }
-    } catch(e) {}
-  };
-
-  window.finalDashboardMemoryCleanup = cleanupMemory;
-  setInterval(cleanupMemory, 120000);
-  window.addEventListener('pagehide', cleanupMemory, { passive: true });
-  document.addEventListener('visibilitychange', function(){
-    if (document.visibilityState === 'hidden') cleanupMemory();
-  }, { passive: true });
-
-  // Pastikan background tidak berubah/crop saat resize.
-  const stabilizeBackground = function(){
-    document.querySelectorAll('#dashboardBgImage, #chatBgImage, .visual-bg-img').forEach(function(img){
-      img.style.objectFit = 'contain';
-      img.style.objectPosition = 'center center';
-      img.style.transform = 'none';
-    });
-  };
-  window.addEventListener('resize', stabilizeBackground, { passive: true });
-  window.addEventListener('orientationchange', function(){ setTimeout(stabilizeBackground, 180); }, { passive: true });
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', stabilizeBackground, { once: true });
-  else stabilizeBackground();
-})();
-</script>
-
 
 <style id="final-presence-theme-readable-upgrade">
   /* THEME KHUSUS SETELAH LOGIN: Crimson Pirate — bubble & font dibuat lebih jelas. */
@@ -17002,70 +16632,6 @@
 
   @media(max-width:680px){ .dashboard-theme-options { grid-template-columns: 1fr !important; } }
 </style>
-
-<script id="final-theme-presence-accurate-patch">
-(function(){
-  'use strict';
-  const EXTRA_THEME = 'one-piece-crimson';
-  const THEME_KEY = 'dashboard_latar_theme_v2';
-
-  function ensureExtraThemeCard(){
-    const box = document.getElementById('dashboardThemeOptions');
-    if (!box || box.querySelector('[data-dashboard-theme="'+EXTRA_THEME+'"]')) return;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'dashboard-theme-card';
-    btn.dataset.dashboardTheme = EXTRA_THEME;
-    btn.setAttribute('onclick', "setDashboardTheme('"+EXTRA_THEME+"')");
-    btn.innerHTML = '<span class="theme-swatch" style="background:linear-gradient(135deg,#130207,#FF3B4F 55%,#FFD36A);"></span><span class="dashboard-theme-info"><b>Crimson Pirate</b><small>Tema merah bajak laut, bubble jelas</small></span>';
-    box.appendChild(btn);
-  }
-
-  const oldSetTheme = window.setDashboardTheme;
-  window.setDashboardTheme = function(themeName){
-    if (themeName === EXTRA_THEME) {
-      document.documentElement.setAttribute('data-dashboard-theme', EXTRA_THEME);
-      document.querySelectorAll('.dashboard-theme-card[data-dashboard-theme]').forEach(function(btn){
-        btn.classList.toggle('active', btn.dataset.dashboardTheme === EXTRA_THEME);
-      });
-      try { localStorage.setItem(THEME_KEY, EXTRA_THEME); } catch(e) {}
-      return;
-    }
-    if (typeof oldSetTheme === 'function') return oldSetTheme.apply(this, arguments);
-  };
-
-  const oldOpenTheme = window.openThemeSettingsModal;
-  window.openThemeSettingsModal = function(){
-    if (typeof oldOpenTheme === 'function') oldOpenTheme.apply(this, arguments);
-    ensureExtraThemeCard();
-    const saved = localStorage.getItem(THEME_KEY);
-    if (saved === EXTRA_THEME) window.setDashboardTheme(EXTRA_THEME);
-  };
-
-  function init(){
-    ensureExtraThemeCard();
-    try { if (localStorage.getItem(THEME_KEY) === EXTRA_THEME) window.setDashboardTheme(EXTRA_THEME); } catch(e) {}
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once:true });
-  else init();
-
-  // Koreksi indikator typing dari cache presence jika patch module lama belum sempat render.
-  function partnerTypingActive(){
-    const partner = window.passivePartner || '';
-    const me = window.loggedInUser || '';
-    const states = window.cachePresenceStates || {};
-    const st = states[partner];
-    if (!partner || !me || !st) return false;
-    return String(st.status || '').toLowerCase() === 'typing'
-      && String(st.activeRoom || '') === String(me)
-      && Number(st.typingUntilMs || 0) > Date.now()
-      && Number(st.lastSeenMs || 0) > Date.now() - 70000;
-  }
-  // DISABLE: typing header sudah ditangani unified cleanup ticker agar tidak berat.
-  // setInterval(function(){ ... }, 700);
-})();
-</script>
-
 <style id="fix-dashboard-theme-button-visible-final">
   /* FINAL FIX: tombol Tema setelah login wajib muncul di menu Sandi / Tema / Profil / Admin / Keluar */
   #themeActionBtn {
@@ -17090,270 +16656,9 @@
     }
   }
 </style>
-
-<script id="fix-dashboard-theme-button-visible-final-js">
-  (function(){
-    function ensureThemeButtonVisible(){
-      var actions = document.querySelector('.sh-actions');
-      var themeBtn = document.getElementById('themeActionBtn');
-      if (!actions || !themeBtn) return;
-      themeBtn.style.display = 'flex';
-      themeBtn.style.visibility = 'visible';
-      themeBtn.style.opacity = '1';
-      themeBtn.onclick = function(){
-        if (typeof window.openThemeSettingsModal === 'function') {
-          window.openThemeSettingsModal();
-        } else {
-          var modal = document.getElementById('themeModal');
-          if (modal) modal.style.display = 'grid';
-        }
-      };
-    }
-    document.addEventListener('DOMContentLoaded', ensureThemeButtonVisible);
-    window.addEventListener('load', ensureThemeButtonVisible);
-    window.ensureThemeButtonVisible = ensureThemeButtonVisible;
-    var oldApply = window.applyCurrentUserAccess;
-    if (typeof oldApply === 'function') {
-      window.applyCurrentUserAccess = function(){
-        var result = oldApply.apply(this, arguments);
-        ensureThemeButtonVisible();
-        return result;
-      };
-    }
-    // DISABLE: diganti oleh final unified cleanup ticker agar tidak ada interval dobel.
-    // setInterval(ensureThemeButtonVisible, 3000);
-  })();
-</script>
-
-
-
 <!-- FINAL PATCH: Hapus indikator typing bawah chat agar tidak mengganggu area input. Presence/online/offline tetap berjalan. -->
-<style id="remove-bottom-typing-indicator-final">
-  #typingLiveLine, .typing-live-line, #typingIndicator, .typing-indicator {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-  }
-</style>
-<script id="remove-bottom-typing-indicator-final-script">
-  (function(){
-    function removeBottomTypingIndicator(){
-      document.querySelectorAll('#typingLiveLine, .typing-live-line, #typingIndicator, .typing-indicator').forEach(function(el){
-        el.remove();
-      });
-    }
-    removeBottomTypingIndicator();
-    document.addEventListener('DOMContentLoaded', removeBottomTypingIndicator);
-    // DISABLE: diganti oleh final unified cleanup ticker agar tidak ada interval dobel.
-    // setInterval(removeBottomTypingIndicator, 5000);
-  })();
-</script>
-
-
 <!-- FINAL PATCH: Typing indicator satu saja, tidak double warna merah/ungu. -->
-<style id="final-single-typing-indicator-only-style">
-  /* Indikator bawah tetap dihapus agar tidak mengganggu area input */
-  #typingLiveLine,
-  .typing-live-line,
-  #typingIndicator,
-  .typing-indicator {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-  }
-
-  /* Hapus dot/pseudo tambahan yang membuat typing terlihat seperti dua indikator */
-  .presence-typing::after,
-  .typing-live-dot,
-  #topHeaderStatus .typing-live-dot {
-    content: none !important;
-    display: none !important;
-    animation: none !important;
-    box-shadow: none !important;
-  }
-
-  /* Satu warna indikator typing: merah-gold sesuai tema dashboard */
-  #topHeaderStatus .single-typing-indicator {
-    color: var(--theme-accent-2, #FFD36A) !important;
-    font-style: italic !important;
-    font-weight: 800 !important;
-    letter-spacing: .01em !important;
-    text-shadow: 0 0 10px rgba(255, 80, 90, .22) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-  }
-  #topHeaderStatus .single-typing-indicator::before {
-    content: "●";
-    color: var(--theme-accent, #FF3B4F) !important;
-    text-shadow: 0 0 10px currentColor !important;
-  }
-</style>
-
-<script id="final-single-typing-indicator-only-script">
-(function(){
-  'use strict';
-
-  function getPartner(){ return String(window.passivePartner || '').trim(); }
-  function getMe(){ return String(window.loggedInUser || '').trim(); }
-  function getPresence(partner){
-    try { return (window.cachePresenceStates && window.cachePresenceStates[partner]) || null; }
-    catch(e){ return null; }
-  }
-  function isTypingForMe(partner, data){
-    if (!partner || !data) return false;
-    var me = getMe();
-    var activeRoom = String(data.activeRoom || '').trim();
-    var status = String(data.status || '').toLowerCase();
-    var until = Number(data.typingUntilMs || 0);
-    var lastSeen = Number(data.lastSeenMs || 0);
-    return status === 'typing' && activeRoom === me && until > Date.now() && (!lastSeen || lastSeen > Date.now() - 70000);
-  }
-  function isOnline(data){
-    if (!data) return false;
-    var status = String(data.status || '').toLowerCase();
-    var lastSeen = Number(data.lastSeenMs || 0);
-    return (status === 'online' || status === 'typing') && (!lastSeen || lastSeen > Date.now() - 70000);
-  }
-
-  function setHeaderStatus(){
-    var top = document.getElementById('topHeaderStatus');
-    var partner = getPartner();
-    if (!top || !partner) return;
-    var data = getPresence(partner);
-
-    if (isTypingForMe(partner, data)) {
-      top.innerHTML = '<span class="single-typing-indicator">Sedang mengetik...</span>';
-      top.dataset.singleTypingLock = '1';
-      return;
-    }
-
-    if (top.dataset.singleTypingLock === '1') {
-      top.dataset.singleTypingLock = '0';
-      if (isOnline(data)) top.innerHTML = '<span style="color:#54FF8D;font-weight:800;">● Online</span>';
-      else top.innerHTML = '<span style="color:rgba(255,255,255,.46);font-weight:750;">Offline</span>';
-    }
-  }
-
-  function removeDuplicateTypingVisual(){
-    // Hapus semua indikator bawah yang mungkin dibuat ulang oleh patch lama.
-    document.querySelectorAll('#typingLiveLine,.typing-live-line,#typingIndicator,.typing-indicator').forEach(function(el){
-      try { el.remove(); } catch(e) {}
-    });
-
-    // Jangan tampilkan tulisan Mengetik di daftar room, cukup header chat saja agar tidak double.
-    document.querySelectorAll('.chat-list-container .presence-typing, #activeChatRoomsBox .presence-typing').forEach(function(el){
-      el.classList.remove('presence-typing');
-      el.classList.add('online');
-      el.textContent = 'Online';
-    });
-
-    setHeaderStatus();
-  }
-
-  // Override render presence lama jika tersedia, supaya typing tidak tampil di dua tempat.
-  setTimeout(function(){
-    try {
-      if (typeof window.renderPresenceStatusForUser === 'function' && !window.renderPresenceStatusForUser.__singleTypingFixed) {
-        var oldRenderPresence = window.renderPresenceStatusForUser;
-        window.renderPresenceStatusForUser = function(name, data){
-          var result = oldRenderPresence.apply(this, arguments);
-          removeDuplicateTypingVisual();
-          return result;
-        };
-        window.renderPresenceStatusForUser.__singleTypingFixed = true;
-      }
-    } catch(e) {}
-  }, 0);
-
-  document.addEventListener('DOMContentLoaded', removeDuplicateTypingVisual);
-  window.addEventListener('load', removeDuplicateTypingVisual);
-  // DISABLE: diganti oleh final unified cleanup ticker agar tidak ada interval dobel.
-  // setInterval(removeDuplicateTypingVisual, 1200);
-})();
-</script>
-
-
-
 <!-- FINAL FIX: Typing indicator satu warna saja, tidak merah+ungu/double glow. -->
-<style id="final-fix-typing-one-color-only">
-  /* Sembunyikan semua indikator typing bawah/duplikat */
-  #typingLiveLine,
-  .typing-live-line,
-  #typingIndicator,
-  .typing-indicator {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-  }
-
-  /* Typing di header dan daftar room hanya pakai satu warna */
-  #topHeaderStatus .single-typing-indicator,
-  #topHeaderStatus .typing-single-color,
-  #dashboardPage .presence-typing,
-  #dashboardPage .status-indicator.presence-typing {
-    color: var(--theme-accent, #FF3B4F) !important;
-    text-shadow: none !important;
-    -webkit-text-stroke: 0 !important;
-    filter: none !important;
-    background: transparent !important;
-    font-style: italic !important;
-    font-weight: 800 !important;
-  }
-
-  /* Hilangkan dot/pseudo yang membuat warna terlihat double */
-  #topHeaderStatus .single-typing-indicator::before,
-  #topHeaderStatus .single-typing-indicator::after,
-  #topHeaderStatus .typing-single-color::before,
-  #topHeaderStatus .typing-single-color::after,
-  #dashboardPage .presence-typing::before,
-  #dashboardPage .presence-typing::after,
-  #dashboardPage .typing-live-dot {
-    content: none !important;
-    display: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-    animation: none !important;
-  }
-</style>
-<script id="final-fix-typing-one-color-only-script">
-(function(){
-  'use strict';
-  function normalizeTypingHeader(){
-    var top = document.getElementById('topHeaderStatus');
-    if (!top) return;
-    var txt = (top.textContent || '').toLowerCase();
-    if (txt.indexOf('mengetik') !== -1) {
-      top.innerHTML = '<span class="single-typing-indicator">Sedang mengetik...</span>';
-    }
-  }
-  document.addEventListener('DOMContentLoaded', normalizeTypingHeader);
-  window.addEventListener('load', normalizeTypingHeader);
-  // DISABLE: diganti oleh final unified cleanup ticker agar tidak ada interval dobel.
-  // setInterval(normalizeTypingHeader, 1200);
-})();
-</script>
-
-
 <!-- FINAL PERFORMANCE STABILITY PATCH - anti delay/lag, single listener, render limit, mobile light -->
 <!-- FINAL PATCH REQUEST USER — Luffy fit + logo bajak laut gambar ketiga -->
 <style id="FINAL_USER_LUFFY_FULL_FIT_AND_PIRATE_LOGO_PATCH">
@@ -17827,174 +17132,6 @@
     }
   }
 </style>
-
-<script id="FINAL_LIGHTWEIGHT_DASHBOARD_WEB_MOBILE_SCRIPT">
-(function(){
-  "use strict";
-
-  var MAX_CHAT_ROWS_DESKTOP = 170;
-  var MAX_CHAT_ROWS_MOBILE = 95;
-  var MAX_PARTICLES_DESKTOP = 24;
-  var MAX_PARTICLES_MOBILE = 8;
-  var MAX_TOASTS = 3;
-
-  var cleanupTimer = null;
-  var observerReady = false;
-
-  function isMobile(){
-    try {
-      return window.matchMedia && window.matchMedia("(max-width: 680px), (hover: none), (pointer: coarse)").matches;
-    } catch(e) {
-      return window.innerWidth <= 680;
-    }
-  }
-
-  function isDashboardVisible(){
-    var dash = document.getElementById("dashboardPage");
-    if (!dash) return false;
-    return getComputedStyle(dash).display !== "none";
-  }
-
-  function setDashboardActiveClass(){
-    document.body.classList.toggle("dashboard-active", isDashboardVisible());
-  }
-
-  function limitElements(selector, max){
-    var items = document.querySelectorAll(selector);
-    if (!items || items.length <= max) return;
-    for (var i = 0; i < items.length - max; i++) {
-      if (items[i] && items[i].parentNode) items[i].parentNode.removeChild(items[i]);
-    }
-  }
-
-  function cleanupParticles(){
-    var max = isMobile() ? MAX_PARTICLES_MOBILE : MAX_PARTICLES_DESKTOP;
-    limitElements(".login-love-particle", max);
-    limitElements(".prelogin-love-particle", max);
-    limitElements(".chat-love-bg-particle", max);
-    limitElements(".love-point", max);
-    limitElements(".floating-heart", max);
-    limitElements(".floating-star", max);
-    limitElements(".heart-fx", max);
-    limitElements(".love-fx", max);
-    limitElements(".star-fx", max);
-    limitElements(".pirate-fx", max);
-  }
-
-  function cleanupChatRows(){
-    var box = document.querySelector(".message-area");
-    if (!box) return;
-
-    var max = isMobile() ? MAX_CHAT_ROWS_MOBILE : MAX_CHAT_ROWS_DESKTOP;
-    var rows = box.querySelectorAll(".msg-row");
-    if (rows.length > max) {
-      var removeCount = rows.length - max;
-      for (var i = 0; i < removeCount; i++) {
-        if (rows[i] && rows[i].parentNode) rows[i].parentNode.removeChild(rows[i]);
-      }
-    }
-
-    var dividers = box.querySelectorAll(".day-divider");
-    if (dividers.length > 8) {
-      var dRemove = dividers.length - 8;
-      for (var j = 0; j < dRemove; j++) {
-        if (dividers[j] && dividers[j].parentNode) dividers[j].parentNode.removeChild(dividers[j]);
-      }
-    }
-  }
-
-  function cleanupToasts(){
-    limitElements(".desktop-notification-card", MAX_TOASTS);
-  }
-
-  function scrollBottomFast(){
-    var box = document.querySelector(".message-area");
-    if (!box) return;
-    requestAnimationFrame(function(){
-      try { box.scrollTop = box.scrollHeight; } catch(e) {}
-    });
-  }
-
-  function lightCleanup(){
-    setDashboardActiveClass();
-    cleanupParticles();
-    cleanupChatRows();
-    cleanupToasts();
-  }
-
-  function scheduleCleanup(){
-    if (cleanupTimer) return;
-    cleanupTimer = setTimeout(function(){
-      cleanupTimer = null;
-      lightCleanup();
-    }, 120);
-  }
-
-  function observeDashboard(){
-    if (observerReady) return;
-    observerReady = true;
-
-    var rootObserver = new MutationObserver(scheduleCleanup);
-    rootObserver.observe(document.documentElement, { childList: true, subtree: true });
-
-    var dash = document.getElementById("dashboardPage");
-    if (dash) {
-      var dashObserver = new MutationObserver(function(){
-        scheduleCleanup();
-        setTimeout(scrollBottomFast, 120);
-      });
-      dashObserver.observe(dash, { attributes: true, attributeFilter: ["style", "class"] });
-    }
-
-    var box = document.querySelector(".message-area");
-    if (box) {
-      var chatObserver = new MutationObserver(function(){
-        scheduleCleanup();
-        scrollBottomFast();
-      });
-      chatObserver.observe(box, { childList: true });
-    }
-  }
-
-  function patchSendButton(){
-    var btn = document.querySelector(".send-action-btn");
-    if (!btn || btn.__lightweightPatch) return;
-    btn.__lightweightPatch = true;
-
-    btn.addEventListener("click", function(){
-      setTimeout(function(){
-        cleanupChatRows();
-        cleanupToasts();
-        scrollBottomFast();
-      }, 120);
-    }, { passive: true });
-  }
-
-  function boot(){
-    setDashboardActiveClass();
-    lightCleanup();
-    observeDashboard();
-    patchSendButton();
-    setTimeout(lightCleanup, 500);
-    setTimeout(lightCleanup, 1500);
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot, { once: true });
-  } else {
-    boot();
-  }
-
-  window.addEventListener("load", boot, { once: true });
-  window.addEventListener("resize", scheduleCleanup, { passive: true });
-  window.addEventListener("orientationchange", function(){
-    setTimeout(function(){
-      lightCleanup();
-      scrollBottomFast();
-    }, 250);
-  }, { passive: true });
-})();
-</script>
 <!-- END FINAL OPTIMASI RINGAN WEB & MOBILE -->
 
 
@@ -18158,40 +17295,6 @@
     #loginPage .luffy-stat-ico { display: none !important; }
   }
 </style>
-<script id="FINAL_CROSSCHECK_SAFE_CLEANUP_PATCH">
-(function(){
-  "use strict";
-  function removeDuplicateBySelector(selector){
-    var nodes = document.querySelectorAll(selector);
-    if (!nodes || nodes.length <= 1) return;
-    for (var i = 1; i < nodes.length; i++) {
-      if (nodes[i] && nodes[i].parentNode) nodes[i].parentNode.removeChild(nodes[i]);
-    }
-  }
-  function safeCrosscheck(){
-    var login = document.getElementById("loginPage");
-    if (!login) return;
-    removeDuplicateBySelector("#loginPage .luffy-login-stats");
-    removeDuplicateBySelector("#loginPage .luffy-update-pill");
-    removeDuplicateBySelector("#loginPage .luffy-copy");
-    removeDuplicateBySelector("#loginPage .portal-head");
-    var stats = login.querySelector(".luffy-login-stats");
-    var card = login.querySelector(".card");
-    var pill = login.querySelector(".luffy-update-pill");
-    if (stats && card && (stats.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_PRECEDING)) login.insertBefore(stats, card);
-    if (pill && card && (pill.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_PRECEDING)) login.insertBefore(pill, card);
-    if (stats) {
-      stats.style.willChange = "auto";
-      stats.style.backfaceVisibility = "hidden";
-    }
-  }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", safeCrosscheck, { once: true });
-  else safeCrosscheck();
-  window.addEventListener("load", safeCrosscheck, { once: true });
-  setTimeout(safeCrosscheck, 400);
-  setTimeout(safeCrosscheck, 1200);
-})();
-</script>
 <!-- END FINAL ALIGNMENT STATS PATCH -->
 
 <!-- FINAL FIX LOGIN PIRATE LOGO DIRECT IMG
@@ -18369,443 +17472,84 @@
 
 
 <!-- FINAL CLEAN CONSOLIDATED PATCH V5 — non-conflict, no duplicate override -->
-<style id="FINAL_CLEAN_CONSOLIDATED_PATCH_V5">
-  /* =========================================================
-     FINAL CLEAN V5
-     Tujuan:
-     - Satu patch final untuk logout, mobile drawer, scroll chat, dan alignment.
-     - Tidak import Firebase ulang.
-     - Tidak memangkas isi chat lama.
-     - Tidak menimpa tema/dashboard yang tidak berhubungan.
-     ========================================================= */
 
-  html, body { width: 100%; min-height: 100%; }
-
-  /* Logout reset: semua layer yang bisa menahan klik dimatikan saat kembali ke login. */
-  body.fd-clean-logout #dashboardPage {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-  body.fd-clean-logout #loginPage {
-    display: grid !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-  body.fd-clean-logout .modal-overlay:not(#maintenanceDashboardPopup),
-  body.fd-clean-logout .image-lightbox-overlay,
-  body.fd-clean-logout #emojiGifPicker,
-  body.fd-clean-logout .emoji-gif-picker,
-  body.fd-clean-logout #imagePreviewBar,
-  body.fd-clean-logout .edit-state-indicator-bar,
-  body.fd-clean-logout .reply-status-bar {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-
-  /* Maintenance popup hanya boleh tampil setelah user klik login. */
-  body:not(.fd-login-attempted) #maintenanceDashboardPopup.is-visible,
-  body:not(.fd-login-attempted) .maintenance-popup-overlay.is-visible {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-  body.fd-login-attempted #maintenanceDashboardPopup.is-visible,
-  body.fd-login-attempted .maintenance-popup-overlay.is-visible {
-    display: grid !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-  }
-
-  #dashboardPage {
-    height: 100dvh;
-    min-height: 100dvh;
-    overflow: hidden;
-  }
-  .chat-main-window { min-width: 0; min-height: 0; }
-  #messageFlowBox,
-  .message-area {
-    overflow-anchor: none !important;
-    overscroll-behavior: contain !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-  #typedMessageInput { min-width: 0 !important; }
-
-  /* Alignment PERSONAL ROOM + Start Chat: icon/teks tepat di tengah bubble. */
-  .section-label {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    align-items: center !important;
-    column-gap: 10px !important;
-    min-height: 44px !important;
-    padding: 6px 2px 10px !important;
-    line-height: 1 !important;
-  }
-  .section-label > span {
-    display: inline-flex !important;
-    align-items: center !important;
-    min-height: 36px !important;
-    margin: 0 !important;
-    line-height: 1 !important;
-    white-space: nowrap !important;
-  }
-  .start-chat-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 4px !important;
-    min-width: 92px !important;
-    min-height: 34px !important;
-    height: 34px !important;
-    padding: 0 12px !important;
-    margin: 0 !important;
-    line-height: 1 !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    vertical-align: middle !important;
-  }
-  .start-chat-btn svg,
-  .start-chat-btn i,
-  .start-chat-btn .icon,
-  .start-chat-btn [class*="icon"] {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 0 auto !important;
-    margin: 0 !important;
-    line-height: 1 !important;
-  }
-
-  /* Room card: avatar, nama, role, online/offline, tombol profil/hapus, dan badge NEW dibuat rata. */
-  .chat-item-card {
-    display: grid !important;
-    grid-template-columns: 56px minmax(0, 1fr) 76px !important;
-    align-items: center !important;
-    column-gap: 12px !important;
-    min-height: 88px !important;
-    padding: 14px !important;
-    overflow: visible !important;
-  }
-  .chat-item-card .partner-avatar-img {
-    align-self: center !important;
-    justify-self: center !important;
-    margin: 0 !important;
-  }
-  .chat-item-card > div:nth-child(2) {
-    min-width: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    gap: 7px !important;
-    align-self: stretch !important;
-    position: relative !important;
-    z-index: 2 !important;
-  }
-  .chat-item-name,
-  .chat-item-subline,
-  .status-indicator,
-  .role-pill {
-    line-height: 1.15 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-  .chat-item-name {
-    display: flex !important;
-    align-items: center !important;
-    min-height: 18px !important;
-  }
-  .chat-item-subline {
-    display: flex !important;
-    align-items: center !important;
-    min-height: 24px !important;
-    gap: 8px !important;
-  }
-  .status-indicator {
-    display: inline-flex !important;
-    align-items: center !important;
-  }
-  .status-indicator::before {
-    flex: 0 0 auto !important;
-    margin: 0 !important;
-  }
-  .chat-item-actions {
-    width: 76px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    align-self: stretch !important;
-    position: relative !important;
-    z-index: 3 !important;
-  }
-  .chat-item-actions .tiny-profile-btn,
-  .chat-item-actions .unread-badge-alert {
-    width: 70px !important;
-    min-width: 70px !important;
-    min-height: 30px !important;
-    height: 30px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 !important;
-    line-height: 1 !important;
-    text-align: center !important;
-  }
-  .chat-item-actions .unread-badge-alert {
-    position: static !important;
-    top: auto !important;
-    right: auto !important;
-    transform: none !important;
-    border-radius: 999px !important;
-  }
-
-  .mobile-sidebar-toggle,
-  .mobile-sidebar-close,
-  .mobile-sidebar-backdrop { display: none; }
-
-  @media (max-width: 680px) {
-    html, body {
-      height: 100dvh !important;
-      overflow: hidden !important;
-      overscroll-behavior: none !important;
-    }
-    #loginPage.wrap {
-      min-height: 100dvh !important;
-      height: 100dvh !important;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      -webkit-overflow-scrolling: touch !important;
-      padding: 22px 14px calc(24px + env(safe-area-inset-bottom)) !important;
-    }
-    body:not(.fd-clean-logout) #dashboardPage.is-mobile-authenticated,
-    body:not(.fd-clean-logout) #dashboardPage.mobile-chat-active {
-      display: grid !important;
-      grid-template-columns: 1fr !important;
-      height: 100dvh !important;
-      min-height: 100dvh !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-    #dashboardPage .sidebar {
-      display: flex !important;
-      position: fixed !important;
-      inset: 0 auto 0 0 !important;
-      width: min(88vw, 340px) !important;
-      max-width: 340px !important;
-      height: 100dvh !important;
-      z-index: 230 !important;
-      transform: translateX(-106%) !important;
-      transition: transform .18s ease !important;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-      pointer-events: none !important;
-    }
-    #dashboardPage.mobile-sidebar-open .sidebar {
-      transform: translateX(0) !important;
-      pointer-events: auto !important;
-    }
-    #dashboardPage .mobile-sidebar-backdrop {
-      display: block !important;
-      position: fixed !important;
-      inset: 0 !important;
-      background: rgba(0,0,0,.56) !important;
-      z-index: 220 !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-      transition: opacity .18s ease !important;
-    }
-    #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-    .mobile-sidebar-toggle {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 42px !important;
-      height: 42px !important;
-      border-radius: 14px !important;
-      border: 1px solid rgba(255,255,255,.12) !important;
-      background: rgba(255,255,255,.055) !important;
-      color: var(--dash-accent, #28DFFF) !important;
-      flex: 0 0 auto !important;
-      cursor: pointer !important;
-    }
-    .mobile-sidebar-close {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 36px !important;
-      height: 36px !important;
-      border-radius: 12px !important;
-      border: 1px solid rgba(255,255,255,.12) !important;
-      background: rgba(255,255,255,.055) !important;
-      color: #fff !important;
-      cursor: pointer !important;
-      margin-left: auto !important;
-    }
-    body.mobile-nav-lock { overflow: hidden !important; touch-action: none !important; }
-    .chat-main-header { min-height: 68px !important; padding: 12px 14px !important; }
-    .message-area { padding: 14px !important; gap: 12px !important; }
-    .chat-footer-panel { padding: 10px 12px calc(10px + env(safe-area-inset-bottom)) !important; gap: 10px !important; }
-    .bubble { max-width: 88% !important; }
-    .section-label { grid-template-columns: minmax(0, 1fr) auto !important; min-height: 42px !important; padding: 4px 0 8px !important; }
-    .start-chat-btn { min-width: 86px !important; height: 32px !important; min-height: 32px !important; padding: 0 10px !important; font-size: 10px !important; }
-    .chat-item-card { grid-template-columns: 50px minmax(0, 1fr) 66px !important; min-height: 82px !important; gap: 9px !important; padding: 12px !important; }
-    .chat-item-card .partner-avatar-img { width: 48px !important; height: 48px !important; }
-    .chat-item-actions { width: 66px !important; }
-    .chat-item-actions .tiny-profile-btn,
-    .chat-item-actions .unread-badge-alert { width: 62px !important; min-width: 62px !important; height: 28px !important; min-height: 28px !important; font-size: 9.5px !important; }
-    #dashboardPage::after,
-    .chat-main-window::after,
-    .sidebar::before { opacity: .06 !important; }
-    .bubble:hover,
-    .chat-item-card:hover,
-    .action-link-btn:hover { transform: none !important; }
-  }
-</style>
-
-<script id="FINAL_CLEAN_CONSOLIDATED_PATCH_V5_SCRIPT">
+<script id="FINAL_CLEAN_CONSOLIDATED_PATCH_V6_SCRIPT">
 (function(){
   "use strict";
-  if (window.__FINAL_CLEAN_CONSOLIDATED_PATCH_V5__) return;
-  window.__FINAL_CLEAN_CONSOLIDATED_PATCH_V5__ = true;
+  if (window.__FINAL_CLEAN_CONSOLIDATED_PATCH_V6__) return;
+  window.__FINAL_CLEAN_CONSOLIDATED_PATCH_V6__ = true;
 
-  var SESSION_KEY = "fandah_dashboard_login_session_v1";
-  var logoutLock = false;
+  var retryCount = 0;
+  var retryTimer = null;
+  var chatPinned = true;
   var forceBottomUntil = 0;
   var chatObserver = null;
-  var chatPinned = true;
-  var patchTimer = null;
-  var tries = 0;
 
   function $(id){ return document.getElementById(id); }
-  function safe(fn){ try { return fn(); } catch(e) { return undefined; } }
-  function isMobile(){ return !!(window.matchMedia && window.matchMedia("(max-width: 680px)").matches); }
+  function isMobile(){ return window.matchMedia && window.matchMedia("(max-width: 680px)").matches; }
+  function safe(fn){ try { return fn(); } catch (err) { console.warn("[V6 Clean]", err); } }
 
   function dashboardVisible(){
-    var d = $("dashboardPage");
-    if (!d) return false;
-    var display = safe(function(){ return getComputedStyle(d).display; }) || d.style.display || "";
-    return display === "grid" || d.classList.contains("is-mobile-authenticated") || d.classList.contains("mobile-chat-active");
+    var dash = $("dashboardPage");
+    if (!dash) return false;
+    var cs = window.getComputedStyle ? getComputedStyle(dash) : null;
+    return dash.style.display !== "none" && (!cs || cs.display !== "none") && dash.offsetParent !== null;
   }
 
-  function closeOverlay(el){
+  function messageBox(){ return $("messageFlowBox") || document.querySelector(".message-area"); }
+
+  function isNearBottom(box){
+    if (!box) return true;
+    return (box.scrollHeight - box.scrollTop - box.clientHeight) < 140;
+  }
+
+  function scrollChatBottom(immediate){
+    var box = messageBox();
+    if (!box) return;
+    var run = function(){
+      box.scrollTop = box.scrollHeight;
+      if (immediate) box.scrollTop = box.scrollHeight + 9999;
+    };
+    if (immediate) run();
+    else (window.requestAnimationFrame || window.setTimeout)(run, 16);
+  }
+
+  function closeOverlay(el, keepMaintenance){
     if (!el) return;
-    el.classList.remove("is-visible", "active", "open", "show");
-    el.style.display = "none";
-    el.style.opacity = "0";
-    el.style.visibility = "hidden";
-    el.style.pointerEvents = "none";
+    if (keepMaintenance && el.id === "maintenanceDashboardPopup") return;
+    el.classList.remove("is-visible", "show", "active", "open");
+    if (el.style && el.style.display && el.style.display !== "none") el.style.display = "none";
   }
 
-  function clearBlockingLayers(){
-    document.querySelectorAll(".modal-overlay:not(#maintenanceDashboardPopup),.image-lightbox-overlay,#emojiGifPicker,.emoji-gif-picker,#imagePreviewBar,.reply-status-bar,.edit-state-indicator-bar").forEach(closeOverlay);
-    safe(function(){ document.body.style.pointerEvents = ""; });
+  function clearBlockingLayers(keepMaintenance){
+    document.body.classList.remove("modal-open", "drawer-open", "sidebar-open", "no-scroll");
+    document.querySelectorAll(".modal-overlay, .image-lightbox-overlay").forEach(function(el){ closeOverlay(el, keepMaintenance); });
+    ["emojiGifPickerPanel", "imagePreviewBar"].forEach(function(id){
+      var el = $(id);
+      if (el && el.style && el.style.display && el.style.display !== "none") el.style.display = "none";
+    });
   }
 
-  function hardShowLogin(){
+  function hardShowLogin(keepMaintenance){
     var login = $("loginPage");
     var dash = $("dashboardPage");
-    document.documentElement.classList.remove("session-restoring");
-    document.body.classList.add("fd-clean-logout", "prelogin-theme-fab-visible");
-    document.body.classList.remove("mobile-nav-lock", "dashboard-active", "dashboard-love-active", "fd-login-attempted");
+    closeMobileSidebar();
+    document.body.classList.add("fd-v6-logout");
+    document.body.classList.remove("dashboard-active", "fd-dashboard-active", "mobile-sidebar-active");
     if (dash) {
+      dash.classList.remove("mobile-sidebar-open");
       dash.style.display = "none";
-      dash.style.visibility = "hidden";
-      dash.style.opacity = "0";
       dash.style.pointerEvents = "none";
-      dash.classList.remove("mobile-sidebar-open", "mobile-chat-active", "is-mobile-authenticated");
+      dash.style.visibility = "hidden";
     }
     if (login) {
       login.style.display = "grid";
+      login.style.pointerEvents = "auto";
       login.style.visibility = "visible";
       login.style.opacity = "1";
-      login.style.pointerEvents = "auto";
     }
-    clearBlockingLayers();
-    safe(function(){ localStorage.removeItem(SESSION_KEY); });
-    if (typeof window.closeMobileSidebar === "function") safe(window.closeMobileSidebar);
-    setTimeout(function(){ clearBlockingLayers(); }, 80);
-    setTimeout(function(){ if (!dashboardVisible()) document.body.classList.remove("fd-clean-logout"); }, 450);
-  }
-
-  function syncDashboardState(){
-    var dash = $("dashboardPage");
-    if (!dash) return;
-    var visible = dashboardVisible();
-    document.body.classList.toggle("dashboard-active", visible);
-    if (visible) {
-      document.body.classList.remove("fd-clean-logout");
-      if (isMobile()) dash.classList.add("is-mobile-authenticated");
-    }
-  }
-
-  function patchLogout(){
-    if (typeof window.triggerSignOut !== "function" || window.triggerSignOut.__fdCleanV5) return;
-    var original = window.triggerSignOut;
-    function wrapped(){
-      if (logoutLock) return;
-      logoutLock = true;
-      try { original.apply(this, arguments); }
-      catch(e) { console.warn("Logout original error:", e); }
-      hardShowLogin();
-      setTimeout(function(){ logoutLock = false; }, 500);
-    }
-    wrapped.__fdCleanV5 = true;
-    wrapped.__original = original;
-    window.triggerSignOut = wrapped;
-  }
-
-  function bindFallbackLogout(){
-    if (document.body.__fdCleanLogoutBoundV5) return;
-    document.body.__fdCleanLogoutBoundV5 = true;
-    document.addEventListener("click", function(event){
-      var btn = event.target.closest && event.target.closest(".logout-btn");
-      if (!btn || typeof window.triggerSignOut !== "function") return;
-      event.preventDefault();
-      event.stopPropagation();
-      window.triggerSignOut({ reason: "manual" });
-    }, true);
-  }
-
-  function patchLogin(){
-    var form = document.querySelector("form.form") || document.querySelector("#loginPage form");
-    if (form && !form.__fdCleanLoginAttemptBoundV5) {
-      form.__fdCleanLoginAttemptBoundV5 = true;
-      form.addEventListener("submit", function(){ document.body.classList.add("fd-login-attempted"); }, true);
-    }
-    var loginBtn = document.querySelector("#loginPage .btn") || document.querySelector("#loginPage button[type='submit']");
-    if (loginBtn && !loginBtn.__fdCleanLoginAttemptBoundV5) {
-      loginBtn.__fdCleanLoginAttemptBoundV5 = true;
-      loginBtn.addEventListener("click", function(){ document.body.classList.add("fd-login-attempted"); }, true);
-    }
-    if (typeof window.executeLoginValidation === "function" && !window.executeLoginValidation.__fdCleanV5) {
-      var original = window.executeLoginValidation;
-      function wrapped(){
-        document.body.classList.add("fd-login-attempted");
-        document.body.classList.remove("fd-clean-logout");
-        var result = original.apply(this, arguments);
-        Promise.resolve(result).finally(function(){ setTimeout(syncDashboardState, 80); });
-        return result;
-      }
-      wrapped.__fdCleanV5 = true;
-      wrapped.__original = original;
-      window.executeLoginValidation = wrapped;
-    }
-  }
-
-  function hideMaintenanceBeforeAttempt(){
-    if (document.body.classList.contains("fd-login-attempted")) return;
-    document.querySelectorAll("#maintenanceDashboardPopup.is-visible,.maintenance-popup-overlay.is-visible").forEach(closeOverlay);
+    clearBlockingLayers(!!keepMaintenance);
+    setTimeout(function(){ document.body.classList.remove("fd-v6-logout"); }, keepMaintenance ? 1200 : 500);
   }
 
   function ensureMobileDrawerElements(){
@@ -18816,155 +17560,262 @@
       backdrop.id = "mobileSidebarBackdrop";
       backdrop.className = "mobile-sidebar-backdrop";
       backdrop.setAttribute("aria-hidden", "true");
-      dash.appendChild(backdrop);
+      backdrop.addEventListener("click", closeMobileSidebar);
+      dash.insertBefore(backdrop, dash.firstChild);
     }
-    var header = dash.querySelector(".chat-main-header");
+    var header = document.querySelector(".chat-main-header");
     if (header && !$("mobileSidebarToggle")) {
       var toggle = document.createElement("button");
       toggle.type = "button";
       toggle.id = "mobileSidebarToggle";
       toggle.className = "mobile-sidebar-toggle";
-      toggle.setAttribute("aria-label", "Buka daftar chat");
-      toggle.innerHTML = "☰";
+      toggle.setAttribute("aria-label", "Buka menu");
+      toggle.textContent = "☰";
+      toggle.addEventListener("click", toggleMobileSidebar);
       header.insertBefore(toggle, header.firstChild);
     }
-    var sidebarHeader = dash.querySelector(".sidebar-header") || dash.querySelector(".sidebar");
+    var sidebarHeader = document.querySelector(".sidebar-header");
     if (sidebarHeader && !$("mobileSidebarClose")) {
       var close = document.createElement("button");
       close.type = "button";
       close.id = "mobileSidebarClose";
       close.className = "mobile-sidebar-close";
-      close.setAttribute("aria-label", "Tutup daftar chat");
-      close.innerHTML = "×";
-      sidebarHeader.appendChild(close);
+      close.setAttribute("aria-label", "Tutup menu");
+      close.textContent = "×";
+      close.addEventListener("click", closeMobileSidebar);
+      sidebarHeader.insertBefore(close, sidebarHeader.firstChild);
     }
   }
 
-  function openDrawer(){
-    var page = $("dashboardPage");
-    if (!page || !isMobile()) return;
-    page.classList.add("mobile-sidebar-open", "is-mobile-authenticated");
-    document.body.classList.add("mobile-nav-lock");
+  function openMobileSidebar(){
+    ensureMobileDrawerElements();
+    if (!isMobile()) return;
+    var dash = $("dashboardPage");
+    var sidebar = document.querySelector("#dashboardPage .sidebar");
+    document.body.classList.add("mobile-sidebar-active");
+    if (dash) dash.classList.add("mobile-sidebar-open");
+    if (sidebar) sidebar.classList.add("mobile-open");
   }
-  function closeDrawer(){
-    var page = $("dashboardPage");
-    if (!page) return;
-    page.classList.remove("mobile-sidebar-open");
-    document.body.classList.remove("mobile-nav-lock");
+
+  function closeMobileSidebar(){
+    var dash = $("dashboardPage");
+    var sidebar = document.querySelector("#dashboardPage .sidebar");
+    document.body.classList.remove("mobile-sidebar-active");
+    if (dash) dash.classList.remove("mobile-sidebar-open");
+    if (sidebar) sidebar.classList.remove("mobile-open");
   }
-  function toggleDrawer(){
-    var page = $("dashboardPage");
-    if (!page) return;
-    if (page.classList.contains("mobile-sidebar-open")) closeDrawer(); else openDrawer();
+
+  function toggleMobileSidebar(){
+    if (document.body.classList.contains("mobile-sidebar-active")) closeMobileSidebar();
+    else openMobileSidebar();
   }
 
   function bindMobileDrawer(){
     ensureMobileDrawerElements();
-    window.openMobileSidebar = openDrawer;
-    window.closeMobileSidebar = closeDrawer;
-    window.toggleMobileSidebar = toggleDrawer;
+    window.openMobileSidebar = openMobileSidebar;
+    window.closeMobileSidebar = closeMobileSidebar;
+    window.toggleMobileSidebar = toggleMobileSidebar;
+
     var toggle = $("mobileSidebarToggle");
     var close = $("mobileSidebarClose");
     var backdrop = $("mobileSidebarBackdrop");
-    if (toggle && !toggle.__fdCleanBoundV5) { toggle.__fdCleanBoundV5 = true; toggle.addEventListener("click", toggleDrawer); }
-    if (close && !close.__fdCleanBoundV5) { close.__fdCleanBoundV5 = true; close.addEventListener("click", closeDrawer); }
-    if (backdrop && !backdrop.__fdCleanBoundV5) { backdrop.__fdCleanBoundV5 = true; backdrop.addEventListener("click", closeDrawer); }
-    if (!document.body.__fdCleanEscBoundV5) {
-      document.body.__fdCleanEscBoundV5 = true;
-      document.addEventListener("keydown", function(event){ if (event.key === "Escape") closeDrawer(); });
-    }
-    if (!document.body.__fdCleanRoomCloseBoundV5) {
-      document.body.__fdCleanRoomCloseBoundV5 = true;
-      document.addEventListener("click", function(event){
-        if (!isMobile()) return;
-        var room = event.target.closest && event.target.closest(".chat-item-card");
-        if (!room || event.target.closest("button,input,select,textarea,a")) return;
-        setTimeout(function(){ closeDrawer(); forceBottomUntil = Date.now() + 1500; scrollChatBottom(true); }, 80);
+    if (toggle && !toggle.__fdV6Bound) { toggle.__fdV6Bound = true; toggle.addEventListener("click", function(e){ e.preventDefault(); toggleMobileSidebar(); }); }
+    if (close && !close.__fdV6Bound) { close.__fdV6Bound = true; close.addEventListener("click", function(e){ e.preventDefault(); closeMobileSidebar(); }); }
+    if (backdrop && !backdrop.__fdV6Bound) { backdrop.__fdV6Bound = true; backdrop.addEventListener("click", closeMobileSidebar); }
+
+    var rooms = $("activeChatRoomsBox");
+    if (rooms && !rooms.__fdV6CloseDrawer) {
+      rooms.__fdV6CloseDrawer = true;
+      rooms.addEventListener("click", function(){
+        if (isMobile()) closeMobileSidebar();
+        forceBottomUntil = Date.now() + 1600;
+        setTimeout(function(){ scrollChatBottom(true); }, 80);
+        setTimeout(function(){ scrollChatBottom(true); }, 260);
       }, true);
     }
   }
 
-  function messageBox(){ return $("messageFlowBox") || document.querySelector(".message-area"); }
-  function isNearBottom(box){ if (!box) return true; return (box.scrollHeight - box.scrollTop - box.clientHeight) < 130; }
-  function scrollChatBottom(force){
-    var box = messageBox();
-    if (!box) return;
-    if (!force && !chatPinned && Date.now() > forceBottomUntil) return;
-    box.scrollTop = box.scrollHeight;
-    requestAnimationFrame(function(){ box.scrollTop = box.scrollHeight; });
-    setTimeout(function(){ box.scrollTop = box.scrollHeight; }, 80);
-  }
-  window.scrollChatToBottomSafe = function(){ forceBottomUntil = Date.now() + 1200; scrollChatBottom(true); };
-
   function bindChatBottomGuard(){
     var box = messageBox();
-    if (!box || box.__fdCleanScrollBoundV5) return;
-    box.__fdCleanScrollBoundV5 = true;
-    chatPinned = isNearBottom(box);
-    box.addEventListener("scroll", function(){ chatPinned = isNearBottom(box); }, { passive: true });
+    if (!box) return;
+    if (!box.__fdV6ScrollBound) {
+      box.__fdV6ScrollBound = true;
+      chatPinned = isNearBottom(box);
+      box.addEventListener("scroll", function(){ chatPinned = isNearBottom(box); }, { passive: true });
+    }
     if (chatObserver) chatObserver.disconnect();
-    chatObserver = new MutationObserver(function(){
-      if (chatPinned || Date.now() <= forceBottomUntil) scrollChatBottom(false);
-    });
-    chatObserver.observe(box, { childList: true, subtree: true });
+    if (window.MutationObserver) {
+      chatObserver = new MutationObserver(function(){
+        if (chatPinned || Date.now() <= forceBottomUntil) scrollChatBottom(false);
+      });
+      chatObserver.observe(box, { childList: true });
+    }
   }
 
-  function patchSend(){
-    if (typeof window.commitMessageToFirebase !== "function" || window.commitMessageToFirebase.__fdCleanV5) return;
+  function patchSendOnce(){
+    if (typeof window.commitMessageToFirebase !== "function") return false;
+    if (window.commitMessageToFirebase.__fdV6Clean) return true;
     var original = window.commitMessageToFirebase;
-    function wrapped(){
-      forceBottomUntil = Date.now() + 1800;
+    function wrappedCommit(){
+      forceBottomUntil = Date.now() + 2200;
       var result = original.apply(this, arguments);
-      Promise.resolve(result).finally(function(){ scrollChatBottom(true); setTimeout(function(){ scrollChatBottom(true); }, 120); });
+      Promise.resolve(result).finally(function(){
+        scrollChatBottom(true);
+        setTimeout(function(){ scrollChatBottom(true); }, 120);
+        setTimeout(function(){ scrollChatBottom(true); }, 320);
+      });
       return result;
     }
-    wrapped.__fdCleanV5 = true;
-    wrapped.__original = original;
-    window.commitMessageToFirebase = wrapped;
+    wrappedCommit.__fdV6Clean = true;
+    wrappedCommit.__original = original;
+    window.commitMessageToFirebase = wrappedCommit;
+    return true;
   }
 
-  function capDecorations(){
-    var max = isMobile() ? 36 : 90;
-    [".gold-love-particle", ".love-particle", ".pirate-love-particle", ".star-particle", ".floating-love", ".floating-heart", ".sparkle-dot"].forEach(function(selector){
-      document.querySelectorAll(selector).forEach(function(node, index){ node.style.display = index >= max ? "none" : ""; });
+  function patchLogoutOnce(){
+    if (typeof window.triggerSignOut !== "function") return false;
+    if (window.triggerSignOut.__fdV6Clean) return true;
+    var original = window.triggerSignOut;
+    async function wrappedLogout(options){
+      var keepMaintenance = !!(options && options.reason === "maintenance");
+      if (keepMaintenance) document.body.dataset.fdMaintenanceLogout = "1";
+      document.body.classList.add("fd-v6-logging-out");
+      closeMobileSidebar();
+      if (!keepMaintenance) clearBlockingLayers(false);
+      try {
+        return await original.apply(this, arguments);
+      } finally {
+        hardShowLogin(keepMaintenance);
+        setTimeout(function(){
+          document.body.classList.remove("fd-v6-logging-out");
+          if (!keepMaintenance) delete document.body.dataset.fdMaintenanceLogout;
+          syncDashboardState();
+        }, 160);
+      }
+    }
+    wrappedLogout.__fdV6Clean = true;
+    wrappedLogout.__original = original;
+    window.triggerSignOut = wrappedLogout;
+    return true;
+  }
+
+  function bindLogoutFallback(){
+    document.querySelectorAll(".logout-btn").forEach(function(btn){
+      if (btn.__fdV6LogoutFallback) return;
+      btn.__fdV6LogoutFallback = true;
+      btn.addEventListener("click", function(){
+        setTimeout(function(){
+          if (typeof window.triggerSignOut === "function") return;
+          hardShowLogin(false);
+        }, 40);
+      });
     });
+  }
+
+  function bindLoginAttempt(){
+    var form = $("mainLoginForm");
+    if (form && !form.__fdV6LoginAttempt) {
+      form.__fdV6LoginAttempt = true;
+      form.addEventListener("submit", function(){
+        document.body.dataset.fdLoginAttempted = "1";
+        document.body.classList.remove("fd-v6-logout", "fd-v6-logging-out");
+        delete document.body.dataset.fdMaintenanceLogout;
+      }, true);
+    }
+  }
+
+  function hideMaintenanceBeforeAttempt(){
+    if (dashboardVisible()) return;
+    if (document.body.dataset.fdLoginAttempted === "1") return;
+    if (document.body.dataset.fdMaintenanceLogout === "1") return;
+    var popup = $("maintenanceDashboardPopup");
+    if (popup) popup.classList.remove("is-visible", "show", "active", "open");
+  }
+
+  function ensureThemeButtonVisible(){
+    var btn = $("themeActionBtn");
+    if (btn) {
+      btn.style.removeProperty("display");
+      btn.hidden = false;
+    }
+  }
+
+  function removeBottomTypingIndicator(){
+    document.querySelectorAll("#typingLiveLine, .typing-live-line, #typingIndicator, .typing-indicator").forEach(function(el){
+      el.setAttribute("aria-hidden", "true");
+    });
+  }
+
+  function capDecorationsOnce(){
+    var max = isMobile() ? 42 : 96;
+    [".gold-love-particle", ".love-particle", ".pirate-love-particle", ".star-particle", ".floating-love", ".floating-heart", ".sparkle-dot"].forEach(function(selector){
+      document.querySelectorAll(selector).forEach(function(node, index){
+        if (index >= max) node.style.display = "none";
+      });
+    });
+  }
+
+  function syncDashboardState(){
+    var dash = $("dashboardPage");
+    if (dashboardVisible()) {
+      document.body.classList.add("fd-dashboard-active");
+      document.body.classList.remove("fd-v6-logout", "fd-v6-logging-out");
+      if (dash) {
+        dash.style.pointerEvents = "";
+        dash.style.visibility = "";
+      }
+      ensureThemeButtonVisible();
+      bindChatBottomGuard();
+    } else {
+      document.body.classList.remove("fd-dashboard-active", "mobile-sidebar-active");
+      if (!isMobile()) closeMobileSidebar();
+      hideMaintenanceBeforeAttempt();
+    }
   }
 
   function run(){
-    patchLogout();
-    patchLogin();
-    bindFallbackLogout();
-    hideMaintenanceBeforeAttempt();
+    bindLoginAttempt();
+    bindLogoutFallback();
     bindMobileDrawer();
     bindChatBottomGuard();
-    patchSend();
-    capDecorations();
+    patchLogoutOnce();
+    patchSendOnce();
+    ensureThemeButtonVisible();
+    removeBottomTypingIndicator();
+    capDecorationsOnce();
     syncDashboardState();
   }
 
-  function startRetry(){
-    if (patchTimer) return;
-    patchTimer = setInterval(function(){
-      tries += 1;
+  function retryBoot(){
+    if (retryTimer) return;
+    retryTimer = setInterval(function(){
+      retryCount += 1;
       run();
-      if (tries > 80 || (window.triggerSignOut?.__fdCleanV5 && window.executeLoginValidation?.__fdCleanV5 && window.commitMessageToFirebase?.__fdCleanV5)) {
-        clearInterval(patchTimer);
-        patchTimer = null;
+      var done = retryCount >= 60 || (
+        (!window.triggerSignOut || window.triggerSignOut.__fdV6Clean) &&
+        (!window.commitMessageToFirebase || window.commitMessageToFirebase.__fdV6Clean)
+      );
+      if (done) {
+        clearInterval(retryTimer);
+        retryTimer = null;
       }
     }, 250);
   }
 
+  window.fdCleanV6Run = run;
+  window.fdCleanV6ScrollBottom = scrollChatBottom;
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function(){ run(); startRetry(); }, { once: true });
+    document.addEventListener("DOMContentLoaded", function(){ run(); retryBoot(); }, { once: true });
   } else {
     run();
-    startRetry();
+    retryBoot();
   }
+
   window.addEventListener("load", function(){ run(); scrollChatBottom(true); }, { once: true, passive: true });
-  window.addEventListener("resize", function(){ syncDashboardState(); bindMobileDrawer(); scrollChatBottom(false); }, { passive: true });
+  window.addEventListener("resize", function(){ syncDashboardState(); bindMobileDrawer(); if (!isMobile()) closeMobileSidebar(); }, { passive: true });
   window.addEventListener("orientationchange", function(){ setTimeout(function(){ syncDashboardState(); bindMobileDrawer(); scrollChatBottom(true); }, 260); }, { passive: true });
-  document.addEventListener("visibilitychange", function(){ if (!document.hidden) { syncDashboardState(); run(); } }, { passive: true });
-  setInterval(function(){ syncDashboardState(); hideMaintenanceBeforeAttempt(); capDecorations(); }, 15000);
+  document.addEventListener("visibilitychange", function(){ if (!document.hidden) run(); }, { passive: true });
 })();
 </script>
 
