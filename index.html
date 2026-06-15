@@ -1,4 +1,23 @@
 <!DOCTYPE html>
+<!--
+CLEAN FINAL CHANGELOG
+- Crosscheck v4: added robust maintenance status sync, admin banner, custom toggle confirmation, and anti-duplicate runtime guard.
+- Fixed maintenance admin status: visible ACTIVE/NORMAL indicator, different buttons, immediate UI sync after activate/deactivate.
+
+PERFORMANCE FIX v2 BY CHATGPT
+- Lowered realtime chat limits to reduce DOM/database load: mobile 50, desktop 100.
+- Lowered global room notification scan and read-receipt scan.
+- Debounced read-receipt updates so switching/opening a room does not write repeatedly.
+- Optimized delete-all-chat query to prefer roomKey instead of reading the whole collection.
+- Added custom delete confirmation popup for single message and full conversation delete.
+- Added incremental chat render path for common new-message/update cases so long chats do not always rebuild the whole message area.
+- Added final mobile performance CSS to reduce heavy blur/shadow/animation only on mobile.
+- Removed old duplicate style patches: FINAL_LIGHTWEIGHT_DASHBOARD_WEB_MOBILE_PATCH, chatgpt-final-maintenance-mobile-stabilizer-style, final-anti-delay-lag-stability-style, final-crosscheck-safe-light-patch, final-lightweight-maintenance-owner-patch-style, final-longterm-safe-polish, final-mobile-drawer-access-fix, final-mobile-logout-chat-photo-fix-style, final-production-polish-style, final-stability-performance-crosscheck-fix, final-ultra-smooth-dashboard-performance-fix, final-ultralight-no-heavy-visual-patch, mobile-chat-full-scroll-fix, mobile-show-all-fix, remove-bottom-typing-indicator-final
+- Removed old duplicate script patches: FINAL_LIGHTWEIGHT_DASHBOARD_WEB_MOBILE_SCRIPT, chatgpt-final-maintenance-mobile-stabilizer-script, final-anti-delay-lag-stability-script, final-fix-typing-one-color-only-script, final-lightweight-maintenance-owner-patch-script, final-presence-anti-alt-tab-fix, final-single-typing-indicator-only-script, final-theme-presence-accurate-patch, remove-bottom-typing-indicator-final-script
+- Edited final-request-light-engine-script: maintenance/session kept; duplicate typing/presence override removed.
+- Edited final-register-maintenance-theme-patch-script: register popup kept; maintenance popup wrapper removed.
+- Added one consolidated CSS block and one runtime guard.
+-->
 
 <html lang="id">
 <head>
@@ -6423,6 +6442,19 @@
 
     async function activateDashboardSession(loginUser, userData = {}, originalUsername = loginUser, options = {}) {
       const normalizedLoginUser = getDisplayUsername(loginUser);
+
+      // MAINTENANCE GATE FINAL: user biasa tidak boleh masuk dashboard saat maintenance aktif.
+      // Owner tetap bisa login untuk mematikan maintenance dari Admin Panel.
+      const maintenanceGateState = await readMaintenanceGateState();
+      if (maintenanceGateState.active && !isOwnerDisplayUsername(normalizedLoginUser)) {
+        clearDashboardSession({ broadcast: true, reason: "maintenance" });
+        loggedInUser = "";
+        passivePartner = "";
+        ensureMaintenanceGatePopup(maintenanceGateState.message, maintenanceGateState);
+        return false;
+      }
+      hideMaintenanceGatePopup();
+
       loggedInUser = normalizedLoginUser;
       userRole = normalizeRoleId((loggedInUser === OWNER_USERNAME || originalUsername === LEGACY_OWNER_USERNAME) ? "owner" : (userData.role || "biasa"));
       cacheUserRoles[loggedInUser] = userRole;
@@ -6502,7 +6534,8 @@
           return;
         }
 
-        await activateDashboardSession(savedUser, userSnap.data() || {}, savedUser, { restoredFromSession: true });
+        const restoredSessionAllowed = await activateDashboardSession(savedUser, userSnap.data() || {}, savedUser, { restoredFromSession: true });
+        if (restoredSessionAllowed === false) return;
         refreshDashboardSessionActivity(true);
       } catch (error) {
         console.warn("Gagal memulihkan sesi dashboard:", error);
@@ -6524,6 +6557,100 @@
 
     const OWNER_USERNAME = "OWNER";
     const LEGACY_OWNER_USERNAME = "Fadly";
+    const MAINTENANCE_SETTINGS_COLLECTION = "app_settings";
+    const MAINTENANCE_SETTINGS_DOC = "maintenance_dashboard";
+    const DEFAULT_MAINTENANCE_LOCK_MESSAGE = "Dashboard sedang maintenance. Estimasi tidak dapat dipastikan, silakan menunggu sesaat.";
+
+    function isOwnerDisplayUsername(username) {
+      const normalized = getDisplayUsername(String(username || "").trim());
+      return normalized === OWNER_USERNAME;
+    }
+
+    function escapeMaintenanceHtml(text) {
+      return String(text ?? "").replace(/[&<>'"]/g, function(ch) {
+        return ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[ch];
+      });
+    }
+
+    function normalizeMaintenanceGateState(data = {}) {
+      return {
+        active: data.active === true,
+        message: String(data.message || DEFAULT_MAINTENANCE_LOCK_MESSAGE).trim() || DEFAULT_MAINTENANCE_LOCK_MESSAGE,
+        activatedAtMs: Number(data.activatedAtMs || data.updatedAtMs || 0),
+        estimateText: String(data.estimateText || "Estimasi tidak dapat dipastikan, silakan menunggu sesaat.").trim()
+      };
+    }
+
+    async function readMaintenanceGateState() {
+      try {
+        const snap = await getDoc(doc(db, MAINTENANCE_SETTINGS_COLLECTION, MAINTENANCE_SETTINGS_DOC));
+        return normalizeMaintenanceGateState(snap.exists() ? (snap.data() || {}) : {});
+      } catch (error) {
+        console.warn("Gagal membaca status maintenance:", error);
+        return normalizeMaintenanceGateState({ active: false });
+      }
+    }
+
+    function formatMaintenanceGateTime(ms) {
+      if (!ms) return "Belum tersedia";
+      try {
+        return new Date(ms).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" });
+      } catch (error) {
+        return new Date(ms).toString();
+      }
+    }
+
+    function ensureMaintenanceGatePopup(message, state = {}) {
+      const finalState = normalizeMaintenanceGateState({ ...state, message: message || state.message });
+      try { document.body.classList.add("maintenance-login-attempted"); } catch (error) {}
+
+      let overlay = document.getElementById("maintenanceDashboardPopup");
+      if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "maintenanceDashboardPopup";
+        overlay.className = "maintenance-popup-overlay";
+        document.body.appendChild(overlay);
+      }
+
+      overlay.innerHTML = `
+        <div class="maintenance-popup-box" role="alert" aria-live="assertive">
+          <div class="maintenance-popup-icon">⚙</div>
+          <div class="maintenance-popup-title">MAINTENANCE DASHBOARD</div>
+          <div class="maintenance-popup-text" id="maintenanceDashboardPopupText">${escapeMaintenanceHtml(finalState.message)}</div>
+          <div class="maintenance-popup-meta" id="maintenanceDashboardPopupMeta">
+            Jadwal maintenance dimulai: ${escapeMaintenanceHtml(formatMaintenanceGateTime(finalState.activatedAtMs))}<br>
+            ${escapeMaintenanceHtml(finalState.estimateText)}
+          </div>
+        </div>`;
+
+      overlay.classList.add("is-visible");
+      overlay.style.display = "grid";
+      overlay.style.opacity = "1";
+      overlay.style.pointerEvents = "auto";
+      overlay.style.visibility = "visible";
+
+      const dashboardPage = document.getElementById("dashboardPage");
+      const loginPage = document.getElementById("loginPage");
+      if (dashboardPage) dashboardPage.style.display = "none";
+      if (loginPage) loginPage.style.display = "grid";
+      showLoginNotice("Dashboard sedang maintenance. Login user biasa ditutup sementara.");
+    }
+
+    function hideMaintenanceGatePopup() {
+      const overlay = document.getElementById("maintenanceDashboardPopup");
+      if (overlay) {
+        overlay.classList.remove("is-visible");
+        overlay.style.display = "none";
+        overlay.style.opacity = "";
+        overlay.style.pointerEvents = "";
+        overlay.style.visibility = "";
+      }
+      try { document.body.classList.remove("maintenance-login-attempted"); } catch (error) {}
+    }
+
+    window.__showMaintenanceGatePopup = ensureMaintenanceGatePopup;
+    window.__hideMaintenanceGatePopup = hideMaintenanceGatePopup;
+
 
     const ROLE_ACCESS_OPTIONS = [
       { key: "chatAccess", label: "Lihat Chat" },
@@ -7742,6 +7869,7 @@
 
     window.executeLoginValidation = async function(e) {
       e.preventDefault();
+      try { document.body.classList.add("maintenance-login-attempted"); } catch (error) {}
       const user = document.getElementById('inputUser').value.trim();
       const pass = document.getElementById('inputPass').value;
       const errorBox = document.getElementById('authErrorNotification');
@@ -13920,6 +14048,76 @@
     .maintenance-meta-line { font-size: 11.5px; color: var(--theme-muted, rgba(240,244,248,.58)); line-height: 1.5; }
     .maintenance-popup-meta { margin-top: 12px; font-size: 12px; line-height: 1.55; color: color-mix(in srgb, var(--theme-accent-3, #FFE39A) 72%, #fff 28%); }
 
+    /* STATUS MAINTENANCE FINAL — biar Owner jelas tahu mode aktif/nonaktif */
+    .maintenance-status-wrap {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 15px;
+      background: rgba(89, 255, 132, .055);
+      border: 1px solid rgba(89, 255, 132, .22);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+    .maintenance-center-card.is-maintenance-active .maintenance-status-wrap {
+      background: rgba(255, 78, 122, .085);
+      border-color: rgba(255, 78, 122, .34);
+      box-shadow: 0 0 22px rgba(255,78,122,.10), inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+    .maintenance-status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-height: 31px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 950;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #061221;
+      background: linear-gradient(135deg, #59FF84, #B5FFC8);
+      border: 1px solid rgba(255,255,255,.20);
+      box-shadow: 0 0 16px rgba(89,255,132,.22);
+    }
+    .maintenance-status-pill.is-active {
+      color: #fff;
+      background: linear-gradient(135deg, #FF3E72, #FF8A3D);
+      box-shadow: 0 0 18px rgba(255,62,114,.36);
+      animation: maintenanceStatusPulse 1.45s ease-in-out infinite;
+    }
+    .maintenance-status-desc {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--theme-muted, rgba(240,244,248,.62));
+    }
+    .maintenance-owner-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+    .maintenance-save-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      filter: grayscale(.35);
+      box-shadow: none !important;
+    }
+    .maintenance-save-btn.maintenance-on-btn:not(:disabled) {
+      border-color: rgba(255,78,122,.38);
+      background: rgba(255,78,122,.11);
+      color: #FF9AB1;
+    }
+    .maintenance-save-btn.maintenance-off-btn:not(:disabled) {
+      border-color: rgba(89,255,132,.30);
+      background: rgba(89,255,132,.08);
+      color: #9CFFB8;
+    }
+    @keyframes maintenanceStatusPulse {
+      0%, 100% { box-shadow: 0 0 13px rgba(255,62,114,.25); }
+      50% { box-shadow: 0 0 26px rgba(255,62,114,.55); }
+    }
+
     @media (max-width: 680px), (hover:none) {
       .dashboard-theme-options { grid-template-columns: 1fr !important; }
       #dashboardPage::after, .chat-main-window::after, .sidebar::before { display: none !important; }
@@ -14130,10 +14328,30 @@
     }
     window.showMaintenancePopup = function(message) {
       maintenanceStateLite.message = message || maintenanceStateLite.message || DEFAULT_MAINT_MESSAGE;
+      try { document.body.classList.add("maintenance-login-attempted"); } catch (error) {}
+      if (typeof window.__showMaintenanceGatePopup === "function") {
+        window.__showMaintenanceGatePopup(maintenanceStateLite.message, maintenanceStateLite);
+        return;
+      }
       const overlay = ensureMaintenancePopupLite();
       overlay.classList.add("is-visible");
+      overlay.style.display = "grid";
+      overlay.style.opacity = "1";
+      overlay.style.pointerEvents = "auto";
+      overlay.style.visibility = "visible";
     };
-    function hideMaintenancePopupLite() { document.getElementById("maintenanceDashboardPopup")?.classList.remove("is-visible"); }
+    function hideMaintenancePopupLite() {
+      const overlay = document.getElementById("maintenanceDashboardPopup");
+      if (overlay) {
+        overlay.classList.remove("is-visible");
+        overlay.style.display = "none";
+        overlay.style.opacity = "";
+        overlay.style.pointerEvents = "";
+        overlay.style.visibility = "";
+      }
+      try { document.body.classList.remove("maintenance-login-attempted"); } catch (error) {}
+      if (typeof window.__hideMaintenanceGatePopup === "function") window.__hideMaintenanceGatePopup();
+    }
     function ensureMaintenanceCenterPanel() {
       const ownerCard = document.getElementById("ownerToolsCard");
       if (!ownerCard || document.getElementById("maintenanceCenterCard")) return;
@@ -14143,13 +14361,19 @@
       card.innerHTML = `
         <div class="admin-section-title">Owner Tools — Maintenance Center</div>
         <div class="owner-tools-desc">Atur pesan maintenance. Jadwal otomatis dihitung dari jam dan tanggal saat maintenance diaktifkan.</div>
+
+        <div class="maintenance-status-wrap" aria-live="polite">
+          <div class="maintenance-status-pill" id="maintenanceOwnerStatus">MEMUAT STATUS...</div>
+          <div class="maintenance-status-desc" id="maintenanceOwnerStatusDesc">Status maintenance sedang dibaca.</div>
+        </div>
+
         <textarea id="maintenanceMessageInput" placeholder="Tulis pesan maintenance...">${escapeHtml(maintenanceStateLite.message || DEFAULT_MAINT_MESSAGE)}</textarea>
         <div class="maintenance-meta-line" id="maintenanceScheduleInfo">Jadwal maintenance: ${escapeHtml(formatDateTime(maintenanceStateLite.activatedAtMs))}</div>
-        <div class="maintenance-meta-line">Estimasi: tidak dapat dipastikan, silakan menunggu sesaat.</div>
+        <div class="maintenance-meta-line" id="maintenanceEstimateInfo">Estimasi: tidak dapat dipastikan, silakan menunggu sesaat.</div>
         <div class="maintenance-owner-actions">
-          <button type="button" class="maintenance-save-btn" onclick="saveMaintenanceMessageOnly()">Simpan Pesan</button>
-          <button type="button" class="maintenance-save-btn danger" onclick="activateMaintenanceDashboardOwnerOnly()">Aktifkan Maintenance</button>
-          <button type="button" class="maintenance-save-btn" onclick="deactivateMaintenanceDashboardOwnerOnly()">Nonaktifkan</button>
+          <button type="button" class="maintenance-save-btn" id="maintenanceSaveBtn" onclick="saveMaintenanceMessageOnly()">Simpan Pesan</button>
+          <button type="button" class="maintenance-save-btn maintenance-on-btn" id="maintenanceActivateBtn" onclick="activateMaintenanceDashboardOwnerOnly()">Aktifkan Maintenance</button>
+          <button type="button" class="maintenance-save-btn maintenance-off-btn" id="maintenanceDeactivateBtn" onclick="deactivateMaintenanceDashboardOwnerOnly()">Nonaktifkan Maintenance</button>
         </div>
       `;
       ownerCard.appendChild(card);
@@ -14158,12 +14382,39 @@
     function renderMaintenanceCenterState() {
       const input = document.getElementById("maintenanceMessageInput");
       const info = document.getElementById("maintenanceScheduleInfo");
+      const estimate = document.getElementById("maintenanceEstimateInfo");
+      const card = document.getElementById("maintenanceCenterCard");
+      const isActive = !!maintenanceStateLite.active;
       if (input && document.activeElement !== input) input.value = maintenanceStateLite.message || DEFAULT_MAINT_MESSAGE;
-      if (info) info.textContent = "Jadwal maintenance: " + formatDateTime(maintenanceStateLite.activatedAtMs);
+      if (info) {
+        info.textContent = isActive
+          ? "Jadwal maintenance aktif sejak: " + formatDateTime(maintenanceStateLite.activatedAtMs)
+          : "Jadwal maintenance: belum aktif";
+      }
+      if (estimate) estimate.textContent = "Estimasi: tidak dapat dipastikan, silakan menunggu sesaat.";
+      if (card) card.classList.toggle("is-maintenance-active", isActive);
       const status = document.getElementById("maintenanceOwnerStatus");
       if (status) {
-        status.textContent = maintenanceStateLite.active ? "MAINTENANCE AKTIF" : "NORMAL AKTIF";
-        status.classList.toggle("is-active", !!maintenanceStateLite.active);
+        status.textContent = isActive ? "🔴 MAINTENANCE SEDANG AKTIF" : "🟢 DASHBOARD NORMAL";
+        status.classList.toggle("is-active", isActive);
+      }
+      const desc = document.getElementById("maintenanceOwnerStatusDesc");
+      if (desc) {
+        desc.textContent = isActive
+          ? "User biasa sedang diblokir dari dashboard. Owner tetap bisa masuk untuk menonaktifkan maintenance."
+          : "Maintenance nonaktif. User biasa dapat login dan menggunakan dashboard seperti normal.";
+      }
+      const activateBtn = document.getElementById("maintenanceActivateBtn");
+      const deactivateBtn = document.getElementById("maintenanceDeactivateBtn");
+      if (activateBtn) {
+        activateBtn.disabled = isActive;
+        activateBtn.textContent = isActive ? "Maintenance Sudah Aktif" : "Aktifkan Maintenance";
+        activateBtn.title = isActive ? "Maintenance sudah aktif" : "Aktifkan maintenance dan blokir user biasa";
+      }
+      if (deactivateBtn) {
+        deactivateBtn.disabled = !isActive;
+        deactivateBtn.textContent = isActive ? "Nonaktifkan Maintenance" : "Maintenance Sudah Nonaktif";
+        deactivateBtn.title = isActive ? "Matikan maintenance agar user bisa login lagi" : "Maintenance belum aktif";
       }
     }
     window.saveMaintenanceMessageOnly = async function() {
@@ -14174,23 +14425,40 @@
     };
     window.activateMaintenanceDashboardOwnerOnly = async function() {
       if (!isOwner(currentUser())) return alert("Fitur maintenance hanya untuk OWNER.");
+      if (maintenanceStateLite.active) {
+        renderMaintenanceCenterState();
+        return alert("Maintenance sudah aktif. User biasa sudah diblokir dari dashboard.");
+      }
       const msg = document.getElementById("maintenanceMessageInput")?.value?.trim() || DEFAULT_MAINT_MESSAGE;
-      if (!confirm("Aktifkan MAINTENANCE DASHBOARD dan logout semua user?")) return;
+      if (!confirm("Aktifkan MAINTENANCE DASHBOARD? User biasa akan diblokir dan diarahkan ke popup maintenance.")) return;
+      const now = Date.now();
+      maintenanceStateLite = { active: true, message: msg, activatedAtMs: now };
+      renderMaintenanceCenterState();
       await setDoc(MAINT_REF, {
         active: true,
         message: msg,
-        activatedAtMs: Date.now(),
+        activatedAtMs: now,
         scheduleText: "Maintenance dimulai pada jam dan tanggal saat fitur diaktifkan.",
         estimateText: "Estimasi tidak dapat dipastikan, silakan menunggu sesaat.",
         updatedBy: OWNER_NAME,
-        updatedAtMs: Date.now(),
+        updatedAtMs: now,
         updatedAt: serverTimestamp()
       }, { merge: true });
+      alert("Maintenance sudah AKTIF. User biasa sekarang diblokir dari dashboard.");
     };
     window.deactivateMaintenanceDashboardOwnerOnly = async function() {
       if (!isOwner(currentUser())) return alert("Fitur maintenance hanya untuk OWNER.");
-      await setDoc(MAINT_REF, { active: false, updatedBy: OWNER_NAME, updatedAtMs: Date.now(), updatedAt: serverTimestamp() }, { merge: true });
+      if (!maintenanceStateLite.active) {
+        renderMaintenanceCenterState();
+        return alert("Maintenance sudah nonaktif. Dashboard berjalan normal.");
+      }
+      if (!confirm("Nonaktifkan maintenance dan izinkan user biasa login kembali?")) return;
+      const now = Date.now();
+      maintenanceStateLite = { ...maintenanceStateLite, active: false, activatedAtMs: 0 };
+      renderMaintenanceCenterState();
+      await setDoc(MAINT_REF, { active: false, activatedAtMs: 0, updatedBy: OWNER_NAME, updatedAtMs: now, updatedAt: serverTimestamp() }, { merge: true });
       hideMaintenancePopupLite();
+      alert("Maintenance sudah NONAKTIF. User biasa dapat login kembali.");
     };
 
     function patchAdminOpen() {
@@ -14232,8 +14500,10 @@
         };
         renderMaintenanceCenterState();
         if (maintenanceStateLite.active && !isOwner(currentUser()) && currentUser()) {
+          try { document.body.classList.add("maintenance-login-attempted"); } catch (error) {}
           if (typeof window.triggerSignOut === "function") await window.triggerSignOut({ reason: "maintenance", skipSessionBroadcast: true });
           window.showMaintenancePopup(maintenanceStateLite.message);
+          return;
         }
         if (!maintenanceStateLite.active) hideMaintenancePopupLite();
       }, () => {});
@@ -19210,6 +19480,634 @@
 })();
 </script>
 <!-- END CLEAN FINAL SINGLE RUNTIME GUARD -->
+
+
+<!-- FINAL MAINTENANCE GATE VISIBILITY FIX: popup harus benar-benar tampil di web dan mobile saat maintenance aktif. -->
+<style id="final-maintenance-gate-visibility-fix">
+  body.maintenance-login-attempted #maintenanceDashboardPopup.maintenance-popup-overlay.is-visible,
+  body.maintenance-login-attempted #maintenanceDashboardPopup.is-visible,
+  body.maintenance-login-attempted .maintenance-popup-overlay.is-visible {
+    display: grid !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 999999 !important;
+  }
+  body.maintenance-login-attempted #dashboardPage {
+    pointer-events: none !important;
+  }
+  @media (max-width: 680px) {
+    body.maintenance-login-attempted #maintenanceDashboardPopup.maintenance-popup-overlay.is-visible,
+    body.maintenance-login-attempted #maintenanceDashboardPopup.is-visible,
+    body.maintenance-login-attempted .maintenance-popup-overlay.is-visible {
+      display: grid !important;
+      padding: 18px !important;
+    }
+    body.maintenance-login-attempted #maintenanceDashboardPopup .maintenance-popup-box {
+      width: min(440px, 94vw) !important;
+      max-height: 88vh !important;
+      overflow-y: auto !important;
+    }
+  }
+</style>
+
+
+
+<!-- =========================================================
+     FINAL CROSSCHECK MAINTENANCE STABILITY PATCH v4
+     - Status admin lebih jelas ACTIVE/NORMAL.
+     - Tombol aktif/nonaktif tersinkron realtime dari Firebase.
+     - Popup maintenance tetap memblokir user biasa di web & mobile.
+     - Guard anti dobel agar patch tidak memasang listener berulang.
+     ========================================================= -->
+<style id="final-crosscheck-maintenance-stability-v4-style">
+  #adminModal[data-maintenance-mode="active"] .admin-control-modal {
+    border-color: rgba(255, 78, 122, .42) !important;
+    box-shadow: 0 22px 90px rgba(0,0,0,.58), 0 0 34px rgba(255,78,122,.16) !important;
+  }
+  #adminModal[data-maintenance-mode="normal"] .admin-control-modal {
+    border-color: rgba(89, 255, 132, .26) !important;
+  }
+  .maintenance-admin-global-banner {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 14px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(89,255,132,.28);
+    background: linear-gradient(135deg, rgba(89,255,132,.075), rgba(40,223,255,.045));
+    color: rgba(239,255,245,.92);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+  }
+  .maintenance-admin-global-banner.is-active {
+    border-color: rgba(255,78,122,.48);
+    background: linear-gradient(135deg, rgba(255,78,122,.16), rgba(255,122,61,.08));
+    color: #FFF4F7;
+    box-shadow: 0 0 22px rgba(255,78,122,.14), inset 0 0 0 1px rgba(255,255,255,.035);
+  }
+  .maintenance-admin-global-banner strong {
+    font-size: 13px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .maintenance-admin-global-banner span {
+    font-size: 12px;
+    line-height: 1.45;
+    color: rgba(240,244,248,.68);
+  }
+  .maintenance-center-card.crosscheck-v4 {
+    margin-top: 14px;
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(89,255,132,.24);
+    background: linear-gradient(135deg, rgba(8,18,36,.78), rgba(4,9,20,.88));
+  }
+  .maintenance-center-card.crosscheck-v4.is-maintenance-active {
+    border-color: rgba(255,78,122,.52) !important;
+    background: linear-gradient(135deg, rgba(58,13,31,.66), rgba(8,12,24,.92)) !important;
+    box-shadow: 0 0 22px rgba(255,78,122,.12) !important;
+  }
+  .maintenance-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 40px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 950;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #061221;
+    background: linear-gradient(135deg, #59FF84, #37E7FF);
+    border: 1px solid rgba(255,255,255,.22);
+  }
+  .maintenance-status-pill.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, #FF3E72, #FF7A3D);
+    box-shadow: 0 0 20px rgba(255,62,114,.34);
+  }
+  .maintenance-status-desc,
+  .maintenance-meta-line {
+    font-size: 12px;
+    line-height: 1.55;
+    color: rgba(240,244,248,.68);
+  }
+  #maintenanceMessageInput {
+    width: 100%;
+    min-height: 92px;
+    margin: 12px 0;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(40,223,255,.18);
+    background: rgba(1,5,14,.55);
+    color: #F7FBFF;
+    outline: none;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  #maintenanceMessageInput:focus {
+    border-color: rgba(40,223,255,.45);
+    box-shadow: 0 0 18px rgba(40,223,255,.10);
+  }
+  .maintenance-owner-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .maintenance-save-btn {
+    min-height: 42px;
+    border-radius: 12px;
+    border: 1px solid rgba(40,223,255,.24);
+    background: rgba(40,223,255,.08);
+    color: #72F0FF;
+    font-weight: 850;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .maintenance-save-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #37E7FF, #8B5CFF);
+    color: #020814;
+  }
+  .maintenance-save-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    filter: grayscale(.25);
+  }
+  .maintenance-save-btn.maintenance-on-btn:not(:disabled) {
+    border-color: rgba(255,78,122,.36);
+    background: rgba(255,78,122,.10);
+    color: #FFB4C4;
+  }
+  .maintenance-save-btn.maintenance-off-btn:not(:disabled) {
+    border-color: rgba(89,255,132,.36);
+    background: rgba(89,255,132,.08);
+    color: #B6FFC6;
+  }
+  .maintenance-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000001;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(0,0,0,.74);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .maintenance-confirm-box {
+    width: min(430px, 94vw);
+    border-radius: 22px;
+    padding: 22px;
+    border: 1px solid rgba(40,223,255,.20);
+    background: linear-gradient(135deg, rgba(8,18,36,.96), rgba(4,9,20,.98));
+    color: #F7FBFF;
+    box-shadow: 0 24px 90px rgba(0,0,0,.62);
+  }
+  .maintenance-confirm-box.danger {
+    border-color: rgba(255,78,122,.45);
+  }
+  .maintenance-confirm-title {
+    font-size: 17px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .maintenance-confirm-text {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(240,244,248,.72);
+  }
+  .maintenance-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .maintenance-confirm-actions button {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    font-weight: 750;
+    cursor: pointer;
+  }
+  .maintenance-confirm-actions .primary {
+    border-color: rgba(40,223,255,.28);
+    color: #72F0FF;
+    background: rgba(40,223,255,.10);
+  }
+  .maintenance-confirm-actions .danger {
+    border-color: rgba(255,78,122,.44);
+    color: #FFB4C4;
+    background: rgba(255,78,122,.12);
+  }
+  @media (max-width: 680px) {
+    .maintenance-owner-actions { grid-template-columns: 1fr; }
+    .maintenance-admin-global-banner { margin-bottom: 10px; padding: 12px; }
+    #maintenanceMessageInput { min-height: 84px; }
+    .maintenance-confirm-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+</style>
+<script type="module" id="final-crosscheck-maintenance-stability-v4-script">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  (function(){
+    "use strict";
+    if (window.__FINAL_CROSSCHECK_MAINTENANCE_STABILITY_V4__) return;
+    window.__FINAL_CROSSCHECK_MAINTENANCE_STABILITY_V4__ = true;
+
+    const app = getApps().length ? getApp() : initializeApp({
+      apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTlVZNw",
+      authDomain: "fandah-c08fc.firebaseapp.com",
+      projectId: "fandah-c08fc",
+      storageBucket: "fandah-c08fc.firebasestorage.app",
+      messagingSenderId: "624734789171",
+      appId: "1:624734789171:web:7ba9ab16730acb5cfc8d46",
+      measurementId: "G-DN9Y49Q8QQ"
+    });
+    const db = getFirestore(app);
+    const MAINT_REF = doc(db, "app_settings", "maintenance_dashboard");
+    const OWNER = "OWNER";
+    const LEGACY_OWNER = "Fadly";
+    const SESSION_KEY = "fandah_dashboard_login_session_v1";
+    const LOCAL_STATE_KEY = "fandah_maintenance_state_mirror_v4";
+    const DEFAULT_MESSAGE = "Dashboard sedang maintenance. Estimasi tidak dapat dipastikan, silakan menunggu sesaat.";
+    let maintenanceState = readLocalMirror();
+    let snapshotReady = false;
+    let patchOpenAdminInstalled = false;
+    let renderTimer = null;
+
+    function normalizeUser(name) {
+      const raw = String(name || "").trim();
+      if (raw.toLowerCase() === LEGACY_OWNER.toLowerCase()) return OWNER;
+      if (raw.toLowerCase() === OWNER.toLowerCase()) return OWNER;
+      return raw;
+    }
+    function readSessionUser() {
+      try {
+        const data = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+        return normalizeUser(data && data.username ? data.username : "");
+      } catch (error) { return ""; }
+    }
+    function currentUser() { return normalizeUser(window.loggedInUser || readSessionUser() || ""); }
+    function isOwnerUser(name = currentUser()) { return normalizeUser(name) === OWNER; }
+    function escapeHtml(text) {
+      return String(text ?? "").replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
+    }
+    function formatTime(ms) {
+      const n = Number(ms || 0);
+      if (!n) return "Belum aktif";
+      try { return new Date(n).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" }); }
+      catch (error) { return new Date(n).toString(); }
+    }
+    function normalizeState(data = {}) {
+      const active = data.active === true;
+      const message = String(data.message || DEFAULT_MESSAGE).trim() || DEFAULT_MESSAGE;
+      const activatedAtMs = active ? Number(data.activatedAtMs || data.updatedAtMs || Date.now()) : 0;
+      return {
+        active,
+        message,
+        activatedAtMs,
+        estimateText: String(data.estimateText || "Estimasi tidak dapat dipastikan, silakan menunggu sesaat.").trim(),
+        updatedAtMs: Number(data.updatedAtMs || 0)
+      };
+    }
+    function readLocalMirror() {
+      try { return normalizeState(JSON.parse(localStorage.getItem(LOCAL_STATE_KEY) || "{}")); }
+      catch (error) { return normalizeState({ active: false }); }
+    }
+    function writeLocalMirror() {
+      try { localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(maintenanceState)); } catch (error) {}
+    }
+    function setButtonsBusy(busy) {
+      ["maintenanceSaveBtn", "maintenanceActivateBtn", "maintenanceDeactivateBtn"].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.dataset.busy = busy ? "1" : "0";
+      });
+    }
+    function ensureAdminBanner() {
+      const modal = document.getElementById("adminModal");
+      const box = modal ? modal.querySelector(".admin-control-modal") : null;
+      if (!box) return null;
+      let banner = document.getElementById("maintenanceAdminGlobalBanner");
+      if (!banner) {
+        banner = document.createElement("div");
+        banner.id = "maintenanceAdminGlobalBanner";
+        banner.className = "maintenance-admin-global-banner";
+        const firstCard = box.querySelector(".admin-section-card");
+        box.insertBefore(banner, firstCard || box.firstChild);
+      }
+      return banner;
+    }
+    function ensureMaintenanceCenterPanel() {
+      const ownerCard = document.getElementById("ownerToolsCard");
+      if (!ownerCard || !isOwnerUser()) return null;
+      let card = document.getElementById("maintenanceCenterCard");
+      if (!card) {
+        card = document.createElement("div");
+        card.id = "maintenanceCenterCard";
+        ownerCard.appendChild(card);
+      }
+      if (card.dataset.crosscheckVersion !== "v4") {
+        card.className = "maintenance-center-card crosscheck-v4";
+        card.dataset.crosscheckVersion = "v4";
+        card.innerHTML = `
+          <div class="admin-section-title">Owner Tools — Maintenance Center</div>
+          <div class="owner-tools-desc">Status di bawah ini tersinkron realtime. Saat aktif, user biasa diblokir dari dashboard web dan mobile; OWNER tetap bisa masuk untuk menonaktifkan.</div>
+          <div class="maintenance-status-wrap" aria-live="polite">
+            <div class="maintenance-status-pill" id="maintenanceOwnerStatus">MEMUAT STATUS...</div>
+            <div class="maintenance-status-desc" id="maintenanceOwnerStatusDesc">Status maintenance sedang dibaca.</div>
+          </div>
+          <textarea id="maintenanceMessageInput" placeholder="Tulis pesan maintenance...">${escapeHtml(maintenanceState.message)}</textarea>
+          <div class="maintenance-meta-line" id="maintenanceScheduleInfo">Jadwal maintenance: ${escapeHtml(formatTime(maintenanceState.activatedAtMs))}</div>
+          <div class="maintenance-meta-line" id="maintenanceEstimateInfo">Estimasi: ${escapeHtml(maintenanceState.estimateText)}</div>
+          <div class="maintenance-owner-actions">
+            <button type="button" class="maintenance-save-btn" id="maintenanceSaveBtn">Simpan Pesan</button>
+            <button type="button" class="maintenance-save-btn maintenance-on-btn" id="maintenanceActivateBtn">Aktifkan Maintenance</button>
+            <button type="button" class="maintenance-save-btn maintenance-off-btn" id="maintenanceDeactivateBtn">Nonaktifkan Maintenance</button>
+          </div>`;
+        card.querySelector("#maintenanceSaveBtn")?.addEventListener("click", () => window.saveMaintenanceMessageOnly());
+        card.querySelector("#maintenanceActivateBtn")?.addEventListener("click", () => window.activateMaintenanceDashboardOwnerOnly());
+        card.querySelector("#maintenanceDeactivateBtn")?.addEventListener("click", () => window.deactivateMaintenanceDashboardOwnerOnly());
+      }
+      return card;
+    }
+    function renderMaintenanceState() {
+      renderTimer = null;
+      const isActive = !!maintenanceState.active;
+      const modal = document.getElementById("adminModal");
+      if (modal) modal.dataset.maintenanceMode = isActive ? "active" : "normal";
+
+      const banner = ensureAdminBanner();
+      if (banner) {
+        banner.classList.toggle("is-active", isActive);
+        banner.innerHTML = isActive
+          ? `<strong>🔴 MAINTENANCE SEDANG AKTIF</strong><span>User biasa sedang diblokir dari dashboard. Aktif sejak: ${escapeHtml(formatTime(maintenanceState.activatedAtMs))}</span>`
+          : `<strong>🟢 DASHBOARD NORMAL</strong><span>Maintenance nonaktif. User biasa dapat login dan memakai dashboard.</span>`;
+      }
+
+      const card = ensureMaintenanceCenterPanel();
+      if (card) card.classList.toggle("is-maintenance-active", isActive);
+      const input = document.getElementById("maintenanceMessageInput");
+      if (input && document.activeElement !== input) input.value = maintenanceState.message || DEFAULT_MESSAGE;
+      const status = document.getElementById("maintenanceOwnerStatus");
+      if (status) {
+        status.textContent = isActive ? "🔴 MAINTENANCE SEDANG AKTIF" : "🟢 DASHBOARD NORMAL";
+        status.classList.toggle("is-active", isActive);
+      }
+      const desc = document.getElementById("maintenanceOwnerStatusDesc");
+      if (desc) {
+        desc.textContent = isActive
+          ? "User biasa sedang diblokir dari dashboard web dan mobile. OWNER tetap bisa masuk untuk menonaktifkan."
+          : "Maintenance nonaktif. Dashboard berjalan normal untuk semua user yang memiliki akses.";
+      }
+      const info = document.getElementById("maintenanceScheduleInfo");
+      if (info) info.textContent = isActive ? "Jadwal maintenance aktif sejak: " + formatTime(maintenanceState.activatedAtMs) : "Jadwal maintenance: belum aktif";
+      const estimate = document.getElementById("maintenanceEstimateInfo");
+      if (estimate) estimate.textContent = "Estimasi: " + (maintenanceState.estimateText || "tidak dapat dipastikan, silakan menunggu sesaat.");
+      const saveBtn = document.getElementById("maintenanceSaveBtn");
+      const onBtn = document.getElementById("maintenanceActivateBtn");
+      const offBtn = document.getElementById("maintenanceDeactivateBtn");
+      if (saveBtn) saveBtn.disabled = saveBtn.dataset.busy === "1";
+      if (onBtn) {
+        onBtn.disabled = isActive || onBtn.dataset.busy === "1";
+        onBtn.textContent = isActive ? "Maintenance Sudah Aktif" : "Aktifkan Maintenance";
+        onBtn.title = isActive ? "Status sudah aktif" : "Aktifkan maintenance dan blokir user biasa";
+      }
+      if (offBtn) {
+        offBtn.disabled = !isActive || offBtn.dataset.busy === "1";
+        offBtn.textContent = isActive ? "Nonaktifkan Maintenance" : "Maintenance Sudah Nonaktif";
+        offBtn.title = isActive ? "Nonaktifkan maintenance agar user biasa bisa login" : "Status sudah nonaktif";
+      }
+    }
+    function scheduleRender(delay = 0) {
+      if (renderTimer) clearTimeout(renderTimer);
+      renderTimer = setTimeout(renderMaintenanceState, delay);
+    }
+    function showGatePopup(message, state = maintenanceState) {
+      const finalState = normalizeState({ ...state, active: true, message: message || state.message });
+      try { document.body.classList.add("maintenance-login-attempted"); } catch (error) {}
+      let overlay = document.getElementById("maintenanceDashboardPopup");
+      if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "maintenanceDashboardPopup";
+        overlay.className = "maintenance-popup-overlay";
+        document.body.appendChild(overlay);
+      }
+      overlay.innerHTML = `
+        <div class="maintenance-popup-box" role="alert" aria-live="assertive">
+          <div class="maintenance-popup-icon">⚙</div>
+          <div class="maintenance-popup-title">MAINTENANCE DASHBOARD</div>
+          <div class="maintenance-popup-text" id="maintenanceDashboardPopupText">${escapeHtml(finalState.message)}</div>
+          <div class="maintenance-popup-meta" id="maintenanceDashboardPopupMeta">
+            Jadwal maintenance dimulai: ${escapeHtml(formatTime(finalState.activatedAtMs))}<br>
+            ${escapeHtml(finalState.estimateText)}
+          </div>
+        </div>`;
+      overlay.classList.add("is-visible");
+      overlay.style.display = "grid";
+      overlay.style.opacity = "1";
+      overlay.style.pointerEvents = "auto";
+      overlay.style.visibility = "visible";
+      const dash = document.getElementById("dashboardPage");
+      const login = document.getElementById("loginPage");
+      if (dash && !isOwnerUser()) dash.style.display = "none";
+      if (login && !isOwnerUser()) login.style.display = "grid";
+    }
+    function hideGatePopup() {
+      const overlay = document.getElementById("maintenanceDashboardPopup");
+      if (overlay) {
+        overlay.classList.remove("is-visible");
+        overlay.style.display = "none";
+        overlay.style.opacity = "";
+        overlay.style.pointerEvents = "";
+        overlay.style.visibility = "";
+      }
+      try { document.body.classList.remove("maintenance-login-attempted"); } catch (error) {}
+    }
+    function confirmBox({ title, text, danger = false, okText = "Ya", cancelText = "Batal" }) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        overlay.className = "maintenance-confirm-overlay";
+        overlay.innerHTML = `
+          <div class="maintenance-confirm-box ${danger ? "danger" : ""}" role="dialog" aria-modal="true">
+            <div class="maintenance-confirm-title">${escapeHtml(title)}</div>
+            <div class="maintenance-confirm-text">${escapeHtml(text)}</div>
+            <div class="maintenance-confirm-actions">
+              <button type="button" data-action="cancel">${escapeHtml(cancelText)}</button>
+              <button type="button" class="${danger ? "danger" : "primary"}" data-action="ok">${escapeHtml(okText)}</button>
+            </div>
+          </div>`;
+        const done = value => { overlay.remove(); resolve(value); };
+        overlay.addEventListener("click", e => {
+          if (e.target === overlay || e.target.closest('[data-action="cancel"]')) done(false);
+          if (e.target.closest('[data-action="ok"]')) done(true);
+        });
+        overlay.addEventListener("keydown", e => { if (e.key === "Escape") done(false); }, { once: true });
+        document.body.appendChild(overlay);
+        setTimeout(() => overlay.querySelector('[data-action="ok"]')?.focus(), 20);
+      });
+    }
+    function notify(message) { try { alert(message); } catch (error) { console.log(message); } }
+
+    window.__showMaintenanceGatePopup = showGatePopup;
+    window.__hideMaintenanceGatePopup = hideGatePopup;
+    window.showMaintenancePopup = function(message) { showGatePopup(message || maintenanceState.message, maintenanceState); };
+
+    window.saveMaintenanceMessageOnly = async function() {
+      if (!isOwnerUser()) return notify("Hanya OWNER yang dapat mengubah pesan maintenance.");
+      const input = document.getElementById("maintenanceMessageInput");
+      const msg = String(input?.value || "").trim() || DEFAULT_MESSAGE;
+      const previous = { ...maintenanceState };
+      maintenanceState = normalizeState({ ...maintenanceState, message: msg, updatedAtMs: Date.now() });
+      writeLocalMirror();
+      setButtonsBusy(true); scheduleRender();
+      try {
+        await setDoc(MAINT_REF, { message: msg, updatedBy: OWNER, updatedAtMs: Date.now(), updatedAt: serverTimestamp() }, { merge: true });
+        notify("Pesan maintenance berhasil disimpan.");
+      } catch (error) {
+        maintenanceState = previous; writeLocalMirror(); scheduleRender();
+        console.error("Gagal menyimpan pesan maintenance:", error);
+        notify("Gagal menyimpan pesan maintenance. Cek koneksi atau rules Firebase.");
+      } finally { setButtonsBusy(false); scheduleRender(); }
+    };
+
+    window.activateMaintenanceDashboardOwnerOnly = async function() {
+      if (!isOwnerUser()) return notify("Fitur maintenance hanya untuk OWNER.");
+      if (maintenanceState.active) { scheduleRender(); return notify("Maintenance sudah AKTIF. User biasa sudah diblokir."); }
+      const input = document.getElementById("maintenanceMessageInput");
+      const msg = String(input?.value || "").trim() || DEFAULT_MESSAGE;
+      const ok = await confirmBox({
+        title: "Aktifkan Maintenance?",
+        text: "User biasa akan langsung diblokir dari dashboard web dan mobile. OWNER tetap bisa masuk untuk menonaktifkan.",
+        okText: "Aktifkan",
+        danger: true
+      });
+      if (!ok) return;
+      const previous = { ...maintenanceState };
+      const now = Date.now();
+      maintenanceState = normalizeState({ active: true, message: msg, activatedAtMs: now, updatedAtMs: now });
+      writeLocalMirror();
+      setButtonsBusy(true); scheduleRender();
+      try {
+        await setDoc(MAINT_REF, {
+          active: true,
+          message: msg,
+          activatedAtMs: now,
+          scheduleText: "Maintenance dimulai pada jam dan tanggal saat fitur diaktifkan.",
+          estimateText: "Estimasi tidak dapat dipastikan, silakan menunggu sesaat.",
+          updatedBy: OWNER,
+          updatedAtMs: now,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        notify("Maintenance sudah AKTIF. User biasa sekarang diblokir dari dashboard.");
+      } catch (error) {
+        maintenanceState = previous; writeLocalMirror(); scheduleRender();
+        console.error("Gagal mengaktifkan maintenance:", error);
+        notify("Gagal mengaktifkan maintenance. Cek koneksi atau rules Firebase.");
+      } finally { setButtonsBusy(false); scheduleRender(); }
+    };
+
+    window.deactivateMaintenanceDashboardOwnerOnly = async function() {
+      if (!isOwnerUser()) return notify("Fitur maintenance hanya untuk OWNER.");
+      if (!maintenanceState.active) { scheduleRender(); return notify("Maintenance sudah NONAKTIF. Dashboard berjalan normal."); }
+      const ok = await confirmBox({
+        title: "Nonaktifkan Maintenance?",
+        text: "User biasa akan diizinkan login kembali dan popup maintenance akan ditutup.",
+        okText: "Nonaktifkan",
+        danger: false
+      });
+      if (!ok) return;
+      const previous = { ...maintenanceState };
+      const now = Date.now();
+      maintenanceState = normalizeState({ ...maintenanceState, active: false, activatedAtMs: 0, updatedAtMs: now });
+      writeLocalMirror();
+      setButtonsBusy(true); hideGatePopup(); scheduleRender();
+      try {
+        await setDoc(MAINT_REF, { active: false, activatedAtMs: 0, updatedBy: OWNER, updatedAtMs: now, updatedAt: serverTimestamp() }, { merge: true });
+        notify("Maintenance sudah NONAKTIF. User biasa dapat login kembali.");
+      } catch (error) {
+        maintenanceState = previous; writeLocalMirror(); scheduleRender();
+        console.error("Gagal menonaktifkan maintenance:", error);
+        notify("Gagal menonaktifkan maintenance. Cek koneksi atau rules Firebase.");
+      } finally { setButtonsBusy(false); scheduleRender(); }
+    };
+
+    function patchAdminOpen() {
+      if (patchOpenAdminInstalled) return;
+      if (typeof window.openAdminManagementModal !== "function") return;
+      const original = window.openAdminManagementModal;
+      if (original.__crosscheckMaintenanceV4) { patchOpenAdminInstalled = true; return; }
+      window.openAdminManagementModal = function(...args) {
+        const result = original.apply(this, args);
+        setTimeout(() => { ensureAdminBanner(); ensureMaintenanceCenterPanel(); scheduleRender(); }, 50);
+        setTimeout(() => { ensureAdminBanner(); ensureMaintenanceCenterPanel(); scheduleRender(); }, 260);
+        return result;
+      };
+      window.openAdminManagementModal.__crosscheckMaintenanceV4 = true;
+      patchOpenAdminInstalled = true;
+    }
+    async function enforceGateIfNeeded() {
+      const user = currentUser();
+      if (maintenanceState.active && user && !isOwnerUser(user)) {
+        try { localStorage.removeItem(SESSION_KEY); } catch (error) {}
+        try { window.loggedInUser = ""; window.passivePartner = ""; } catch (error) {}
+        if (typeof window.triggerSignOut === "function") {
+          try { await window.triggerSignOut({ reason: "maintenance", skipSessionBroadcast: true }); } catch (error) {}
+        }
+        showGatePopup(maintenanceState.message, maintenanceState);
+      } else if (!maintenanceState.active) {
+        hideGatePopup();
+      }
+    }
+    function applySnapshotData(data = {}) {
+      maintenanceState = normalizeState(data);
+      snapshotReady = true;
+      writeLocalMirror();
+      scheduleRender();
+      enforceGateIfNeeded();
+    }
+    function boot() {
+      patchAdminOpen();
+      ensureAdminBanner();
+      ensureMaintenanceCenterPanel();
+      scheduleRender();
+      const retry = setInterval(() => {
+        patchAdminOpen();
+        ensureAdminBanner();
+        ensureMaintenanceCenterPanel();
+        scheduleRender();
+      }, 400);
+      setTimeout(() => clearInterval(retry), 9000);
+
+      getDoc(MAINT_REF).then(snap => {
+        applySnapshotData(snap.exists() ? (snap.data() || {}) : { active: false });
+      }).catch(error => {
+        console.warn("Gagal membaca status maintenance awal:", error);
+        scheduleRender();
+      });
+      onSnapshot(MAINT_REF, snap => {
+        applySnapshotData(snap.exists() ? (snap.data() || {}) : { active: false });
+      }, error => {
+        console.warn("Listener maintenance gagal:", error);
+        snapshotReady = false;
+        scheduleRender();
+      });
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) enforceGateIfNeeded(); }, { passive: true });
+      window.addEventListener("storage", event => { if (event.key === LOCAL_STATE_KEY) { maintenanceState = readLocalMirror(); scheduleRender(); enforceGateIfNeeded(); } }, { passive: true });
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
+    else boot();
+  })();
+</script>
 
 </body>
 </html>
