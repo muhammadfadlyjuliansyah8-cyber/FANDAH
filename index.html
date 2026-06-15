@@ -5639,6 +5639,790 @@ PERFORMANCE FIX v2 BY CHATGPT
     }
   </style>
 
+
+<!-- CHATGPT_FINAL_UI_POLISH_REQUEST_66: UI-only polish requested by user -->
+<style id="CHATGPT_FINAL_UI_POLISH_REQUEST_66">
+  /* =========================================================
+     FINAL UI POLISH REQUEST 66
+     Fokus:
+     1. Login layout lebih rapih dan tidak terlalu jauh
+     2. Gambar anime depan tidak terlalu gelap
+     3. Statistik dashboard lebih besar
+     4. Spacing form login lebih lega
+     5. Teks kecil lebih terbaca
+     6. Empty state chat kosong
+     7. Bubble chat lebih besar
+     8. Bubble kanan tidak mepet tepi layar
+     9. Header chat lebih rapih
+     10. Sidebar dan tombol room lebih clean
+     11. Sidebar mobile menjadi drawer
+     12. Glow/blur berat dikurangi di mobile
+     ========================================================= */
+
+  /* ===== 1-5: Login / front dashboard polish ===== */
+  @media (min-width: 901px) {
+    #loginPage.wrap {
+      grid-template-columns: minmax(520px, 1fr) minmax(440px, 565px) !important;
+      column-gap: clamp(26px, 3.2vw, 68px) !important;
+      row-gap: 12px !important;
+      padding: 34px clamp(34px, 4vw, 76px) 36px !important;
+      align-content: center !important;
+    }
+
+    #loginPage .portal-head {
+      margin-left: clamp(8px, 1.2vw, 22px) !important;
+    }
+
+    #loginPage .luffy-login-stats,
+    #loginPage .luffy-update-pill {
+      width: min(100%, 620px) !important;
+      max-width: 620px !important;
+    }
+
+    #loginPage .luffy-login-stats {
+      gap: 12px !important;
+      align-self: end !important;
+      margin-bottom: 2px !important;
+    }
+
+    #loginPage .card {
+      width: min(100%, 520px) !important;
+      max-width: 520px !important;
+      margin-top: 34px !important;
+    }
+  }
+
+  /* Gambar Luffy/anime depan dibuat lebih jelas, overlay gelap dikurangi */
+  #loginPage.wrap::before {
+    opacity: .94 !important;
+    filter: saturate(1.12) contrast(1.08) brightness(.92) !important;
+  }
+
+  #loginPage.wrap::after {
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.03) 40%, rgba(0,0,0,.52) 64%, rgba(0,0,0,.82) 100%),
+      radial-gradient(520px 320px at 86% 42%, rgba(240,30,44,.12), transparent 68%),
+      linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.26)) !important;
+  }
+
+  #loginPage .luffy-stat-card {
+    min-height: 76px !important;
+    padding: 13px 14px !important;
+    border-radius: 16px !important;
+  }
+
+  #loginPage .luffy-stat-label {
+    font-size: 10.5px !important;
+    letter-spacing: .08em !important;
+    line-height: 1.2 !important;
+  }
+
+  #loginPage .luffy-stat-value {
+    font-size: 28px !important;
+    line-height: 1 !important;
+    margin-top: 8px !important;
+  }
+
+  #loginPage .luffy-stat-ico {
+    font-size: 17px !important;
+  }
+
+  #loginPage .luffy-update-pill {
+    font-size: 12.3px !important;
+    padding: 10px 16px !important;
+    border-radius: 999px !important;
+  }
+
+  #loginPage .inner {
+    padding: 38px 36px 30px !important;
+  }
+
+  #loginPage .top {
+    margin-bottom: 10px !important;
+  }
+
+  #loginPage h1 {
+    font-size: clamp(31px, 3.2vw, 36px) !important;
+    letter-spacing: .12em !important;
+    line-height: 1.08 !important;
+  }
+
+  #loginPage .sub {
+    margin-top: 10px !important;
+    font-size: 13.5px !important;
+  }
+
+  #loginPage form.form {
+    gap: 16px !important;
+    margin-top: 18px !important;
+  }
+
+  #loginPage .input-group {
+    display: grid !important;
+    gap: 8px !important;
+  }
+
+  #loginPage .field-label {
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    color: rgba(245,248,255,.82) !important;
+  }
+
+  #loginPage .field {
+    min-height: 54px !important;
+    height: 54px !important;
+    padding: 0 17px !important;
+    border-radius: 15px !important;
+  }
+
+  #loginPage input {
+    font-size: 14.2px !important;
+  }
+
+  #loginPage .login-helper-row {
+    margin-top: 2px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 14px !important;
+  }
+
+  #loginPage .remember-check,
+  #loginPage .forgot-link,
+  #loginPage .meta,
+  #loginPage .info-line,
+  #loginPage .warning-line,
+  #loginPage .login-footnote {
+    font-size: 12.4px !important;
+    line-height: 1.45 !important;
+  }
+
+  #loginPage .remember-check {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    color: rgba(245,248,255,.72) !important;
+  }
+
+  #loginPage .forgot-link {
+    color: rgba(255,205,210,.86) !important;
+    font-weight: 800 !important;
+  }
+
+  #loginPage .btn,
+  #loginPage #loginButton {
+    height: 54px !important;
+    border-radius: 15px !important;
+    margin-top: 6px !important;
+    font-size: 14px !important;
+    letter-spacing: .16em !important;
+  }
+
+  #loginPage .register-link,
+  #loginPage .register-action,
+  #loginPage [onclick*="Register"],
+  #loginPage [onclick*="register"] {
+    min-height: 34px !important;
+    padding: 8px 16px !important;
+    font-size: 12px !important;
+    border-radius: 999px !important;
+  }
+
+  /* ===== 7-9: Chat area, bubble, header ===== */
+  #dashboardPage {
+    grid-template-columns: 340px minmax(0, 1fr) !important;
+  }
+
+  #dashboardPage .chat-main-header {
+    min-height: 74px !important;
+    padding: 15px 30px !important;
+    gap: 15px !important;
+    align-items: center !important;
+  }
+
+  #dashboardPage .chat-main-header > div:not(.emoji-gif-picker) {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 3px !important;
+  }
+
+  #dashboardPage .chat-main-header .partner-avatar-img {
+    width: 46px !important;
+    height: 46px !important;
+    flex: 0 0 46px !important;
+  }
+
+  #topHeaderTitle {
+    font-size: 16.2px !important;
+    line-height: 1.2 !important;
+  }
+
+  #topHeaderStatus {
+    font-size: 12.2px !important;
+    line-height: 1.3 !important;
+    color: rgba(216,235,255,.64) !important;
+  }
+
+  #dashboardPage .message-area {
+    padding: 30px clamp(36px, 4.2vw, 62px) 26px !important;
+    gap: 18px !important;
+  }
+
+  #dashboardPage .msg-row {
+    max-width: 100% !important;
+  }
+
+  #dashboardPage .bubble {
+    max-width: min(68%, 620px) !important;
+    min-width: 126px !important;
+    padding: 13px 18px !important;
+    font-size: 14px !important;
+    line-height: 1.56 !important;
+    border-radius: 20px !important;
+  }
+
+  #dashboardPage .incoming-row .bubble {
+    border-bottom-left-radius: 7px !important;
+  }
+
+  #dashboardPage .outgoing-row .bubble {
+    border-bottom-right-radius: 7px !important;
+  }
+
+  #dashboardPage .bubble-meta {
+    margin-top: 7px !important;
+  }
+
+  #dashboardPage .time-text {
+    font-size: 10.3px !important;
+  }
+
+  #dashboardPage .day-divider {
+    padding: 7px 16px !important;
+    font-size: 11.6px !important;
+    color: rgba(220,243,255,.82) !important;
+    background: rgba(255, 70, 70, .10) !important;
+    border-color: rgba(255, 70, 70, .28) !important;
+  }
+
+  /* ===== 10: Sidebar dan room list ===== */
+  #dashboardPage .sidebar {
+    width: 340px !important;
+    max-width: 340px !important;
+  }
+
+  #dashboardPage .sidebar-header {
+    padding: 18px 16px 16px !important;
+    gap: 13px !important;
+  }
+
+  #dashboardPage .sh-top {
+    min-height: 82px !important;
+    padding: 12px !important;
+    border-radius: 22px !important;
+  }
+
+  #dashboardPage .avatar-wrapper {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  #myProfileName {
+    font-size: 16px !important;
+  }
+
+  #dashboardPage .sh-actions {
+    gap: 8px !important;
+    padding: 9px !important;
+    border-radius: 18px !important;
+  }
+
+  #dashboardPage .action-link-btn {
+    height: 64px !important;
+    min-height: 64px !important;
+    border-radius: 14px !important;
+    gap: 6px !important;
+  }
+
+  #dashboardPage .action-ico {
+    width: 21px !important;
+    height: 21px !important;
+    font-size: 15px !important;
+  }
+
+  #dashboardPage .chat-list-container {
+    padding: 18px 14px 20px !important;
+    gap: 15px !important;
+  }
+
+  #dashboardPage .section-label {
+    padding: 0 2px 2px !important;
+    gap: 10px !important;
+  }
+
+  #dashboardPage .start-chat-btn {
+    min-height: 34px !important;
+    padding: 0 12px !important;
+    border-radius: 12px !important;
+    font-size: 10.5px !important;
+  }
+
+  #dashboardPage #activeChatRoomsBox {
+    gap: 12px !important;
+  }
+
+  #dashboardPage .chat-item-card {
+    grid-template-columns: 52px minmax(0, 1fr) 74px !important;
+    gap: 12px !important;
+    padding: 13px !important;
+    border-radius: 20px !important;
+  }
+
+  #dashboardPage .chat-item-card .partner-avatar-img {
+    width: 52px !important;
+    height: 52px !important;
+  }
+
+  #dashboardPage .chat-item-name {
+    font-size: 14.5px !important;
+    margin-bottom: 7px !important;
+  }
+
+  #dashboardPage .chat-item-subline {
+    gap: 8px !important;
+  }
+
+  #dashboardPage .chat-item-actions {
+    width: 74px !important;
+    gap: 8px !important;
+  }
+
+  #dashboardPage .chat-item-actions .tiny-profile-btn {
+    width: 70px !important;
+    min-height: 32px !important;
+  }
+
+  /* ===== 6: Empty state chat kosong ===== */
+  #messageFlowBox.has-empty-chat {
+    justify-content: center !important;
+  }
+
+  .chat-empty-state {
+    align-self: center !important;
+    margin: auto !important;
+    width: min(420px, 92%) !important;
+    padding: 28px 24px !important;
+    text-align: center !important;
+    border-radius: 26px !important;
+    border: 1px solid rgba(40, 223, 255, .18) !important;
+    background:
+      radial-gradient(220px 120px at 50% 0%, rgba(40,223,255,.13), transparent 68%),
+      linear-gradient(135deg, rgba(8,18,36,.64), rgba(4,8,18,.78)) !important;
+    box-shadow: 0 16px 46px rgba(0,0,0,.24), inset 0 0 0 1px rgba(255,255,255,.025) !important;
+    color: rgba(241,248,255,.92) !important;
+    pointer-events: none !important;
+  }
+
+  .chat-empty-avatar {
+    width: 70px !important;
+    height: 70px !important;
+    margin: 0 auto 14px !important;
+    border-radius: 50% !important;
+    display: grid !important;
+    place-items: center !important;
+    font-size: 30px !important;
+    background: linear-gradient(135deg, rgba(40,223,255,.18), rgba(139,92,255,.16)) !important;
+    border: 1px solid rgba(40,223,255,.28) !important;
+    box-shadow: 0 0 22px rgba(40,223,255,.10) !important;
+  }
+
+  .chat-empty-title {
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    letter-spacing: -.02em !important;
+    margin-bottom: 7px !important;
+  }
+
+  .chat-empty-text {
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+    color: rgba(216,235,255,.62) !important;
+  }
+
+  /* ===== 11-12: Mobile drawer + reduce heavy glow ===== */
+  .mobile-sidebar-toggle,
+  .mobile-sidebar-close {
+    display: none !important;
+  }
+
+  @media (max-width: 900px) {
+    #loginPage.wrap {
+      gap: 12px !important;
+      padding: 18px 12px 16px !important;
+    }
+
+    #loginPage .luffy-login-stats {
+      gap: 8px !important;
+    }
+
+    #loginPage .luffy-stat-card {
+      min-height: 66px !important;
+      padding: 10px 8px !important;
+    }
+
+    #loginPage .luffy-stat-value {
+      font-size: 23px !important;
+    }
+
+    #loginPage .inner {
+      padding: 30px 24px 24px !important;
+    }
+
+    #loginPage h1 {
+      font-size: 29px !important;
+    }
+  }
+
+  @media (max-width: 680px) {
+    html,
+    body {
+      height: 100dvh !important;
+      overflow: hidden !important;
+    }
+
+    #dashboardPage,
+    #dashboardPage.is-mobile-authenticated,
+    #dashboardPage.mobile-chat-active,
+    #dashboardPage[style*="display: grid"],
+    #dashboardPage[style*="display:grid"] {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      grid-template-rows: minmax(0, 1fr) !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      min-height: 100dvh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+      position: fixed !important;
+      inset: 0 !important;
+    }
+
+    #dashboardPage .chat-main-window {
+      grid-column: 1 !important;
+      grid-row: 1 !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      min-height: 0 !important;
+      display: flex !important;
+    }
+
+    #dashboardPage .sidebar {
+      display: flex !important;
+      position: fixed !important;
+      z-index: 320 !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      width: min(86vw, 340px) !important;
+      max-width: min(86vw, 340px) !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      min-height: 100dvh !important;
+      transform: translateX(-104%) !important;
+      transition: transform .18s ease !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      border-right: 1px solid rgba(40,223,255,.20) !important;
+      border-bottom: 0 !important;
+      box-shadow: 18px 0 44px rgba(0,0,0,.36) !important;
+    }
+
+    #dashboardPage.mobile-sidebar-open .sidebar {
+      transform: translateX(0) !important;
+    }
+
+    #dashboardPage .mobile-sidebar-backdrop {
+      display: none !important;
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 310 !important;
+      background: rgba(0,0,0,.56) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    #dashboardPage.mobile-sidebar-open .mobile-sidebar-backdrop {
+      display: block !important;
+    }
+
+    #dashboardPage .mobile-sidebar-toggle {
+      display: inline-grid !important;
+      place-items: center !important;
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px !important;
+      border-radius: 14px !important;
+      border: 1px solid rgba(40,223,255,.28) !important;
+      background: rgba(8,18,36,.84) !important;
+      color: var(--dash-accent, #28DFFF) !important;
+      font-size: 21px !important;
+      line-height: 1 !important;
+      cursor: pointer !important;
+    }
+
+    #dashboardPage .mobile-sidebar-close {
+      display: grid !important;
+      place-items: center !important;
+      position: absolute !important;
+      top: max(10px, env(safe-area-inset-top)) !important;
+      right: 12px !important;
+      width: 38px !important;
+      height: 38px !important;
+      border-radius: 50% !important;
+      border: 1px solid rgba(255,255,255,.16) !important;
+      background: rgba(0,0,0,.32) !important;
+      color: #fff !important;
+      z-index: 5 !important;
+      font-size: 22px !important;
+      cursor: pointer !important;
+    }
+
+    body.mobile-nav-lock {
+      overflow: hidden !important;
+    }
+
+    #dashboardPage .sidebar-header {
+      padding: calc(14px + env(safe-area-inset-top)) 12px 12px !important;
+      gap: 10px !important;
+    }
+
+    #dashboardPage .sh-top {
+      min-height: 70px !important;
+      padding: 10px 52px 10px 11px !important;
+      border-radius: 18px !important;
+    }
+
+    #dashboardPage .avatar-wrapper {
+      width: 44px !important;
+      height: 44px !important;
+    }
+
+    #dashboardPage .sh-actions {
+      gap: 6px !important;
+      padding: 7px !important;
+    }
+
+    #dashboardPage .action-link-btn {
+      height: 50px !important;
+      min-height: 50px !important;
+      font-size: 8.6px !important;
+      border-radius: 12px !important;
+      padding: 5px 2px !important;
+    }
+
+    #dashboardPage .chat-list-container {
+      padding: 11px 10px 14px !important;
+    }
+
+    #dashboardPage .chat-item-card {
+      grid-template-columns: 46px minmax(0, 1fr) 64px !important;
+      gap: 9px !important;
+      padding: 11px !important;
+      border-radius: 16px !important;
+    }
+
+    #dashboardPage .chat-item-card .partner-avatar-img {
+      width: 46px !important;
+      height: 46px !important;
+    }
+
+    #dashboardPage .chat-item-actions,
+    #dashboardPage .chat-item-actions .tiny-profile-btn,
+    #dashboardPage .chat-item-actions .unread-badge-alert {
+      width: 62px !important;
+      min-width: 62px !important;
+    }
+
+    #dashboardPage .chat-main-header {
+      min-height: 62px !important;
+      padding: calc(10px + env(safe-area-inset-top)) 12px 10px !important;
+      gap: 10px !important;
+    }
+
+    #dashboardPage .chat-main-header .partner-avatar-img {
+      width: 36px !important;
+      height: 36px !important;
+      flex-basis: 36px !important;
+    }
+
+    #topHeaderTitle {
+      font-size: 14px !important;
+    }
+
+    #topHeaderStatus {
+      font-size: 11px !important;
+    }
+
+    #dashboardPage .message-area {
+      padding: 14px 14px 12px !important;
+      gap: 12px !important;
+    }
+
+    #dashboardPage .bubble {
+      max-width: 84% !important;
+      min-width: 112px !important;
+      padding: 11px 14px !important;
+      font-size: 13.3px !important;
+      line-height: 1.48 !important;
+      border-radius: 17px !important;
+    }
+
+    #dashboardPage .msg-avatar {
+      display: none !important;
+    }
+
+    #dashboardPage .chat-footer-panel {
+      padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) !important;
+      gap: 8px !important;
+    }
+
+    #dashboardPage .clip-btn,
+    #dashboardPage .emoji-trigger-btn,
+    #dashboardPage .send-action-btn {
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px !important;
+      flex-basis: 40px !important;
+    }
+
+    #dashboardPage .gif-trigger-btn {
+      height: 40px !important;
+      min-height: 40px !important;
+    }
+
+    #typedMessageInput,
+    #dashboardPage .chat-footer-panel input[type="text"] {
+      height: 42px !important;
+      font-size: 16px !important;
+      border-radius: 22px !important;
+    }
+
+    .chat-empty-state {
+      width: min(340px, 92%) !important;
+      padding: 24px 18px !important;
+      border-radius: 22px !important;
+      box-shadow: 0 10px 26px rgba(0,0,0,.22) !important;
+    }
+
+    .chat-empty-avatar {
+      width: 58px !important;
+      height: 58px !important;
+      font-size: 25px !important;
+    }
+
+    .chat-empty-title {
+      font-size: 15.5px !important;
+    }
+
+    .chat-empty-text {
+      font-size: 12.5px !important;
+    }
+
+    /* Kurangi glow/blur berat di mobile agar dashboard lebih ringan */
+    body.dashboard-active .fx,
+    body.dashboard-active .grid,
+    body.dashboard-active .noise,
+    body.dashboard-active .gold-love-points,
+    body.dashboard-active .login-love-particle,
+    body.dashboard-active .prelogin-love-particle,
+    body.dashboard-active .chat-love-bg-particle,
+    body.dashboard-active .love-point,
+    body.dashboard-active .floating-heart,
+    body.dashboard-active .floating-star,
+    body.dashboard-active .heart-fx,
+    body.dashboard-active .love-fx,
+    body.dashboard-active .star-fx,
+    body.dashboard-active .pirate-fx,
+    #dashboardPage::after,
+    #dashboardPage .chat-main-window::after,
+    #dashboardPage .sidebar::before,
+    #dashboardPage .sidebar::after,
+    #dashboardPage .chat-item-card::before,
+    #dashboardPage .action-link-btn::before,
+    #dashboardPage .action-link-btn::after {
+      display: none !important;
+      animation: none !important;
+      transition: none !important;
+    }
+
+    #dashboardPage .sidebar,
+    #dashboardPage .chat-main-header,
+    #dashboardPage .chat-footer-panel,
+    #dashboardPage .modal-box,
+    #dashboardPage .bubble,
+    #dashboardPage .chat-item-card,
+    #dashboardPage #imagePreviewBar,
+    #dashboardPage .desktop-notification-card {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      filter: none !important;
+      text-shadow: none !important;
+    }
+
+    #dashboardPage .bubble,
+    #dashboardPage .chat-item-card {
+      box-shadow: 0 5px 14px rgba(0,0,0,.20) !important;
+    }
+
+    #dashboardPage .chat-main-header,
+    #dashboardPage .chat-footer-panel {
+      box-shadow: 0 6px 16px rgba(0,0,0,.20) !important;
+    }
+
+    #loginPage.wrap::before {
+      background-size: min(92vw, 760px) auto !important;
+      background-position: center bottom 0 !important;
+      opacity: .56 !important;
+      filter: saturate(1.05) contrast(1.02) brightness(.86) !important;
+    }
+
+    #loginPage.wrap::after {
+      background: linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.82)) !important;
+    }
+
+    #loginPage .luffy-login-stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      width: min(100%, 430px) !important;
+      gap: 8px !important;
+    }
+
+    #loginPage .luffy-stat-card {
+      min-height: 62px !important;
+    }
+  }
+
+  @media (max-width: 420px) {
+    #dashboardPage .bubble {
+      max-width: 88% !important;
+      font-size: 13px !important;
+    }
+
+    #dashboardPage .message-area {
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+    }
+
+    #loginPage .luffy-login-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #loginPage .inner {
+      padding: 26px 20px 22px !important;
+    }
+  }
+</style>
+<!-- END CHATGPT_FINAL_UI_POLISH_REQUEST_66 -->
+
 </head>
 
 <body>
@@ -20108,6 +20892,170 @@ PERFORMANCE FIX v2 BY CHATGPT
     else boot();
   })();
 </script>
+
+
+<!-- CHATGPT_FINAL_UI_POLISH_REQUEST_66_JS: UI helper for empty chat state and mobile drawer -->
+<script id="CHATGPT_FINAL_UI_POLISH_REQUEST_66_JS">
+(function(){
+  "use strict";
+  if (window.__CHATGPT_UI_POLISH_REQUEST_66__) return;
+  window.__CHATGPT_UI_POLISH_REQUEST_66__ = true;
+
+  function getDashboardPage() {
+    return document.getElementById("dashboardPage");
+  }
+
+  function getMessageBox() {
+    return document.getElementById("messageFlowBox");
+  }
+
+  function isMobileDrawerView() {
+    try {
+      return window.matchMedia("(max-width: 680px)").matches;
+    } catch (error) {
+      return window.innerWidth <= 680;
+    }
+  }
+
+  function isDashboardVisible() {
+    var dash = getDashboardPage();
+    if (!dash) return false;
+    return getComputedStyle(dash).display !== "none";
+  }
+
+  function openMobileSidebar() {
+    var dash = getDashboardPage();
+    if (!dash) return;
+    dash.classList.add("mobile-sidebar-open");
+    document.body.classList.add("mobile-nav-lock");
+  }
+
+  function closeMobileSidebar() {
+    var dash = getDashboardPage();
+    if (!dash) return;
+    dash.classList.remove("mobile-sidebar-open");
+    document.body.classList.remove("mobile-nav-lock");
+  }
+
+  function toggleMobileSidebar() {
+    var dash = getDashboardPage();
+    if (!dash) return;
+    if (dash.classList.contains("mobile-sidebar-open")) closeMobileSidebar();
+    else openMobileSidebar();
+  }
+
+  window.openMobileSidebar = openMobileSidebar;
+  window.closeMobileSidebar = closeMobileSidebar;
+  window.toggleMobileSidebar = toggleMobileSidebar;
+
+  function getActiveChatName() {
+    var titleNode = document.getElementById("topHeaderTitle");
+    var title = titleNode ? String(titleNode.textContent || "").trim() : "";
+    if (!title || /pilih\s+teman|start\s+chat|mengobrol/i.test(title)) return "";
+    return title;
+  }
+
+  function syncEmptyChatState() {
+    var box = getMessageBox();
+    if (!box || !isDashboardVisible()) return;
+
+    var hasRealMessage = !!box.querySelector(".msg-row, .message-row, [data-message-id]");
+    var emptyNode = box.querySelector(":scope > .chat-empty-state");
+
+    if (hasRealMessage) {
+      box.classList.remove("has-empty-chat");
+      if (emptyNode) emptyNode.remove();
+      return;
+    }
+
+    var chatName = getActiveChatName();
+    var titleText = chatName ? ("Mulai percakapan dengan " + chatName) : "Pilih room untuk mulai chat";
+    var bodyText = chatName
+      ? "Belum ada pesan di room ini. Kirim pesan pertama kamu dari kolom bawah."
+      : "Klik tombol menu di kiri atas, pilih Personal Room, lalu mulai percakapan.";
+
+    if (!emptyNode) {
+      emptyNode = document.createElement("div");
+      emptyNode.className = "chat-empty-state";
+      emptyNode.setAttribute("aria-live", "polite");
+      box.appendChild(emptyNode);
+    }
+
+    var stateKey = titleText + "|" + bodyText;
+    if (emptyNode.getAttribute("data-state-key") !== stateKey) {
+      emptyNode.setAttribute("data-state-key", stateKey);
+      emptyNode.innerHTML =
+        '<div class="chat-empty-avatar" aria-hidden="true">💬</div>' +
+        '<div class="chat-empty-title"></div>' +
+        '<div class="chat-empty-text"></div>';
+      emptyNode.querySelector(".chat-empty-title").textContent = titleText;
+      emptyNode.querySelector(".chat-empty-text").textContent = bodyText;
+    }
+
+    box.classList.add("has-empty-chat");
+  }
+
+  var emptyTimer = 0;
+  function scheduleEmptySync() {
+    clearTimeout(emptyTimer);
+    emptyTimer = setTimeout(syncEmptyChatState, 60);
+  }
+
+  function bootUiPolish() {
+    var box = getMessageBox();
+    if (box && !box.__chatgptEmptyObserver66) {
+      var observer = new MutationObserver(scheduleEmptySync);
+      observer.observe(box, { childList: true });
+      box.__chatgptEmptyObserver66 = observer;
+    }
+
+    var title = document.getElementById("topHeaderTitle");
+    if (title && !title.__chatgptEmptyTitleObserver66) {
+      var titleObserver = new MutationObserver(scheduleEmptySync);
+      titleObserver.observe(title, { childList: true, characterData: true, subtree: true });
+      title.__chatgptEmptyTitleObserver66 = titleObserver;
+    }
+
+    scheduleEmptySync();
+  }
+
+  document.addEventListener("click", function(event) {
+    if (!isMobileDrawerView()) return;
+
+    if (event.target && event.target.closest && event.target.closest(".chat-item-card")) {
+      setTimeout(closeMobileSidebar, 120);
+    }
+  }, true);
+
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") closeMobileSidebar();
+  }, { passive: true });
+
+  window.addEventListener("resize", function() {
+    if (!isMobileDrawerView()) closeMobileSidebar();
+    scheduleEmptySync();
+  }, { passive: true });
+
+  window.addEventListener("orientationchange", function() {
+    setTimeout(function() {
+      closeMobileSidebar();
+      scheduleEmptySync();
+    }, 250);
+  }, { passive: true });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootUiPolish, { once: true });
+  } else {
+    bootUiPolish();
+  }
+
+  window.addEventListener("load", function() {
+    bootUiPolish();
+    scheduleEmptySync();
+  }, { once: true });
+})();
+</script>
+<!-- END CHATGPT_FINAL_UI_POLISH_REQUEST_66_JS -->
 
 </body>
 </html>
