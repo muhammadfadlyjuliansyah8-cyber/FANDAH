@@ -1,14 +1,15 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
  
 
   <html lang="id">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
     <title>Premium Dashboard — Cyber Luxury v4.5</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -6652,7 +6653,7 @@
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
                   <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
                 </svg>
-                <input id="inputUser" name="username" placeholder="Username" required="">
+                <input id="inputUser" name="username" placeholder="Username" required="" type="text" aria-label="Username" autocomplete="username" autocapitalize="none" spellcheck="false">
               </div>
             </div>
 
@@ -6663,13 +6664,13 @@
                   <path d="M17 11H7a4 4 0 0 0-4 4v3a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-3a4 4 0 0 0-4-4Z" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
                   <path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="rgba(231,236,245,.75)" stroke-width="1.6" stroke-linecap="round"></path>
                 </svg>
-                <input type="password" id="inputPass" name="password" placeholder="Password" required="">
+                <input type="password" id="inputPass" name="password" placeholder="Password" required="" aria-label="Password" autocomplete="current-password">
               </div>
             </div>
 
             <div class="login-helper-row">
-              <label class="remember-check"><input type="checkbox" id="rememberLoginCheck"> <span>Remember me</span></label>
-              <a href="javascript:void(0)" class="forgot-link" id="forgotPasswordLink" onclick="openForgotPasswordPopup(event)">Forgot Password?</a>
+              <label class="remember-check"><input type="checkbox" id="rememberLoginCheck" aria-label="Ingat login saya"> <span>Remember me</span></label>
+              <a href="#" role="button" class="forgot-link" id="forgotPasswordLink" onclick="openForgotPasswordPopup(event); return false;">Forgot Password?</a>
             </div>
 
             <button class="btn" id="loginButton" type="submit">Login</button>
@@ -6692,8 +6693,8 @@
           <div class="sh-top">
             <div class="user-profile">
               <label class="avatar-wrapper" title="Ubah Foto Profil">
-                <img src="" id="myAvatarImg">
-                <input type="file" id="uploadAvatarInput" accept="image/*" onchange="uploadAvatarFirebase(event)">
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" id="myAvatarImg" alt="Foto profil saya" decoding="async">
+                <input type="file" id="uploadAvatarInput" accept="image/*" onchange="uploadAvatarFirebase(event)" aria-label="Unggah foto profil">
               </label>
               <div>
                 <span id="myProfileName" style="display:block; font-weight:600; font-size:14px;">User</span>
@@ -6702,19 +6703,19 @@
             </div>
           </div>
           <div class="sh-actions">
-            <button class="action-link-btn" id="changePasswordActionBtn" onclick="openChangePasswordModal()">
+            <button type="button" class="action-link-btn" id="changePasswordActionBtn" onclick="openChangePasswordModal()">
               <span class="action-ico">✎</span><span class="action-text">Sandi</span>
             </button>
-            <button class="action-link-btn" id="themeActionBtn" onclick="openThemeSettingsModal()" title="Pilih Tema Dashboard">
+            <button type="button" class="action-link-btn" id="themeActionBtn" onclick="openThemeSettingsModal()" title="Pilih Tema Dashboard">
               <span class="action-ico">◈</span><span class="action-text">Tema</span>
             </button>
-            <button class="action-link-btn" id="profileActionBtn" onclick="openMyProfileModal()">
+            <button type="button" class="action-link-btn" id="profileActionBtn" onclick="openMyProfileModal()">
               <span class="action-ico">●</span><span class="action-text">Profil</span>
             </button>
-            <button class="action-link-btn" id="adminPanelTrigger" style="display:none;" onclick="openAdminManagementModal()">
+            <button type="button" class="action-link-btn" id="adminPanelTrigger" style="display:none;" onclick="openAdminManagementModal()">
               <span class="action-ico">♛</span><span class="action-text">Admin</span>
             </button>
-            <button class="action-link-btn logout-btn" onclick="triggerSignOut()">
+            <button type="button" class="action-link-btn logout-btn" onclick="triggerSignOut()">
               <span class="action-ico">↪</span><span class="action-text">Keluar</span>
             </button>
           </div>
@@ -6723,7 +6724,7 @@
         <div class="chat-list-container">
           <div class="section-label">
             <span>Personal Room</span>
-            <button class="start-chat-btn" onclick="openStartChatModal()">➕ Start Chat</button>
+            <button type="button" class="start-chat-btn" onclick="openStartChatModal()">➕ Start Chat</button>
           </div>
           <div id="activeChatRoomsBox"></div>
         </div>
@@ -6732,7 +6733,7 @@
       <div class="chat-main-window">
         <div class="chat-main-header">
           <button type="button" class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" aria-label="Buka menu">☰</button>
-          <img src="" class="partner-avatar-img profile-openable" id="partnerHeaderAvatar" title="Lihat profil" onclick="openActivePartnerProfile()">
+          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" class="partner-avatar-img profile-openable" id="partnerHeaderAvatar" title="Lihat profil" onclick="openActivePartnerProfile()" alt="Foto profil teman chat" decoding="async">
           <div>
             <div id="topHeaderTitle" style="font-weight: 700; font-size: 15px;">Pilih Teman Mengobrol...</div>
             <div id="topHeaderStatus" style="font-size: 11px; color:rgba(255,255,255,0.3);">Klik Start Chat untuk memilih pengguna</div>
@@ -6755,7 +6756,7 @@
         </div>
 
         <div id="imagePreviewBar">
-          <img src="" id="targetImgSrc" alt="Preview" title="Klik untuk lihat gambar full sebelum dikirim" onclick="previewAttachedImageFull()">
+          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" id="targetImgSrc" alt="Preview" title="Klik untuk lihat gambar full sebelum dikirim" onclick="previewAttachedImageFull()" decoding="async">
           <div class="preview-info">
             <span class="preview-title" id="imagePreviewCaption">Berkas gambar siap</span>
             <span class="preview-hint">Klik thumbnail / tombol Lihat Full sebelum dikirim.</span>
@@ -6805,13 +6806,13 @@
             <div class="picker-panel" id="gifPickerPanel">
               <div class="gif-help-text">Kirim GIF dengan cara pilih GIF cepat di bawah, atau tempel direct link GIF dari Giphy / Tenor / image link lainnya.</div>
               <div class="gif-url-row">
-                <input type="text" id="gifUrlInput" placeholder="Tempel link GIF di sini...">
+                <input type="text" id="gifUrlInput" placeholder="Tempel link GIF di sini..." aria-label="Tempel link GIF di sini..." autocomplete="off">
                 <button type="button" class="gif-attach-btn" onclick="attachGifFromUrl()">Pakai GIF</button>
               </div>
               <div class="gif-presets-grid">
-                <button type="button" class="gif-preset-btn" onclick="usePresetGif('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmdmYjdrNTE4bHhzMDQydjNteWI5NTlpN2RnaHJodGJhM2lycW1qYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ICOgUNjpvO0PC/giphy.gif','Happy GIF')"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmdmYjdrNTE4bHhzMDQydjNteWI5NTlpN2RnaHJodGJhM2lycW1qYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ICOgUNjpvO0PC/giphy.gif" alt="Happy GIF"><span>Happy</span></button>
-                <button type="button" class="gif-preset-btn" onclick="usePresetGif('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGxmcXI0MmNyeXU4dDgwYnpobHJzbnAyajM4eGFwa3JmNXl2OXBmYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0HlvtIPzPdt2usKs/giphy.gif','Love GIF')"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGxmcXI0MmNyeXU4dDgwYnpobHJzbnAyajM4eGFwa3JmNXl2OXBmYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0HlvtIPzPdt2usKs/giphy.gif" alt="Love GIF"><span>Love</span></button>
-                <button type="button" class="gif-preset-btn" onclick="usePresetGif('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjQxejE3dWJyOXBwdGd3Nzc0YWQ4eGRjeTY1OHM4cm1yc3VpM2xvZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o7TKMt1VVNkHV2PaE/giphy.gif','Thanks GIF')"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjQxejE3dWJyOXBwdGd3Nzc0YWQ4eGRjeTY1OHM4cm1yc3VpM2xvZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o7TKMt1VVNkHV2PaE/giphy.gif" alt="Thanks GIF"><span>Thanks</span></button>
+                <button type="button" class="gif-preset-btn" onclick="usePresetGif('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmdmYjdrNTE4bHhzMDQydjNteWI5NTlpN2RnaHJodGJhM2lycW1qYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ICOgUNjpvO0PC/giphy.gif','Happy GIF')"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmdmYjdrNTE4bHhzMDQydjNteWI5NTlpN2RnaHJodGJhM2lycW1qYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ICOgUNjpvO0PC/giphy.gif" alt="Happy GIF" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span>Happy</span></button>
+                <button type="button" class="gif-preset-btn" onclick="usePresetGif('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGxmcXI0MmNyeXU4dDgwYnpobHJzbnAyajM4eGFwa3JmNXl2OXBmYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0HlvtIPzPdt2usKs/giphy.gif','Love GIF')"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGxmcXI0MmNyeXU4dDgwYnpobHJzbnAyajM4eGFwa3JmNXl2OXBmYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0HlvtIPzPdt2usKs/giphy.gif" alt="Love GIF" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span>Love</span></button>
+                <button type="button" class="gif-preset-btn" onclick="usePresetGif('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjQxejE3dWJyOXBwdGd3Nzc0YWQ4eGRjeTY1OHM4cm1yc3VpM2xvZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o7TKMt1VVNkHV2PaE/giphy.gif','Thanks GIF')"><img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjQxejE3dWJyOXBwdGd3Nzc0YWQ4eGRjeTY1OHM4cm1yc3VpM2xvZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o7TKMt1VVNkHV2PaE/giphy.gif" alt="Thanks GIF" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span>Thanks</span></button>
               </div>
             </div>
           </div>
@@ -6834,7 +6835,7 @@
 
           <button type="button" class="gif-trigger-btn" id="gifTriggerButton" title="GIF" onclick="toggleEmojiGifPicker('gif')">GIF</button>
 
-          <input type="text" id="typedMessageInput" placeholder="Ketik pesan disini..." oninput="handleTypingState()">
+          <input type="text" id="typedMessageInput" placeholder="Ketik pesan disini..." oninput="handleTypingState()" aria-label="Ketik pesan disini..." autocomplete="off" enterkeyhint="send">
 
           <button type="button" class="send-action-btn" id="sendOrSaveActionButton" onclick="commitMessageToFirebase()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -6847,7 +6848,7 @@
 
     <div class="image-lightbox-overlay" id="chatImageLightbox" onclick="closeChatImageLightbox(event)">
       <button class="image-lightbox-close" type="button" onclick="closeChatImageLightbox(event)" aria-label="Tutup gambar">×</button>
-      <img src="" id="chatImageLightboxImg" alt="Gambar full" onclick="event.stopPropagation()">
+      <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" id="chatImageLightboxImg" alt="Gambar full" onclick="event.stopPropagation()" decoding="async">
     </div>
 
     <div id="desktopNotificationStack" aria-live="polite" aria-label="Notifikasi pesan baru"></div>
@@ -6858,7 +6859,7 @@
         <div style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom:10px;">Pilih pengguna terdaftar untuk membuka obrolan khusus:</div>
         <div class="user-list-startchat" id="startChatUserContainer"></div>
         <div class="modal-foot">
-          <button class="modal-btn secondary" onclick="closeStartChatModal()">Batal</button>
+          <button type="button" class="modal-btn secondary" onclick="closeStartChatModal()">Batal</button>
         </div>
       </div>
     </div>
@@ -6869,7 +6870,7 @@
         <h3>👤 Profil Pengguna</h3>
         <div class="profile-modal-body">
           <div class="profile-hero">
-            <img src="" id="profileModalAvatar" alt="Foto profil" onclick="openChatImageLightbox(this.src)">
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" id="profileModalAvatar" alt="Foto profil" onclick="openChatImageLightbox(this.src)" decoding="async">
             <div>
               <div class="profile-name-role" id="profileModalNameRole">User - Role</div>
               <div id="profileModalRoleBadge"></div>
@@ -6880,12 +6881,12 @@
           <div class="profile-edit-name" id="profileNameEditBox">
             <div class="profile-edit-label">Ubah Nama Profil</div>
             <div class="profile-edit-row">
-              <input type="text" id="profileDisplayNameInput" maxlength="32" placeholder="Masukkan nama profil baru">
+              <input type="text" id="profileDisplayNameInput" maxlength="32" placeholder="Masukkan nama profil baru" aria-label="Masukkan nama profil baru" autocomplete="off">
               <button type="button" class="profile-save-name-btn" onclick="saveMyProfileDisplayName()">Simpan</button>
             </div>
             <div class="profile-edit-hint">Nama ini akan tampil di chat, daftar room, dan profil. Username login tetap tidak berubah.</div>
             <div class="profile-mobile-avatar-action">
-              <input type="file" id="profileMobileAvatarInput" accept="image/*" onchange="uploadAvatarFirebase(event)">
+              <input type="file" id="profileMobileAvatarInput" accept="image/*" onchange="uploadAvatarFirebase(event)" aria-label="Pilih foto profil">
               <button type="button" class="profile-change-photo-btn" onclick="openMobileProfilePhotoPicker()">Ganti Foto Profil</button>
             </div>
           </div>
@@ -6894,7 +6895,7 @@
           <div class="profile-note" id="profileModalNote">Foto profil dan role user bisa dilihat oleh pengguna lain.</div>
         </div>
         <div class="modal-foot">
-          <button class="modal-btn secondary" onclick="closeUserProfileModal()">Tutup</button>
+          <button type="button" class="modal-btn secondary" onclick="closeUserProfileModal()">Tutup</button>
         </div>
       </div>
     </div>
@@ -6903,19 +6904,19 @@
       <div class="modal-box">
         <h3>🖼️ Background HD</h3>
         <div class="modal-fields">
-          <div class="field"><input type="url" id="dashboardBgUrlInput" placeholder="Link gambar HD untuk background depan dashboard"></div>
-          <div class="field"><input type="url" id="chatBgUrlInput" placeholder="Link gambar HD untuk background chat"></div>
+          <div class="field"><input type="url" id="dashboardBgUrlInput" placeholder="Link gambar HD untuk background depan dashboard" aria-label="Link gambar HD untuk background depan dashboard" autocomplete="url"></div>
+          <div class="field"><input type="url" id="chatBgUrlInput" placeholder="Link gambar HD untuk background chat" aria-label="Link gambar HD untuk background chat" autocomplete="url"></div>
           <div class="bg-help-text">
             Bisa pakai direct link gambar HD. Untuk Google Images, gunakan link hasil Google yang memiliki parameter imgurl/mediaurl atau klik gambar lalu Copy image address. Untuk Pinterest sekarang bisa langsung pakai link pin biasa, contoh: https://www.pinterest.com/pin/1130755419053022933/
           </div>
         </div>
         <div class="bg-action-row">
-          <button class="modal-btn secondary" onclick="previewBackgroundSettings()">Preview</button>
-          <button class="modal-btn primary" onclick="saveBackgroundSettings()">Simpan</button>
+          <button type="button" class="modal-btn secondary" onclick="previewBackgroundSettings()">Preview</button>
+          <button type="button" class="modal-btn primary" onclick="saveBackgroundSettings()">Simpan</button>
         </div>
         <div class="modal-foot">
-          <button class="modal-btn secondary" onclick="resetBackgroundSettings()">Reset</button>
-          <button class="modal-btn secondary" onclick="closeBackgroundSettingsModal()">Tutup</button>
+          <button type="button" class="modal-btn secondary" onclick="resetBackgroundSettings()">Reset</button>
+          <button type="button" class="modal-btn secondary" onclick="closeBackgroundSettingsModal()">Tutup</button>
         </div>
       </div>
     </div>
@@ -6959,7 +6960,7 @@
           </button>
         </div>
         <div class="modal-foot">
-          <button class="modal-btn secondary" onclick="closeThemeSettingsModal()">Tutup</button>
+          <button type="button" class="modal-btn secondary" onclick="closeThemeSettingsModal()">Tutup</button>
         </div>
       </div>
     </div>
@@ -6968,11 +6969,11 @@
       <div class="modal-box">
         <h3>Ubah Kata Sandi</h3>
         <div class="modal-fields">
-          <div class="field"><input type="password" id="newPasswordInput" placeholder="Kata Sandi Baru"></div>
+          <div class="field"><input type="password" id="newPasswordInput" placeholder="Kata Sandi Baru" aria-label="Kata Sandi Baru" autocomplete="new-password"></div>
         </div>
         <div class="modal-foot">
-          <button class="modal-btn secondary" onclick="closeChangePasswordModal()">Batal</button>
-          <button class="modal-btn primary" onclick="submitChangePassword()">Simpan</button>
+          <button type="button" class="modal-btn secondary" onclick="closeChangePasswordModal()">Batal</button>
+          <button type="button" class="modal-btn primary" onclick="submitChangePassword()">Simpan</button>
         </div>
       </div>
     </div>
@@ -7024,7 +7025,7 @@
           <div class="owner-tools-desc">
             Tombol ini khusus OWNER. Fungsinya membersihkan cache dashboard, cache browser, data sementara, dan mengirim sinyal reset cache ke user lain yang sedang membuka dashboard. Data akun, role, dan chat di Firebase tidak ikut terhapus.
           </div>
-          <button class="modal-btn danger admin-wide-btn" onclick="clearDashboardCacheOwnerOnly()">Clear Cache Dashboard</button>
+          <button type="button" class="modal-btn danger admin-wide-btn" onclick="clearDashboardCacheOwnerOnly()">Clear Cache Dashboard</button>
           <div class="owner-tools-foot">
             <span class="admin-cache-status" id="ownerCacheStatus">Cache status: siap.</span>
           </div>
@@ -7033,20 +7034,20 @@
         <div class="admin-section-card">
           <div class="admin-section-title">Tambah Pengguna</div>
           <div class="modal-fields">
-            <div class="field"><input type="text" id="adminNewUser" placeholder="Username Baru"></div>
-            <div class="field"><input type="password" id="adminNewPass" placeholder="Kata Sandi Akun"></div>
+            <div class="field"><input type="text" id="adminNewUser" placeholder="Username Baru" aria-label="Username Baru" autocomplete="off" autocapitalize="none" spellcheck="false"></div>
+            <div class="field"><input type="password" id="adminNewPass" placeholder="Kata Sandi Akun" aria-label="Kata Sandi Akun" autocomplete="new-password"></div>
           </div>
-          <button class="modal-btn primary admin-wide-btn" onclick="submitCreateUserByAdmin()">Tambah Pengguna</button>
+          <button type="button" class="modal-btn primary admin-wide-btn" onclick="submitCreateUserByAdmin()">Tambah Pengguna</button>
         </div>
 
         <div class="admin-section-card">
           <div class="admin-section-title">Tambah Role Baru</div>
           <div class="modal-fields">
-            <div class="field"><input type="text" id="adminNewRoleName" placeholder="Nama role baru, contoh: CS, Moderator, Viewer"></div>
+            <div class="field"><input type="text" id="adminNewRoleName" placeholder="Nama role baru, contoh: CS, Moderator, Viewer" aria-label="Nama role baru, contoh: CS, Moderator, Viewer" autocomplete="off"></div>
           </div>
           <div class="access-title">Akses untuk role ini</div>
           <div class="role-access-grid" id="newRoleAccessGrid"></div>
-          <button class="modal-btn primary admin-wide-btn" onclick="submitCreateRoleByAdmin()">Simpan Role</button>
+          <button type="button" class="modal-btn primary admin-wide-btn" onclick="submitCreateRoleByAdmin()">Simpan Role</button>
         </div>
 
         <div class="admin-section-card">
@@ -7060,7 +7061,7 @@
         </div>
 
         <div class="modal-foot">
-          <button class="modal-btn secondary" onclick="closeAdminManagementModal()">Tutup</button>
+          <button type="button" class="modal-btn secondary" onclick="closeAdminManagementModal()">Tutup</button>
         </div>
       </div>
     </div>
@@ -9671,9 +9672,9 @@
           const readReceiptHtml = isMeSender ? buildReadReceiptHtml(item) : '';
           const controlsHtml = `
             <div class="msg-controls">
-              <button class="ctrl-btn reply-btn" title="Balas / Reply Chat" onclick="activateReplyMode('${docId}')">↩</button>
-              ${isMeSender && item.textMessage ? `<button class="ctrl-btn edit-one-btn" title="Edit Pesan" onclick="activateLowerBarEditMode('${docId}')">✎</button>` : ''}
-              ${isMeSender ? `<button class="ctrl-btn delete-one-btn" title="Hapus Pesan" onclick="triggerDeleteFirebase('${docId}')">🗑️</button>` : ''}
+              <button type="button" class="ctrl-btn reply-btn" title="Balas / Reply Chat" onclick="activateReplyMode('${docId}')">↩</button>
+              ${isMeSender && item.textMessage ? `<button type="button" class="ctrl-btn edit-one-btn" title="Edit Pesan" onclick="activateLowerBarEditMode('${docId}')">✎</button>` : ''}
+              ${isMeSender ? `<button type="button" class="ctrl-btn delete-one-btn" title="Hapus Pesan" onclick="triggerDeleteFirebase('${docId}')">🗑️</button>` : ''}
             </div>
           `;
 
@@ -13699,8 +13700,8 @@
             <div class="safe-admin-title">Security & Aktivitas</div>
             <div class="safe-admin-desc">Reset Password juga membuka blokir login user. Logout User = paksa keluar + blokir login sampai dibuka lagi.</div>
             <div class="safe-admin-row">
-              <input type="text" id="safeAdminUserInput" placeholder="Username user">
-              <input type="text" id="safeAdminPassInput" placeholder="Password baru">
+              <input type="text" id="safeAdminUserInput" placeholder="Username user" aria-label="Username user" autocomplete="off" autocapitalize="none" spellcheck="false">
+              <input type="text" id="safeAdminPassInput" placeholder="Password baru" aria-label="Password baru" autocomplete="new-password">
               <button type="button" id="safeResetPasswordBtn">Reset Password</button>
             </div>
             <div class="safe-admin-row">
@@ -13725,7 +13726,7 @@
             <div class="safe-admin-title">Owner Only • Blokir / Buka User</div>
             <div class="safe-admin-desc">Khusus OWNER. Blokir user akan memaksa logout dan mencegah user login sampai OWNER membuka blokir.</div>
             <div class="safe-admin-row">
-              <input type="text" id="safeOwnerUserInput" placeholder="Username user">
+              <input type="text" id="safeOwnerUserInput" placeholder="Username user" aria-label="Username user" autocomplete="off" autocapitalize="none" spellcheck="false">
               <button type="button" id="safeOwnerBlockBtn">Blokir User</button>
               <button type="button" id="safeOwnerUnblockBtn">Buka Blokir</button>
             </div>
