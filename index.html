@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Future Savings">
-  <link rel="manifest" href="future-savings.webmanifest">
+  <link rel="manifest" href="future-savings-v5.webmanifest">
   <link rel="icon" href="future-savings-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="future-savings-icon-192.png">
   <title>Future Savings — Pirate Wealth Console</title>
@@ -360,7 +360,49 @@
     .login-short-sub { margin: 10px 0 20px !important; }
     .copy-note-btn { min-width: 120px; }
     /* Dashboard */
-    #dashboardPage { min-height: 100vh; position: relative; z-index: 1; }
+    #dashboardPage { min-height: 100vh; position: relative; z-index: 1; isolation: isolate; overflow: hidden; }
+    #dashboardPage > *:not(.future-bg) { position: relative; z-index: 2; }
+    .future-bg { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; opacity: .72; }
+    #dashboardPage::before, #dashboardPage::after {
+      content: ""; position: fixed; pointer-events: none; z-index: 1; border-radius: 50%;
+      filter: blur(80px); opacity: .18; will-change: transform;
+    }
+    #dashboardPage::before {
+      width: 420px; height: 420px; left: -140px; top: 18%; background: rgba(var(--accent-rgb), .38);
+      animation: futureOrbA 16s ease-in-out infinite alternate;
+    }
+    #dashboardPage::after {
+      width: 360px; height: 360px; right: -100px; top: 42%; background: rgba(var(--purple-rgb), .30);
+      animation: futureOrbB 19s ease-in-out infinite alternate;
+    }
+    @keyframes futureOrbA { from { transform: translate3d(0,-20px,0) scale(.92); } to { transform: translate3d(120px,150px,0) scale(1.15); } }
+    @keyframes futureOrbB { from { transform: translate3d(0,40px,0) scale(1); } to { transform: translate3d(-140px,-100px,0) scale(.86); } }
+    .futuristic-number {
+      display: inline-block;
+      max-width: 100%;
+      font-variant-numeric: tabular-nums;
+      transform: translateZ(0);
+      text-shadow: 0 0 10px rgba(var(--accent-rgb),.20);
+      animation: numberIdleGlow 4.8s ease-in-out infinite;
+    }
+    .number-animate {
+      will-change: transform, opacity, text-shadow;
+      animation: numberPulse .52s cubic-bezier(.2,.8,.2,1), numberDataFlash .72s ease-out;
+    }
+    @keyframes numberPulse {
+      0% { transform: translate3d(0,7px,0) scale(.975); opacity: .42; }
+      58% { transform: translate3d(0,-1px,0) scale(1.012); opacity: 1; }
+      100% { transform: translate3d(0,0,0) scale(1); }
+    }
+    @keyframes numberDataFlash {
+      0% { text-shadow: -5px 0 0 rgba(var(--purple-rgb),.30), 5px 0 0 rgba(var(--accent-rgb),.34); }
+      45% { text-shadow: 0 0 18px rgba(var(--accent-rgb),.55), 0 0 8px rgba(var(--gold-rgb),.26); }
+      100% { text-shadow: 0 0 10px rgba(var(--accent-rgb),.20); }
+    }
+    @keyframes numberIdleGlow {
+      0%,100% { text-shadow: 0 0 8px rgba(var(--accent-rgb),.14); }
+      50% { text-shadow: 0 0 14px rgba(var(--accent-rgb),.28); }
+    }
     .topbar {
       position: sticky;
       top: 0;
@@ -533,7 +575,11 @@
       .hero-actions { grid-template-columns: 1fr; }
       .topbar-actions { gap: 8px; }
     }
-    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+    @media (max-width: 640px) {
+      .futuristic-number { animation-duration: 6.5s; text-shadow: 0 0 7px rgba(var(--accent-rgb),.15); }
+      .number-animate { animation-duration: .42s, .58s; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } .future-bg { display:none !important; } }
 
 
     /* Upgrade dashboard */
@@ -570,10 +616,8 @@
     .filter-bar { align-items: center; }
     .filter-bar .date-filter { min-width: 142px; }
     .filter-reset { min-height: 40px; padding-inline: 13px; font-size: 11px; }
-    .file-input-hidden { display: none; }
     .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .modal-helper { margin: 12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
-    .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
     .summary-card.negative { border-color: rgba(var(--red-rgb),.38); box-shadow: 0 24px 80px rgba(var(--red-rgb),.08); }
     .summary-card.negative .summary-value { color: #ff9bb1; }
     .mobile-meta { display: none; }
@@ -584,7 +628,7 @@
     }
     @media (max-width: 720px) {
       .quick-stats { grid-template-columns: 1fr 1fr; }
-      .modal-grid, .button-grid { grid-template-columns: 1fr; }
+      .modal-grid { grid-template-columns: 1fr; }
       .chart-wrap { height: 250px; }
     }
     .theme-inline-chip { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background: rgba(255,255,255,.04); color:var(--muted); font-size:11px; font-weight:700; }
@@ -679,6 +723,486 @@
       .offline-banner { bottom:10px; border-radius:14px; width:calc(100vw - 24px); text-align:center; }
     }
 
+    @media (max-width: 640px) {
+      .future-bg { opacity: .48; }
+      #dashboardPage::before, #dashboardPage::after { filter: blur(95px); opacity: .12; }
+    }
+
+
+    .danger-zone {
+      margin-top: 24px;
+      padding: 18px;
+      border: 1px solid rgba(var(--red-rgb),.28);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(var(--red-rgb),.08), rgba(var(--red-rgb),.025));
+      box-shadow: inset 0 0 28px rgba(var(--red-rgb),.035);
+    }
+    .danger-zone-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+    .danger-zone-kicker {
+      display:block; color:#ff9bb1; font:800 10px/1.2 Orbitron,sans-serif;
+      letter-spacing:.16em; text-transform:uppercase;
+    }
+    .danger-zone h4 { margin:7px 0 0; font-size:15px; }
+    .danger-zone-icon {
+      width:38px; height:38px; display:grid; place-items:center; border-radius:12px;
+      color:#ffdce4; border:1px solid rgba(var(--red-rgb),.24); background:rgba(var(--red-rgb),.10);
+    }
+    .danger-zone p { margin:13px 0 0; color:var(--muted); font-size:11px; line-height:1.65; }
+    .danger-zone small { display:block; margin-top:12px; color:rgba(255,220,228,.62); font-size:10px; line-height:1.55; }
+    .danger-zone-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px; }
+
+    #loginFxCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: .88;
+      mix-blend-mode: screen;
+    }
+
+    #loginTransition {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(var(--accent-rgb),.18), transparent 28%),
+        radial-gradient(circle at 20% 20%, rgba(var(--purple-rgb),.16), transparent 34%),
+        radial-gradient(circle at 80% 24%, rgba(var(--gold-rgb),.14), transparent 32%),
+        linear-gradient(180deg, rgba(2,7,17,.52), rgba(2,7,17,.92));
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      overflow: hidden;
+      transition: opacity .34s ease, visibility .34s ease;
+    }
+    #loginTransition.show { opacity: 1; visibility: visible; }
+    #loginTransition::before,
+    #loginTransition::after {
+      content: "";
+      position: absolute;
+      inset: 50% auto auto 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    #loginTransition::before {
+      width: min(82vw, 620px);
+      height: min(82vw, 620px);
+      border: 1px solid rgba(var(--accent-rgb),.24);
+      box-shadow: 0 0 70px rgba(var(--accent-rgb),.12), inset 0 0 38px rgba(var(--accent-rgb),.08);
+      animation: hudRotate 12s linear infinite;
+    }
+    #loginTransition::after {
+      width: min(62vw, 420px);
+      height: min(62vw, 420px);
+      border: 1px dashed rgba(var(--gold-rgb),.26);
+      animation: hudRotateReverse 8s linear infinite;
+    }
+    .login-transition-beam {
+      position: absolute;
+      inset: -20% auto auto -25%;
+      width: 48%;
+      height: 160%;
+      background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.05), rgba(var(--accent-rgb),.26), transparent);
+      filter: blur(12px);
+      transform: rotate(16deg);
+      animation: beamSweep 1.2s ease-in-out infinite;
+    }
+    .login-transition-card {
+      position: relative;
+      width: min(100%, 460px);
+      padding: 34px 28px;
+      border-radius: 26px;
+      border: 1px solid rgba(var(--accent-rgb),.18);
+      background: rgba(4, 12, 24, .78);
+      box-shadow: 0 26px 80px rgba(0,0,0,.42), 0 0 40px rgba(var(--accent-rgb),.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      text-align: center;
+      overflow: hidden;
+      animation: transitionCardIn .58s cubic-bezier(.2,.9,.2,1);
+    }
+    .login-transition-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(var(--gold-rgb),.62), rgba(var(--accent-rgb),.62), rgba(var(--purple-rgb),.46));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    .transition-rings {
+      position: relative;
+      width: 98px;
+      height: 98px;
+      margin: 0 auto 18px;
+      display: grid;
+      place-items: center;
+    }
+    .transition-rings i {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(var(--accent-rgb),.26);
+      box-shadow: 0 0 20px rgba(var(--accent-rgb),.10);
+    }
+    .transition-rings i:nth-child(1) { inset: 0; animation: ringSpin 4s linear infinite; }
+    .transition-rings i:nth-child(2) { inset: 14px; border-color: rgba(var(--gold-rgb),.28); animation: ringSpinReverse 3.2s linear infinite; }
+    .transition-rings i:nth-child(3) {
+      inset: 31px;
+      border-color: rgba(var(--purple-rgb),.36);
+      background: radial-gradient(circle, rgba(var(--gold-rgb),.84) 0 10%, rgba(var(--accent-rgb),.72) 22%, transparent 62%);
+      box-shadow: 0 0 24px rgba(var(--accent-rgb),.24);
+      animation: pulse 1.1s ease-in-out infinite;
+    }
+    .transition-kicker {
+      color: var(--gold);
+      font: 800 11px/1.2 Orbitron, sans-serif;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      text-shadow: 0 0 18px rgba(var(--gold-rgb),.20);
+    }
+    .transition-title {
+      margin-top: 14px;
+      font: 800 clamp(22px, 4vw, 30px)/1.2 Orbitron, sans-serif;
+      letter-spacing: .03em;
+      color: #f8fbff;
+      text-shadow: 0 0 18px rgba(var(--accent-rgb),.16);
+    }
+    .transition-sub {
+      margin-top: 10px;
+      color: rgba(234,245,255,.72);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+    .transition-loader {
+      width: min(100%, 250px);
+      height: 8px;
+      margin: 20px auto 0;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.06);
+    }
+    .transition-loader > span {
+      display: block;
+      width: 36%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--gold), var(--purple));
+      box-shadow: 0 0 18px rgba(var(--accent-rgb),.20);
+      animation: transitionProgress 1.05s cubic-bezier(.2,.8,.2,1) infinite;
+    }
+    body.login-transitioning { overflow: hidden; }
+    @keyframes hudRotate { to { transform: translate(-50%, -50%) rotate(360deg); } }
+    @keyframes hudRotateReverse { to { transform: translate(-50%, -50%) rotate(-360deg); } }
+    @keyframes ringSpin { to { transform: rotate(360deg); } }
+    @keyframes ringSpinReverse { to { transform: rotate(-360deg); } }
+    @keyframes beamSweep {
+      0% { transform: translateX(-12%) rotate(16deg); opacity: .38; }
+      50% { transform: translateX(138%) rotate(16deg); opacity: .95; }
+      100% { transform: translateX(220%) rotate(16deg); opacity: .1; }
+    }
+    @keyframes transitionCardIn {
+      0% { transform: translateY(18px) scale(.96); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes transitionProgress {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(420%); }
+    }
+    @media (max-width: 640px) {
+      .login-transition-card { padding: 28px 18px; border-radius: 22px; }
+      .transition-title { font-size: 22px; }
+      .transition-sub { font-size: 12px; }
+      .transition-rings { width: 84px; height: 84px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #loginFxCanvas, #loginTransition { display: none !important; }
+    }
+
+    /* Mobile performance mode: target 60 FPS with lighter compositing. */
+    @media (max-width: 640px) {
+      body { --shadow: 0 12px 34px rgba(0,0,0,.30); }
+      #dashboardPage::before, #dashboardPage::after { display:none !important; animation:none !important; filter:none !important; }
+      .summary-card, .panel, .topbar, .modal-box, .simple-login-card, .login-transition-card {
+        -webkit-backdrop-filter:none !important;
+        backdrop-filter:none !important;
+      }
+      .summary-card, .panel { background:rgba(var(--theme-panel),.94); }
+      .topbar { background:rgba(2,8,19,.96); }
+      .future-bg { opacity:.44; }
+      .danger-zone-actions { grid-template-columns:1fr; }
+      .summary-card, .panel, .quick-stat, .theme-card, tbody tr {
+        contain:layout paint;
+      }
+    }
+
+
+    /* Compact dashboard menu — satu logo, panel menu rapi */
+    .hero-row {
+      align-items: center;
+    }
+    .hero-actions.compact-actions {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+      gap: 12px;
+      min-width: 0;
+    }
+    .compact-actions .sync-state {
+      min-height: 42px;
+      padding: 0 13px;
+      border: 1px solid rgba(var(--accent-rgb),.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,.025);
+      white-space: nowrap;
+    }
+    .quick-menu-wrap {
+      position: relative;
+      flex: 0 0 auto;
+      width: auto !important;
+    }
+    .quick-menu-trigger {
+      width: 48px;
+      height: 48px;
+      min-height: 48px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 15px;
+      color: var(--cyan);
+      background:
+        linear-gradient(145deg, rgba(var(--accent-rgb),.11), rgba(var(--purple-rgb),.08)),
+        rgba(5,14,29,.86);
+      box-shadow: 0 10px 28px rgba(0,0,0,.24), inset 0 0 18px rgba(var(--accent-rgb),.045);
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+    .quick-menu-trigger:hover,
+    .quick-menu-trigger[aria-expanded="true"] {
+      transform: translateY(-1px);
+      border-color: rgba(var(--accent-rgb),.68);
+      background: rgba(var(--accent-rgb),.12);
+      box-shadow: 0 12px 30px rgba(0,0,0,.28), 0 0 20px rgba(var(--accent-rgb),.10);
+    }
+    .quick-menu-trigger:focus-visible,
+    .quick-menu-item:focus-visible,
+    .quick-menu-close:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 3px;
+    }
+    .menu-dot-grid {
+      width: 20px;
+      height: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 4px);
+      grid-template-rows: repeat(3, 4px);
+      gap: 4px;
+      place-content: center;
+    }
+    .menu-dot-grid i {
+      width: 4px;
+      height: 4px;
+      display: block;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 7px rgba(var(--accent-rgb),.58);
+      transition: transform .16s ease, opacity .16s ease;
+    }
+    .quick-menu-trigger[aria-expanded="true"] .menu-dot-grid i:nth-child(1),
+    .quick-menu-trigger[aria-expanded="true"] .menu-dot-grid i:nth-child(9) { transform: scale(.72); opacity: .55; }
+
+    .quick-menu {
+      position: absolute;
+      z-index: 120;
+      top: calc(100% + 12px);
+      right: 0;
+      width: min(360px, calc(100vw - 28px));
+      padding: 12px;
+      border: 1px solid rgba(var(--accent-rgb),.20);
+      border-radius: 20px;
+      background: rgba(4,13,27,.96);
+      box-shadow: 0 24px 70px rgba(0,0,0,.46), 0 0 34px rgba(var(--accent-rgb),.07);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transform-origin: top right;
+      animation: quickMenuIn .18s cubic-bezier(.2,.85,.2,1);
+    }
+    .quick-menu::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      right: 18px;
+      width: 11px;
+      height: 11px;
+      border-top: 1px solid rgba(var(--accent-rgb),.20);
+      border-left: 1px solid rgba(var(--accent-rgb),.20);
+      background: rgba(4,13,27,.96);
+      transform: rotate(45deg);
+    }
+    @keyframes quickMenuIn {
+      from { opacity: 0; transform: translateY(-7px) scale(.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .quick-menu-head {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 5px 5px 12px 7px;
+      border-bottom: 1px solid rgba(var(--accent-rgb),.10);
+    }
+    .quick-menu-head strong {
+      display: block;
+      font-size: 13px;
+      letter-spacing: -.01em;
+    }
+    .quick-menu-head span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .quick-menu-close {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      min-height: 34px;
+      padding: 0;
+      border: 1px solid rgba(var(--accent-rgb),.12);
+      border-radius: 11px;
+      color: var(--muted);
+      background: rgba(255,255,255,.035);
+      font-size: 21px;
+      line-height: 1;
+    }
+    .quick-menu-close:hover { color: var(--text); background: rgba(var(--accent-rgb),.08); }
+    .quick-menu-list {
+      display: grid;
+      gap: 7px;
+      padding-top: 10px;
+    }
+    .quick-menu-item {
+      width: 100%;
+      min-height: 62px;
+      padding: 9px 10px;
+      display: grid;
+      grid-template-columns: 42px minmax(0,1fr) 18px;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      color: var(--text);
+      border: 1px solid transparent;
+      border-radius: 15px;
+      background: transparent;
+      transition: transform .14s ease, border-color .14s ease, background .14s ease;
+    }
+    .quick-menu-item:hover {
+      transform: translateX(2px);
+      border-color: rgba(var(--accent-rgb),.15);
+      background: rgba(var(--accent-rgb),.055);
+    }
+    .quick-menu-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(var(--accent-rgb),.14);
+      border-radius: 13px;
+      color: var(--cyan);
+      background: linear-gradient(145deg, rgba(var(--accent-rgb),.09), rgba(var(--purple-rgb),.055));
+      font: 800 18px/1 Orbitron, sans-serif;
+      box-shadow: inset 0 0 16px rgba(var(--accent-rgb),.035);
+    }
+    .quick-menu-copy {
+      display: block;
+      min-width: 0;
+    }
+    .quick-menu-copy strong {
+      display: block;
+      font-size: 12px;
+      line-height: 1.25;
+    }
+    .quick-menu-copy small {
+      display: block;
+      margin-top: 4px;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.4;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .quick-menu-arrow {
+      color: rgba(222,239,252,.36);
+      font-size: 22px;
+      line-height: 1;
+      text-align: center;
+    }
+    .quick-menu-item.install-btn { display: none; }
+    .quick-menu-item.install-btn.available { display: grid; }
+
+    @media (max-width: 780px) {
+      .hero-row { gap: 18px; }
+      .hero-actions.compact-actions {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .compact-actions .sync-state {
+        width: auto;
+        max-width: calc(100% - 62px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .quick-menu-wrap { margin-left: auto; }
+    }
+    @media (max-width: 560px) {
+      .hero-actions.compact-actions { display: flex; grid-template-columns: none; }
+      .hero-actions.compact-actions button { flex: none; }
+      .compact-actions .sync-state {
+        min-height: 38px;
+        padding-inline: 10px;
+        font-size: 9px;
+      }
+      .quick-menu-trigger {
+        width: 44px;
+        height: 44px;
+        min-height: 44px;
+        border-radius: 14px;
+      }
+      .quick-menu {
+        position: fixed;
+        top: auto;
+        right: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom));
+        left: 12px;
+        width: auto;
+        max-height: min(78vh, 620px);
+        overflow: auto;
+        border-radius: 22px;
+        transform-origin: bottom right;
+        overscroll-behavior: contain;
+      }
+      .quick-menu::before { display: none; }
+      .quick-menu-item { min-height: 60px; }
+      .quick-menu-copy small { white-space: normal; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .quick-menu { animation: none !important; }
+    }
+
   </style>
 </head>
 <body>
@@ -690,7 +1214,20 @@
     </div>
   </div>
 
+
+  <div id="loginTransition" aria-hidden="true">
+    <div class="login-transition-beam" aria-hidden="true"></div>
+    <div class="login-transition-card" role="status" aria-live="polite">
+      <div class="transition-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="transition-kicker">Access Granted</div>
+      <div class="transition-title" id="transitionTitle">Membuka 1 Tabungan Bersama</div>
+      <div class="transition-sub" id="transitionSub">Sinkronisasi akun, saldo, dan dashboard futuristik sedang diproses...</div>
+      <div class="transition-loader" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+
   <main id="loginPage">
+    <canvas id="loginFxCanvas" aria-hidden="true"></canvas>
     <section class="simple-login-card" aria-labelledby="loginTitle">
       <div class="simple-login-logo" aria-hidden="true">☠</div>
       <div class="login-kicker">Pirate Console</div>
@@ -718,12 +1255,13 @@
   </main>
 
   <main id="dashboardPage" class="hidden">
+    <canvas class="future-bg" id="futureBackground" aria-hidden="true"></canvas>
     <header class="topbar">
       <div class="topbar-brand">
         <div class="logo-mark">☠</div>
         <div class="topbar-title">
           <strong>FUTURE SAVINGS</strong>
-          <span>Savings For Family</span>
+          <span>Futuristic Pirate Savings Dashboard</span>
         </div>
       </div>
       <div class="topbar-actions">
@@ -739,15 +1277,59 @@
           <p id="heroDate">Ringkas, fokus, dan siap menabung.</p>
           <div class="hero-badge" id="achievementBadge">Belum ada target aktif</div>
         </div>
-        <div class="hero-actions">
+        <div class="hero-actions compact-actions">
           <span class="sync-state" id="syncState">Realtime tersambung</span>
-          <button class="secondary-btn" id="themeButton" type="button">Tema</button>
-          <button class="secondary-btn" id="budgetButton" type="button">Budget</button>
-          <button class="secondary-btn" id="recurringButton" type="button">Transaksi Rutin</button>
-          <button class="secondary-btn install-btn" id="installAppButton" type="button">Install App</button>
-          <button class="secondary-btn" id="targetButton" type="button">Atur Target</button>
-          <button class="secondary-btn" id="exportButton" type="button">Export & Backup</button>
-          <button class="secondary-btn" id="accountButton" type="button">Pengaturan Akun</button>
+          <div class="quick-menu-wrap">
+            <button class="quick-menu-trigger" id="quickMenuButton" type="button"
+              aria-label="Buka menu dashboard" aria-haspopup="menu" aria-expanded="false" aria-controls="quickMenu">
+              <span class="menu-dot-grid" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </span>
+            </button>
+
+            <div class="quick-menu hidden" id="quickMenu" role="menu" aria-label="Menu dashboard">
+              <div class="quick-menu-head">
+                <div>
+                  <strong>Menu Dashboard</strong>
+                  <span>Pilih fitur yang ingin dibuka</span>
+                </div>
+                <button class="quick-menu-close" id="quickMenuClose" type="button" aria-label="Tutup menu">×</button>
+              </div>
+
+              <div class="quick-menu-list">
+                <button class="quick-menu-item" id="themeButton" type="button" role="menuitem">
+                  <span class="quick-menu-icon" aria-hidden="true">◈</span>
+                  <span class="quick-menu-copy"><strong>Tema</strong><small>Ubah warna dan suasana dashboard</small></span>
+                  <span class="quick-menu-arrow" aria-hidden="true">›</span>
+                </button>
+                <button class="quick-menu-item" id="budgetButton" type="button" role="menuitem">
+                  <span class="quick-menu-icon" aria-hidden="true">◷</span>
+                  <span class="quick-menu-copy"><strong>Budget</strong><small>Atur batas pengeluaran bulanan</small></span>
+                  <span class="quick-menu-arrow" aria-hidden="true">›</span>
+                </button>
+                <button class="quick-menu-item" id="recurringButton" type="button" role="menuitem">
+                  <span class="quick-menu-icon" aria-hidden="true">↻</span>
+                  <span class="quick-menu-copy"><strong>Transaksi Rutin</strong><small>Kelola transaksi otomatis bulanan</small></span>
+                  <span class="quick-menu-arrow" aria-hidden="true">›</span>
+                </button>
+                <button class="quick-menu-item install-btn" id="installAppButton" type="button" role="menuitem">
+                  <span class="quick-menu-icon" aria-hidden="true">↓</span>
+                  <span class="quick-menu-copy"><strong>Install App</strong><small>Pasang dashboard pada perangkat</small></span>
+                  <span class="quick-menu-arrow" aria-hidden="true">›</span>
+                </button>
+                <button class="quick-menu-item" id="targetButton" type="button" role="menuitem">
+                  <span class="quick-menu-icon" aria-hidden="true">◎</span>
+                  <span class="quick-menu-copy"><strong>Target Tabungan</strong><small>Atur dan pantau tujuan tabungan</small></span>
+                  <span class="quick-menu-arrow" aria-hidden="true">›</span>
+                </button>
+                <button class="quick-menu-item" id="accountButton" type="button" role="menuitem">
+                  <span class="quick-menu-icon" aria-hidden="true">⚙</span>
+                  <span class="quick-menu-copy"><strong>Pengaturan Akun</strong><small>Password dan Zona Berbahaya</small></span>
+                  <span class="quick-menu-arrow" aria-hidden="true">›</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -969,6 +1551,22 @@
         <button class="secondary-btn" id="closeAccountModal" type="button">Batal</button>
         <button class="primary-btn" id="savePasswordButton" type="button">Ganti Kata Sandi</button>
       </div>
+
+      <section class="danger-zone" aria-labelledby="dangerZoneTitle">
+        <div class="danger-zone-head">
+          <div>
+            <span class="danger-zone-kicker">Zona Berbahaya</span>
+            <h4 id="dangerZoneTitle">Reset Riwayat Tabungan</h4>
+          </div>
+          <span class="danger-zone-icon" aria-hidden="true">⚠</span>
+        </div>
+        <p>Fitur reset dipindahkan ke sini agar tidak mudah tertekan. Reset akan menghapus permanen seluruh riwayat sesuai jenis transaksi.</p>
+        <div class="danger-zone-actions">
+          <button class="danger-btn" id="resetIncomeButton" type="button">Reset Semua Pemasukan</button>
+          <button class="danger-btn" id="resetExpenseButton" type="button">Reset Semua Pengeluaran</button>
+        </div>
+        <small>Transaksi rutin pada bulan yang sedang berjalan akan ditandai sudah diproses agar tidak muncul kembali setelah reset.</small>
+      </section>
     </div>
   </div>
 
@@ -1005,22 +1603,6 @@
     </div>
   </div>
 
-  <div class="modal-overlay hidden" id="exportModal">
-    <div class="modal-box">
-      <h3>Export & Backup Data</h3>
-      <p class="modal-helper">CSV cocok untuk Excel. Backup JSON menyimpan transaksi dan target agar dapat dipulihkan kembali.</p>
-      <div class="button-grid">
-        <button class="secondary-btn" id="exportFilteredButton" type="button">CSV Hasil Filter</button>
-        <button class="secondary-btn" id="exportAllButton" type="button">CSV Semua Data</button>
-        <button class="secondary-btn" id="backupJsonButton" type="button">Backup JSON</button>
-        <button class="secondary-btn" id="restoreJsonButton" type="button">Pulihkan JSON</button>
-      </div>
-      <input class="file-input-hidden" id="restoreFileInput" type="file" accept="application/json,.json">
-      <div class="modal-actions">
-        <button class="secondary-btn" id="closeExportModal" type="button">Tutup</button>
-      </div>
-    </div>
-  </div>
 
   <div class="modal-overlay hidden" id="confirmModal">
     <div class="modal-box">
@@ -1083,7 +1665,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import {
-      getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
+      getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, writeBatch,
       query, orderBy, onSnapshot, serverTimestamp, enableMultiTabIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -1113,6 +1695,10 @@
     const PAGE_SIZE = 50;
     const COMPLETION_KEY = "future_savings_completed_seen_v1";
 
+    /* Semua akun mengakses satu tabungan bersama.
+       Path Fadly dipakai sebagai pusat agar data lama tetap terbaca tanpa migrasi manual. */
+    const SHARED_SAVINGS_ID = "Fadly";
+
     const state = {
       currentUser: "",
       transactions: [],
@@ -1123,6 +1709,7 @@
       targetDate: "",
       monthlyBudget: 0,
       recurringTemplates: [],
+      recurringProcessing: false,
       unsubscribeTransactions: null,
       unsubscribeAccount: null,
       pendingDeleteId: null,
@@ -1136,7 +1723,15 @@
       visibleLimit: PAGE_SIZE,
       transactionsLoaded: false,
       deferredInstallPrompt: null,
-      lastFocusedElement: null
+      lastFocusedElement: null,
+      backgroundFrame: null,
+      backgroundResizeTimer: null,
+      futureBgResizeHandler: null,
+      loginFxFrame: null,
+      loginFxResizeHandler: null,
+      animatedNumbers: new Map(),
+      numberFrames: new Map(),
+      numberFxTimers: new Map()
     };
 
     const $ = (selector) => document.querySelector(selector);
@@ -1178,7 +1773,6 @@
       return ms ? new Intl.DateTimeFormat("id-ID", { dateStyle:"medium", timeStyle:"short" }).format(new Date(ms)) : "-";
     };
     const makeId = (prefix = "id") => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
-    const transactionFingerprint = (item) => [item.type, item.date, Number(item.amount || 0), String(item.category || "").trim().toLowerCase(), String(item.note || "").trim().toLowerCase()].join("|");
     const depositCategories = ["Gaji","Bonus","Tabungan Bulanan","Pendapatan Tambahan","Penjualan","Investasi","Lainnya"];
     const expenseCategories = ["Rumah Tangga","Anak","Kendaraan","Makanan","Belanja","Kesehatan","Pendidikan","Tagihan","Darurat","Lainnya"];
 
@@ -1197,7 +1791,7 @@
     function setSyncState(online, text = "Realtime tersambung") {
       const node = $("#syncState");
       node.classList.toggle("offline", !online);
-      node.textContent = text;
+      node.textContent = `${text} • 1 Tabungan Bersama`;
     }
 
     function togglePasswordInput(input) {
@@ -1216,7 +1810,7 @@
     function setHeroGreeting() {
       if (!$("#heroGreeting")) return;
       $("#heroGreeting").textContent = getGreeting();
-      $("#heroDate").textContent = `${new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())} • DONT COMPLAIN,JUST ENJOY UR PAIN.`;
+      $("#heroDate").textContent = `${new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())} • Fokus pada progres hari ini.`;
     }
 
     function applyTheme(theme = "ocean") {
@@ -1226,6 +1820,10 @@
       const themeColors={ocean:"#04111f",royal:"#120d28",crimson:"#260d16",emerald:"#07251f"};
       $("#themeColorMeta")?.setAttribute("content",themeColors[theme]||themeColors.ocean);
       $$(".theme-card").forEach((card) => card.classList.toggle("active", card.dataset.theme === theme));
+      requestAnimationFrame(() => {
+        if (!$("#dashboardPage")?.classList.contains("hidden")) startFutureBackground();
+        else if (!$("#loginPage")?.classList.contains("hidden")) startLoginBackground();
+      });
     }
 
     function loadTheme() {
@@ -1306,6 +1904,314 @@
 
     function markActivity() {
       state.lastActivity = Date.now();
+    }
+
+    function animateNumber(selector, target, formatter = rupiah, duration = 760) {
+      const node = typeof selector === "string" ? $(selector) : selector;
+      if (!node) return;
+      node.classList.add("futuristic-number");
+
+      const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      const mobile = window.matchMedia?.("(max-width: 640px)").matches;
+      const end = Number(target) || 0;
+      const previousFrame = state.numberFrames.get(node);
+      if (previousFrame) cancelAnimationFrame(previousFrame);
+      const previousTimer = state.numberFxTimers.get(node);
+      if (previousTimer) clearTimeout(previousTimer);
+
+      if (reduced) {
+        node.textContent = formatter(end);
+        state.animatedNumbers.set(node, end);
+        return;
+      }
+
+      const start = Number(state.animatedNumbers.get(node) ?? 0);
+      if (start === end) {
+        node.textContent = formatter(end);
+        return;
+      }
+
+      state.animatedNumbers.set(node, end);
+      const actualDuration = mobile ? Math.min(duration, 420) : duration;
+      const minFrameGap = 16; // requestAnimationFrame target 60 FPS
+      const started = performance.now();
+      let lastPaint = 0;
+
+      node.classList.remove("number-animate");
+      void node.offsetWidth;
+      node.classList.add("number-animate");
+      const cleanupTimer = setTimeout(() => {
+        node.classList.remove("number-animate");
+        state.numberFxTimers.delete(node);
+      }, actualDuration + 120);
+      state.numberFxTimers.set(node, cleanupTimer);
+
+      const ease = (t) => 1 - Math.pow(1 - t, 3);
+      const step = (now) => {
+        const progress = Math.min(1, (now - started) / actualDuration);
+        if (progress >= 1 || now - lastPaint >= minFrameGap) {
+          node.textContent = formatter(start + (end - start) * ease(progress));
+          lastPaint = now;
+        }
+        if (progress < 1) {
+          const frame = requestAnimationFrame(step);
+          state.numberFrames.set(node, frame);
+        } else {
+          node.textContent = formatter(end);
+          state.numberFrames.delete(node);
+        }
+      };
+      const frame = requestAnimationFrame(step);
+      state.numberFrames.set(node, frame);
+    }
+
+    function animatePercent(selector, target, duration = 650) {
+      const value = Number(target) || 0;
+      animateNumber(selector, value, (v) => `${v > 0 ? "+" : ""}${v.toFixed(1).replace(".0", "")}%`, duration);
+    }
+
+    function stopLoginBackground() {
+      if (state.loginFxFrame) cancelAnimationFrame(state.loginFxFrame);
+      state.loginFxFrame = null;
+      if (state.loginFxResizeHandler) {
+        window.removeEventListener("resize", state.loginFxResizeHandler);
+        state.loginFxResizeHandler = null;
+      }
+      const canvas = $("#loginFxCanvas");
+      const ctx = canvas?.getContext?.("2d");
+      if (canvas && ctx) ctx.clearRect(0, 0, canvas.width || 0, canvas.height || 0);
+    }
+
+    function startLoginBackground() {
+      const canvas = $("#loginFxCanvas");
+      if (!canvas || $("#loginPage").classList.contains("hidden") || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+      stopLoginBackground();
+      const ctx = canvas.getContext("2d", { alpha: true });
+      if (!ctx) return;
+      let width = 0, height = 0, ratio = 1, particles = [];
+      const isMobile = window.matchMedia("(max-width: 640px)").matches;
+      const count = isMobile ? 14 : 40;
+      const style = getComputedStyle(document.body);
+      const accent = style.getPropertyValue("--accent-rgb").trim() || "73,229,255";
+      const purple = style.getPropertyValue("--purple-rgb").trim() || "157,108,255";
+      const gold = style.getPropertyValue("--gold-rgb").trim() || "255,215,102";
+
+      const resize = () => {
+        ratio = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5);
+        width = canvas.offsetWidth || window.innerWidth;
+        height = canvas.offsetHeight || window.innerHeight;
+        canvas.width = Math.floor(width * ratio);
+        canvas.height = Math.floor(height * ratio);
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        particles = Array.from({ length: count }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - .5) * (isMobile ? .14 : .20),
+          vy: (Math.random() - .5) * (isMobile ? .12 : .18),
+          r: Math.random() * 1.9 + .5,
+          phase: Math.random() * Math.PI * 2,
+          alpha: .10 + Math.random() * .18
+        }));
+      };
+
+      const draw = (time = 0) => {
+        if ($("#loginPage").classList.contains("hidden")) return;
+        ctx.clearRect(0, 0, width, height);
+        const beamY = (time * .08) % (height + 220) - 110;
+        const beam = ctx.createLinearGradient(0, beamY - 40, width, beamY + 120);
+        beam.addColorStop(0, 'rgba(' + accent + ',0)');
+        beam.addColorStop(.5, 'rgba(' + accent + ',' + (isMobile ? '.05' : '.08') + ')');
+        beam.addColorStop(1, 'rgba(' + accent + ',0)');
+        ctx.fillStyle = beam;
+        ctx.fillRect(0, beamY - 60, width, 140);
+
+        const ringSize = Math.min(width, height) * (isMobile ? .26 : .32);
+        ctx.save();
+        ctx.translate(width * .5, height * .28);
+        ctx.rotate(time * .00018);
+        ctx.strokeStyle = 'rgba(' + accent + ',' + (isMobile ? '.10' : '.14') + ')';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(0, 0, ringSize, 0, Math.PI * 1.7);
+        ctx.stroke();
+        ctx.rotate(-time * .00034);
+        ctx.strokeStyle = 'rgba(' + gold + ',' + (isMobile ? '.12' : '.16') + ')';
+        ctx.beginPath();
+        ctx.arc(0, 0, ringSize * .74, 0, Math.PI * 1.38);
+        ctx.stroke();
+        ctx.restore();
+
+        particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.phase += .016;
+          if (p.x < -8) p.x = width + 8;
+          if (p.x > width + 8) p.x = -8;
+          if (p.y < -8) p.y = height + 8;
+          if (p.y > height + 8) p.y = -8;
+          ctx.fillStyle = 'rgba(' + (Math.sin(p.phase) > 0 ? accent : purple) + ',' + (p.alpha + (Math.sin(p.phase) + 1) * .04) + ')';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        if (!isMobile) {
+          const maxDistance = 128;
+          ctx.lineWidth = .7;
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const a = particles[i], b = particles[j];
+              const distance = Math.hypot(a.x - b.x, a.y - b.y);
+              if (distance < maxDistance) {
+                ctx.strokeStyle = 'rgba(' + accent + ',' + ((1 - distance / maxDistance) * .05) + ')';
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+              }
+            }
+          }
+        }
+        state.loginFxFrame = requestAnimationFrame(draw);
+      };
+
+      resize();
+      state.loginFxResizeHandler = () => {
+        clearTimeout(state.backgroundResizeTimer);
+        state.backgroundResizeTimer = setTimeout(resize, 120);
+      };
+      window.addEventListener("resize", state.loginFxResizeHandler, { passive: true });
+      state.loginFxFrame = requestAnimationFrame(draw);
+    }
+
+    async function playLoginTransition(username, onSwitch) {
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+        if (typeof onSwitch === "function") await onSwitch();
+        return;
+      }
+      const overlay = $("#loginTransition");
+      if (!overlay) {
+        if (typeof onSwitch === "function") await onSwitch();
+        return;
+      }
+      $("#transitionTitle").textContent = "Membuka 1 Tabungan Bersama";
+      $("#transitionSub").textContent = `Halo ${username}, menyinkronkan saldo, target, dan riwayat transaksi...`;
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.classList.add("login-transitioning");
+      await new Promise((resolve) => setTimeout(resolve, 240));
+      if (typeof onSwitch === "function") await onSwitch();
+      await new Promise((resolve) => setTimeout(resolve, 980));
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden", "true");
+      await new Promise((resolve) => setTimeout(resolve, 260));
+      document.body.classList.remove("login-transitioning");
+    }
+
+    function stopFutureBackground() {
+      if (state.backgroundFrame) cancelAnimationFrame(state.backgroundFrame);
+      state.backgroundFrame = null;
+      if (state.futureBgResizeHandler) {
+        window.removeEventListener("resize", state.futureBgResizeHandler);
+        state.futureBgResizeHandler = null;
+      }
+    }
+
+    function startFutureBackground() {
+      const canvas = $("#futureBackground");
+      if (!canvas || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+      stopFutureBackground();
+      const ctx = canvas.getContext("2d", { alpha: true });
+      if (!ctx) return;
+      let width = 0, height = 0, ratio = 1, particles = [];
+      const isMobile = window.matchMedia("(max-width: 640px)").matches;
+      const count = isMobile ? 16 : 48;
+      const style = getComputedStyle(document.body);
+      const accent = style.getPropertyValue("--accent-rgb").trim() || "73,229,255";
+      const purple = style.getPropertyValue("--purple-rgb").trim() || "157,108,255";
+      const gold = style.getPropertyValue("--gold-rgb").trim() || "255,215,102";
+
+      const resize = () => {
+        ratio = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.55);
+        width = window.innerWidth; height = window.innerHeight;
+        canvas.width = Math.floor(width * ratio); canvas.height = Math.floor(height * ratio);
+        canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        particles = Array.from({ length: count }, () => ({
+          x: Math.random() * width, y: Math.random() * height,
+          vx: (Math.random() - .5) * (isMobile ? .16 : .24),
+          vy: (Math.random() - .5) * (isMobile ? .14 : .20),
+          r: Math.random() * 1.5 + .45, phase: Math.random() * Math.PI * 2
+        }));
+      };
+
+      const drawGrid = (time) => {
+        const grid = isMobile ? 64 : 78;
+        const offsetX = (time * .006) % grid, offsetY = (time * .004) % grid;
+        ctx.strokeStyle = `rgba(${accent},${isMobile ? .035 : .05})`; ctx.lineWidth = 1; ctx.beginPath();
+        for (let x = -grid + offsetX; x < width + grid; x += grid) { ctx.moveTo(x,0); ctx.lineTo(x,height); }
+        for (let y = -grid + offsetY; y < height + grid; y += grid) { ctx.moveTo(0,y); ctx.lineTo(width,y); }
+        ctx.stroke();
+      };
+
+      const draw = (time = 0) => {
+        if ($("#dashboardPage").classList.contains("hidden")) return;
+        ctx.clearRect(0,0,width,height); drawGrid(time);
+
+        const sweepX = ((time * (isMobile ? .08 : .12)) % (width + 220)) - 110;
+        const sweep = ctx.createLinearGradient(sweepX - 90, 0, sweepX + 120, 0);
+        sweep.addColorStop(0, `rgba(${accent},0)`);
+        sweep.addColorStop(.5, `rgba(${accent},${isMobile ? .045 : .075})`);
+        sweep.addColorStop(1, `rgba(${accent},0)`);
+        ctx.fillStyle = sweep;
+        ctx.fillRect(sweepX - 100, 0, 220, height);
+
+        const orbX = width * .76 + Math.sin(time * .00045) * (isMobile ? 26 : 52);
+        const orbY = height * .24 + Math.cos(time * .00038) * (isMobile ? 18 : 34);
+        const orb = ctx.createRadialGradient(orbX, orbY, 0, orbX, orbY, isMobile ? 120 : 170);
+        orb.addColorStop(0, `rgba(${purple},${isMobile ? .10 : .16})`);
+        orb.addColorStop(1, `rgba(${purple},0)`);
+        ctx.fillStyle = orb;
+        ctx.fillRect(orbX - 180, orbY - 180, 360, 360);
+
+        ctx.save();
+        ctx.translate(width * .18, height * .22);
+        ctx.rotate(time * .00016);
+        ctx.strokeStyle = `rgba(${gold},${isMobile ? .08 : .12})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(0, 0, isMobile ? 44 : 66, 0, Math.PI * 1.72);
+        ctx.stroke();
+        ctx.restore();
+
+        particles.forEach((p) => {
+          p.x += p.vx; p.y += p.vy; p.phase += .015;
+          if (p.x < -10) p.x = width + 10; if (p.x > width + 10) p.x = -10;
+          if (p.y < -10) p.y = height + 10; if (p.y > height + 10) p.y = -10;
+          ctx.fillStyle = `rgba(${accent},${.18 + (Math.sin(p.phase)+1)*.12})`;
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+        });
+        if (!isMobile) {
+          const maxDistance = 130;
+          ctx.lineWidth = .7;
+          for (let i=0;i<particles.length;i++) for (let j=i+1;j<particles.length;j++) {
+            const a=particles[i], b=particles[j], dx=a.x-b.x, dy=a.y-b.y, distance=Math.hypot(dx,dy);
+            if (distance < maxDistance) {
+              ctx.strokeStyle = `rgba(${accent},${(1-distance/maxDistance)*.08})`;
+              ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+            }
+          }
+        }
+        state.backgroundFrame = requestAnimationFrame(draw);
+      };
+
+      resize();
+      state.futureBgResizeHandler = () => {
+        clearTimeout(state.backgroundResizeTimer);
+        state.backgroundResizeTimer = setTimeout(resize, 120);
+      };
+      window.addEventListener("resize", state.futureBgResizeHandler, { passive: true });
+      state.backgroundFrame = requestAnimationFrame(draw);
     }
 
     async function validateLogin(username, password) {
@@ -1417,12 +2323,15 @@
       $("#heroUser").textContent = username;
       $("#userAvatar").textContent = username.charAt(0).toUpperCase();
       setHeroGreeting();
+      $("#syncState").title = "Semua akun terhubung ke satu tabungan bersama";
+      stopLoginBackground();
       $("#loginPage").classList.add("hidden");
       $("#dashboardPage").classList.remove("hidden");
       resetForm();
       listenAccount();
       listenTransactions();
       startIdleMonitor();
+      requestAnimationFrame(startFutureBackground);
     }
 
     function leaveDashboard(showMessage = false) {
@@ -1442,21 +2351,24 @@
       state.visibleLimit = PAGE_SIZE;
       state.transactionsLoaded = false;
       stopIdleMonitor();
+      setQuickMenu(false);
+      stopFutureBackground();
       clearSession();
       closeAllModals();
       $("#dashboardPage").classList.add("hidden");
       $("#loginPage").classList.remove("hidden");
+      requestAnimationFrame(startLoginBackground);
       $("#loginPassword").value = "";
       renderAll();
       if (showMessage) toast("Sesi berakhir. Silakan masuk kembali.", "error");
     }
 
     function accountRef() {
-      return doc(db, "tabungan_accounts", state.currentUser);
+      return doc(db, "tabungan_accounts", SHARED_SAVINGS_ID);
     }
 
     function transactionsRef() {
-      return collection(db, "tabungan_accounts", state.currentUser, "transactions");
+      return collection(db, "tabungan_accounts", SHARED_SAVINGS_ID, "transactions");
     }
 
     function syncActiveTarget() {
@@ -1537,10 +2449,10 @@
       const { deposit, expense, balance } = calculateTotals();
       const progress = state.target > 0 ? Math.max(0, Math.min(100, (balance / state.target) * 100)) : 0;
 
-      $("#totalDeposit").textContent = rupiah(deposit);
-      $("#totalExpense").textContent = rupiah(expense);
-      $("#currentBalance").textContent = rupiah(balance);
-      $("#savingTarget").textContent = rupiah(state.target);
+      animateNumber("#totalDeposit", deposit);
+      animateNumber("#totalExpense", expense);
+      animateNumber("#currentBalance", balance);
+      animateNumber("#savingTarget", state.target);
       $("#targetCardName").textContent = state.targetName || (state.target > 0 ? "Target utama" : "Belum ada nama target");
       $("#targetProgress").style.width = `${progress}%`;
       $("#targetProgressText").textContent = state.target > 0
@@ -1580,20 +2492,20 @@
       const difference = current.balance - previous.balance;
       const percentage = previous.balance !== 0 ? (difference / Math.abs(previous.balance)) * 100 : null;
 
-      $("#monthDeposit").textContent = rupiah(current.deposit);
-      $("#monthExpense").textContent = rupiah(current.expense);
-      $("#monthNet").textContent = rupiah(current.balance);
+      animateNumber("#monthDeposit", current.deposit);
+      animateNumber("#monthExpense", current.expense);
+      animateNumber("#monthNet", current.balance);
       $("#monthNet").className = `quick-stat-value ${current.balance < 0 ? "amount-negative" : "amount-positive"}`;
       $("#monthDepositNote").textContent = current.deposit ? `${getRowsByMonth(currentKey).filter((i) => i.type === "deposit").length} transaksi pemasukan` : "Belum ada pemasukan bulan ini";
       $("#monthExpenseNote").textContent = current.expense ? `${getRowsByMonth(currentKey).filter((i) => i.type === "expense").length} transaksi pengeluaran` : "Belum ada pengeluaran bulan ini";
       $("#monthNetNote").textContent = current.balance < 0 ? "Pengeluaran bulan ini lebih besar" : "Pemasukan dikurangi pengeluaran";
 
       if (percentage === null) {
-        $("#monthChange").textContent = difference === 0 ? "0%" : rupiah(difference);
+        if (difference === 0) animatePercent("#monthChange", 0); else animateNumber("#monthChange", difference);
         $("#monthChangeNote").textContent = previous.balance === 0 ? "Bulan lalu belum memiliki saldo bersih" : "Belum ada pembanding";
       } else {
         const sign = percentage > 0 ? "+" : "";
-        $("#monthChange").textContent = `${sign}${percentage.toFixed(1).replace(".0", "")}%`;
+        animatePercent("#monthChange", percentage);
         $("#monthChange").className = `quick-stat-value ${difference < 0 ? "amount-negative" : "amount-positive"}`;
         $("#monthChangeNote").textContent = `${difference >= 0 ? "Naik" : "Turun"} ${rupiah(Math.abs(difference))} dari bulan lalu`;
       }
@@ -1602,7 +2514,7 @@
 
     function renderBudgetSummary(monthExpense = calculateTotals(getRowsByMonth(monthKey(new Date()))).expense) {
       const budget = Number(state.monthlyBudget || 0);
-      $("#monthBudget").textContent = budget ? rupiah(budget) : "Rp0";
+      animateNumber("#monthBudget", budget);
       const percentage = budget > 0 ? (monthExpense / budget) * 100 : 0;
       $("#budgetProgress").style.width = `${Math.min(100, percentage)}%`;
       if (!budget) {
@@ -1701,17 +2613,59 @@
     }
 
     async function processRecurringTransactions() {
-      if (!state.currentUser || !state.recurringTemplates.length) return;
+      if (!state.currentUser || !state.recurringTemplates.length || state.recurringProcessing) return;
+      state.recurringProcessing = true;
       const today = new Date();
       const currentMonth = monthKey(today);
-      const due = state.recurringTemplates.filter((item) => item.active !== false && Number(item.day || 1) <= today.getDate());
-      for (const item of due) {
-        const exists = state.transactions.some((row) => row.recurringId === item.id && row.recurringMonth === currentMonth);
-        if (exists) continue;
-        const date = `${currentMonth}-${String(Math.min(Number(item.day || 1), new Date(today.getFullYear(), today.getMonth()+1, 0).getDate())).padStart(2,"0")}`;
-        try {
-          await addDoc(transactionsRef(), { type:item.type, date, amount:Number(item.amount), category:item.category, note:item.note || "Transaksi rutin otomatis", createdBy:state.currentUser, recurringId:item.id, recurringMonth:currentMonth, createdAt:serverTimestamp(), updatedAt:serverTimestamp() });
-        } catch (error) { console.warn("Gagal membuat transaksi rutin", error); }
+      let templates = state.recurringTemplates.map((item) => ({ ...item }));
+      let templatesChanged = false;
+
+      try {
+        const due = templates.filter((item) =>
+          item.active !== false &&
+          Number(item.day || 1) <= today.getDate() &&
+          item.lastGeneratedMonth !== currentMonth
+        );
+
+        for (const item of due) {
+          const templateIndex = templates.findIndex((row) => row.id === item.id);
+          const exists = state.transactions.some((row) => row.recurringId === item.id && row.recurringMonth === currentMonth);
+
+          if (!exists) {
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+            const date = `${currentMonth}-${String(Math.min(Number(item.day || 1), lastDay)).padStart(2,"0")}`;
+            await addDoc(transactionsRef(), {
+              type:item.type,
+              date,
+              amount:Number(item.amount),
+              category:item.category,
+              note:item.note || "Transaksi rutin otomatis",
+              createdBy:state.currentUser,
+              recurringId:item.id,
+              recurringMonth:currentMonth,
+              createdAt:serverTimestamp(),
+              updatedAt:serverTimestamp()
+            });
+          }
+
+          if (templateIndex >= 0) {
+            templates[templateIndex] = {
+              ...templates[templateIndex],
+              lastGeneratedMonth: currentMonth,
+              lastGeneratedAt: new Date().toISOString()
+            };
+            templatesChanged = true;
+          }
+        }
+
+        if (templatesChanged) {
+          state.recurringTemplates = templates;
+          await setDoc(accountRef(), { recurringTemplates:templates, updatedAt:serverTimestamp() }, { merge:true });
+        }
+      } catch (error) {
+        console.warn("Gagal memproses transaksi rutin", error);
+      } finally {
+        state.recurringProcessing = false;
       }
     }
 
@@ -1940,7 +2894,7 @@
         } else {
           await addDoc(transactionsRef(), { ...payload, createdBy: state.currentUser, createdAt: serverTimestamp() });
           if ($("#makeRecurringInput").checked) {
-            const templates = [...state.recurringTemplates, { id:makeId("routine"), type, amount, category, note, day:Number(date.slice(-2)) || 1, active:true, createdAt:new Date().toISOString() }];
+            const templates = [...state.recurringTemplates, { id:makeId("routine"), type, amount, category, note, day:Number(date.slice(-2)) || 1, active:true, lastGeneratedMonth:date.slice(0,7), lastGeneratedAt:new Date().toISOString(), createdAt:new Date().toISOString() }];
             await setDoc(accountRef(), { recurringTemplates:templates, updatedAt:serverTimestamp() }, { merge:true });
           }
           toast(navigator.onLine ? "Transaksi berhasil ditambahkan." : "Transaksi disimpan offline dan menunggu sinkronisasi.");
@@ -1952,6 +2906,103 @@
       } finally {
         button.disabled = false;
         button.textContent = $("#editTransactionId").value ? "Simpan Perubahan" : "Simpan Transaksi";
+      }
+    }
+
+    async function markRecurringTypeProcessedForCurrentMonth(type) {
+      const currentMonth = monthKey(new Date());
+      let changed = false;
+      const templates = state.recurringTemplates.map((item) => {
+        if (item.type !== type || item.lastGeneratedMonth === currentMonth) return item;
+        changed = true;
+        return {
+          ...item,
+          lastGeneratedMonth: currentMonth,
+          lastResetMonth: currentMonth,
+          lastResetAt: new Date().toISOString()
+        };
+      });
+      if (!changed) return;
+      state.recurringTemplates = templates;
+      await setDoc(accountRef(), { recurringTemplates:templates, updatedAt:serverTimestamp() }, { merge:true });
+    }
+
+    async function resetAllIncome() {
+      const deposits = state.transactions.filter((item) => item.type === "deposit");
+      if (!deposits.length) {
+        toast("Tidak ada riwayat pemasukan untuk direset.");
+        return;
+      }
+
+      const total = deposits.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const approved = await askConfirm(
+        "Reset pemasukan dan riwayatnya?",
+        `${deposits.length} transaksi pemasukan dengan total ${rupiah(total)} akan dihapus permanen dari riwayat tabungan. Data pengeluaran tidak diubah.`,
+        { confirmText: "Hapus Semua Pemasukan", danger: true }
+      );
+      if (!approved) return;
+
+      const button = $("#resetIncomeButton");
+      button.disabled = true;
+      button.textContent = "Mereset...";
+      try {
+        await markRecurringTypeProcessedForCurrentMonth("deposit");
+        const chunkSize = 400;
+        for (let index = 0; index < deposits.length; index += chunkSize) {
+          const batch = writeBatch(db);
+          deposits.slice(index, index + chunkSize).forEach((item) => {
+            batch.delete(doc(transactionsRef(), item.id));
+          });
+          await batch.commit();
+        }
+        closeModal("#accountModal");
+        toast(`${deposits.length} pemasukan dan seluruh riwayatnya berhasil direset. Transaksi rutin bulan ini tidak akan dibuat ulang.`);
+      } catch (error) {
+        console.error(error);
+        toast("Gagal mereset pemasukan dan riwayatnya. Periksa koneksi atau Firestore rules.", "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Reset Pemasukan";
+      }
+    }
+
+
+    async function resetAllExpense() {
+      const expenses = state.transactions.filter((item) => item.type === "expense");
+      if (!expenses.length) {
+        toast("Tidak ada riwayat pengeluaran untuk direset.");
+        return;
+      }
+
+      const total = expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const approved = await askConfirm(
+        "Reset pengeluaran dan riwayatnya?",
+        `${expenses.length} transaksi pengeluaran dengan total ${rupiah(total)} akan dihapus permanen dari riwayat tabungan. Data pemasukan tidak diubah.`,
+        { confirmText: "Hapus Semua Pengeluaran", danger: true }
+      );
+      if (!approved) return;
+
+      const button = $("#resetExpenseButton");
+      button.disabled = true;
+      button.textContent = "Mereset...";
+      try {
+        await markRecurringTypeProcessedForCurrentMonth("expense");
+        const chunkSize = 400;
+        for (let index = 0; index < expenses.length; index += chunkSize) {
+          const batch = writeBatch(db);
+          expenses.slice(index, index + chunkSize).forEach((item) => {
+            batch.delete(doc(transactionsRef(), item.id));
+          });
+          await batch.commit();
+        }
+        closeModal("#accountModal");
+        toast(`${expenses.length} pengeluaran dan seluruh riwayatnya berhasil direset. Transaksi rutin bulan ini tidak akan dibuat ulang.`);
+      } catch (error) {
+        console.error(error);
+        toast("Gagal mereset pengeluaran dan riwayatnya. Periksa koneksi atau Firestore rules.", "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Reset Pengeluaran";
       }
     }
 
@@ -2061,90 +3112,6 @@
       } finally { button.disabled = false; }
     }
 
-    function downloadBlob(blob, filename) {
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 300);
-    }
-
-    function exportCsv(mode = "filtered") {
-      const rows = mode === "all" ? [...state.transactions] : getFilteredTransactions();
-      if (!rows.length) {
-        toast("Tidak ada data untuk diekspor.", "error");
-        return;
-      }
-      const csvRows = [
-        ["Tanggal", "Jenis", "Perihal", "Catatan", "Jumlah", "Dibuat Oleh"],
-        ...rows.map((item) => [
-          item.date || "",
-          item.type === "deposit" ? "Deposito" : "Pengeluaran",
-          item.category || "",
-          item.note || "",
-          Number(item.amount || 0),
-          item.createdBy || state.currentUser
-        ])
-      ];
-      const csv = csvRows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";")).join("\n");
-      downloadBlob(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }),
-        `tabungan-${state.currentUser}-${mode}-${localDate()}.csv`);
-      toast(`CSV ${mode === "all" ? "semua data" : "hasil filter"} berhasil dibuat.`);
-    }
-
-    function backupJson() {
-      const payload = {
-        version: 4,
-        exportedAt: new Date().toISOString(),
-        account: state.currentUser,
-        targets: state.targets,
-        activeTargetId: state.activeTargetId,
-        monthlyBudget: state.monthlyBudget,
-        recurringTemplates: state.recurringTemplates,
-        transactions: state.transactions.map((item) => ({
-          type: item.type,
-          date: item.date,
-          amount: Number(item.amount || 0),
-          category: item.category || "",
-          note: item.note || "",
-          createdBy: item.createdBy || state.currentUser
-        }))
-      };
-      downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }),
-        `backup-tabungan-${state.currentUser}-${localDate()}.json`);
-      toast("Backup JSON berhasil dibuat.");
-    }
-
-    async function restoreJson(file) {
-      if (!file) return;
-      try {
-        const payload = JSON.parse(await file.text());
-        if (!payload || !Array.isArray(payload.transactions)) throw new Error("FORMAT_INVALID");
-        const validRows = payload.transactions.filter((item) => ["deposit","expense"].includes(item.type) && /^\d{4}-\d{2}-\d{2}$/.test(String(item.date || "")) && Number(item.amount || 0) > 0 && String(item.category || "").trim());
-        if (!validRows.length) throw new Error("NO_VALID_ROWS");
-        const existing = new Set(state.transactions.map(transactionFingerprint));
-        const uniqueRows = validRows.filter((item) => !existing.has(transactionFingerprint(item)));
-        const skipped = validRows.length - uniqueRows.length;
-        if (!uniqueRows.length) { toast(`Tidak ada data baru. ${skipped} transaksi terdeteksi duplikat.`, "error"); return; }
-        const approved = await askConfirm("Pulihkan backup?", `${uniqueRows.length} transaksi baru akan ditambahkan dan ${skipped} duplikat akan dilewati.`, { confirmText:"Pulihkan" });
-        if (!approved) return;
-        const button=$("#restoreJsonButton"); button.disabled=true; button.textContent="Memulihkan...";
-        let added=0;
-        for (const item of uniqueRows) {
-          await addDoc(transactionsRef(), { type:item.type,date:item.date,amount:Number(item.amount),category:String(item.category).slice(0,60),note:String(item.note||"").slice(0,220),createdBy:String(item.createdBy||state.currentUser).slice(0,40),restoredAt:serverTimestamp(),createdAt:serverTimestamp(),updatedAt:serverTimestamp() });
-          added += 1;
-          button.textContent=`Memulihkan ${added}/${uniqueRows.length}`;
-        }
-        const targets = Array.isArray(payload.targets) ? payload.targets.filter((item)=>item?.id&&Number(item.amount||0)>0) : (payload.target&&Number(payload.target.amount||0)>0?[{id:makeId("target"),name:String(payload.target.name||"Target utama"),amount:Number(payload.target.amount),date:String(payload.target.date||""),status:"active"}]:state.targets);
-        await setDoc(accountRef(), { targets, activeTargetId:String(payload.activeTargetId||targets.find((item)=>item.status!=="completed")?.id||""), monthlyBudget:Number(payload.monthlyBudget||state.monthlyBudget||0), recurringTemplates:Array.isArray(payload.recurringTemplates)?payload.recurringTemplates:state.recurringTemplates, updatedAt:serverTimestamp() }, { merge:true });
-        closeModal("#exportModal");
-        toast(`${added} transaksi dipulihkan • ${skipped} duplikat dilewati.`);
-      } catch (error) { console.error(error); toast("File backup tidak valid atau gagal dipulihkan.", "error"); }
-      finally { $("#restoreJsonButton").disabled=false; $("#restoreJsonButton").textContent="Pulihkan JSON"; $("#restoreFileInput").value=""; }
-    }
 
     async function saveBudget() {
       const amount=parseMoney($("#monthlyBudgetInput").value);
@@ -2171,7 +3138,7 @@
         <div class="audit-row"><span>Dibuat pada</span><strong>${safeText(timestampText(item.createdAt))}</strong></div>
         <div class="audit-row"><span>Terakhir diedit oleh</span><strong>${safeText(item.updatedBy||item.createdBy||"-")}</strong></div>
         <div class="audit-row"><span>Terakhir diedit</span><strong>${safeText(timestampText(item.updatedAt))}</strong></div>
-        <div class="audit-row"><span>Sumber</span><strong>${item.recurringId?"Transaksi rutin otomatis":item.restoredAt?"Restore backup":"Input manual"}</strong></div>`;
+        <div class="audit-row"><span>Sumber</span><strong>${item.recurringId?"Transaksi rutin otomatis":"Input manual"}</strong></div>`;
       openModal("#auditModal");
     }
 
@@ -2196,6 +3163,20 @@
       $("#sortFilter").value = "newest";
       state.visibleLimit = PAGE_SIZE;
       renderTable();
+    }
+
+    function setQuickMenu(open) {
+      const menu = $("#quickMenu");
+      const button = $("#quickMenuButton");
+      if (!menu || !button) return;
+      const shouldOpen = Boolean(open);
+      menu.classList.toggle("hidden", !shouldOpen);
+      button.setAttribute("aria-expanded", String(shouldOpen));
+      if (shouldOpen) requestAnimationFrame(() => menu.querySelector(".quick-menu-item:not(.hidden)")?.focus());
+    }
+
+    function toggleQuickMenu() {
+      setQuickMenu($("#quickMenuButton")?.getAttribute("aria-expanded") !== "true");
     }
 
     $("#loginForm").addEventListener("submit", async (event) => {
@@ -2234,7 +3215,7 @@
         }
         clearLoginGuard();
         updateLoginLockUi();
-        await enterDashboard(username);
+        await playLoginTransition(username, () => enterDashboard(username));
       } catch (error) {
         console.error(error);
         $("#loginError").textContent = "Login gagal karena database tidak dapat diakses.";
@@ -2262,6 +3243,24 @@
         toast("Gagal menyalin pesan.", "error");
       }
     });
+    $("#quickMenuButton").addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleQuickMenu();
+    });
+    $("#quickMenuClose").addEventListener("click", () => setQuickMenu(false));
+    $("#quickMenu").addEventListener("click", (event) => {
+      if (event.target.closest(".quick-menu-item")) setQuickMenu(false);
+    });
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".quick-menu-wrap")) setQuickMenu(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && $("#quickMenuButton")?.getAttribute("aria-expanded") === "true") {
+        setQuickMenu(false);
+        $("#quickMenuButton")?.focus();
+      }
+    });
+
     $("#themeButton").addEventListener("click", () => openModal("#themeModal"));
     $("#closeThemeModal").addEventListener("click", () => closeModal("#themeModal"));
     $$(".theme-card").forEach((card) => card.addEventListener("click", () => applyTheme(card.dataset.theme)));
@@ -2326,13 +3325,8 @@
     $("#closeAccountModal").addEventListener("click", () => closeModal("#accountModal"));
     $("#savePasswordButton").addEventListener("click", changePassword);
 
-    $("#exportButton").addEventListener("click", () => openModal("#exportModal"));
-    $("#closeExportModal").addEventListener("click", () => closeModal("#exportModal"));
-    $("#exportFilteredButton").addEventListener("click", () => exportCsv("filtered"));
-    $("#exportAllButton").addEventListener("click", () => exportCsv("all"));
-    $("#backupJsonButton").addEventListener("click", backupJson);
-    $("#restoreJsonButton").addEventListener("click", () => $("#restoreFileInput").click());
-    $("#restoreFileInput").addEventListener("change", (event) => restoreJson(event.target.files?.[0]));
+    $("#resetIncomeButton").addEventListener("click", resetAllIncome);
+    $("#resetExpenseButton").addEventListener("click", resetAllExpense);
 
     $("#confirmCancel").addEventListener("click", () => {
       const resolve=state.confirmResolver; state.confirmResolver=null; closeModal("#confirmModal"); resolve?.(false);
@@ -2361,6 +3355,16 @@
       window.addEventListener(eventName, markActivity, { passive: true });
     });
 
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopFutureBackground();
+        stopLoginBackground();
+        return;
+      }
+      if (!$("#dashboardPage").classList.contains("hidden")) startFutureBackground();
+      else if (!$("#loginPage").classList.contains("hidden")) startLoginBackground();
+    });
+
     window.addEventListener("online", () => { setSyncState(true,"Menyinkronkan..."); $("#offlineBanner").classList.add("hidden"); setTimeout(()=>setSyncState(true),900); });
     window.addEventListener("offline", () => { setSyncState(false, "Perangkat offline"); $("#offlineBanner").classList.remove("hidden"); });
     window.addEventListener("beforeinstallprompt", (event) => { event.preventDefault(); state.deferredInstallPrompt=event; $("#installAppButton").classList.add("available"); });
@@ -2379,9 +3383,10 @@
     async function boot() {
       loadTheme();
       await enableMultiTabIndexedDbPersistence(db).catch((error) => console.warn("Offline persistence tidak aktif:", error?.code || error));
-      if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("future-savings-sw.js").catch(console.warn);
+      if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("future-savings-sw-v5.js").catch(console.warn);
       if (!navigator.onLine) $("#offlineBanner").classList.remove("hidden");
       if (window.matchMedia("(max-width: 640px)").matches) $("#filterBar").classList.add("collapsed"); else $("#filterToggleButton").setAttribute("aria-expanded","true");
+      startLoginBackground();
       updateLoginLockUi();
       clearInterval(state.loginLockInterval);
       state.loginLockInterval = setInterval(updateLoginLockUi, 1000);
