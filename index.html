@@ -2452,20 +2452,20 @@ body::after{
   <main id="loginPage">
     <canvas id="loginFxCanvas" aria-hidden="true"></canvas>
     <section class="simple-login-card" aria-labelledby="loginTitle">
-      <div class="simple-login-logo" aria-hidden="true">FS</div>
-      <div class="login-kicker">Personal Wealth Console</div>
+      <div class="simple-login-logo" aria-hidden="true">F & I</div>
+      <div class="login-kicker">Julian Dashboard</div>
       <h1 id="loginTitle">FUTURE SAVINGS</h1>
-      <p class="login-short-sub">Kelola tabungan dengan lebih tenang, aman, dan terarah.</p>
+      <p class="login-short-sub">Don't complain just enjoy your pain.</p>
 
       <form id="loginForm">
         <div class="field-group">
           <label for="loginUser">Username</label>
-          <input class="input" id="loginUser" type="text" placeholder="Masukkan username" autocomplete="username" autocapitalize="none" required>
+          <input class="input" id="loginUser" type="text" placeholder="Username" autocomplete="username" autocapitalize="none" required>
         </div>
         <div class="field-group">
           <label for="loginPassword">Kata sandi</label>
           <div class="password-wrap">
-            <input class="input" id="loginPassword" type="password" placeholder="Masukkan kata sandi" autocomplete="current-password" required>
+            <input class="input" id="loginPassword" type="password" placeholder="Kata sandi" autocomplete="current-password" required>
             <button class="password-toggle" id="toggleLoginPassword" type="button" aria-label="Tampilkan kata sandi" title="Tampilkan kata sandi">👁</button>
           </div>
         </div>
@@ -2475,7 +2475,7 @@ body::after{
         <div class="login-lock-note" id="loginLockNote"></div>
         <div class="login-trust-note" aria-label="Informasi keamanan">
           <span aria-hidden="true">✓</span>
-          <span>Data akun dan transaksi tersinkronisasi melalui Firebase.</span>
+          <span>Please Confirm The Authentication.</span>
         </div>
       </form>
     </section>
@@ -2485,10 +2485,10 @@ body::after{
     <canvas class="future-bg" id="futureBackground" aria-hidden="true"></canvas>
     <header class="topbar">
       <div class="topbar-brand">
-        <div class="logo-mark" aria-label="Future Savings">FS</div>
+        <div class="logo-mark" aria-label="FADLY & INDAH">F & I</div>
         <div class="topbar-title">
-          <strong>FUTURE SAVINGS</strong>
-          <span>Personal Wealth Dashboard</span>
+          <strong>FADLY & INDAH</strong>
+          <span>Family Dashboard Savings</span>
         </div>
       </div>
       <div class="topbar-actions">
@@ -2632,7 +2632,7 @@ body::after{
         <article class="summary-card balance summary-primary">
           <div class="summary-top"><div class="summary-label">Saldo Saat Ini</div><div class="summary-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a3 3 0 0 1-3-3v-10a3 3 0 0 1 3-3h12v4"/><path d="M16 12h4v4h-4a2 2 0 0 1 0-4Z"/></svg></div></div>
           <div class="summary-value" id="currentBalance">Rp0</div>
-          <div class="summary-note" id="balanceNote">Pemasukan dikurangi pengeluaran</div>
+          <div class="summary-note" id="balanceNote">Totality Balance</div>
           <div class="balance-accent-line" aria-hidden="true"></div>
         </article>
         <article class="summary-card income summary-secondary">
@@ -2722,7 +2722,7 @@ body::after{
         </article>
         <article class="panel">
           <div class="panel-head">
-            <div><h3>Detail Target</h3><p>Perkiraan kebutuhan untuk mencapai target.</p></div>
+            <div><h3>Detail Target</h3><p>Perkiraan estimasi agar mencapai target.</p></div>
           </div>
           <div id="targetDetailContent" class="target-empty">Atur target untuk melihat rincian.</div>
         </article>
@@ -2731,7 +2731,7 @@ body::after{
       <section class="content-grid">
         <article class="panel transaction-panel">
           <div class="panel-head">
-            <div><h3 id="formTitle">Tambah Transaksi</h3><p>Data tersimpan ke Firebase secara realtime.</p></div>
+            <div><h3 id="formTitle">Tambah Transaksi</h3><p>Realtime saved on database.</p></div>
             <button class="transaction-panel-close" id="closeTransactionPanel" type="button" aria-label="Tutup formulir transaksi">×</button>
           </div>
           <form class="transaction-form" id="transactionForm">
@@ -2777,13 +2777,13 @@ body::after{
             </div>
             <label class="checkbox-row">
               <input id="makeRecurringInput" type="checkbox">
-              <span>Jadikan transaksi rutin bulanan pada tanggal yang sama</span>
+              <span>Checklist agar menjadi trx rutin tiap bulannya </span>
             </label>
             <div class="form-actions">
               <button class="primary-btn" id="saveTransactionButton" type="submit">Simpan Transaksi</button>
               <button class="secondary-btn hidden" id="cancelEditButton" type="button">Batal</button>
             </div>
-            <div class="form-hint">Gunakan angka tanpa simbol Rp. Titik atau koma akan dibersihkan otomatis.</div>
+            <div class="form-hint">- Ketik hanya angka tanpa tanda baca titik -</div>
           </form>
         </article>
 
@@ -2792,7 +2792,7 @@ body::after{
             <div><h3>Riwayat Tabungan</h3><p id="transactionCount">0 transaksi ditemukan</p></div>
             <button class="secondary-btn filter-toggle" id="filterToggleButton" type="button" aria-expanded="false">Filter & Urutkan</button>
             <div class="filter-bar" id="filterBar">
-              <input class="input search-input" id="searchInput" aria-label="Cari transaksi" placeholder="Cari perihal, catatan, atau pembuat...">
+              <input class="input search-input" id="searchInput" aria-label="Cari transaksi" placeholder="Caru perihal">
               <select class="input" id="typeFilter" aria-label="Filter jenis transaksi">
                 <option value="all">Semua Jenis</option>
                 <option value="deposit">Pemasukan</option>
@@ -3206,14 +3206,14 @@ body::after{
     }
 
     function setLoading(done) {
-      if (done) updateLoadingProgress(100, "Sistem siap", "Dashboard siap digunakan.");
+      if (done) updateLoadingProgress(100, "System Ready", "Dashboard Ready to use.");
       $("#loadingScreen").classList.toggle("done", done);
     }
 
-    function setSyncState(online, text = "Realtime tersambung") {
+    function setSyncState(online, text = "Realtime Connected") {
       const node = $("#syncState");
       node.classList.toggle("offline", !online);
-      node.textContent = `${text} • 1 Tabungan Bersama`;
+      node.textContent = `${text} • Family Savings`;
     }
 
     function togglePasswordInput(input) {
@@ -3545,7 +3545,7 @@ body::after{
         if (typeof onSwitch === "function") await onSwitch();
         return;
       }
-      $("#transitionTitle").textContent = "Membuka 1 Tabungan Bersama";
+      $("#transitionTitle").textContent = "Opening Family Savings";
       $("#transitionSub").textContent = `Halo ${username}, menyinkronkan saldo, target, dan riwayat transaksi...`;
       overlay.classList.add("show");
       overlay.setAttribute("aria-hidden", "false");
@@ -5500,17 +5500,17 @@ body::after{
         setMonthlyCollapsed(false);
       }
       startLoginBackground();
-      updateLoadingProgress(70, "Menyiapkan keamanan sesi", "Memeriksa status login dan proteksi akses...");
+      updateLoadingProgress(70, "Get security sessions", "Checked login status and protection access...");
       updateLoginLockUi();
       clearInterval(state.loginLockInterval);
       state.loginLockInterval = setInterval(updateLoginLockUi, 1000);
       $("#transactionDate").value = localDate();
       const sessionUser = readSession();
       if (sessionUser) {
-        updateLoadingProgress(86, "Memulihkan akun aktif", "Menghubungkan kembali data dashboard...");
+        updateLoadingProgress(86, "Get ready!", "Waiting to connect on Dashboard...");
         await enterDashboard(sessionUser);
       } else {
-        updateLoadingProgress(92, "Sistem siap", "Silakan login untuk melanjutkan.");
+        updateLoadingProgress(92, "System Ready", "Relogin to continue.");
       }
       setTimeout(() => setLoading(true), 550);
     }
