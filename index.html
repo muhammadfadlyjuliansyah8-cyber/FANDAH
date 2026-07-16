@@ -6637,7 +6637,572 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
   }
 }
 
-</style>
+
+/* ==========================================================================
+   V28 — GUIDED LIGHT MOTION
+   Efek cahaya diarahkan ke status, navigasi, perubahan data, dan interaksi.
+   ========================================================================== */
+
+/* 1) Navigasi bawah: indikator aktif + orbit tombol tambah */
+.mobile-bottom-nav button {
+  position: relative;
+  isolation: isolate;
+}
+.mobile-bottom-nav button:not(.nav-add)::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--gold), transparent);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), .45);
+  opacity: 0;
+  transform: scaleX(.18) translateY(3px);
+  transition: opacity .22s ease, transform .26s cubic-bezier(.2,.85,.2,1);
+}
+.mobile-bottom-nav button.active:not(.nav-add)::after {
+  opacity: 1;
+  transform: scaleX(1) translateY(0);
+  animation: mobileNavIndicatorBreath 2.7s ease-in-out infinite;
+}
+.mobile-bottom-nav button.active .ui-icon {
+  filter: drop-shadow(0 0 7px rgba(var(--accent-rgb), .42));
+  animation: mobileNavIconPulse 2.5s ease-in-out infinite;
+}
+.mobile-bottom-nav .nav-add {
+  overflow: visible;
+}
+.mobile-bottom-nav .nav-add::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  border-radius: 21px;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 28%,
+    rgba(var(--accent-rgb), .82) 36%,
+    rgba(var(--gold-rgb), .86) 48%,
+    transparent 58% 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 2px;
+  opacity: .64;
+  animation: mobileAddOrbit 4.8s linear infinite;
+}
+.mobile-bottom-nav .nav-add:active::before {
+  animation-duration: 1.4s;
+  opacity: .95;
+}
+
+@keyframes mobileNavIndicatorBreath {
+  0%,100% { filter: brightness(.86); box-shadow: 0 0 8px rgba(var(--accent-rgb), .28); }
+  50% { filter: brightness(1.2); box-shadow: 0 0 17px rgba(var(--accent-rgb), .58); }
+}
+@keyframes mobileNavIconPulse {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-1px) scale(1.08); }
+}
+@keyframes mobileAddOrbit { to { transform: rotate(360deg); } }
+
+/* 2) Navigasi bagian desktop: kapsul cahaya yang berpindah */
+.dashboard-section-nav {
+  --active-index: 0;
+  position: sticky;
+  isolation: isolate;
+}
+.dashboard-section-nav::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 7px;
+  bottom: 7px;
+  left: 7px;
+  width: calc((100% - 38px) / 4);
+  border: 1px solid rgba(var(--accent-rgb), .24);
+  border-radius: 13px;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(var(--accent-rgb), .13), rgba(var(--purple-rgb), .08)),
+    rgba(255,255,255,.018);
+  box-shadow: inset 0 0 18px rgba(var(--accent-rgb), .045), 0 0 18px rgba(var(--accent-rgb), .08);
+  transform: translateX(calc(var(--active-index) * (100% + 8px)));
+  transition: transform .34s cubic-bezier(.2,.86,.22,1), box-shadow .24s ease;
+}
+.dashboard-section-nav button {
+  position: relative;
+  z-index: 1;
+}
+.dashboard-section-nav button.active {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.dashboard-section-nav button.active .ui-icon {
+  filter: drop-shadow(0 0 7px rgba(var(--accent-rgb), .44));
+  animation: desktopNavIconPulse 2.7s ease-in-out infinite;
+}
+.section-light-enter {
+  animation: sectionLightEnter .58s cubic-bezier(.2,.82,.2,1) both;
+}
+@keyframes desktopNavIconPulse {
+  0%,100% { transform: translateY(0); opacity: .88; }
+  50% { transform: translateY(-1px); opacity: 1; }
+}
+@keyframes sectionLightEnter {
+  from { opacity: .58; transform: translateY(9px); filter: brightness(.9); }
+  to { opacity: 1; transform: translateY(0); filter: brightness(1); }
+}
+
+/* 3) Tooltip dan pergantian range grafik */
+.chart-tooltip:not(.hidden) {
+  animation: chartTooltipIn .18s cubic-bezier(.2,.86,.2,1) both;
+}
+.chart-wrap.chart-refreshing #monthlyChart {
+  animation: chartRefreshSweep .52s cubic-bezier(.2,.82,.2,1) both;
+}
+.chart-wrap.chart-refreshing::before {
+  animation-duration: .85s;
+  opacity: .82;
+}
+.chart-range button {
+  position: relative;
+  overflow: hidden;
+  transition: color .18s ease, background .22s ease, box-shadow .22s ease, transform .18s ease;
+}
+.chart-range button.active {
+  box-shadow: 0 0 15px rgba(var(--accent-rgb), .24);
+  animation: chartRangeActiveBreath 2.8s ease-in-out infinite;
+}
+.chart-range button.active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 18%, rgba(255,255,255,.54) 50%, transparent 82%);
+  transform: translateX(-145%);
+  animation: chartRangeShine 3.4s ease-in-out infinite;
+}
+@keyframes chartTooltipIn {
+  from { opacity: 0; transform: translateY(7px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes chartRefreshSweep {
+  0% { opacity: .55; transform: translateY(4px) scale(.992); filter: blur(.4px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes chartRangeActiveBreath {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+@keyframes chartRangeShine {
+  0%,56% { transform: translateX(-145%); opacity: 0; }
+  72% { opacity: .78; }
+  100% { transform: translateX(145%); opacity: 0; }
+}
+
+/* 4) Transaksi baru: glow sekali, bukan animasi terus-menerus */
+tbody tr.transaction-new {
+  --transaction-flash-rgb: var(--accent-rgb);
+}
+tbody tr.transaction-new.deposit { --transaction-flash-rgb: var(--green-rgb); }
+tbody tr.transaction-new.expense { --transaction-flash-rgb: var(--red-rgb); }
+tbody tr.transaction-new td {
+  position: relative;
+  overflow: hidden;
+  animation: transactionCellGlow 1.45s ease-out both;
+}
+tbody tr.transaction-new td::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0 24%,
+    rgba(var(--transaction-flash-rgb), .08) 38%,
+    rgba(var(--transaction-flash-rgb), .34) 50%,
+    rgba(255,255,255,.26) 54%,
+    transparent 72% 100%
+  );
+  transform: translateX(-135%);
+  animation: transactionRowSweep 1.05s .08s ease-out both;
+}
+@keyframes transactionCellGlow {
+  0% { background: rgba(var(--transaction-flash-rgb), .18); box-shadow: inset 0 0 22px rgba(var(--transaction-flash-rgb), .12); }
+  100% { background: transparent; box-shadow: inset 0 0 0 rgba(var(--transaction-flash-rgb), 0); }
+}
+@keyframes transactionRowSweep {
+  from { transform: translateX(-135%); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: translateX(135%); opacity: 0; }
+}
+
+/* 5) Budget adaptif berdasarkan tingkat penggunaan */
+.budget-card {
+  --budget-state-rgb: var(--green-rgb);
+  transition: border-color .28s ease, box-shadow .28s ease, background .28s ease;
+}
+.budget-card .budget-progress > span {
+  background: linear-gradient(90deg, rgba(var(--budget-state-rgb), .96), var(--gold), rgba(var(--budget-state-rgb), .88));
+  box-shadow: 0 0 14px rgba(var(--budget-state-rgb), .24);
+}
+.budget-card.budget-safe { --budget-state-rgb: var(--green-rgb); }
+.budget-card.budget-watch {
+  --budget-state-rgb: var(--gold-rgb);
+  border-color: rgba(var(--gold-rgb), .24);
+}
+.budget-card.budget-warning {
+  --budget-state-rgb: 255,173,102;
+  border-color: rgba(255,173,102,.34);
+  box-shadow: 0 16px 42px rgba(255,173,102,.07);
+}
+.budget-card.budget-danger {
+  --budget-state-rgb: var(--red-rgb);
+  border-color: rgba(var(--red-rgb), .38);
+  box-shadow: 0 18px 48px rgba(var(--red-rgb), .10), inset 0 0 24px rgba(var(--red-rgb), .035);
+  animation: budgetDangerBreath 2.4s ease-in-out infinite;
+}
+.budget-card.budget-watch .budget-status,
+.budget-card.budget-warning .budget-status { color: var(--gold); }
+.budget-card.budget-danger .budget-status { color: #ff9bb1; font-weight: 800; }
+@keyframes budgetDangerBreath {
+  0%,100% { box-shadow: 0 18px 48px rgba(var(--red-rgb), .08), inset 0 0 18px rgba(var(--red-rgb), .025); }
+  50% { box-shadow: 0 18px 52px rgba(var(--red-rgb), .15), 0 0 20px rgba(var(--red-rgb), .08), inset 0 0 28px rgba(var(--red-rgb), .055); }
+}
+
+/* 6) Target milestone */
+.target-progress-shell.milestone-celebrate {
+  animation: targetShellCelebrate 1.15s ease-out both;
+}
+.target-progress-shell.milestone-celebrate::after {
+  content: "";
+  position: absolute;
+  inset: -9px -5px;
+  z-index: 3;
+  border-radius: 999px;
+  pointer-events: none;
+  border: 1px solid rgba(var(--gold-rgb), .72);
+  box-shadow: 0 0 22px rgba(var(--gold-rgb), .34);
+  animation: targetMilestoneRing 1.15s ease-out both;
+}
+.target-milestones i.just-reached {
+  animation: targetMarkerReached 1.25s cubic-bezier(.2,.86,.2,1) both;
+}
+@keyframes targetShellCelebrate {
+  0% { filter: brightness(1); }
+  38% { filter: brightness(1.28); }
+  100% { filter: brightness(1); }
+}
+@keyframes targetMilestoneRing {
+  from { opacity: .9; transform: scaleX(.76) scaleY(.65); }
+  to { opacity: 0; transform: scaleX(1.05) scaleY(1.9); }
+}
+@keyframes targetMarkerReached {
+  0% { transform: translate(-50%,-50%) scale(.65); }
+  38% { transform: translate(-50%,-50%) scale(1.72); box-shadow: 0 0 22px rgba(var(--gold-rgb), .78); }
+  100% { transform: translate(-50%,-50%) scale(1); }
+}
+
+/* 7) Input aktif dan valid */
+.field-group {
+  position: relative;
+}
+.field-group > label {
+  transition: color .2s ease, text-shadow .2s ease, transform .2s ease;
+}
+.field-group:focus-within > label {
+  color: var(--cyan);
+  text-shadow: 0 0 12px rgba(var(--accent-rgb), .28);
+  transform: translateX(2px);
+}
+.field-group::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--gold), transparent);
+  opacity: 0;
+  transform: scaleX(.2);
+  transition: opacity .2s ease, transform .26s ease;
+}
+.field-group:focus-within::after {
+  opacity: .7;
+  transform: scaleX(1);
+  animation: inputFocusLine 2.3s ease-in-out infinite;
+}
+.input:valid:not(:placeholder-shown) {
+  border-color: rgba(var(--green-rgb), .28);
+}
+.input:invalid:not(:focus):not(:placeholder-shown) {
+  border-color: rgba(var(--red-rgb), .36);
+}
+@keyframes inputFocusLine {
+  0%,100% { filter: brightness(.86); opacity: .42; }
+  50% { filter: brightness(1.25); opacity: .9; }
+}
+
+/* 8) Status sinkronisasi radar */
+.sync-state {
+  position: relative;
+}
+.sync-state::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border: 1px solid rgba(var(--green-rgb), .62);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translateY(-50%) scale(.75);
+  animation: syncRadar 2.4s ease-out infinite;
+}
+.sync-state.offline::after {
+  border-color: rgba(var(--red-rgb), .72);
+  animation-duration: 3.2s;
+}
+@keyframes syncRadar {
+  0% { opacity: .78; transform: translateY(-50%) scale(.72); }
+  70%,100% { opacity: 0; transform: translateY(-50%) scale(3.5); }
+}
+
+/* 9) Empty state: ikon hidup + CTA shine jarang */
+.empty-state,
+.chart-empty-state,
+.target-empty,
+.wishlist-empty > div {
+  position: relative;
+}
+.empty-state::before,
+.chart-empty-state::before,
+.target-empty::before {
+  content: "✦";
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 11px;
+  border: 1px solid rgba(var(--accent-rgb), .22);
+  border-radius: 50%;
+  color: var(--cyan);
+  background: rgba(var(--accent-rgb), .055);
+  box-shadow: 0 0 20px rgba(var(--accent-rgb), .08);
+  animation: emptyIconFloat 3.8s ease-in-out infinite;
+}
+.chart-empty-state::before {
+  margin-bottom: 4px;
+}
+.wishlist-empty-icon {
+  animation: emptyIconFloat 3.8s ease-in-out infinite, emptyIconGlow 3.8s ease-in-out infinite;
+}
+.chart-empty-state button,
+.wishlist-empty button,
+.empty-dashboard-state button {
+  position: relative;
+  overflow: hidden;
+}
+.chart-empty-state button::after,
+.wishlist-empty button::after,
+.empty-dashboard-state button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.46) 50%, transparent 80%);
+  transform: translateX(-145%);
+  animation: emptyCtaShine 6.2s ease-in-out infinite;
+}
+@keyframes emptyIconFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(5deg); }
+}
+@keyframes emptyIconGlow {
+  0%,100% { filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), .12)); }
+  50% { filter: drop-shadow(0 0 12px rgba(var(--accent-rgb), .38)); }
+}
+@keyframes emptyCtaShine {
+  0%,68% { transform: translateX(-145%); opacity: 0; }
+  78% { opacity: .8; }
+  100% { transform: translateX(145%); opacity: 0; }
+}
+
+/* Aksesibilitas dan performa */
+body[data-reduce-motion="true"] .mobile-bottom-nav button::after,
+body[data-reduce-motion="true"] .mobile-bottom-nav .nav-add::before,
+body[data-reduce-motion="true"] .mobile-bottom-nav button.active .ui-icon,
+body[data-reduce-motion="true"] .dashboard-section-nav button.active .ui-icon,
+body[data-reduce-motion="true"] .chart-tooltip,
+body[data-reduce-motion="true"] .chart-wrap.chart-refreshing #monthlyChart,
+body[data-reduce-motion="true"] .chart-range button.active,
+body[data-reduce-motion="true"] .chart-range button.active::after,
+body[data-reduce-motion="true"] tbody tr.transaction-new td,
+body[data-reduce-motion="true"] tbody tr.transaction-new td::after,
+body[data-reduce-motion="true"] .budget-card.budget-danger,
+body[data-reduce-motion="true"] .target-progress-shell,
+body[data-reduce-motion="true"] .target-progress-shell::after,
+body[data-reduce-motion="true"] .target-milestones i,
+body[data-reduce-motion="true"] .field-group::after,
+body[data-reduce-motion="true"] .sync-state::after,
+body[data-reduce-motion="true"] .empty-state::before,
+body[data-reduce-motion="true"] .chart-empty-state::before,
+body[data-reduce-motion="true"] .target-empty::before,
+body[data-reduce-motion="true"] .wishlist-empty-icon,
+body[data-reduce-motion="true"] .chart-empty-state button::after,
+body[data-reduce-motion="true"] .wishlist-empty button::after,
+body[data-reduce-motion="true"] .empty-dashboard-state button::after {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-bottom-nav button::after,
+  .mobile-bottom-nav .nav-add::before,
+  .mobile-bottom-nav button.active .ui-icon,
+  .dashboard-section-nav button.active .ui-icon,
+  .chart-tooltip,
+  .chart-wrap.chart-refreshing #monthlyChart,
+  .chart-range button.active,
+  .chart-range button.active::after,
+  tbody tr.transaction-new td,
+  tbody tr.transaction-new td::after,
+  .budget-card.budget-danger,
+  .target-progress-shell,
+  .target-progress-shell::after,
+  .target-milestones i,
+  .field-group::after,
+  .sync-state::after,
+  .empty-state::before,
+  .chart-empty-state::before,
+  .target-empty::before,
+  .wishlist-empty-icon,
+  .chart-empty-state button::after,
+  .wishlist-empty button::after,
+  .empty-dashboard-state button::after {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  tbody tr.transaction-new {
+    animation: transactionMobileCardGlow 1.45s ease-out both;
+  }
+  @keyframes transactionMobileCardGlow {
+    0% { border-color: rgba(var(--transaction-flash-rgb), .58); box-shadow: 0 0 24px rgba(var(--transaction-flash-rgb), .18); }
+    100% { border-color: rgba(var(--accent-rgb), .12); box-shadow: 0 0 0 rgba(var(--transaction-flash-rgb), 0); }
+  }
+}
+
+
+
+/* ========================================================================== 
+   V29 — PERBAIKAN FINAL LAYER POPUP MENU DASHBOARD
+   Popup dipindahkan ke root <body> melalui JavaScript agar tidak terjebak
+   stacking-context hero/dashboard dan tidak bisa ditutup navigasi sticky.
+   ========================================================================== */
+body.quick-menu-popup-open {
+  overflow: hidden !important;
+}
+
+/* Jangan mengangkat seluruh dashboard saat popup aktif. Mengangkat dashboard
+   justru membuat navigasi sticky ikut berada di atas kartu popup. */
+body.quick-menu-popup-open .dashboard-wrap {
+  z-index: 3 !important;
+}
+
+/* Semua navigasi dashboard dinonaktifkan sementara selama dialog terbuka. */
+body.quick-menu-popup-open .dashboard-section-nav,
+body.quick-menu-popup-open .mobile-bottom-nav,
+body.quick-menu-popup-open .topbar {
+  pointer-events: none !important;
+}
+
+/* Setelah dipindahkan langsung ke body, kedua layer ini berdiri sendiri dan
+   selalu berada di atas topbar, tab sticky, bottom navigation, serta canvas. */
+body > #quickMenuBackdrop.quick-menu-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 12000 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  margin: 0 !important;
+}
+
+body > #quickMenu.quick-menu {
+  position: fixed !important;
+  z-index: 12001 !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: min(430px, calc(100vw - 32px)) !important;
+  max-height: min(82dvh, 720px) !important;
+  margin: 0 !important;
+  transform: translate(-50%, -50%);
+  isolation: isolate;
+}
+
+/* Pastikan tab desktop tidak membuat layer komposit baru di atas dialog. */
+body.quick-menu-popup-open .dashboard-section-nav {
+  z-index: 0 !important;
+  filter: none !important;
+}
+
+@media (max-width: 640px) {
+  body > #quickMenu.quick-menu {
+    width: calc(100vw - 24px) !important;
+    max-height: min(84dvh, 680px) !important;
+  }
+}
+
+
+    /* =========================================================
+       FIX POSISI IKON MATA — TEPAT DI TENGAH BUBBLE
+       ========================================================= */
+    .password-toggle {
+      display: inline-grid !important;
+      place-items: center !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      line-height: 0 !important;
+      text-align: center !important;
+    }
+
+    .password-toggle .ui-icon {
+      display: block !important;
+      flex: 0 0 auto !important;
+      margin: 0 !important;
+      position: static !important;
+      inset: auto !important;
+      transform: none !important;
+      transform-origin: center !important;
+      vertical-align: middle !important;
+    }
+
+    /* Khusus tombol mata pada halaman login */
+    .simple-login-card .password-toggle {
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      display: grid !important;
+      place-items: center !important;
+    }
+
+    .simple-login-card .password-toggle .ui-icon {
+      width: 15px !important;
+      height: 15px !important;
+    }
+
+  </style>
 </head>
 <body data-theme="obsidian" data-visual-mode="normal" data-high-contrast="false" data-reduce-motion="false" data-money-visible="true" data-ui-version="27">
   <div id="loadingScreen">
@@ -7633,7 +8198,14 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       numberFxTimers: new Map(),
       hudClockTimer: null,
       userMenuLastFocus: null,
-      dashboardEntryTimer: null
+      dashboardEntryTimer: null,
+      newTransactionFlashId: "",
+      newTransactionFlashTimer: null,
+      chartRefreshTimer: null,
+      sectionLightTimer: null,
+      targetMilestoneKey: "",
+      targetMilestoneValue: 0,
+      targetMilestoneTimer: null
     };
 
     const $ = (selector) => document.querySelector(selector);
@@ -7707,7 +8279,7 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       if (done) sessionStorage.setItem("future_savings_boot_seen_v16", "1");
     }
 
-    function setSyncState(online, text = "Sinkronisasi realtime aktif") {
+    function setSyncState(online, text = "SYNC ACTIVATED") {
       const node = $("#syncState");
       if (!node) return;
       node.classList.toggle("offline", !online);
@@ -8678,8 +9250,8 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       const username = state.currentUser || "akun ini";
       const approved = await askConfirm(
         "Keluar dari akun?",
-        `APAKAH ANDA YAKIN INGIN KELUAR ?`,
-        { confirmText: "Ya, Keluar", danger: true }
+        `Yakin nih mau keluar ?`,
+        { confirmText: "Yakin Dong", danger: true }
       );
       if (!approved) return;
       leaveDashboard(false);
@@ -8881,6 +9453,28 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
         ? `${progress.toFixed(1).replace(".0", "")}% tercapai${state.targetDate ? ` • target ${formatDate(state.targetDate)}` : ""}`
         : "Target belum diatur";
       $$(".target-milestones i").forEach((marker) => marker.classList.toggle("reached", progress >= Number(marker.dataset.milestone || 0)));
+      const currentMilestone = [100, 75, 50, 25].find((value) => progress >= value) || 0;
+      const milestoneKey = `${state.currentUser || "guest"}:${state.activeTargetId || "none"}:${state.target || 0}`;
+      if (state.targetMilestoneKey !== milestoneKey) {
+        state.targetMilestoneKey = milestoneKey;
+        state.targetMilestoneValue = currentMilestone;
+      } else if (currentMilestone > state.targetMilestoneValue) {
+        state.targetMilestoneValue = currentMilestone;
+        const shell = $("#targetProgress")?.closest(".target-progress-shell");
+        const marker = $(`.target-milestones i[data-milestone="${currentMilestone}"]`);
+        shell?.classList.remove("milestone-celebrate");
+        marker?.classList.remove("just-reached");
+        void shell?.offsetWidth;
+        shell?.classList.add("milestone-celebrate");
+        marker?.classList.add("just-reached");
+        clearTimeout(state.targetMilestoneTimer);
+        state.targetMilestoneTimer = setTimeout(() => {
+          shell?.classList.remove("milestone-celebrate");
+          marker?.classList.remove("just-reached");
+        }, 1350);
+      } else {
+        state.targetMilestoneValue = currentMilestone;
+      }
       $("#balanceNote").textContent = balance < 0 ? "Pengeluaran melebihi pemasukan" : "Pemasukan dikurangi pengeluaran";
       $(".summary-card.balance").classList.toggle("negative", balance < 0);
       const trendNode = $("#balanceTrend");
@@ -9036,6 +9630,19 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       animateNumber("#monthBudget", budget);
       const percentage = budget > 0 ? (monthExpense / budget) * 100 : 0;
       $("#budgetProgress").style.width = `${Math.min(100, percentage)}%`;
+      const budgetCard = $(".budget-card");
+      budgetCard?.classList.remove("budget-safe", "budget-watch", "budget-warning", "budget-danger");
+      const budgetClass = !budget
+        ? "budget-safe"
+        : percentage >= 100
+          ? "budget-danger"
+          : percentage >= 90
+            ? "budget-warning"
+            : percentage >= 70
+              ? "budget-watch"
+              : "budget-safe";
+      budgetCard?.classList.add(budgetClass);
+      budgetCard?.setAttribute("data-budget-usage", budget ? String(Math.round(percentage)) : "0");
       if (!budget) {
         $("#budgetStatus").textContent = "Budget belum diatur";
       } else {
@@ -9446,6 +10053,16 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       state.chartAnimationLastPaint = 0;
     }
 
+    function triggerChartRefreshMotion() {
+      const wrap = $("#monthlyChart")?.closest(".chart-wrap");
+      if (!wrap || state.reduceMotion) return;
+      wrap.classList.remove("chart-refreshing");
+      void wrap.offsetWidth;
+      wrap.classList.add("chart-refreshing");
+      clearTimeout(state.chartRefreshTimer);
+      state.chartRefreshTimer = setTimeout(() => wrap.classList.remove("chart-refreshing"), 620);
+    }
+
     function renderChart(animationTime = performance.now(), fromAnimationFrame = false) {
       const canvas = $("#monthlyChart");
       if (!canvas || $("#dashboardPage").classList.contains("hidden")) {
@@ -9471,6 +10088,12 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       const months = getLastMonths(state.chartMonths || 6);
       const data = months.map((month) => ({ ...month, ...calculateTotals(getRowsByMonth(month.key)) }));
       const hasAnyData = data.some((item) => item.deposit || item.expense);
+      const latestDataIndex = (() => {
+        for (let index = data.length - 1; index >= 0; index -= 1) {
+          if (data[index].deposit || data[index].expense || data[index].balance) return index;
+        }
+        return -1;
+      })();
       $("#chartEmptyState")?.classList.toggle("hidden", hasAnyData);
       canvas.classList.toggle("chart-muted", !hasAnyData);
       const visibleValues = data.flatMap((item) => [
@@ -9610,6 +10233,44 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
         });
       }
 
+      if (hasAnyData && latestDataIndex >= 0) {
+        const latest = data[latestDataIndex];
+        const latestCenter = left + groupW * latestDataIndex + groupW / 2;
+        const selectedBarValue = Math.max(
+          state.chartSeries.deposit ? latest.deposit : 0,
+          state.chartSeries.expense ? latest.expense : 0
+        );
+        const latestValue = state.chartSeries.balance ? Math.max(0, latest.balance) : selectedBarValue;
+        const latestY = top + plotH - (latestValue / maxValue) * plotH;
+        const ringPulse = motionEnabled ? 8 + Math.max(0, Math.sin(phase * 3.1)) * 5 : 9;
+
+        ctx.save();
+        ctx.strokeStyle = `rgba(${accentRgb},.22)`;
+        ctx.lineWidth = 1;
+        if (motionEnabled) ctx.setLineDash([4, 7]);
+        ctx.beginPath();
+        ctx.moveTo(latestCenter, top);
+        ctx.lineTo(latestCenter, zeroY);
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+        ctx.strokeStyle = gold;
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = motionEnabled ? .34 + Math.max(0, Math.sin(phase * 3.1)) * .36 : .62;
+        ctx.shadowColor = gold;
+        ctx.shadowBlur = motionEnabled ? 13 : 7;
+        ctx.beginPath();
+        ctx.arc(latestCenter, latestY, ringPulse, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = gold;
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(latestCenter, latestY, 3.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
       if (motionEnabled && hasAnyData) {
         const scanX = left + ((phase * .11) % 1) * plotW;
         const scanGradient = ctx.createLinearGradient(scanX - 20, 0, scanX + 20, 0);
@@ -9681,8 +10342,9 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       $("#loadMoreButton").classList.toggle("hidden", rows.length >= allRows.length);
       tbody.innerHTML = rows.map((item) => {
         const isDeposit = item.type === "deposit";
+        const isNewTransaction = item.id === state.newTransactionFlashId;
         return `
-          <tr>
+          <tr class="${isNewTransaction ? `transaction-new ${isDeposit ? "deposit" : "expense"}` : ""}" data-transaction-id="${safeText(item.id)}">
             <td>${safeText(formatDate(item.date))}</td>
             <td><span class="type-pill ${isDeposit ? "deposit" : "expense"}">${isDeposit ? "＋ Pemasukan" : "－ Pengeluaran"}</span></td>
             <td><strong>${safeText(item.category || "-")}</strong></td>
@@ -9776,7 +10438,14 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
           await updateDoc(doc(transactionsRef(), id), payload);
           toast("Transaksi berhasil diperbarui.");
         } else {
-          await addDoc(transactionsRef(), { ...payload, createdBy: state.currentUser, createdAt: serverTimestamp() });
+          const newTransactionRef = await addDoc(transactionsRef(), { ...payload, createdBy: state.currentUser, createdAt: serverTimestamp() });
+          state.newTransactionFlashId = newTransactionRef.id;
+          clearTimeout(state.newTransactionFlashTimer);
+          state.newTransactionFlashTimer = setTimeout(() => {
+            state.newTransactionFlashId = "";
+            renderTable();
+          }, 1750);
+          renderTable();
           if ($("#makeRecurringInput").checked) {
             const templates = [...state.recurringTemplates, { id:makeId("routine"), type, amount, category, note, day:Number(date.slice(-2)) || 1, active:true, lastGeneratedMonth:date.slice(0,7), lastGeneratedAt:new Date().toISOString(), createdAt:new Date().toISOString() }];
             await setDoc(accountRef(), { recurringTemplates:templates, updatedAt:serverTimestamp() }, { merge:true });
@@ -10142,14 +10811,32 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
     }
 
     function updateQuickMenuReservedSpace() {
-      /* Menu Dashboard sekarang memakai popup fixed di tengah layar.
-         Fungsi ini hanya membersihkan sisa layout dari versi dropdown lama. */
+      /* Menu Dashboard memakai popup fixed; bersihkan seluruh sisa perilaku
+         dropdown lama agar layout tidak bergeser. */
       const hero = $(".hero-row");
       hero?.classList.remove("quick-menu-open");
       hero?.style.removeProperty("--quick-menu-reserved-space");
     }
 
+    function mountQuickMenuPortal() {
+      const menu = $("#quickMenu");
+      const backdrop = $("#quickMenuBackdrop");
+      if (!menu || !backdrop) return;
+
+      /* Pindahkan popup keluar dari hero/dashboard-wrap. Elemen fixed yang
+         berada di dalam stacking-context tidak dapat melampaui navigasi sticky,
+         walaupun z-index-nya besar. Menaruhnya langsung di body menyelesaikan
+         masalah tersebut secara konsisten di desktop dan mobile. */
+      if (backdrop.parentElement !== document.body) {
+        document.body.appendChild(backdrop);
+      }
+      if (menu.parentElement !== document.body) {
+        document.body.appendChild(menu);
+      }
+    }
+
     function setQuickMenu(open, options = {}) {
+      mountQuickMenuPortal();
       const menu = $("#quickMenu");
       const backdrop = $("#quickMenuBackdrop");
       const button = $("#quickMenuButton");
@@ -10250,12 +10937,18 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
     $("#quickMenuClose").addEventListener("click", () => setQuickMenu(false, { restoreFocus: true }));
     $("#quickMenuBackdrop")?.addEventListener("click", () => setQuickMenu(false, { restoreFocus: true }));
     $("#quickMenu").addEventListener("click", (event) => {
+      event.stopPropagation();
       if (event.target.closest(".quick-menu-item")) setQuickMenu(false);
     });
     document.addEventListener("click", (event) => {
-      if (!event.target.closest(".quick-menu-wrap") && $("#quickMenuButton")?.getAttribute("aria-expanded") === "true") {
-        setQuickMenu(false, { restoreFocus: true });
-      }
+      const isOpen = $("#quickMenuButton")?.getAttribute("aria-expanded") === "true";
+      if (!isOpen) return;
+
+      /* Popup kini berada langsung di body, jadi pengecekan tidak lagi memakai
+         .quick-menu-wrap. Klik di dalam popup atau tombol pembuka tidak menutup
+         dialog; klik di luar tetap menutupnya. */
+      if (event.target.closest("#quickMenu") || event.target.closest("#quickMenuButton")) return;
+      setQuickMenu(false, { restoreFocus: true });
     });
     document.addEventListener("keydown", (event) => {
       const quickMenuOpen = $("#quickMenuButton")?.getAttribute("aria-expanded") === "true";
@@ -10341,6 +11034,7 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       state.chartSeries[key] = !state.chartSeries[key];
       if (!Object.values(state.chartSeries).some(Boolean)) state.chartSeries[key] = true;
       button.classList.toggle("active", state.chartSeries[key]);
+      triggerChartRefreshMotion();
       renderChart();
     }));
     $("#monthlyChart")?.addEventListener("pointermove", showChartTooltip, { passive:true });
@@ -10392,10 +11086,29 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       state.wishlistExpanded = !state.wishlistExpanded;
       renderWishlist();
     });
+    function setDashboardSectionActive(button, animateSection = false) {
+      const buttons = $$("[data-dashboard-target]");
+      const index = Math.max(0, buttons.indexOf(button));
+      buttons.forEach((item) => {
+        const active = item === button;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-current", active ? "page" : "false");
+      });
+      $("#dashboardSectionNav")?.style.setProperty("--active-index", String(index));
+      const target = $(button?.dataset.dashboardTarget || "");
+      if (animateSection && target && !state.reduceMotion) {
+        target.classList.remove("section-light-enter");
+        void target.offsetWidth;
+        target.classList.add("section-light-enter");
+        clearTimeout(state.sectionLightTimer);
+        state.sectionLightTimer = setTimeout(() => target.classList.remove("section-light-enter"), 700);
+      }
+    }
+
     $$("[data-dashboard-target]").forEach((button) => button.addEventListener("click", () => {
       const target = $(button.dataset.dashboardTarget);
       if (!target) return;
-      $$("[data-dashboard-target]").forEach((item) => item.classList.toggle("active", item === button));
+      setDashboardSectionActive(button, true);
       target.scrollIntoView({ behavior: state.reduceMotion ? "auto" : "smooth", block: "start" });
     }));
     $("#loadMoreButton").addEventListener("click", () => { state.visibleLimit += PAGE_SIZE; renderTable(); });
@@ -10531,6 +11244,7 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
       state.chartMonths = Number(button.dataset.chartMonths) || 6;
       $$('[data-chart-months]').forEach((item) => item.classList.toggle("active", item === button));
       $("#chartTitle").textContent = `Perkembangan ${state.chartMonths} Bulan`;
+      triggerChartRefreshMotion();
       renderChart();
     }));
 
@@ -10541,8 +11255,18 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
     $("#navMenuButton").addEventListener("click", () => {
       setQuickMenu(true);
     });
+    function setMobileNavActive(button) {
+      if (!button) return;
+      $$("#mobileBottomNav button").forEach((item) => {
+        const active = item === button;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-current", active ? "page" : "false");
+      });
+    }
+
     $$("#mobileBottomNav button").forEach((button) => button.addEventListener("click", () => {
-      $$("#mobileBottomNav button").forEach((item) => item.classList.toggle("active", item === button));
+      if (button.id === "navAddButton") return;
+      setMobileNavActive(button);
     }));
 
     window.addEventListener("resize", () => {
@@ -10623,8 +11347,12 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
   const historyButton = document.querySelector('#navHistoryButton');
   if (historyPanel && homeButton && historyButton && 'IntersectionObserver' in window) {
     const observer = new IntersectionObserver(([entry]) => {
-      [homeButton, historyButton].forEach((button) => button.classList.remove('active'));
-      (entry.isIntersecting ? historyButton : homeButton).classList.add('active');
+      const activeButton = entry.isIntersecting ? historyButton : homeButton;
+      [homeButton, historyButton].forEach((button) => {
+        const active = button === activeButton;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-current', active ? 'page' : 'false');
+      });
     }, { threshold: .18, rootMargin: '-20% 0px -48% 0px' });
     observer.observe(historyPanel);
   }
@@ -10636,8 +11364,12 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
         .filter((entry) => entry.isIntersecting)
         .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
       if (!visible) return;
-      desktopSectionButtons.forEach((button) => {
-        button.classList.toggle('active', button.dataset.dashboardTarget === `#${visible.target.id}`);
+      const activeButton = desktopSectionButtons.find((button) => button.dataset.dashboardTarget === `#${visible.target.id}`);
+      desktopSectionButtons.forEach((button, index) => {
+        const active = button === activeButton;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-current', active ? 'page' : 'false');
+        if (active) document.querySelector('#dashboardSectionNav')?.style.setProperty('--active-index', String(index));
       });
     }, { threshold: [0.12, 0.28, 0.5], rootMargin: '-22% 0px -55% 0px' });
     desktopSectionButtons.forEach((button) => {
@@ -10646,6 +11378,15 @@ body[data-reduce-motion="true"] .onboarding-progress > span::after {
     });
   }
 
+  const initialDesktopButton = desktopSectionButtons.find((button) => button.classList.contains('active')) || desktopSectionButtons[0];
+  if (initialDesktopButton) {
+    const initialIndex = Math.max(0, desktopSectionButtons.indexOf(initialDesktopButton));
+    document.querySelector('#dashboardSectionNav')?.style.setProperty('--active-index', String(initialIndex));
+    initialDesktopButton.setAttribute('aria-current', 'page');
+  }
+  document.querySelectorAll('#mobileBottomNav button').forEach((button) => {
+    button.setAttribute('aria-current', button.classList.contains('active') ? 'page' : 'false');
+  });
 
 })();
 </script>
