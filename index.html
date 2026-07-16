@@ -1244,6 +1244,114 @@
     .account-section-divider { height:1px; margin:20px 0; background:rgba(var(--accent-rgb),.10); }
     .account-section-heading { margin:0 0 3px; font-size:14px; }
     .account-section-sub { margin:0 0 15px; color:var(--muted); font-size:11px; line-height:1.55; }
+
+    /* Galeri foto akun dari Menu Dashboard */
+    .account-photo-modal-box { width:min(100%,760px); }
+    .account-photo-modal-head {
+      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+      margin-bottom:4px;
+    }
+    .account-photo-modal-head h3 { margin:0; }
+    .account-photo-modal-head p {
+      margin:7px 0 0; max-width:560px; color:var(--muted); font-size:11px; line-height:1.65;
+    }
+    .account-photo-refresh {
+      flex:0 0 auto; min-height:38px; padding-inline:12px; font-size:10px;
+    }
+    .account-photo-grid {
+      display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:18px;
+    }
+    .account-photo-loading {
+      grid-column:1/-1; min-height:230px; display:grid; place-items:center; text-align:center;
+      padding:26px; border:1px dashed rgba(var(--accent-rgb),.18); border-radius:20px;
+      color:var(--muted); background:rgba(255,255,255,.018); font-size:12px; line-height:1.65;
+    }
+    .account-photo-card {
+      position:relative; width:100%; min-width:0; padding:16px; display:grid;
+      grid-template-columns:116px minmax(0,1fr); gap:15px; align-items:center; text-align:left;
+      color:var(--text); border:1px solid rgba(var(--accent-rgb),.14); border-radius:20px;
+      background:
+        linear-gradient(145deg,rgba(var(--accent-rgb),.055),rgba(var(--purple-rgb),.025)),
+        rgba(255,255,255,.018);
+      overflow:hidden; transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;
+    }
+    .account-photo-card::after {
+      content:""; position:absolute; width:100px; height:100px; right:-46px; bottom:-48px;
+      border-radius:50%; background:rgba(var(--accent-rgb),.10); filter:blur(8px); pointer-events:none;
+    }
+    .account-photo-card:hover {
+      transform:translateY(-2px); border-color:var(--line-strong);
+      background:linear-gradient(145deg,rgba(var(--accent-rgb),.09),rgba(var(--purple-rgb),.045)),rgba(255,255,255,.025);
+      box-shadow:0 16px 38px rgba(0,0,0,.24);
+    }
+    .account-photo-card:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
+    .account-photo-card.is-current { border-color:rgba(var(--gold-rgb),.34); }
+    .account-photo-avatar {
+      position:relative; z-index:1; width:116px; height:116px; display:grid; place-items:center;
+      border-radius:24px; overflow:hidden; color:#031019;
+      border:1px solid rgba(var(--accent-rgb),.32);
+      background-color:#07111f;
+      background-image:linear-gradient(135deg,var(--cyan),var(--purple));
+      background-position:center; background-size:cover; background-repeat:no-repeat;
+      font:800 34px/1 Orbitron,sans-serif;
+      box-shadow:0 12px 30px rgba(0,0,0,.28),0 0 24px rgba(var(--accent-rgb),.09);
+    }
+    .account-photo-avatar.has-photo { color:transparent; }
+    .account-photo-avatar.has-photo::after {
+      content:""; position:absolute; inset:0; border-radius:inherit;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.13); pointer-events:none;
+    }
+    .account-photo-copy { position:relative; z-index:1; min-width:0; }
+    .account-photo-copy strong { display:block; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .account-photo-copy small { display:block; margin-top:7px; color:var(--muted); font-size:10px; line-height:1.55; }
+    .account-photo-card-badge {
+      display:inline-flex; align-items:center; min-height:24px; margin-top:12px; padding:0 9px;
+      border:1px solid rgba(var(--accent-rgb),.18); border-radius:999px;
+      color:var(--cyan); background:rgba(var(--accent-rgb),.065);
+      font-size:9px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
+    }
+    .account-photo-card.is-current .account-photo-card-badge {
+      color:var(--gold); border-color:rgba(var(--gold-rgb),.22); background:rgba(var(--gold-rgb),.07);
+    }
+    .account-photo-open-hint {
+      display:flex; align-items:center; gap:6px; margin-top:10px; color:rgba(222,239,252,.48); font-size:9px; font-weight:700;
+    }
+    .account-photo-open-hint .ui-icon { width:13px; height:13px; }
+
+    .account-photo-viewer-box { width:min(100%,690px); text-align:center; }
+    .account-photo-viewer-kicker {
+      color:var(--gold); font:800 10px/1.2 Orbitron,sans-serif; letter-spacing:.18em; text-transform:uppercase;
+    }
+    .account-photo-viewer-box h3 { margin:8px 0 0; }
+    .account-photo-viewer-sub { margin:7px 0 16px; color:var(--muted); font-size:11px; }
+    .account-photo-viewer-stage {
+      position:relative; min-height:360px; display:grid; place-items:center; overflow:hidden;
+      padding:16px; border:1px solid rgba(var(--accent-rgb),.16); border-radius:22px;
+      background:
+        radial-gradient(circle at 50% 42%,rgba(var(--accent-rgb),.10),transparent 42%),
+        rgba(0,0,0,.20);
+    }
+    .account-photo-viewer-image {
+      display:block; width:auto; max-width:100%; max-height:min(60vh,560px); border-radius:18px;
+      object-fit:contain; box-shadow:0 20px 54px rgba(0,0,0,.42);
+    }
+    .account-photo-viewer-fallback {
+      width:min(260px,70vw); aspect-ratio:1; display:grid; place-items:center; border-radius:28px;
+      color:#031019; background:linear-gradient(135deg,var(--cyan),var(--purple));
+      font:800 clamp(64px,14vw,110px)/1 Orbitron,sans-serif;
+      box-shadow:0 20px 54px rgba(0,0,0,.38),0 0 34px rgba(var(--accent-rgb),.12);
+    }
+    .account-photo-viewer-note {
+      margin:13px 0 0; color:var(--muted); font-size:10px; line-height:1.55;
+    }
+    @media (max-width:640px) {
+      .account-photo-modal-head { display:grid; }
+      .account-photo-refresh { width:100%; }
+      .account-photo-grid { grid-template-columns:1fr; }
+      .account-photo-card { grid-template-columns:92px minmax(0,1fr); padding:13px; }
+      .account-photo-avatar { width:92px; height:92px; border-radius:20px; font-size:28px; }
+      .account-photo-viewer-stage { min-height:300px; padding:10px; }
+    }
     @media (max-width:560px) {
       .account-profile-card { grid-template-columns:1fr; text-align:center; }
       .profile-photo-actions { justify-content:center; }
@@ -7444,6 +7552,12 @@ body.quick-menu-popup-open .dashboard-section-nav {
                   <span class="quick-menu-copy"><strong>Wishlist</strong><small>Simpan barang impian dan pantau dananya</small></span>
                   <span class="quick-menu-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span>
                 </button>
+                <div class="quick-menu-group-label">Akun</div>
+                <button class="quick-menu-item" id="accountPhotosButton" type="button" role="menuitem">
+                  <span class="quick-menu-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2.2"/><path d="m5.5 17 3.4-3.4a2 2 0 0 1 2.8 0l1.2 1.2 1.8-1.8a2 2 0 0 1 2.8 0l1 1"/></svg></span>
+                  <span class="quick-menu-copy"><strong>Foto Semua Akun</strong><small>Lihat foto profil sendiri dan akun lainnya</small></span>
+                  <span class="quick-menu-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+                </button>
                 <div class="quick-menu-group-label">Tampilan</div>
                 <button class="quick-menu-item" id="themeButton" type="button" role="menuitem">
                   <span class="quick-menu-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18h1.3a1.7 1.7 0 0 0 1.2-2.9l-.2-.2a1.7 1.7 0 0 1 1.2-2.9H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8Z"/><path d="M7.5 10h.01M10 6.8h.01M14.2 7.2h.01M17 10.2h.01"/></svg></span>
@@ -7976,6 +8090,41 @@ body.quick-menu-popup-open .dashboard-section-nav {
     </div>
   </div>
 
+  <div class="modal-overlay hidden" id="accountPhotosModal" aria-hidden="true">
+    <div class="modal-box account-photo-modal-box" role="dialog" aria-modal="true" aria-labelledby="accountPhotosModalTitle" tabindex="-1">
+      <div class="account-photo-modal-head">
+        <div>
+          <h3 id="accountPhotosModalTitle">Foto Semua Akun</h3>
+          <p>Foto akun yang sedang digunakan dan akun lainnya ditampilkan dari profil Firebase. Klik salah satu kartu untuk membuka fotonya dalam ukuran besar.</p>
+        </div>
+        <button class="secondary-btn account-photo-refresh" id="refreshAccountPhotosButton" type="button">Muat Ulang Foto</button>
+      </div>
+      <div class="account-photo-grid" id="accountPhotoGallery" aria-live="polite">
+        <div class="account-photo-loading">Memuat foto seluruh akun...</div>
+      </div>
+      <div class="modal-actions">
+        <button class="secondary-btn" id="manageOwnProfilePhotoButton" type="button">Kelola Foto Saya</button>
+        <button class="primary-btn" id="closeAccountPhotosModal" type="button">Selesai</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="accountPhotoViewerModal" aria-hidden="true">
+    <div class="modal-box account-photo-viewer-box" role="dialog" aria-modal="true" aria-labelledby="accountPhotoViewerTitle" tabindex="-1">
+      <div class="account-photo-viewer-kicker" id="accountPhotoViewerBadge">PROFILE VIEWER</div>
+      <h3 id="accountPhotoViewerTitle">Foto Akun</h3>
+      <p class="account-photo-viewer-sub" id="accountPhotoViewerSub">Tampilan foto profil akun.</p>
+      <div class="account-photo-viewer-stage">
+        <img class="account-photo-viewer-image hidden" id="accountPhotoViewerImage" alt="">
+        <div class="account-photo-viewer-fallback" id="accountPhotoViewerFallback" aria-hidden="true">F</div>
+      </div>
+      <p class="account-photo-viewer-note" id="accountPhotoViewerNote">Foto ditampilkan sesuai data profil terbaru yang tersedia.</p>
+      <div class="modal-actions">
+        <button class="primary-btn" id="closeAccountPhotoViewerModal" type="button">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay hidden" id="budgetModal" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="budgetModalTitle" tabindex="-1">
       <h3 id="budgetModalTitle">Budget Bulanan</h3>
@@ -8120,6 +8269,7 @@ body.quick-menu-popup-open .dashboard-section-nav {
     const SESSION_KEY = "nfandah_tabungan_session_v2";
     const SESSION_DURATION = 24 * 60 * 60 * 1000;
     const ALLOWED_ACCOUNTS = ["Fadly", "Indah"];
+    const ACCOUNT_PHOTO_REQUEST_TIMEOUT = 5500;
     const PASSWORD_VERSION = 2;
     const PASSWORD_DOMAIN = "future-savings-v10";
     const BOOTSTRAP_PASSWORD_HASH = "d2be1601a3454c00663979941e770b82bd153893b65bef8f5a6b26e2dbd79c5f";
@@ -8193,6 +8343,9 @@ body.quick-menu-popup-open .dashboard-section-nav {
       pendingProfilePhotoDataUrl: "",
       profilePhotoObjectUrl: "",
       profilePhotoBusy: false,
+      accountPhotoSources: {},
+      activePhotoAccount: "",
+      accountPhotosBusy: false,
       animatedNumbers: new Map(),
       numberFrames: new Map(),
       numberFxTimers: new Map(),
@@ -9026,6 +9179,224 @@ body.quick-menu-popup-open .dashboard-section-nav {
       }
     }
 
+
+    function normalizeProfilePhotoSource(source = "") {
+      const candidate = String(source || "").trim();
+      return /^(data:image\/|https?:\/\/|blob:)/i.test(candidate) ? candidate : "";
+    }
+
+    function cachedProfilePhotoSource(username) {
+      const fromState = username === state.currentUser
+        ? normalizeProfilePhotoSource(state.profilePhotoDataUrl || "")
+        : "";
+      return fromState || normalizeProfilePhotoSource(localStorage.getItem(profileCacheKey(username)) || "");
+    }
+
+    async function resolvePhotoRequest(task, fallbackValue, label) {
+      let timeoutId = null;
+      try {
+        return await Promise.race([
+          Promise.resolve().then(task),
+          new Promise((resolve) => {
+            timeoutId = window.setTimeout(() => {
+              console.warn(`${label} melewati batas waktu; memakai data cache.`);
+              resolve(fallbackValue);
+            }, ACCOUNT_PHOTO_REQUEST_TIMEOUT);
+          })
+        ]);
+      } catch (error) {
+        console.warn(`${label} gagal; memakai data cache.`, error);
+        return fallbackValue;
+      } finally {
+        if (timeoutId) window.clearTimeout(timeoutId);
+      }
+    }
+
+    async function fetchProfilePhotoSource(username) {
+      const safeUsername = ALLOWED_ACCOUNTS.includes(username) ? username : "";
+      if (!safeUsername) return "";
+
+      const cacheKey = profileCacheKey(safeUsername);
+      let photo = cachedProfilePhotoSource(safeUsername);
+
+      const snapshot = await resolvePhotoRequest(
+        () => getDoc(profileRef(safeUsername)),
+        null,
+        `Pembacaan profil ${safeUsername}`
+      );
+
+      if (snapshot?.exists?.()) {
+        const data = snapshot.data() || {};
+        const cloudPhoto = normalizeProfilePhotoSource(data.photoUrl || data.photoDataUrl || "");
+        if (cloudPhoto) {
+          photo = cloudPhoto;
+          localStorage.setItem(cacheKey, cloudPhoto);
+        } else {
+          // Dokumen berhasil dibaca tetapi belum memiliki foto. Storage tetap diperiksa
+          // agar kompatibel dengan akun lama yang hanya menyimpan file avatar.
+          photo = "";
+        }
+      }
+
+      if (!photo) {
+        const storagePhoto = await resolvePhotoRequest(
+          async () => normalizeProfilePhotoSource(
+            await getDownloadURL(storageRef(storage, profileStoragePath(safeUsername)))
+          ),
+          "",
+          `Pembacaan Storage ${safeUsername}`
+        );
+        if (storagePhoto) {
+          photo = storagePhoto;
+          localStorage.setItem(cacheKey, storagePhoto);
+        } else if (snapshot?.exists?.()) {
+          localStorage.removeItem(cacheKey);
+        }
+      }
+
+      return photo;
+    }
+
+    function createAccountPhotoCard(username, photo) {
+      const isCurrent = username === state.currentUser;
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = `account-photo-card${isCurrent ? " is-current" : ""}`;
+      card.dataset.accountPhoto = username;
+      card.setAttribute("aria-label", `Lihat foto profil akun ${username}`);
+
+      const avatar = document.createElement("span");
+      avatar.className = `account-photo-avatar${photo ? " has-photo" : ""}`;
+      avatar.textContent = profileInitial(username);
+      if (photo) avatar.style.backgroundImage = `url("${photo.replace(/"/g, "%22")}")`;
+
+      const copy = document.createElement("span");
+      copy.className = "account-photo-copy";
+
+      const name = document.createElement("strong");
+      name.textContent = username;
+
+      const description = document.createElement("small");
+      description.textContent = photo
+        ? "Foto profil tersedia dan siap dibuka dalam ukuran besar."
+        : "Akun ini belum memasang foto profil atau fotonya belum dapat dimuat.";
+
+      const badge = document.createElement("span");
+      badge.className = "account-photo-card-badge";
+      badge.textContent = isCurrent ? "Akun Anda" : "Akun Lain";
+
+      const hint = document.createElement("span");
+      hint.className = "account-photo-open-hint";
+      hint.innerHTML = '<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.7"/></svg><span>Klik untuk melihat</span>';
+
+      copy.append(name, description, badge, hint);
+      card.append(avatar, copy);
+      return card;
+    }
+
+    async function renderAccountPhotoGallery() {
+      const gallery = $("#accountPhotoGallery");
+      const refreshButton = $("#refreshAccountPhotosButton");
+      if (!gallery || state.accountPhotosBusy) return;
+
+      state.accountPhotosBusy = true;
+      if (refreshButton) {
+        refreshButton.disabled = true;
+        refreshButton.textContent = "Memeriksa...";
+      }
+
+      // Tampilkan kartu akun seketika dari state/cache. Dengan cara ini modal tidak
+      // pernah berhenti pada layar "Memuat..." ketika Firebase lambat atau offline.
+      const cachedEntries = ALLOWED_ACCOUNTS.map((username) => [
+        username,
+        normalizeProfilePhotoSource(state.accountPhotoSources[username] || cachedProfilePhotoSource(username))
+      ]);
+      state.accountPhotoSources = {
+        ...state.accountPhotoSources,
+        ...Object.fromEntries(cachedEntries)
+      };
+      gallery.replaceChildren(...cachedEntries.map(([username, photo]) => createAccountPhotoCard(username, photo)));
+
+      try {
+        const settled = await Promise.allSettled(
+          ALLOWED_ACCOUNTS.map(async (username) => {
+            const fallback = normalizeProfilePhotoSource(state.accountPhotoSources[username] || cachedProfilePhotoSource(username));
+            const photo = await resolvePhotoRequest(
+              () => fetchProfilePhotoSource(username),
+              fallback,
+              `Sinkronisasi foto ${username}`
+            );
+            return [username, normalizeProfilePhotoSource(photo || fallback)];
+          })
+        );
+
+        const entries = settled.map((result, index) => {
+          if (result.status === "fulfilled") return result.value;
+          const username = ALLOWED_ACCOUNTS[index];
+          console.warn(`Foto akun ${username} gagal disinkronkan.`, result.reason);
+          return [username, normalizeProfilePhotoSource(state.accountPhotoSources[username] || cachedProfilePhotoSource(username))];
+        });
+
+        state.accountPhotoSources = {
+          ...state.accountPhotoSources,
+          ...Object.fromEntries(entries)
+        };
+        gallery.replaceChildren(...entries.map(([username, photo]) => createAccountPhotoCard(username, photo)));
+
+        const currentPhoto = normalizeProfilePhotoSource(state.accountPhotoSources[state.currentUser] || "");
+        if (currentPhoto && currentPhoto !== state.profilePhotoDataUrl) {
+          applyProfilePhoto(currentPhoto, state.currentUser);
+        }
+      } catch (error) {
+        console.error("Galeri foto akun gagal dimuat.", error);
+        // Kartu cache tetap dipertahankan; jangan menggantinya dengan layar loading/error penuh.
+        toast("Foto terbaru belum dapat disinkronkan. Data cache tetap ditampilkan.", "error");
+      } finally {
+        state.accountPhotosBusy = false;
+        if (refreshButton) {
+          refreshButton.disabled = false;
+          refreshButton.textContent = "Muat Ulang Foto";
+        }
+      }
+    }
+
+    function openAccountPhotos() {
+      if (!state.currentUser) {
+        toast("Sesi akun belum aktif. Silakan masuk kembali.", "error");
+        return;
+      }
+      setUserMenu(false);
+      setQuickMenu(false);
+      openModal("#accountPhotosModal");
+      // Jalankan sinkronisasi tanpa menahan interaksi tombol Selesai/Kelola Foto Saya.
+      void renderAccountPhotoGallery();
+    }
+
+    function openAccountPhotoViewer(username) {
+      if (!ALLOWED_ACCOUNTS.includes(username)) return;
+      const photo = normalizeProfilePhotoSource(state.accountPhotoSources[username] || "");
+      const isCurrent = username === state.currentUser;
+      const image = $("#accountPhotoViewerImage");
+      const fallback = $("#accountPhotoViewerFallback");
+
+      state.activePhotoAccount = username;
+      $("#accountPhotoViewerTitle").textContent = `Foto ${username}`;
+      $("#accountPhotoViewerBadge").textContent = isCurrent ? "AKUN ANDA" : "AKUN LAIN";
+      $("#accountPhotoViewerSub").textContent = isCurrent
+        ? "Ini adalah foto profil akun yang sedang Anda gunakan."
+        : `Ini adalah foto profil akun ${username}.`;
+      $("#accountPhotoViewerNote").textContent = photo
+        ? "Foto ditampilkan dari data profil terbaru yang tersedia."
+        : "Akun ini belum memasang foto profil atau foto belum dapat diakses.";
+
+      image.alt = photo ? `Foto profil akun ${username}` : "";
+      image.src = photo || "";
+      image.classList.toggle("hidden", !photo);
+      fallback.textContent = profileInitial(username);
+      fallback.classList.toggle("hidden", Boolean(photo));
+      openModal("#accountPhotoViewerModal");
+    }
+
     function loadImageElement(file) {
       return new Promise((resolve, reject) => {
         const objectUrl = URL.createObjectURL(file);
@@ -9155,6 +9526,7 @@ body.quick-menu-popup-open .dashboard-section-nav {
         }, { merge: true });
         localStorage.setItem(profileCacheKey(), photoUrl);
         state.pendingProfilePhotoDataUrl = "";
+        state.accountPhotoSources[state.currentUser] = photoUrl;
         applyProfilePhoto(photoUrl, state.currentUser);
         setProfilePhotoStatus("Foto profil HD tersimpan di Storage dan tersinkron ke akun.", "success");
         toast("Foto profil HD berhasil diperbarui.");
@@ -9172,6 +9544,7 @@ body.quick-menu-popup-open .dashboard-section-nav {
           }, { merge: true });
           localStorage.setItem(profileCacheKey(), dataUrl);
           state.pendingProfilePhotoDataUrl = "";
+          state.accountPhotoSources[state.currentUser] = dataUrl;
           applyProfilePhoto(dataUrl, state.currentUser);
           setProfilePhotoStatus("Storage belum diizinkan; foto disimpan melalui fallback Firestore.", "success");
           toast("Foto tersimpan melalui mode kompatibilitas.");
@@ -9179,6 +9552,7 @@ body.quick-menu-popup-open .dashboard-section-nav {
           console.error(fallbackError);
           localStorage.setItem(profileCacheKey(), dataUrl);
           state.pendingProfilePhotoDataUrl = "";
+          state.accountPhotoSources[state.currentUser] = dataUrl;
           applyProfilePhoto(dataUrl, state.currentUser);
           setProfilePhotoStatus("Foto diterapkan lokal. Periksa Firebase Storage/Firestore Rules untuk sinkronisasi cloud.", "error");
           toast("Foto tersimpan lokal, sinkronisasi cloud gagal.", "error");
@@ -9216,6 +9590,7 @@ body.quick-menu-popup-open .dashboard-section-nav {
       }
       localStorage.removeItem(profileCacheKey());
       state.pendingProfilePhotoDataUrl = "";
+      state.accountPhotoSources[state.currentUser] = "";
       applyProfilePhoto("", state.currentUser);
       setProfilePhotoStatus("Foto profil dihapus. Avatar kembali memakai huruf awal.", "success");
       button.textContent = "Hapus Foto";
@@ -9311,6 +9686,8 @@ body.quick-menu-popup-open .dashboard-section-nav {
       state.unsubscribeTransactions = null;
       state.unsubscribeAccount = null;
       state.currentUser = "";
+      state.accountPhotoSources = {};
+      state.activePhotoAccount = "";
       state.transactions = [];
       state.targets = [];
       state.activeTargetId = "";
@@ -11011,6 +11388,19 @@ body.quick-menu-popup-open .dashboard-section-nav {
     $("#emptyAddExpense").addEventListener("click", () => prepareQuickTransaction("expense"));
     $("#closeTransactionPanel").addEventListener("click", closeMobileTransactionPanel);
     $("#transactionDrawerBackdrop")?.addEventListener("click", closeMobileTransactionPanel);
+
+    $("#accountPhotosButton")?.addEventListener("click", openAccountPhotos);
+    $("#refreshAccountPhotosButton")?.addEventListener("click", renderAccountPhotoGallery);
+    $("#closeAccountPhotosModal")?.addEventListener("click", () => closeModal("#accountPhotosModal"));
+    $("#accountPhotoGallery")?.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-account-photo]");
+      if (card) openAccountPhotoViewer(card.dataset.accountPhoto || "");
+    });
+    $("#closeAccountPhotoViewerModal")?.addEventListener("click", () => closeModal("#accountPhotoViewerModal"));
+    $("#manageOwnProfilePhotoButton")?.addEventListener("click", () => {
+      closeModal("#accountPhotosModal");
+      openAccountSettings();
+    });
 
     $("#themeButton").addEventListener("click", () => openModal("#themeModal"));
     $("#closeThemeModal").addEventListener("click", () => closeModal("#themeModal"));
