@@ -6324,6 +6324,42 @@ body.transaction-form-open { overflow: hidden; }
   }
 }
 
+
+
+/* ===== PERBAIKAN MENU DASHBOARD DESKTOP: TIDAK MENIMPA KONTEN ===== */
+@media (min-width: 781px) {
+  /* Jadikan hero sebagai patokan posisi dropdown agar menu muncul
+     tepat di bawah kartu hero, bukan di bawah tombol menu. */
+  .hero-row {
+    position: relative;
+    transition: margin-bottom .22s ease;
+  }
+
+  .hero-actions.compact-actions,
+  .quick-menu-wrap {
+    position: static;
+  }
+
+  .quick-menu {
+    top: calc(100% + 14px);
+    right: 20px;
+    max-height: min(68vh, 640px);
+    overflow: hidden;
+    transform-origin: top right;
+  }
+
+  /* Ruang di bawah hero dihitung otomatis oleh JavaScript sesuai
+     tinggi menu, sehingga navigasi dan panel berikutnya tidak tertutup. */
+  .hero-row.quick-menu-open {
+    z-index: 35;
+    margin-bottom: calc(24px + var(--quick-menu-reserved-space, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-row { transition: none !important; }
+}
+
 </style>
 </head>
 <body data-theme="obsidian" data-visual-mode="normal" data-high-contrast="false" data-reduce-motion="false" data-money-visible="true" data-ui-version="27">
@@ -9698,14 +9734,47 @@ body.transaction-form-open { overflow: hidden; }
       setTransactionPanel(true);
     }
 
+    function updateQuickMenuReservedSpace() {
+      const menu = $("#quickMenu");
+      const hero = $(".hero-row");
+      if (!menu || !hero) return;
+
+      const desktopMode = window.matchMedia("(min-width: 781px)").matches;
+      const menuOpen = !menu.classList.contains("hidden");
+
+      if (!desktopMode || !menuOpen) {
+        hero.classList.remove("quick-menu-open");
+        hero.style.removeProperty("--quick-menu-reserved-space");
+        return;
+      }
+
+      /* Menu berada 14px di bawah hero. Tambahan 10px memberi jarak aman
+         agar navigasi bagian dashboard tidak bersentuhan dengan panel menu. */
+      const reservedSpace = Math.ceil(menu.getBoundingClientRect().height + 24);
+      hero.style.setProperty("--quick-menu-reserved-space", `${reservedSpace}px`);
+      hero.classList.add("quick-menu-open");
+    }
+
     function setQuickMenu(open) {
       const menu = $("#quickMenu");
       const button = $("#quickMenuButton");
+      const hero = $(".hero-row");
       if (!menu || !button) return;
+
       const shouldOpen = Boolean(open);
       menu.classList.toggle("hidden", !shouldOpen);
       button.setAttribute("aria-expanded", String(shouldOpen));
-      if (shouldOpen) requestAnimationFrame(() => menu.querySelector(".quick-menu-item:not(.hidden)")?.focus());
+
+      if (!shouldOpen) {
+        hero?.classList.remove("quick-menu-open");
+        hero?.style.removeProperty("--quick-menu-reserved-space");
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        updateQuickMenuReservedSpace();
+        menu.querySelector(".quick-menu-item:not(.hidden)")?.focus();
+      });
     }
 
     function toggleQuickMenu() {
@@ -10060,7 +10129,10 @@ body.transaction-form-open { overflow: hidden; }
 
     window.addEventListener("resize", () => {
       clearTimeout(state.chartResizeTimer);
-      state.chartResizeTimer = setTimeout(renderChart, 120);
+      state.chartResizeTimer = setTimeout(() => {
+        renderChart();
+        updateQuickMenuReservedSpace();
+      }, 120);
     });
 
     setInterval(() => {
