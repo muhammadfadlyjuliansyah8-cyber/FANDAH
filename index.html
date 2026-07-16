@@ -6221,6 +6221,109 @@ body.transaction-form-open { overflow: hidden; }
   }
 }
 
+
+
+/* ========================================================================== 
+   PERBAIKAN HERO MOBILE — UCAPAN, TANGGAL, BADGE, DAN TOMBOL LEBIH RAPI
+   ========================================================================== */
+@media (max-width: 780px) {
+  /* Paksa susunan vertikal agar area sapaan tidak terjepit oleh tombol. */
+  .hero-row {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+
+  .hero-copy {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .hero-copy h2 {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    font-size: clamp(24px, 7vw, 30px);
+    line-height: 1.16;
+    letter-spacing: -.035em;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+
+  /* “Selamat siang” dan nama tidak pecah per kata. */
+  .hero-copy h2 #heroGreeting,
+  .hero-copy h2 #heroUser {
+    display: inline;
+    white-space: nowrap;
+  }
+
+  .hero-copy p {
+    width: 100%;
+    max-width: 100%;
+    margin: 10px 0 0;
+    line-height: 1.6;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    width: auto;
+    max-width: 100%;
+    margin-top: 12px;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  /* Tombol berada rapi di bawah sapaan dan memakai lebar penuh. */
+  .hero-actions.compact-actions {
+    width: 100%;
+    min-width: 0;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr) 46px !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .hero-main-action,
+  .hero-target-action {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 10px;
+    white-space: nowrap;
+  }
+
+  .quick-menu-wrap {
+    width: 46px !important;
+    min-width: 46px;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero-row {
+    padding: 18px 14px;
+    gap: 14px !important;
+  }
+
+  .hero-copy h2 {
+    font-size: 24px;
+    line-height: 1.18;
+  }
+
+  .hero-actions.compact-actions {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, .78fr) 44px !important;
+  }
+
+  .quick-menu-wrap {
+    width: 44px !important;
+    min-width: 44px;
+  }
+}
+
 </style>
 </head>
 <body data-theme="obsidian" data-visual-mode="normal" data-high-contrast="false" data-reduce-motion="false" data-money-visible="true" data-ui-version="27">
