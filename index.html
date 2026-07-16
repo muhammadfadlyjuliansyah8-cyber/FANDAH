@@ -11,7 +11,7 @@
   <link rel="manifest" href="future-savings-v10.webmanifest">
   <link rel="icon" href="future-savings-icon-v10.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="future-savings-icon-v10-192.png">
-  <title>Future Savings — Obsidian Gold & Pearl Light V23</title>
+  <title>Future Savings — Focused Dashboard V26</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
@@ -5026,9 +5026,1204 @@ body[data-theme="pearl"] .transition-success-mark svg {
   .transition-success-mark { animation:none !important; }
 }
 
+
+
+/* =========================================================
+   V24 — Topbar lebih jelas + micro futuristic luxury effects
+   ========================================================= */
+
+/* Area kanan atas dibuat sedikit lebih besar dan mudah dibaca. */
+.topbar-actions {
+  gap: 13px;
+  flex: 0 0 auto;
+}
+.topbar-hud {
+  position: relative;
+  min-height: 46px;
+  padding: 9px 13px;
+  gap: 11px;
+  border-radius: 15px;
+  border-color: rgba(var(--accent-rgb), .20);
+  background:
+    linear-gradient(135deg, rgba(var(--accent-rgb), .055), rgba(var(--gold-rgb), .026)),
+    rgba(255,255,255,.032);
+  box-shadow:
+    inset 0 0 22px rgba(var(--accent-rgb), .035),
+    0 9px 28px rgba(0,0,0,.18),
+    0 0 0 1px rgba(255,255,255,.012);
+  font-size: 10.5px;
+  letter-spacing: .055em;
+  opacity: 1;
+  overflow: hidden;
+  isolation: isolate;
+}
+.topbar-hud::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,.10) 47%, transparent 67%);
+  transform: translateX(-135%);
+  animation: v24HudScan 6.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.topbar-hud::after {
+  content: "";
+  position: absolute;
+  right: 7px;
+  bottom: 5px;
+  width: 18px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.62));
+  box-shadow: 0 0 8px rgba(var(--accent-rgb),.28);
+  pointer-events: none;
+}
+.hud-signal.sync-state {
+  min-height: auto;
+  padding: 0;
+  gap: 8px;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--text-secondary);
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.hud-signal.sync-state::before {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  box-shadow:
+    0 0 0 3px rgba(var(--green-rgb),.08),
+    0 0 12px rgba(var(--green-rgb),.68);
+}
+.hud-time {
+  min-width: 76px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(var(--accent-rgb),.13);
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 10px rgba(var(--accent-rgb),.18);
+}
+.user-avatar-button {
+  width: 50px;
+  height: 50px;
+  min-height: 50px;
+  border-color: rgba(var(--accent-rgb),.22);
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255,255,255,.10), transparent 34%),
+    rgba(255,255,255,.035);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb),.08),
+    0 10px 28px rgba(0,0,0,.20),
+    0 0 22px rgba(var(--accent-rgb),.09);
+}
+.user-avatar-button::before {
+  inset: -5px;
+  border-color: rgba(var(--accent-rgb),.28);
+  animation: v24AvatarOrbit 12s linear infinite !important;
+}
+.user-avatar-button::after {
+  width: 8px;
+  height: 8px;
+  top: -1px;
+  right: 1px;
+}
+.user-avatar-button .user-avatar {
+  width: 38px;
+  height: 38px;
+  font-size: 13px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+}
+
+/* Layer dekoratif sangat tipis agar dashboard terasa futuristik tanpa ramai. */
+.dashboard-fx-layer {
+  position: fixed;
+  inset: 72px 0 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: .62;
+}
+.dashboard-fx-layer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 9%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0 9%, rgba(var(--accent-rgb),.12) 28%, transparent 54%, rgba(var(--gold-rgb),.08) 78%, transparent 100%);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb),.06);
+  animation: v24DataLine 12s ease-in-out infinite;
+}
+.dashboard-fx-layer::after {
+  content: "";
+  position: absolute;
+  width: min(40vw, 520px);
+  height: min(40vw, 520px);
+  right: -13%;
+  top: 16%;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--accent-rgb),.045);
+  box-shadow:
+    0 0 0 46px rgba(var(--accent-rgb),.012),
+    0 0 0 92px rgba(var(--gold-rgb),.008);
+  animation: v24AmbientOrbit 22s linear infinite;
+}
+
+/* Detail HUD kecil pada hero dan kartu. */
+.hero-row::after {
+  content: "";
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  width: 34px;
+  height: 18px;
+  border-top: 1px solid rgba(var(--accent-rgb),.22);
+  border-right: 1px solid rgba(var(--accent-rgb),.22);
+  border-radius: 0 8px 0 0;
+  opacity: .78;
+  pointer-events: none;
+}
+.summary-card,
+.panel,
+.quick-stat,
+.monthly-overview,
+.finance-insight {
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.summary-card:hover,
+.panel:hover,
+.quick-stat:hover,
+.monthly-overview:hover,
+.finance-insight:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--accent-rgb),.24);
+  box-shadow:
+    0 21px 54px rgba(0,0,0,.25),
+    0 0 24px rgba(var(--accent-rgb),.045);
+}
+.summary-icon,
+.quick-menu-icon,
+.finance-insight-icon {
+  position: relative;
+}
+.summary-icon::after,
+.quick-menu-icon::after,
+.finance-insight-icon::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: inherit;
+  border: 1px solid rgba(var(--accent-rgb),.055);
+  pointer-events: none;
+}
+.progress-bar,
+.budget-progress > span,
+.wishlist-progress > span {
+  background-size: 180% 100%;
+  animation: v24ProgressFlow 5.6s ease-in-out infinite;
+}
+
+/* Pearl Light tetap jelas: top-right box solid, teks dan jam kontras. */
+body[data-theme="pearl"] .topbar-hud {
+  color: #253541;
+  border-color: rgba(17,78,94,.18);
+  background:
+    linear-gradient(135deg, rgba(11,112,133,.055), rgba(140,104,25,.035)),
+    rgba(255,255,255,.96);
+  box-shadow:
+    inset 0 0 18px rgba(11,112,133,.025),
+    0 9px 24px rgba(42,36,25,.08);
+}
+body[data-theme="pearl"] .hud-signal.sync-state {
+  color: #314451 !important;
+}
+body[data-theme="pearl"] .hud-time {
+  color: #075f73;
+  border-left-color: rgba(17,78,94,.16);
+  text-shadow: none;
+}
+body[data-theme="pearl"] .user-avatar-button {
+  border-color: rgba(17,78,94,.20);
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 9px 24px rgba(42,36,25,.10), 0 0 0 1px rgba(17,78,94,.05);
+}
+body[data-theme="pearl"] .dashboard-fx-layer { opacity: .34; }
+body[data-theme="pearl"] .dashboard-fx-layer::after {
+  border-color: rgba(11,112,133,.05);
+  box-shadow: 0 0 0 46px rgba(11,112,133,.012), 0 0 0 92px rgba(140,104,25,.008);
+}
+body[data-theme="pearl"] .summary-card:hover,
+body[data-theme="pearl"] .panel:hover,
+body[data-theme="pearl"] .quick-stat:hover,
+body[data-theme="pearl"] .monthly-overview:hover,
+body[data-theme="pearl"] .finance-insight:hover {
+  border-color: rgba(11,112,133,.22);
+  box-shadow: 0 20px 46px rgba(42,36,25,.11), 0 0 18px rgba(11,112,133,.035);
+}
+
+@keyframes v24HudScan {
+  0%, 70% { transform: translateX(-135%); opacity: 0; }
+  82% { opacity: .72; }
+  100% { transform: translateX(145%); opacity: 0; }
+}
+@keyframes v24AvatarOrbit { to { transform: rotate(360deg); } }
+@keyframes v24DataLine {
+  0%,100% { transform: translateX(-4%); opacity: .32; }
+  50% { transform: translateX(4%); opacity: .78; }
+}
+@keyframes v24AmbientOrbit { to { transform: rotate(360deg); } }
+@keyframes v24ProgressFlow {
+  0%,100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@media (max-width: 1100px) {
+  .topbar-hud { min-height: 43px; padding: 8px 10px; }
+  .hud-signal.sync-state { font-size: 9.5px; }
+  .hud-time { min-width: 68px; font-size: 10px; }
+  .user-avatar-button { width: 47px; height: 47px; min-height: 47px; }
+  .user-avatar-button .user-avatar { width: 35px; height: 35px; }
+}
+@media (max-width: 780px) {
+  .topbar-actions { gap: 9px; }
+  .topbar-hud {
+    min-height: 40px;
+    padding: 7px 9px;
+    border-radius: 13px;
+  }
+  .topbar-hud .sync-state { display: none; }
+  .hud-time {
+    min-width: 60px;
+    padding-left: 0;
+    border-left: 0;
+    font-size: 10px;
+  }
+  .user-avatar-button { width: 44px; height: 44px; min-height: 44px; }
+  .user-avatar-button .user-avatar { width: 34px; height: 34px; }
+  .dashboard-fx-layer { display: none; }
+  .summary-card:hover,
+  .panel:hover,
+  .quick-stat:hover,
+  .monthly-overview:hover,
+  .finance-insight:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .topbar-hud::before,
+  .user-avatar-button::before,
+  .dashboard-fx-layer::before,
+  .dashboard-fx-layer::after,
+  .progress-bar,
+  .budget-progress > span,
+  .wishlist-progress > span {
+    animation: none !important;
+  }
+}
+
+
+
+/* =========================================================
+   V25 — Luxury motion layer for a richer login experience
+   ========================================================= */
+.login-motion-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  opacity: .88;
+}
+.login-aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(82px);
+  opacity: .12;
+  will-change: transform, opacity;
+}
+.login-aurora-a {
+  width: min(42vw, 560px);
+  height: min(34vw, 420px);
+  left: 7%;
+  top: 10%;
+  background: radial-gradient(circle, rgba(var(--accent-rgb),.62), transparent 68%);
+  animation: v25AuroraA 16s ease-in-out infinite alternate;
+}
+.login-aurora-b {
+  width: min(38vw, 500px);
+  height: min(30vw, 360px);
+  right: 5%;
+  bottom: 7%;
+  background: radial-gradient(circle, rgba(var(--gold-rgb),.42), rgba(var(--purple-rgb),.20) 38%, transparent 70%);
+  animation: v25AuroraB 19s ease-in-out infinite alternate;
+}
+.login-orbit {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--accent-rgb),.075);
+  box-shadow: inset 0 0 44px rgba(var(--accent-rgb),.018);
+  transform: translate(-50%,-50%);
+  will-change: transform;
+}
+.login-orbit::before,
+.login-orbit::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+.login-orbit::before {
+  inset: 11%;
+  border-top: 1px solid rgba(var(--gold-rgb),.14);
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid rgba(var(--accent-rgb),.08);
+  border-left: 1px solid transparent;
+}
+.login-orbit::after {
+  width: 5px;
+  height: 5px;
+  right: 9%;
+  top: 22%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb),.72), 0 0 24px rgba(var(--accent-rgb),.28);
+}
+.login-orbit i {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  left: 16%;
+  bottom: 18%;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px rgba(var(--gold-rgb),.70), 0 0 22px rgba(var(--gold-rgb),.25);
+}
+.login-orbit-a {
+  width: min(72vw, 760px);
+  height: min(72vw, 760px);
+  animation: v25OrbitA 26s linear infinite;
+}
+.login-orbit-b {
+  width: min(50vw, 510px);
+  height: min(50vw, 510px);
+  border-style: dashed;
+  border-color: rgba(var(--gold-rgb),.075);
+  animation: v25OrbitB 19s linear infinite reverse;
+}
+.login-data-stream {
+  position: absolute;
+  top: 18%;
+  width: 1px;
+  height: 58%;
+  background: linear-gradient(180deg, transparent, rgba(var(--accent-rgb),.10) 18%, rgba(var(--accent-rgb),.045) 72%, transparent);
+  opacity: .72;
+}
+.login-data-left { left: 9%; }
+.login-data-right { right: 9%; }
+.login-data-stream::before,
+.login-data-stream::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  width: 15px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.36), transparent);
+  box-shadow: 0 0 9px rgba(var(--accent-rgb),.16);
+}
+.login-data-stream::before { top: 16%; }
+.login-data-stream::after { bottom: 19%; }
+.login-data-stream i {
+  position: absolute;
+  left: -2px;
+  width: 5px;
+  height: 30px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, transparent, rgba(var(--accent-rgb),.68), transparent);
+  filter: drop-shadow(0 0 5px rgba(var(--accent-rgb),.42));
+  animation: v25DataPulse 6.4s linear infinite;
+}
+.login-data-stream i:nth-child(2) { animation-delay: -2.1s; opacity: .68; }
+.login-data-stream i:nth-child(3) { animation-delay: -4.2s; opacity: .46; }
+.login-data-right i { animation-direction: reverse; }
+.login-light-streak {
+  position: absolute;
+  width: clamp(130px, 16vw, 260px);
+  height: 1px;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.70), rgba(255,255,255,.62), transparent);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb),.24);
+  transform: rotate(-13deg);
+  will-change: transform, opacity;
+}
+.login-streak-a { top: 18%; left: -18%; animation: v25Streak 11s 1.2s ease-in-out infinite; }
+.login-streak-b { top: 63%; left: -24%; animation: v25Streak 14s 5.4s ease-in-out infinite; opacity: .55; }
+.login-streak-c {
+  top: 35%;
+  right: -22%;
+  transform: rotate(164deg);
+  background: linear-gradient(90deg, transparent, rgba(var(--gold-rgb),.58), rgba(255,246,198,.48), transparent);
+  box-shadow: 0 0 10px rgba(var(--gold-rgb),.18);
+  animation: v25StreakReverse 16s 8.2s ease-in-out infinite;
+}
+.login-hud-corner {
+  position: absolute;
+  width: 54px;
+  height: 34px;
+  opacity: .34;
+}
+.login-corner-a {
+  left: 6%;
+  top: 13%;
+  border-left: 1px solid rgba(var(--accent-rgb),.28);
+  border-top: 1px solid rgba(var(--accent-rgb),.28);
+}
+.login-corner-b {
+  right: 6%;
+  bottom: 13%;
+  border-right: 1px solid rgba(var(--gold-rgb),.25);
+  border-bottom: 1px solid rgba(var(--gold-rgb),.25);
+}
+.login-ghost-logo {
+  animation: v25GhostBreathe 8s ease-in-out infinite;
+}
+#loginPage .simple-login-card {
+  animation:
+    luxuryLoginCardIn .82s cubic-bezier(.18,.86,.24,1) both,
+    v25CardAmbient 7.2s 1.1s ease-in-out infinite;
+}
+#loginPage .simple-login-card .field-group {
+  position: relative;
+}
+#loginPage .simple-login-card .field-group::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.20), transparent);
+  transform: scaleX(.18);
+  opacity: 0;
+  transition: transform .28s ease, opacity .28s ease;
+  pointer-events: none;
+}
+#loginPage .simple-login-card .field-group:focus-within::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+body[data-theme="pearl"] .login-motion-layer {
+  opacity: .58;
+  mix-blend-mode: multiply;
+}
+body[data-theme="pearl"] .login-aurora { opacity: .075; }
+body[data-theme="pearl"] .login-orbit {
+  border-color: rgba(11,112,133,.08);
+  box-shadow: inset 0 0 36px rgba(11,112,133,.018);
+}
+body[data-theme="pearl"] .login-data-stream {
+  background: linear-gradient(180deg, transparent, rgba(11,112,133,.11) 18%, rgba(11,112,133,.045) 72%, transparent);
+}
+body[data-theme="pearl"] .login-light-streak {
+  background: linear-gradient(90deg, transparent, rgba(11,112,133,.34), rgba(255,255,255,.52), transparent);
+  box-shadow: 0 0 8px rgba(11,112,133,.10);
+}
+@keyframes v25AuroraA {
+  from { transform: translate3d(-4%,-6%,0) scale(.92); opacity:.07; }
+  to { transform: translate3d(18%,14%,0) scale(1.14); opacity:.16; }
+}
+@keyframes v25AuroraB {
+  from { transform: translate3d(8%,8%,0) scale(1.06); opacity:.07; }
+  to { transform: translate3d(-18%,-12%,0) scale(.90); opacity:.14; }
+}
+@keyframes v25OrbitA {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to { transform: translate(-50%,-50%) rotate(360deg); }
+}
+@keyframes v25OrbitB {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to { transform: translate(-50%,-50%) rotate(360deg); }
+}
+@keyframes v25DataPulse {
+  from { top:-14%; opacity:0; }
+  12% { opacity:.9; }
+  82% { opacity:.45; }
+  to { top:106%; opacity:0; }
+}
+@keyframes v25Streak {
+  0%,64% { transform: translateX(0) rotate(-13deg); opacity:0; }
+  70% { opacity:.72; }
+  88%,100% { transform: translateX(138vw) rotate(-13deg); opacity:0; }
+}
+@keyframes v25StreakReverse {
+  0%,70% { transform: translateX(0) rotate(164deg); opacity:0; }
+  76% { opacity:.52; }
+  94%,100% { transform: translateX(-138vw) rotate(164deg); opacity:0; }
+}
+@keyframes v25GhostBreathe {
+  0%,100% { opacity:.46; transform:translate(-50%,-50%) scale(.985); filter:blur(.15px); }
+  50% { opacity:.76; transform:translate(-50%,-50%) scale(1.018); filter:blur(0); }
+}
+@keyframes v25CardAmbient {
+  0%,100% {
+    box-shadow:0 24px 68px rgba(0,0,0,.30),0 0 0 1px rgba(var(--gold-rgb),.025) inset,0 0 30px rgba(var(--accent-rgb),.025);
+  }
+  50% {
+    box-shadow:0 28px 76px rgba(0,0,0,.34),0 0 0 1px rgba(var(--gold-rgb),.045) inset,0 0 42px rgba(var(--accent-rgb),.065);
+  }
+}
+@media (max-width: 780px) {
+  .login-motion-layer { opacity:.68; }
+  .login-data-stream,
+  .login-hud-corner,
+  .login-orbit-a { display:none; }
+  .login-orbit-b {
+    width:min(132vw,510px);
+    height:min(132vw,510px);
+    opacity:.62;
+  }
+  .login-light-streak { width:150px; }
+  .login-streak-b { display:none; }
+  .login-aurora { filter:blur(62px); }
+}
+@media (max-width: 480px) {
+  .login-motion-layer { opacity:.52; }
+  .login-streak-c { display:none; }
+  .login-aurora-a { width:270px;height:220px;left:-20%;top:6%; }
+  .login-aurora-b { width:250px;height:200px;right:-22%;bottom:5%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-motion-layer { display:none !important; }
+  .login-ghost-logo,
+  #loginPage .simple-login-card { animation:none !important; }
+}
+
+
+/* =========================================================
+   V26 — Small rotating dashboard orbits and living star field
+   ========================================================= */
+.dashboard-cosmic-layer {
+  position: fixed;
+  inset: 72px 0 0;
+  z-index: 1 !important;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: .72;
+  isolation: isolate;
+  mix-blend-mode: screen;
+}
+.dashboard-star-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.dashboard-star {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  opacity: .14;
+  transform: translate3d(0,0,0) scale(.72);
+  animation: v26StarTwinkle var(--dur) var(--delay) ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.dashboard-star::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--s) * -1.8);
+  border-radius: 50%;
+  opacity: .42;
+  background: radial-gradient(circle, currentColor 0 10%, transparent 64%);
+}
+.dashboard-star.star-cyan {
+  color: var(--cyan);
+  background: rgba(var(--accent-rgb),.82);
+  box-shadow: 0 0 7px rgba(var(--accent-rgb),.38);
+}
+.dashboard-star.star-gold {
+  color: var(--gold);
+  background: rgba(var(--gold-rgb),.88);
+  box-shadow: 0 0 7px rgba(var(--gold-rgb),.34);
+}
+.dashboard-star.star-white {
+  color: #f7fbff;
+  background: rgba(247,251,255,.88);
+  box-shadow: 0 0 6px rgba(247,251,255,.30);
+}
+.dashboard-mini-orbit {
+  position: absolute;
+  display: block;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--accent-rgb),.10);
+  box-shadow:
+    inset 0 0 24px rgba(var(--accent-rgb),.025),
+    0 0 18px rgba(var(--accent-rgb),.025);
+  opacity: .62;
+  animation: v26OrbitRotate 15s linear infinite;
+  will-change: transform;
+}
+.dashboard-mini-orbit::before,
+.dashboard-mini-orbit::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.dashboard-mini-orbit::before {
+  inset: 14px;
+  border: 1px dashed rgba(var(--gold-rgb),.10);
+  animation: v26OrbitReverse 10s linear infinite;
+}
+.dashboard-mini-orbit::after {
+  inset: 32px;
+  border: 1px solid rgba(var(--accent-rgb),.07);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb),.035);
+}
+.dashboard-mini-orbit > i,
+.dashboard-mini-orbit > b {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.dashboard-mini-orbit > i {
+  width: 6px;
+  height: 6px;
+  left: 50%;
+  top: -3px;
+  margin-left: -3px;
+  background: var(--cyan);
+  box-shadow: 0 0 9px rgba(var(--accent-rgb),.58);
+}
+.dashboard-mini-orbit > b {
+  width: 4px;
+  height: 4px;
+  right: 10px;
+  bottom: 16px;
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(var(--gold-rgb),.52);
+}
+.dashboard-mini-orbit.orbit-one {
+  left: 4.5%;
+  top: 16%;
+  width: 84px;
+  height: 84px;
+  animation-duration: 17s;
+}
+.dashboard-mini-orbit.orbit-two {
+  right: 4.5%;
+  top: 34%;
+  width: 112px;
+  height: 112px;
+  animation-duration: 23s;
+  animation-direction: reverse;
+  opacity: .50;
+}
+.dashboard-mini-orbit.orbit-three {
+  left: 8%;
+  bottom: 12%;
+  width: 66px;
+  height: 66px;
+  animation-duration: 13s;
+  opacity: .44;
+}
+.dashboard-mini-orbit.orbit-three::before { inset: 10px; }
+.dashboard-mini-orbit.orbit-three::after { inset: 24px; }
+
+body[data-visual-mode="future"] .dashboard-cosmic-layer { opacity: .90; }
+body[data-visual-mode="minimal"] .dashboard-cosmic-layer { opacity: .28; }
+body[data-theme="pearl"] .dashboard-cosmic-layer {
+  opacity: .46;
+  mix-blend-mode: multiply;
+}
+body[data-theme="pearl"] .dashboard-star.star-white {
+  color: #254452;
+  background: rgba(37,68,82,.52);
+  box-shadow: 0 0 5px rgba(37,68,82,.12);
+}
+body[data-theme="pearl"] .dashboard-star.star-cyan {
+  background: rgba(11,112,133,.58);
+  box-shadow: 0 0 5px rgba(11,112,133,.14);
+}
+body[data-theme="pearl"] .dashboard-star.star-gold {
+  background: rgba(140,104,25,.52);
+  box-shadow: 0 0 5px rgba(140,104,25,.12);
+}
+body[data-theme="pearl"] .dashboard-mini-orbit {
+  border-color: rgba(11,112,133,.10);
+  box-shadow: inset 0 0 18px rgba(11,112,133,.018);
+}
+body[data-theme="pearl"] .dashboard-mini-orbit::before {
+  border-color: rgba(140,104,25,.11);
+}
+
+@keyframes v26StarTwinkle {
+  0%,100% {
+    opacity: .12;
+    transform: translate3d(0,0,0) scale(.68);
+  }
+  42% {
+    opacity: .76;
+    transform: translate3d(calc(var(--drift) * .42), -7px, 0) scale(1.12);
+  }
+  70% {
+    opacity: .28;
+    transform: translate3d(var(--drift), -13px, 0) scale(.86);
+  }
+}
+@keyframes v26OrbitRotate {
+  to { transform: rotate(360deg); }
+}
+@keyframes v26OrbitReverse {
+  to { transform: rotate(-360deg); }
+}
+
+@media (max-width: 1180px) {
+  .dashboard-mini-orbit.orbit-one { left: 1.5%; }
+  .dashboard-mini-orbit.orbit-two { right: 1.5%; }
+}
+@media (max-width: 780px) {
+  .dashboard-cosmic-layer {
+    inset: 66px 0 0;
+    opacity: .46;
+  }
+  .dashboard-star:nth-child(2n) { display:none; }
+  .dashboard-mini-orbit.orbit-one {
+    left: -28px;
+    top: 21%;
+    width: 72px;
+    height: 72px;
+    opacity: .34;
+  }
+  .dashboard-mini-orbit.orbit-two {
+    right: -38px;
+    top: 47%;
+    width: 88px;
+    height: 88px;
+    opacity: .28;
+  }
+  .dashboard-mini-orbit.orbit-three { display:none; }
+}
+@media (max-width: 480px) {
+  .dashboard-star:nth-child(3n) { display:none; }
+  .dashboard-mini-orbit.orbit-one { opacity:.24; }
+  .dashboard-mini-orbit.orbit-two { opacity:.20; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-star,
+  .dashboard-mini-orbit,
+  .dashboard-mini-orbit::before {
+    animation: none !important;
+  }
+  .dashboard-cosmic-layer { opacity: .22; }
+}
+body[data-reduce-motion="true"] .dashboard-star,
+body[data-reduce-motion="true"] .dashboard-mini-orbit,
+body[data-reduce-motion="true"] .dashboard-mini-orbit::before {
+  animation: none !important;
+}
+
+
+
+/* =========================================================
+   V27 — Guaranteed visible dashboard stars and side orbits
+   Fix: V26 stars were mostly hidden behind opaque dashboard panels.
+   ========================================================= */
+#dashboardPage > .future-bg { z-index: 0 !important; }
+#dashboardPage > .dashboard-fx-layer { z-index: 1 !important; }
+#dashboardPage > .dashboard-cosmic-layer {
+  z-index: 2 !important;
+  opacity: .94;
+  mix-blend-mode: normal;
+}
+#dashboardPage > .topbar,
+#dashboardPage > .dashboard-wrap,
+#dashboardPage > .mobile-bottom-nav,
+#dashboardPage > #toastStack,
+#dashboardPage > .offline-banner {
+  position: relative;
+  z-index: 3 !important;
+}
+.dashboard-star-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.dashboard-star {
+  width: max(var(--s), 2px);
+  height: max(var(--s), 2px);
+  opacity: .34;
+  filter: saturate(1.15);
+  animation-name: v27StarRiseTwinkle;
+}
+.dashboard-star::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 10px;
+  transform: translate(-50%, 3px);
+  border-radius: 999px;
+  background: linear-gradient(180deg, currentColor, transparent);
+  opacity: .12;
+}
+.dashboard-star::after {
+  inset: -7px;
+  opacity: .65;
+  background: radial-gradient(circle, currentColor 0 8%, rgba(255,255,255,.18) 9% 13%, transparent 64%);
+}
+.dashboard-star.star-cyan {
+  background: rgb(var(--accent-rgb));
+  box-shadow: 0 0 5px rgba(var(--accent-rgb),.92), 0 0 13px rgba(var(--accent-rgb),.38);
+}
+.dashboard-star.star-gold {
+  background: rgb(var(--gold-rgb));
+  box-shadow: 0 0 5px rgba(var(--gold-rgb),.92), 0 0 13px rgba(var(--gold-rgb),.34);
+}
+.dashboard-star.star-white {
+  background: #f7fbff;
+  box-shadow: 0 0 5px rgba(247,251,255,.88), 0 0 12px rgba(247,251,255,.30);
+}
+.dashboard-mini-orbit {
+  z-index: 2;
+  opacity: .76;
+  border-color: rgba(var(--accent-rgb),.18);
+  box-shadow: inset 0 0 25px rgba(var(--accent-rgb),.04), 0 0 20px rgba(var(--accent-rgb),.04);
+}
+.dashboard-mini-orbit::before { border-color: rgba(var(--gold-rgb),.18); }
+.dashboard-mini-orbit::after { border-color: rgba(var(--accent-rgb),.12); }
+.dashboard-mini-orbit.orbit-one { left: 2.2%; top: 19%; }
+.dashboard-mini-orbit.orbit-two { right: 2.2%; top: 40%; }
+.dashboard-mini-orbit.orbit-three { left: 4.2%; bottom: 10%; }
+body[data-visual-mode="future"] .dashboard-cosmic-layer { opacity: 1; }
+body[data-visual-mode="minimal"] .dashboard-cosmic-layer { opacity: .48; }
+body[data-theme="pearl"] .dashboard-cosmic-layer {
+  opacity: .72;
+  mix-blend-mode: normal;
+}
+body[data-theme="pearl"] .dashboard-star.star-white {
+  color:#274451;
+  background:#274451;
+  box-shadow:0 0 5px rgba(39,68,81,.65),0 0 11px rgba(39,68,81,.18);
+}
+body[data-theme="pearl"] .dashboard-star.star-cyan {
+  background:#087f98;
+  box-shadow:0 0 5px rgba(8,127,152,.72),0 0 11px rgba(8,127,152,.20);
+}
+body[data-theme="pearl"] .dashboard-star.star-gold {
+  background:#98701d;
+  box-shadow:0 0 5px rgba(152,112,29,.70),0 0 11px rgba(152,112,29,.18);
+}
+@keyframes v27StarRiseTwinkle {
+  0%,100% {
+    opacity: .28;
+    transform: translate3d(0,5px,0) scale(.76);
+  }
+  25% {
+    opacity: .62;
+    transform: translate3d(calc(var(--drift) * .22), 0, 0) scale(.94);
+  }
+  52% {
+    opacity: 1;
+    transform: translate3d(calc(var(--drift) * .58), -9px, 0) scale(1.22);
+  }
+  78% {
+    opacity: .48;
+    transform: translate3d(var(--drift), -18px, 0) scale(.86);
+  }
+}
+@media (max-width: 780px) {
+  #dashboardPage > .dashboard-cosmic-layer { opacity: .68; }
+  .dashboard-star { width:max(var(--s),2px);height:max(var(--s),2px); }
+  .dashboard-star:nth-child(2n) { display:block; }
+  .dashboard-star:nth-child(3n) { opacity:.42; }
+  .dashboard-mini-orbit.orbit-one { left:-24px; }
+  .dashboard-mini-orbit.orbit-two { right:-28px; }
+}
+@media (max-width: 480px) {
+  .dashboard-star:nth-child(2n) { display:none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-star { opacity:.42; }
+}
+
+
+
+/* ===== V26 FOCUSED DASHBOARD VISUAL HIERARCHY =====
+   Bintang, orbit, glow, dan animasi futuristik sengaja dipertahankan. */
+.dashboard-section-nav {
+  position: sticky;
+  top: 88px;
+  z-index: 32;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: min(760px, 100%);
+  margin: 0 auto 22px;
+  padding: 7px;
+  border: 1px solid rgba(var(--accent-rgb), .16);
+  border-radius: 18px;
+  background: rgba(var(--theme-panel), .88);
+  box-shadow: 0 14px 38px rgba(0,0,0,.24), inset 0 0 22px rgba(var(--accent-rgb),.025);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.dashboard-section-nav button {
+  min-height: 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 11px;
+  font-weight: 800;
+  transition: .16s ease;
+}
+.dashboard-section-nav button .ui-icon { width: 16px; height: 16px; }
+.dashboard-section-nav button:hover,
+.dashboard-section-nav button.active {
+  color: var(--text);
+  border-color: rgba(var(--accent-rgb), .20);
+  background: linear-gradient(135deg, rgba(var(--accent-rgb),.10), rgba(var(--purple-rgb),.07));
+  box-shadow: inset 0 0 16px rgba(var(--accent-rgb),.035), 0 0 18px rgba(var(--accent-rgb),.06);
+}
+.dashboard-section-nav button.active { color: var(--cyan); }
+
+#summarySection, #analyticsSection, #wishlistSection, #historySection { scroll-margin-top: 158px; }
+
+.summary-grid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-areas:
+    "balance balance balance balance balance balance balance target target target target target"
+    "income income income income income income expense expense expense expense expense expense";
+  align-items: stretch;
+}
+.summary-card.balance { grid-area: balance; min-height: 220px; padding: 27px; }
+.summary-card.target { grid-area: target; min-height: 220px; padding: 25px; }
+.summary-card.income { grid-area: income; }
+.summary-card.expense { grid-area: expense; }
+.summary-card.balance .summary-value { margin-top: 28px; font-size: clamp(36px, 4.7vw, 62px); }
+.summary-card.target .summary-value { font-size: clamp(25px, 2.7vw, 38px); }
+.summary-card.income,
+.summary-card.expense {
+  min-height: 176px;
+  background: rgba(var(--theme-panel), .68);
+  box-shadow: 0 18px 52px rgba(0,0,0,.30), inset 0 0 24px rgba(var(--accent-rgb),.02);
+}
+.summary-card-trend {
+  position: relative;
+  z-index: 1;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.summary-card-trend.good { color: var(--green); }
+.summary-card-trend.warning { color: var(--orange); }
+.summary-sparkline {
+  position: absolute;
+  z-index: 1;
+  right: 20px;
+  bottom: 20px;
+  width: 118px;
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  opacity: .72;
+}
+.summary-sparkline i {
+  flex: 1;
+  min-height: 5px;
+  border-radius: 999px 999px 3px 3px;
+  background: rgba(var(--accent-rgb), .22);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb),.08);
+}
+.summary-card.expense .summary-sparkline i { background: rgba(var(--red-rgb), .24); }
+.summary-sparkline i.current {
+  background: linear-gradient(180deg, var(--gold), var(--cyan));
+  box-shadow: 0 0 13px rgba(var(--accent-rgb),.26);
+}
+.summary-card.expense .summary-sparkline i.current {
+  background: linear-gradient(180deg, var(--gold), var(--red));
+}
+
+.monthly-overview { margin-top: 18px; }
+.monthly-overview.collapsed .monthly-overview-head {
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb),.055), rgba(var(--purple-rgb),.035));
+}
+.finance-insight { margin-top: 18px; }
+.analytics-grid .panel,
+.wishlist-hub,
+.history-panel { background: rgba(var(--theme-panel), .76); }
+
+.wishlist-more-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 15px 16px 4px;
+}
+.wishlist-more-button { min-height: 40px; font-size: 11px; }
+.wishlist-compact-note { color: var(--muted); font-size: 10px; }
+
+.content-grid {
+  display: block;
+  margin-top: 18px;
+}
+.history-panel { width: 100%; }
+.history-panel-head {
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.filter-toggle { display: none; }
+.filter-bar {
+  width: min(100%, 950px);
+  margin-left: auto;
+  display: grid;
+  gap: 9px;
+}
+.filter-primary-row {
+  display: grid;
+  grid-template-columns: minmax(230px, 1.65fr) minmax(135px, .7fr) minmax(135px, .7fr) auto;
+  gap: 9px;
+}
+.filter-primary-row .input,
+.filter-advanced-panel .input { width: 100%; min-width: 0; }
+.filter-advanced-panel {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(128px, 1fr)) auto;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid rgba(var(--accent-rgb),.11);
+  border-radius: 14px;
+  background: rgba(255,255,255,.022);
+}
+.advanced-filter-button,
+.filter-reset { min-height: 40px; font-size: 10px; white-space: nowrap; }
+
+.transaction-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(0,0,0,.24);
+}
+.transaction-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  background: rgba(0,0,0,.54);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+}
+.transaction-panel {
+  position: relative !important;
+  z-index: 1;
+  top: auto !important;
+  align-self: stretch !important;
+  width: min(520px, 100%);
+  height: 100%;
+  overflow: auto;
+  border-radius: 26px 0 0 26px;
+  padding: 26px;
+  background: rgba(var(--theme-panel), .98);
+  box-shadow: -30px 0 90px rgba(0,0,0,.48), 0 0 42px rgba(var(--accent-rgb),.07);
+  animation: transactionDrawerIn .28s cubic-bezier(.2,.86,.2,1);
+}
+.transaction-panel-close {
+  display: grid !important;
+  place-items: center;
+}
+body.transaction-form-open { overflow: hidden; }
+@keyframes transactionDrawerIn {
+  from { transform: translateX(34px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.summary-label,
+.quick-stat-label { font-size: 11px; }
+.summary-note,
+.quick-stat-note,
+.panel-head p,
+.form-hint,
+.wishlist-head p { font-size: 11px; line-height: 1.6; }
+.panel-head h3,
+.wishlist-head h3 { letter-spacing: -.015em; }
+
+@media (max-width: 1050px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    grid-template-areas:
+      "balance balance"
+      "target target"
+      "income expense";
+  }
+  .summary-card.balance,
+  .summary-card.target { min-height: 190px; }
+  .filter-bar { width: 100%; }
+  .history-panel-head { flex-direction: column; align-items: stretch; }
+}
+
+@media (max-width: 780px) {
+  .dashboard-section-nav { display: none; }
+  #summarySection, #analyticsSection, #wishlistSection, #historySection { scroll-margin-top: 82px; }
+  .filter-toggle { display: block; width: 100%; }
+  .filter-bar { width: 100%; }
+  .filter-primary-row,
+  .filter-advanced-panel { grid-template-columns: 1fr 1fr; }
+  .filter-primary-row .search-input { grid-column: 1 / -1; }
+  .advanced-filter-button { grid-column: 1 / -1; }
+}
+
+@media (max-width: 640px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: "balance" "target" "income" "expense";
+  }
+  .summary-card.balance .summary-value { font-size: clamp(31px, 10vw, 44px); }
+  .summary-sparkline { width: 92px; height: 34px; right: 16px; bottom: 18px; }
+  .wishlist-more-shell { flex-direction: column; gap: 7px; text-align: center; }
+  .filter-primary-row,
+  .filter-advanced-panel { grid-template-columns: 1fr; }
+  .filter-primary-row .search-input,
+  .advanced-filter-button { grid-column: auto; }
+  .transaction-drawer-overlay { align-items: flex-end; }
+  .transaction-panel,
+  .transaction-panel.mobile-form-open {
+    position: relative !important;
+    inset: auto !important;
+    width: 100%;
+    height: min(92vh, 820px);
+    border-radius: 24px 24px 0 0;
+    padding: 20px 16px calc(24px + env(safe-area-inset-bottom));
+    animation: transactionSheetIn .28s cubic-bezier(.2,.86,.2,1);
+  }
+  @keyframes transactionSheetIn {
+    from { transform: translateY(35px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+}
+
 </style>
 </head>
-<body data-theme="obsidian" data-visual-mode="normal" data-high-contrast="false" data-reduce-motion="false" data-money-visible="true" data-ui-version="23">
+<body data-theme="obsidian" data-visual-mode="normal" data-high-contrast="false" data-reduce-motion="false" data-money-visible="true" data-ui-version="27">
   <div id="loadingScreen">
     <div class="loader-core loader-core-v14" role="status" aria-live="polite">
       <div class="loader-monogram" aria-hidden="true">
@@ -5068,6 +6263,19 @@ body[data-theme="pearl"] .transition-success-mark svg {
 
   <main id="loginPage">
     <canvas id="loginFxCanvas" aria-hidden="true"></canvas>
+    <div class="login-motion-layer" aria-hidden="true">
+      <span class="login-aurora login-aurora-a"></span>
+      <span class="login-aurora login-aurora-b"></span>
+      <span class="login-orbit login-orbit-a"><i></i></span>
+      <span class="login-orbit login-orbit-b"><i></i></span>
+      <span class="login-data-stream login-data-left"><i></i><i></i><i></i></span>
+      <span class="login-data-stream login-data-right"><i></i><i></i><i></i></span>
+      <span class="login-light-streak login-streak-a"></span>
+      <span class="login-light-streak login-streak-b"></span>
+      <span class="login-light-streak login-streak-c"></span>
+      <span class="login-hud-corner login-corner-a"></span>
+      <span class="login-hud-corner login-corner-b"></span>
+    </div>
     <div class="login-ghost-logo" aria-hidden="true"><span>F</span><span class="ghost-amp">&amp;</span><span>I</span></div>
     <section class="simple-login-card" aria-labelledby="loginTitle">
       <div class="simple-login-logo simple-login-logo-v14" aria-hidden="true">
@@ -5103,6 +6311,38 @@ body[data-theme="pearl"] .transition-success-mark svg {
 
   <main id="dashboardPage" class="hidden">
     <canvas class="future-bg" id="futureBackground" aria-hidden="true"></canvas>
+    <div class="dashboard-fx-layer" aria-hidden="true"></div>
+    <div class="dashboard-cosmic-layer" aria-hidden="true">
+      <div class="dashboard-star-field">
+        <i class="dashboard-star star-cyan" style="--x:2.5%;--y:8%;--s:3px;--delay:-1.2s;--dur:7.4s;--drift:12px"></i>
+        <i class="dashboard-star star-white" style="--x:5.8%;--y:16%;--s:2px;--delay:-3.4s;--dur:8.8s;--drift:-9px"></i>
+        <i class="dashboard-star star-gold" style="--x:2.1%;--y:26%;--s:3px;--delay:-5.1s;--dur:7.9s;--drift:10px"></i>
+        <i class="dashboard-star star-cyan" style="--x:7.2%;--y:37%;--s:2px;--delay:-2.7s;--dur:9.2s;--drift:-12px"></i>
+        <i class="dashboard-star star-white" style="--x:3.7%;--y:49%;--s:2px;--delay:-6.2s;--dur:8.1s;--drift:8px"></i>
+        <i class="dashboard-star star-gold" style="--x:6.4%;--y:60%;--s:3px;--delay:-4.0s;--dur:9.6s;--drift:-10px"></i>
+        <i class="dashboard-star star-cyan" style="--x:2.8%;--y:72%;--s:2px;--delay:-1.8s;--dur:7.6s;--drift:12px"></i>
+        <i class="dashboard-star star-white" style="--x:7.7%;--y:84%;--s:3px;--delay:-7.2s;--dur:8.7s;--drift:-8px"></i>
+        <i class="dashboard-star star-gold" style="--x:4.4%;--y:93%;--s:2px;--delay:-3.1s;--dur:9.1s;--drift:10px"></i>
+        <i class="dashboard-star star-cyan" style="--x:10.5%;--y:19%;--s:2px;--delay:-6.4s;--dur:8.3s;--drift:-10px"></i>
+        <i class="dashboard-star star-gold" style="--x:9.2%;--y:54%;--s:2px;--delay:-2.2s;--dur:7.8s;--drift:9px"></i>
+        <i class="dashboard-star star-white" style="--x:11.4%;--y:77%;--s:2px;--delay:-5.6s;--dur:9.4s;--drift:-7px"></i>
+        <i class="dashboard-star star-cyan" style="--x:97.2%;--y:10%;--s:3px;--delay:-6.7s;--dur:7.5s;--drift:-12px"></i>
+        <i class="dashboard-star star-white" style="--x:94.5%;--y:18%;--s:2px;--delay:-2.4s;--dur:9.0s;--drift:10px"></i>
+        <i class="dashboard-star star-gold" style="--x:98.1%;--y:29%;--s:3px;--delay:-4.8s;--dur:8.2s;--drift:-9px"></i>
+        <i class="dashboard-star star-cyan" style="--x:93.2%;--y:40%;--s:2px;--delay:-1.6s;--dur:9.5s;--drift:11px"></i>
+        <i class="dashboard-star star-white" style="--x:96.4%;--y:51%;--s:2px;--delay:-6.0s;--dur:7.9s;--drift:-8px"></i>
+        <i class="dashboard-star star-gold" style="--x:92.6%;--y:63%;--s:3px;--delay:-3.7s;--dur:9.3s;--drift:10px"></i>
+        <i class="dashboard-star star-cyan" style="--x:97.5%;--y:73%;--s:2px;--delay:-5.4s;--dur:8.4s;--drift:-11px"></i>
+        <i class="dashboard-star star-white" style="--x:93.8%;--y:85%;--s:3px;--delay:-2.9s;--dur:7.7s;--drift:9px"></i>
+        <i class="dashboard-star star-gold" style="--x:96.8%;--y:94%;--s:2px;--delay:-7.0s;--dur:9.6s;--drift:-10px"></i>
+        <i class="dashboard-star star-cyan" style="--x:89.4%;--y:22%;--s:2px;--delay:-4.1s;--dur:8.6s;--drift:8px"></i>
+        <i class="dashboard-star star-gold" style="--x:90.7%;--y:57%;--s:2px;--delay:-1.1s;--dur:9.1s;--drift:-9px"></i>
+        <i class="dashboard-star star-white" style="--x:88.8%;--y:79%;--s:2px;--delay:-5.0s;--dur:8.0s;--drift:10px"></i>
+      </div>
+      <span class="dashboard-mini-orbit orbit-one"><i></i><b></b></span>
+      <span class="dashboard-mini-orbit orbit-two"><i></i><b></b></span>
+      <span class="dashboard-mini-orbit orbit-three"><i></i><b></b></span>
+    </div>
     <header class="topbar">
       <div class="topbar-brand">
         <div class="logo-mark" aria-label="FADLY & INDAH">F & I</div>
@@ -5113,7 +6353,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
       </div>
       <div class="topbar-actions">
         <div class="topbar-hud" aria-label="Status sistem">
-          <span class="hud-signal sync-state" id="syncState">Sinkronisasi realtime aktif</span>
+          <span class="hud-signal sync-state" id="syncState">Realtime Activated Sync</span>
           <span class="hud-time" id="hudClock">--:--:--</span>
         </div>
         <div class="user-menu-wrap">
@@ -5239,6 +6479,25 @@ body[data-theme="pearl"] .transition-success-mark svg {
         </div>
       </section>
 
+      <nav class="dashboard-section-nav" id="dashboardSectionNav" aria-label="Navigasi bagian dashboard">
+        <button class="active" type="button" data-dashboard-target="#summarySection">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+          Ringkasan
+        </button>
+        <button type="button" data-dashboard-target="#analyticsSection">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/></svg>
+          Analitik
+        </button>
+        <button type="button" data-dashboard-target="#wishlistSection">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+          Wishlist
+        </button>
+        <button type="button" data-dashboard-target="#historySection">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>
+          Transaksi
+        </button>
+      </nav>
+
       <section class="empty-dashboard-state empty-onboarding hidden" id="emptyDashboardState">
         <div class="empty-dashboard-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 7.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a3 3 0 0 1-3-3v-10a3 3 0 0 1 3-3h12v4"/><path d="M16 12h4v4h-4a2 2 0 0 1 0-4Z"/></svg></div>
         <div class="empty-dashboard-copy">
@@ -5275,11 +6534,15 @@ body[data-theme="pearl"] .transition-success-mark svg {
         <article class="summary-card income summary-secondary">
           <div class="summary-top"><div class="summary-label">Pemasukan</div><div class="summary-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg></div></div>
           <div class="summary-value" id="totalDeposit">Rp0</div>
+          <div class="summary-card-trend" id="incomeSummaryTrend">Belum ada pembanding bulan lalu</div>
+          <div class="summary-sparkline" id="incomeSummarySparkline" aria-hidden="true"></div>
           <div class="summary-note">Total seluruh uang masuk</div>
         </article>
         <article class="summary-card expense summary-secondary">
           <div class="summary-top"><div class="summary-label">Pengeluaran</div><div class="summary-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="m18 13-6 6-6-6"/></svg></div></div>
           <div class="summary-value" id="totalExpense">Rp0</div>
+          <div class="summary-card-trend" id="expenseSummaryTrend">Belum ada pembanding bulan lalu</div>
+          <div class="summary-sparkline" id="expenseSummarySparkline" aria-hidden="true"></div>
           <div class="summary-note">Total seluruh uang keluar</div>
         </article>
         <article class="summary-card target summary-target-wide">
@@ -5300,8 +6563,8 @@ body[data-theme="pearl"] .transition-success-mark svg {
         </article>
       </section>
 
-      <section class="monthly-overview" id="monthlyOverview">
-        <button class="monthly-overview-head" id="monthlyToggleButton" type="button" aria-expanded="true" aria-controls="monthlyContent">
+      <section class="monthly-overview collapsed" id="monthlyOverview">
+        <button class="monthly-overview-head" id="monthlyToggleButton" type="button" aria-expanded="false" aria-controls="monthlyContent">
           <span><strong>Ringkasan Bulanan</strong><small>Pantau arus uang dan penggunaan budget bulan ini</small></span>
           <span class="monthly-toggle-icon" aria-hidden="true">⌃</span>
         </button>
@@ -5402,10 +6665,16 @@ body[data-theme="pearl"] .transition-success-mark svg {
           <div class="wishlist-stat"><span>Sudah Terbeli</span><strong id="wishlistPurchasedCount">0 item</strong></div>
         </div>
         <div class="wishlist-grid" id="wishlistGrid"></div>
+        <div class="wishlist-more-shell">
+          <button class="secondary-btn wishlist-more-button hidden" id="wishlistMoreButton" type="button" aria-expanded="false">Lihat Semua Wishlist</button>
+          <span class="wishlist-compact-note" id="wishlistCompactNote">Menampilkan wishlist dengan prioritas tertinggi.</span>
+        </div>
       </section>
 
-      <section class="content-grid">
-        <article class="panel transaction-panel">
+      <section class="content-grid" id="historySection">
+        <div class="transaction-drawer-overlay hidden" id="transactionDrawer" aria-hidden="true">
+          <button class="transaction-drawer-backdrop" id="transactionDrawerBackdrop" type="button" aria-label="Tutup formulir transaksi"></button>
+          <article class="panel transaction-panel" role="dialog" aria-modal="true" aria-labelledby="formTitle">
           <div class="panel-head">
             <div><h3 id="formTitle">Tambah Transaksi</h3><p>Tersimpan otomatis dan diperbarui realtime.</p></div>
             <button class="transaction-panel-close" id="closeTransactionPanel" type="button" aria-label="Tutup formulir transaksi">×</button>
@@ -5461,36 +6730,42 @@ body[data-theme="pearl"] .transition-success-mark svg {
             </div>
             <div class="form-hint">- Ketik hanya angka tanpa tanda baca titik -</div>
           </form>
-        </article>
+          </article>
+        </div>
 
         <article class="panel history-panel">
-          <div class="panel-head">
+          <div class="panel-head history-panel-head">
             <div><h3>Riwayat Tabungan</h3><p id="transactionCount">0 transaksi ditemukan</p></div>
-            <button class="secondary-btn filter-toggle" id="filterToggleButton" type="button" aria-expanded="false">Filter & Urutkan</button>
+            <button class="secondary-btn filter-toggle" id="filterToggleButton" type="button" aria-expanded="false">Tampilkan Filter</button>
             <div class="filter-bar" id="filterBar">
-              <input class="input search-input" id="searchInput" aria-label="Cari transaksi" placeholder="Cari perihal">
-              <select class="input" id="typeFilter" aria-label="Filter jenis transaksi">
-                <option value="all">Semua Jenis</option>
-                <option value="deposit">Pemasukan</option>
-                <option value="expense">Pengeluaran</option>
-              </select>
-              <select class="input" id="yearFilter" aria-label="Filter tahun"><option value="all">Semua Tahun</option></select>
-              <select class="input" id="monthFilter" aria-label="Filter bulan">
-                <option value="all">Semua Bulan</option>
-                <option value="01">Januari</option><option value="02">Februari</option><option value="03">Maret</option>
-                <option value="04">April</option><option value="05">Mei</option><option value="06">Juni</option>
-                <option value="07">Juli</option><option value="08">Agustus</option><option value="09">September</option>
-                <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
-              </select>
-              <input class="input date-filter" id="dateFromFilter" type="date" aria-label="Tanggal mulai" title="Dari tanggal">
-              <input class="input date-filter" id="dateToFilter" type="date" aria-label="Tanggal akhir" title="Sampai tanggal">
-              <select class="input" id="sortFilter" aria-label="Urutkan transaksi">
-                <option value="newest">Terbaru</option>
-                <option value="oldest">Terlama</option>
-                <option value="amountDesc">Nominal Terbesar</option>
-                <option value="amountAsc">Nominal Terkecil</option>
-              </select>
-              <button class="secondary-btn filter-reset" id="resetFilterButton" type="button">Reset Filter</button>
+              <div class="filter-primary-row">
+                <input class="input search-input" id="searchInput" aria-label="Cari transaksi" placeholder="Cari perihal transaksi">
+                <select class="input" id="typeFilter" aria-label="Filter jenis transaksi">
+                  <option value="all">Semua Jenis</option>
+                  <option value="deposit">Pemasukan</option>
+                  <option value="expense">Pengeluaran</option>
+                </select>
+                <select class="input" id="monthFilter" aria-label="Filter bulan">
+                  <option value="all">Semua Bulan</option>
+                  <option value="01">Januari</option><option value="02">Februari</option><option value="03">Maret</option>
+                  <option value="04">April</option><option value="05">Mei</option><option value="06">Juni</option>
+                  <option value="07">Juli</option><option value="08">Agustus</option><option value="09">September</option>
+                  <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                </select>
+                <button class="secondary-btn advanced-filter-button" id="advancedFilterButton" type="button" aria-expanded="false">Filter Lainnya</button>
+              </div>
+              <div class="filter-advanced-panel hidden" id="advancedFilterPanel">
+                <select class="input" id="yearFilter" aria-label="Filter tahun"><option value="all">Semua Tahun</option></select>
+                <input class="input date-filter" id="dateFromFilter" type="date" aria-label="Tanggal mulai" title="Dari tanggal">
+                <input class="input date-filter" id="dateToFilter" type="date" aria-label="Tanggal akhir" title="Sampai tanggal">
+                <select class="input" id="sortFilter" aria-label="Urutkan transaksi">
+                  <option value="newest">Terbaru</option>
+                  <option value="oldest">Terlama</option>
+                  <option value="amountDesc">Nominal Terbesar</option>
+                  <option value="amountAsc">Nominal Terkecil</option>
+                </select>
+                <button class="secondary-btn filter-reset" id="resetFilterButton" type="button">Reset Filter</button>
+              </div>
             </div>
           </div>
           <div class="table-shell">
@@ -5900,6 +7175,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
       recurringTemplates: [],
       wishlist: [],
       wishlistFilter: "all",
+      wishlistExpanded: false,
       activeWishlistActionId: "",
       recurringProcessing: false,
       unsubscribeTransactions: null,
@@ -6289,7 +7565,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
       if (!ctx) return;
       let width = 0, height = 0, ratio = 1, particles = [];
       const isMobile = window.matchMedia("(max-width: 640px)").matches;
-      const count = isMobile ? 12 : 30;
+      const count = isMobile ? 14 : 38;
       const style = getComputedStyle(document.body);
       const accent = style.getPropertyValue("--accent-rgb").trim() || "73,229,255";
       const purple = style.getPropertyValue("--purple-rgb").trim() || "157,108,255";
@@ -6319,7 +7595,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
         const beamY = (time * .08) % (height + 220) - 110;
         const beam = ctx.createLinearGradient(0, beamY - 40, width, beamY + 120);
         beam.addColorStop(0, 'rgba(' + accent + ',0)');
-        beam.addColorStop(.5, 'rgba(' + accent + ',' + (isMobile ? '.018' : '.03') + ')');
+        beam.addColorStop(.5, 'rgba(' + accent + ',' + (isMobile ? '.022' : '.042') + ')');
         beam.addColorStop(1, 'rgba(' + accent + ',0)');
         ctx.fillStyle = beam;
         ctx.fillRect(0, beamY - 60, width, 140);
@@ -6667,7 +7943,10 @@ body[data-theme="pearl"] .transition-success-mark svg {
 
     function closeAllModals() {
       $$(".modal-overlay").forEach((modal) => { modal.classList.add("hidden"); modal.setAttribute("aria-hidden", "true"); });
-      document.body.classList.remove("modal-open");
+      $("#transactionDrawer")?.classList.add("hidden");
+      $("#transactionDrawer")?.setAttribute("aria-hidden", "true");
+      $(".transaction-panel")?.classList.remove("mobile-form-open");
+      document.body.classList.remove("modal-open", "transaction-form-open");
       state.pendingDeleteId = null;
       if (state.confirmResolver) { state.confirmResolver(false); state.confirmResolver = null; }
     }
@@ -7050,6 +8329,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
       state.recurringTemplates = [];
       state.wishlist = [];
       state.wishlistFilter = "all";
+      state.wishlistExpanded = false;
       state.activeWishlistActionId = "";
       state.visibleLimit = PAGE_SIZE;
       state.transactionsLoaded = false;
@@ -7191,6 +8471,38 @@ body[data-theme="pearl"] .transition-success-mark svg {
           : `${monthlyDifference >= 0 ? "↑" : "↓"} ${rupiah(Math.abs(monthlyDifference))} dibanding bulan lalu`;
       }
       if ($("#balanceUpdated")) $("#balanceUpdated").textContent = `Diperbarui ${new Intl.DateTimeFormat("id-ID", { hour:"2-digit", minute:"2-digit" }).format(now)}`;
+
+      const previousDeposit = previousMonth.deposit;
+      const previousExpense = previousMonth.expense;
+      const depositDifference = currentMonth.deposit - previousDeposit;
+      const expenseDifference = currentMonth.expense - previousExpense;
+      const setSummaryTrend = (selector, difference, previousValue, positiveWhenUp = true) => {
+        const node = $(selector);
+        if (!node) return;
+        const hasComparison = previousValue !== 0 || difference !== 0;
+        const isGood = positiveWhenUp ? difference >= 0 : difference <= 0;
+        node.className = `summary-card-trend ${!hasComparison ? "" : isGood ? "good" : "warning"}`;
+        node.textContent = !hasComparison
+          ? "Belum ada pembanding bulan lalu"
+          : `${difference >= 0 ? "↑" : "↓"} ${rupiah(Math.abs(difference))} dari bulan lalu`;
+      };
+      setSummaryTrend("#incomeSummaryTrend", depositDifference, previousDeposit, true);
+      setSummaryTrend("#expenseSummaryTrend", expenseDifference, previousExpense, false);
+
+      const sixMonthTotals = Array.from({ length: 6 }, (_, index) => {
+        const date = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1);
+        return calculateTotals(getRowsByMonth(monthKey(date)));
+      });
+      const renderSparkline = (selector, key) => {
+        const node = $(selector);
+        if (!node) return;
+        const values = sixMonthTotals.map((row) => Number(row[key] || 0));
+        const maximum = Math.max(...values, 1);
+        node.innerHTML = values.map((value, index) => `<i style="height:${Math.max(12, value / maximum * 100)}%" class="${index === values.length - 1 ? "current" : ""}"></i>`).join("");
+      };
+      renderSparkline("#incomeSummarySparkline", "deposit");
+      renderSparkline("#expenseSummarySparkline", "expense");
+
       if ($("#achievementBadge")) {
         let badge = "Mulai catat transaksi bulan ini";
         if (currentMonth.deposit > 0) badge = currentMonth.balance >= 0
@@ -7507,13 +8819,25 @@ body[data-theme="pearl"] .transition-success-mark svg {
 
       const filter = state.wishlistFilter || "all";
       const rows = all.filter((item) => filter === "all" || (filter === "active" ? item.status !== "purchased" : item.status === "purchased"));
+      const compactLimit = 3;
+      const visibleRows = state.wishlistExpanded ? rows : rows.slice(0, compactLimit);
+      const moreButton = $("#wishlistMoreButton");
+      const compactNote = $("#wishlistCompactNote");
+      if (moreButton) {
+        moreButton.classList.toggle("hidden", rows.length <= compactLimit);
+        moreButton.setAttribute("aria-expanded", String(state.wishlistExpanded));
+        moreButton.textContent = state.wishlistExpanded ? "Tampilkan Prioritas Utama" : `Lihat Semua Wishlist (${rows.length})`;
+      }
+      if (compactNote) compactNote.textContent = state.wishlistExpanded || rows.length <= compactLimit
+        ? `${rows.length} wishlist ditampilkan.`
+        : `Menampilkan ${visibleRows.length} wishlist dengan prioritas tertinggi.`;
       $$('[data-wishlist-filter]').forEach((button) => button.classList.toggle("active", button.dataset.wishlistFilter === filter));
       if (!rows.length) {
         const emptyText = filter === "purchased" ? "Belum ada wishlist yang ditandai terbeli." : filter === "active" ? "Belum ada wishlist aktif." : "Belum ada barang atau pengalaman impian yang disimpan.";
         grid.innerHTML = `<div class="wishlist-empty"><div><div class="wishlist-empty-icon">♡</div><strong>${safeText(emptyText)}</strong><span>Tambahkan wishlist pertama, tetapkan harga dan prioritas, lalu pantau dana hingga siap dibeli.</span><button class="primary-btn" type="button" data-wishlist-empty-add>Tambah Wishlist Pertama</button></div></div>`;
         return;
       }
-      grid.innerHTML = rows.map((item) => {
+      grid.innerHTML = visibleRows.map((item) => {
         const price = Number(item.price || 0);
         const allocated = Number(item.allocated || 0);
         const progress = item.status === "purchased" ? 100 : (price > 0 ? Math.min(100, Math.max(0, allocated / price * 100)) : 0);
@@ -7870,12 +9194,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
       $("#formTitle").textContent = "Edit Transaksi";
       $("#saveTransactionButton").textContent = "Simpan Perubahan";
       $("#cancelEditButton").classList.remove("hidden");
-      if (window.matchMedia("(max-width: 640px)").matches) {
-        $(".transaction-panel").classList.add("mobile-form-open");
-        document.body.classList.add("transaction-form-open");
-      } else {
-        $(".transaction-panel").scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      setTransactionPanel(true);
     }
 
     async function saveTransaction(event) {
@@ -7919,7 +9238,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
           toast(navigator.onLine ? "Transaksi berhasil ditambahkan." : "Transaksi disimpan offline dan menunggu sinkronisasi.");
         }
         resetForm();
-        if (window.matchMedia("(max-width: 640px)").matches) closeMobileTransactionPanel();
+        closeMobileTransactionPanel();
       } catch (error) {
         console.error(error);
         toast("Gagal menyimpan transaksi. Periksa koneksi atau Firestore rules.", "error");
@@ -8247,9 +9566,25 @@ body[data-theme="pearl"] .transition-success-mark svg {
       }
     }
 
+    function setTransactionPanel(open) {
+      const drawer = $("#transactionDrawer");
+      const panel = $(".transaction-panel");
+      if (!drawer || !panel) return;
+      const shouldOpen = Boolean(open);
+      drawer.classList.toggle("hidden", !shouldOpen);
+      drawer.setAttribute("aria-hidden", String(!shouldOpen));
+      panel.classList.toggle("mobile-form-open", shouldOpen);
+      document.body.classList.toggle("transaction-form-open", shouldOpen);
+      if (shouldOpen) {
+        state.lastFocusedElement = document.activeElement;
+        requestAnimationFrame(() => $("#transactionAmount")?.focus());
+      } else {
+        (state.lastFocusedElement || $("#heroAddTransactionButton"))?.focus?.();
+      }
+    }
+
     function closeMobileTransactionPanel() {
-      $(".transaction-panel")?.classList.remove("mobile-form-open");
-      document.body.classList.remove("transaction-form-open");
+      setTransactionPanel(false);
     }
 
     function prepareQuickTransaction(type) {
@@ -8257,14 +9592,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
       resetForm();
       $("#transactionType").value = type;
       updateCategoryOptions(type);
-      if (window.matchMedia("(max-width: 640px)").matches) {
-        $(".transaction-panel").classList.add("mobile-form-open");
-        document.body.classList.add("transaction-form-open");
-        setTimeout(() => $("#transactionAmount")?.focus(), 120);
-      } else {
-        $(".transaction-panel").scrollIntoView({ behavior:"smooth", block:"start" });
-        setTimeout(() => $("#transactionAmount")?.focus(), 420);
-      }
+      setTransactionPanel(true);
     }
 
     function setQuickMenu(open) {
@@ -8358,7 +9686,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
       if (event.key === "Tab" && userMenuOpen) {
         trapKeyboardFocus(event, $("#userMenu")?.querySelector(".user-menu-card"));
       }
-      if (event.key === "Escape" && $(".transaction-panel")?.classList.contains("mobile-form-open")) closeMobileTransactionPanel();
+      if (event.key === "Escape" && !$("#transactionDrawer")?.classList.contains("hidden")) closeMobileTransactionPanel();
     });
 
     // Menu profil: gunakan handler langsung agar tombol tetap berfungsi saat
@@ -8403,6 +9731,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
     $("#emptyAddDeposit").addEventListener("click", () => prepareQuickTransaction("deposit"));
     $("#emptyAddExpense").addEventListener("click", () => prepareQuickTransaction("expense"));
     $("#closeTransactionPanel").addEventListener("click", closeMobileTransactionPanel);
+    $("#transactionDrawerBackdrop")?.addEventListener("click", closeMobileTransactionPanel);
 
     $("#themeButton").addEventListener("click", () => openModal("#themeModal"));
     $("#closeThemeModal").addEventListener("click", () => closeModal("#themeModal"));
@@ -8464,7 +9793,25 @@ body[data-theme="pearl"] .transition-success-mark svg {
     $("#filterToggleButton").addEventListener("click", () => {
       const collapsed=$("#filterBar").classList.toggle("collapsed");
       $("#filterToggleButton").setAttribute("aria-expanded", String(!collapsed));
+      $("#filterToggleButton").textContent = collapsed ? "Tampilkan Filter" : "Sembunyikan Filter";
     });
+    $("#advancedFilterButton")?.addEventListener("click", () => {
+      const panel = $("#advancedFilterPanel");
+      const willOpen = panel?.classList.contains("hidden");
+      panel?.classList.toggle("hidden", !willOpen);
+      $("#advancedFilterButton")?.setAttribute("aria-expanded", String(willOpen));
+      if ($("#advancedFilterButton")) $("#advancedFilterButton").textContent = willOpen ? "Tutup Filter Lanjutan" : "Filter Lainnya";
+    });
+    $("#wishlistMoreButton")?.addEventListener("click", () => {
+      state.wishlistExpanded = !state.wishlistExpanded;
+      renderWishlist();
+    });
+    $$("[data-dashboard-target]").forEach((button) => button.addEventListener("click", () => {
+      const target = $(button.dataset.dashboardTarget);
+      if (!target) return;
+      $$("[data-dashboard-target]").forEach((item) => item.classList.toggle("active", item === button));
+      target.scrollIntoView({ behavior: state.reduceMotion ? "auto" : "smooth", block: "start" });
+    }));
     $("#loadMoreButton").addEventListener("click", () => { state.visibleLimit += PAGE_SIZE; renderTable(); });
 
     $("#transactionTableBody").addEventListener("click", (event) => {
@@ -8493,7 +9840,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
     ["#wishlistPriceInput", "#wishlistAllocatedInput"].forEach((selector) => {
       $(selector).addEventListener("input", (event) => { event.target.value = formatMoneyInput(event.target.value); updateWishlistFormSummary(); });
     });
-    $$('[data-wishlist-filter]').forEach((button) => button.addEventListener("click", () => { state.wishlistFilter = button.dataset.wishlistFilter || "all"; renderWishlist(); }));
+    $$('[data-wishlist-filter]').forEach((button) => button.addEventListener("click", () => { state.wishlistFilter = button.dataset.wishlistFilter || "all"; state.wishlistExpanded = false; renderWishlist(); }));
     $("#wishlistGrid").addEventListener("click", (event) => {
       const emptyAdd = event.target.closest("[data-wishlist-empty-add]");
       const fund = event.target.closest("[data-wish-fund]");
@@ -8639,7 +9986,7 @@ body[data-theme="pearl"] .transition-success-mark svg {
         setMonthlyCollapsed(true);
       } else {
         $("#filterToggleButton").setAttribute("aria-expanded","true");
-        setMonthlyCollapsed(false);
+        setMonthlyCollapsed(true);
       }
       startLoginBackground();
       updateLoadingProgress(80, "Memeriksa keamanan", "Memeriksa keamanan dan sesi pengguna...");
@@ -8688,6 +10035,24 @@ body[data-theme="pearl"] .transition-success-mark svg {
     }, { threshold: .18, rootMargin: '-20% 0px -48% 0px' });
     observer.observe(historyPanel);
   }
+
+  const desktopSectionButtons = [...document.querySelectorAll('[data-dashboard-target]')];
+  if (desktopSectionButtons.length && 'IntersectionObserver' in window) {
+    const sectionObserver = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      desktopSectionButtons.forEach((button) => {
+        button.classList.toggle('active', button.dataset.dashboardTarget === `#${visible.target.id}`);
+      });
+    }, { threshold: [0.12, 0.28, 0.5], rootMargin: '-22% 0px -55% 0px' });
+    desktopSectionButtons.forEach((button) => {
+      const section = document.querySelector(button.dataset.dashboardTarget);
+      if (section) sectionObserver.observe(section);
+    });
+  }
+
 
 })();
 </script>
