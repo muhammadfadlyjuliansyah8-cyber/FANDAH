@@ -13,7 +13,7 @@
   <link rel="manifest" href="future-savings-v10.webmanifest">
   <link rel="icon" href="future-savings-icon-v10.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="future-savings-icon-v10-192.png">
-  <title>My Lovely Savings</title>
+  <title>Future Savings — Clean Interactive Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
@@ -7269,6 +7269,65 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
         background:
           linear-gradient(180deg, rgba(1,4,10,.16), rgba(1,4,10,.29)),
           radial-gradient(circle at 50% 34%, transparent 0 28%, rgba(0,3,9,.10) 66%, rgba(0,2,7,.30) 100%) !important;
+      }
+    }
+
+  
+
+    /* PERBAIKAN KECERAHAN VIDEO LOGIN:
+       Menampilkan video kucing sesuai warna dan kecerahan file aslinya. */
+    #loginPage {
+      background: #020711 !important;
+    }
+
+    #loginPage > .login-bg-video {
+      position: absolute !important;
+      inset: 0 !important;
+      z-index: 0 !important;
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      object-position: center center !important;
+      opacity: 1 !important;
+      filter: none !important;
+      -webkit-filter: none !important;
+      mix-blend-mode: normal !important;
+      transform: none !important;
+      animation: none !important;
+    }
+
+    /* Hilangkan lapisan gelap, vignette, dan dekorasi yang meredupkan video. */
+    #loginPage::before,
+    #loginPage::after,
+    #loginPage > .login-bg-overlay,
+    #loginFxCanvas,
+    .login-motion-layer,
+    .login-ghost-logo {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      background: transparent !important;
+      background-image: none !important;
+      filter: none !important;
+      animation: none !important;
+    }
+
+    /* Form login tetap berada di atas video tanpa mengubah video di belakangnya. */
+    #loginPage > .simple-login-card {
+      position: relative !important;
+      z-index: 2 !important;
+    }
+
+    @media (max-width: 640px) {
+      #loginPage > .login-bg-video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center center !important;
+        opacity: 1 !important;
+        filter: none !important;
+        -webkit-filter: none !important;
       }
     }
 
