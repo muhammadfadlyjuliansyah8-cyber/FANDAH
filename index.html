@@ -7057,6 +7057,54 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
 }
 
 
+
+
+    /* Video background khusus halaman sebelum login */
+    .login-bg-video {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      pointer-events: none;
+      user-select: none;
+      background: #020711;
+    }
+
+    /* Lapisan gelap agar form login tetap terbaca di atas video */
+    #loginPage::before {
+      z-index: 1;
+      background-image:
+        linear-gradient(180deg, rgba(0, 4, 12, .32), rgba(0, 7, 18, .48)),
+        radial-gradient(circle at 50% 38%, transparent 0 22%, rgba(0, 5, 14, .20) 62%, rgba(0, 3, 10, .48) 100%);
+      opacity: 1;
+    }
+
+    #loginPage::after { z-index: 1; }
+    #loginFxCanvas,
+    .login-motion-layer { z-index: 1; }
+    #loginPage .simple-login-card { z-index: 2; }
+
+  
+    /* Login background tunggal: hanya video kucing. */
+    #loginFxCanvas,
+    .login-motion-layer,
+    .login-ghost-logo,
+    #loginPage::after {
+      display: none !important;
+    }
+
+    #loginPage::before {
+      animation: none !important;
+    }
+
+    .login-bg-video {
+      display: block !important;
+      animation: none !important;
+    }
+
   </style>
 </head>
 <body data-theme="obsidian" data-visual-mode="normal" data-high-contrast="false" data-reduce-motion="false" data-money-visible="true" data-ui-version="28">
@@ -7110,21 +7158,9 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
   </div>
 
   <main id="loginPage">
-    <canvas id="loginFxCanvas" aria-hidden="true"></canvas>
-    <div class="login-motion-layer" aria-hidden="true">
-      <span class="login-aurora login-aurora-a"></span>
-      <span class="login-aurora login-aurora-b"></span>
-      <span class="login-orbit login-orbit-a"><i></i></span>
-      <span class="login-orbit login-orbit-b"><i></i></span>
-      <span class="login-data-stream login-data-left"><i></i><i></i><i></i></span>
-      <span class="login-data-stream login-data-right"><i></i><i></i><i></i></span>
-      <span class="login-light-streak login-streak-a"></span>
-      <span class="login-light-streak login-streak-b"></span>
-      <span class="login-light-streak login-streak-c"></span>
-      <span class="login-hud-corner login-corner-a"></span>
-      <span class="login-hud-corner login-corner-b"></span>
-    </div>
-    <div class="login-ghost-logo" aria-hidden="true"><span>F</span><span class="ghost-amp">&amp;</span><span>I</span></div>
+    <video class="login-bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+      <source src="https://files.catbox.moe/wlq45t.mp4" type="video/mp4">
+    </video>
     <section class="simple-login-card" aria-labelledby="loginTitle">
       <div class="simple-login-logo simple-login-logo-main" aria-hidden="true">
         <span class="classic-login-mark"><span class="logo-letter logo-f">F</span><span class="logo-amp-inline">&amp;</span><span class="logo-letter logo-i">I</span></span>
