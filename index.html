@@ -7364,6 +7364,202 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       }
     }
 
+
+    /* =========================================================
+       DASHBOARD GLASS TRANSPARENCY — background tetap terlihat
+       Mengubah warna permukaan, bukan opacity elemen, agar teks
+       dan tombol tidak ikut memudar.
+       ========================================================= */
+    body:not([data-theme="pearl"]) #dashboardPage {
+      --dashboard-glass-blur: 6px;
+      --dashboard-glass-border: rgba(var(--accent-rgb), .18);
+      --dashboard-glass-shadow: 0 16px 46px rgba(0, 0, 0, .23);
+    }
+
+    /* Header dan navigasi dashboard dibuat lebih ringan. */
+    body:not([data-theme="pearl"]) #dashboardPage .topbar {
+      background: rgba(7, 10, 16, .60) !important;
+      -webkit-backdrop-filter: blur(6px) saturate(108%) !important;
+      backdrop-filter: blur(6px) saturate(108%) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .dashboard-section-nav {
+      background: rgba(9, 11, 17, .54) !important;
+      border-color: var(--dashboard-glass-border) !important;
+      box-shadow: var(--dashboard-glass-shadow) !important;
+      -webkit-backdrop-filter: blur(6px) saturate(108%) !important;
+      backdrop-filter: blur(6px) saturate(108%) !important;
+    }
+
+    /* Kartu ringkasan utama. */
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card,
+    body:not([data-theme="pearl"]) #dashboardPage .summary-primary {
+      background: linear-gradient(145deg, rgba(10, 13, 20, .59), rgba(8, 10, 16, .51)) !important;
+      border-color: var(--dashboard-glass-border) !important;
+      box-shadow: var(--dashboard-glass-shadow) !important;
+      -webkit-backdrop-filter: blur(6px) saturate(108%) !important;
+      backdrop-filter: blur(6px) saturate(108%) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card.balance {
+      background:
+        linear-gradient(145deg, rgba(var(--accent-rgb), .075), transparent 48%),
+        rgba(8, 10, 16, .56) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card.target {
+      background:
+        linear-gradient(145deg, rgba(var(--gold-rgb), .055), transparent 52%),
+        rgba(8, 10, 16, .54) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card.income,
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card.expense {
+      background: rgba(8, 10, 16, .48) !important;
+    }
+
+    /* Panel statistik bulanan dan insight. */
+    body:not([data-theme="pearl"]) #dashboardPage .monthly-overview {
+      background: rgba(8, 10, 16, .47) !important;
+      border-color: var(--dashboard-glass-border) !important;
+      box-shadow: var(--dashboard-glass-shadow) !important;
+      -webkit-backdrop-filter: blur(5px) saturate(108%) !important;
+      backdrop-filter: blur(5px) saturate(108%) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .quick-stat {
+      background: rgba(8, 10, 16, .39) !important;
+      border-color: rgba(var(--accent-rgb), .14) !important;
+      -webkit-backdrop-filter: blur(4px) saturate(106%) !important;
+      backdrop-filter: blur(4px) saturate(106%) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .quick-stat.featured-stat,
+    body:not([data-theme="pearl"]) #dashboardPage .quick-stat.budget-card {
+      background:
+        linear-gradient(145deg, rgba(var(--gold-rgb), .055), transparent 58%),
+        rgba(8, 10, 16, .42) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .finance-insight {
+      background:
+        linear-gradient(135deg, rgba(var(--gold-rgb), .055), rgba(var(--accent-rgb), .025)),
+        rgba(8, 10, 16, .46) !important;
+      border-color: rgba(var(--gold-rgb), .20) !important;
+      box-shadow: var(--dashboard-glass-shadow) !important;
+      -webkit-backdrop-filter: blur(5px) saturate(108%) !important;
+      backdrop-filter: blur(5px) saturate(108%) !important;
+    }
+
+    /* Grafik dan detail target dibuat paling transparan agar gambar terlihat. */
+    body:not([data-theme="pearl"]) #dashboardPage .analytics-grid .panel {
+      background: rgba(8, 10, 16, .45) !important;
+      border-color: var(--dashboard-glass-border) !important;
+      box-shadow: var(--dashboard-glass-shadow) !important;
+      -webkit-backdrop-filter: blur(5px) saturate(108%) !important;
+      backdrop-filter: blur(5px) saturate(108%) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .chart-range,
+    body:not([data-theme="pearl"]) #dashboardPage .chart-series-controls button,
+    body:not([data-theme="pearl"]) #dashboardPage .filter-advanced-panel {
+      background: rgba(5, 7, 12, .24) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .chart-empty-state {
+      background: rgba(8, 10, 16, .43) !important;
+      -webkit-backdrop-filter: blur(4px) !important;
+      backdrop-filter: blur(4px) !important;
+    }
+
+    /* Wishlist keluarga. */
+    body:not([data-theme="pearl"]) #dashboardPage .wishlist-hub {
+      background:
+        radial-gradient(700px 260px at 0 0, rgba(var(--gold-rgb), .045), transparent 72%),
+        rgba(8, 10, 16, .44) !important;
+      border-color: rgba(var(--gold-rgb), .18) !important;
+      box-shadow: var(--dashboard-glass-shadow) !important;
+      -webkit-backdrop-filter: blur(5px) saturate(108%) !important;
+      backdrop-filter: blur(5px) saturate(108%) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .wishlist-stats,
+    body:not([data-theme="pearl"]) #dashboardPage .wishlist-head {
+      background: rgba(5, 7, 12, .10) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .wishlist-empty,
+    body:not([data-theme="pearl"]) #dashboardPage .wishlist-card {
+      background: rgba(255, 255, 255, .025) !important;
+      -webkit-backdrop-filter: blur(3px) !important;
+      backdrop-filter: blur(3px) !important;
+    }
+
+    /* Riwayat transaksi dan isi tabel. */
+    body:not([data-theme="pearl"]) #dashboardPage .history-panel {
+      background: rgba(8, 10, 16, .47) !important;
+      border-color: var(--dashboard-glass-border) !important;
+      box-shadow: var(--dashboard-glass-shadow) !important;
+      -webkit-backdrop-filter: blur(5px) saturate(108%) !important;
+      backdrop-filter: blur(5px) saturate(108%) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .table-shell {
+      background: rgba(4, 6, 10, .12) !important;
+      border-color: rgba(var(--accent-rgb), .15) !important;
+      -webkit-backdrop-filter: blur(3px) !important;
+      backdrop-filter: blur(3px) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage th {
+      background: rgba(7, 9, 14, .66) !important;
+      -webkit-backdrop-filter: blur(5px) !important;
+      backdrop-filter: blur(5px) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage tbody tr {
+      background: rgba(255, 255, 255, .020) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, .035) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage tbody tr:hover {
+      background: rgba(var(--accent-rgb), .085) !important;
+    }
+
+    /* Layar kecil: sedikit lebih pekat agar tulisan tetap jelas,
+       tetapi masih jauh lebih transparan dari versi sebelumnya. */
+    @media (max-width: 640px) {
+      body:not([data-theme="pearl"]) #dashboardPage .summary-card,
+      body:not([data-theme="pearl"]) #dashboardPage .summary-primary,
+      body:not([data-theme="pearl"]) #dashboardPage .monthly-overview,
+      body:not([data-theme="pearl"]) #dashboardPage .finance-insight,
+      body:not([data-theme="pearl"]) #dashboardPage .analytics-grid .panel,
+      body:not([data-theme="pearl"]) #dashboardPage .wishlist-hub,
+      body:not([data-theme="pearl"]) #dashboardPage .history-panel {
+        background: rgba(8, 10, 16, .62) !important;
+        -webkit-backdrop-filter: blur(3px) saturate(106%) !important;
+        backdrop-filter: blur(3px) saturate(106%) !important;
+      }
+
+      body:not([data-theme="pearl"]) #dashboardPage .quick-stat {
+        background: rgba(8, 10, 16, .54) !important;
+        -webkit-backdrop-filter: blur(2px) !important;
+        backdrop-filter: blur(2px) !important;
+      }
+
+      body:not([data-theme="pearl"]) #dashboardPage th {
+        background: rgba(7, 9, 14, .72) !important;
+      }
+
+      body:not([data-theme="pearl"]) #dashboardPage tbody tr,
+      body:not([data-theme="pearl"]) #dashboardPage tbody tr:nth-child(even) {
+        background: rgba(8, 10, 16, .44) !important;
+      }
+    }
+
   </style>
 </head>
 <body data-theme="obsidian" data-visual-mode="normal" data-high-contrast="false" data-reduce-motion="false" data-money-visible="true" data-ui-version="28">
@@ -7455,7 +7651,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
 
   <main id="dashboardPage" class="hidden">
     <video class="dashboard-bg-video" id="dashboardBgVideo" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-      <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784344321/wlq45t_anklmw.mp4" type="video/mp4">
+      <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784367588/anime-boy-and-cat-moewalls-com_xghjdq.mp4" type="video/mp4">
     </video>
     <div class="dashboard-bg-overlay" aria-hidden="true"></div>
     <header class="topbar">
