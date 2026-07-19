@@ -12229,7 +12229,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       const initialDesktopButton = desktopSectionButtons.find((button) => button.classList.contains('active')) || desktopSectionButtons[0];
       if (initialDesktopButton) {
         const initialIndex = Math.max(0, desktopSectionButtons.indexOf(initialDesktopButton));
-        document.querySelector('#dashboardSectionNav')?.style.setProperty('--active-index', String(ini252252tialIndex));
+        document.querySelector('#dashboardSectionNav')?.style.setProperty('--active-index', String(initialIndex));
         initialDesktopButton.setAttribute('aria-current', 'page');
       }
       document.querySelectorAll('#mobileBottomNav button').forEach((button) => {
