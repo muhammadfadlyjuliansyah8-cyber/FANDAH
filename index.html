@@ -7560,6 +7560,692 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       }
     }
 
+
+
+    /* =========================================================
+       FITUR OPACITY PANEL/TABEL — dikontrol dari Menu Dashboard
+       Nilai hanya mengubah warna latar panel. Teks, angka, ikon,
+       tombol, dan isi tabel tetap 100% tajam.
+       ========================================================= */
+    #dashboardPage {
+      --panel-opacity-base: .47;
+      --panel-opacity-strong: .60;
+      --panel-opacity-soft: .39;
+      --panel-opacity-subtle: .12;
+      --panel-opacity-table-head: .66;
+      --panel-opacity-row: .020;
+      --panel-opacity-row-even: .035;
+      --panel-opacity-hover: .085;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .hero-row {
+      background:
+        radial-gradient(420px 180px at 0 0, rgba(var(--gold-rgb), .055), transparent 72%),
+        linear-gradient(145deg,
+          rgba(8, 10, 16, var(--panel-opacity-strong)),
+          rgba(8, 10, 16, var(--panel-opacity-base))) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .topbar {
+      background: rgba(7, 10, 16, var(--panel-opacity-strong)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .dashboard-section-nav {
+      background: rgba(9, 11, 17, var(--panel-opacity-strong)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card,
+    body:not([data-theme="pearl"]) #dashboardPage .summary-primary {
+      background: rgba(8, 10, 16, var(--panel-opacity-base)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card.balance {
+      background:
+        linear-gradient(145deg, rgba(var(--accent-rgb), .075), transparent 48%),
+        rgba(8, 10, 16, var(--panel-opacity-base)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card.target {
+      background:
+        linear-gradient(145deg, rgba(var(--gold-rgb), .055), transparent 52%),
+        rgba(8, 10, 16, var(--panel-opacity-base)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card.income,
+    body:not([data-theme="pearl"]) #dashboardPage .summary-card.expense,
+    body:not([data-theme="pearl"]) #dashboardPage .quick-stat {
+      background: rgba(8, 10, 16, var(--panel-opacity-soft)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .quick-stat.featured-stat,
+    body:not([data-theme="pearl"]) #dashboardPage .quick-stat.budget-card {
+      background:
+        linear-gradient(145deg, rgba(var(--gold-rgb), .055), transparent 58%),
+        rgba(8, 10, 16, var(--panel-opacity-soft)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .monthly-overview,
+    body:not([data-theme="pearl"]) #dashboardPage .analytics-grid .panel,
+    body:not([data-theme="pearl"]) #dashboardPage .history-panel {
+      background: rgba(8, 10, 16, var(--panel-opacity-base)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .finance-insight {
+      background:
+        linear-gradient(135deg, rgba(var(--gold-rgb), .055), rgba(var(--accent-rgb), .025)),
+        rgba(8, 10, 16, var(--panel-opacity-base)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .wishlist-hub {
+      background:
+        radial-gradient(700px 260px at 0 0, rgba(var(--gold-rgb), .045), transparent 72%),
+        rgba(8, 10, 16, var(--panel-opacity-base)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage .chart-range,
+    body:not([data-theme="pearl"]) #dashboardPage .chart-series-controls button,
+    body:not([data-theme="pearl"]) #dashboardPage .filter-advanced-panel,
+    body:not([data-theme="pearl"]) #dashboardPage .wishlist-stats,
+    body:not([data-theme="pearl"]) #dashboardPage .wishlist-head,
+    body:not([data-theme="pearl"]) #dashboardPage .table-shell {
+      background: rgba(5, 7, 12, var(--panel-opacity-subtle)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage th {
+      background: rgba(7, 9, 14, var(--panel-opacity-table-head)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage tbody tr {
+      background: rgba(255, 255, 255, var(--panel-opacity-row)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, var(--panel-opacity-row-even)) !important;
+    }
+
+    body:not([data-theme="pearl"]) #dashboardPage tbody tr:hover {
+      background: rgba(var(--accent-rgb), var(--panel-opacity-hover)) !important;
+    }
+
+    /* Dukungan Pearl Light: slider tetap bekerja dengan permukaan putih. */
+    body[data-theme="pearl"] #dashboardPage .hero-row,
+    body[data-theme="pearl"] #dashboardPage .topbar,
+    body[data-theme="pearl"] #dashboardPage .dashboard-section-nav,
+    body[data-theme="pearl"] #dashboardPage .summary-card,
+    body[data-theme="pearl"] #dashboardPage .summary-primary,
+    body[data-theme="pearl"] #dashboardPage .monthly-overview,
+    body[data-theme="pearl"] #dashboardPage .analytics-grid .panel,
+    body[data-theme="pearl"] #dashboardPage .finance-insight,
+    body[data-theme="pearl"] #dashboardPage .wishlist-hub,
+    body[data-theme="pearl"] #dashboardPage .history-panel {
+      background: rgba(255, 255, 255, var(--panel-opacity-strong)) !important;
+    }
+
+    body[data-theme="pearl"] #dashboardPage .quick-stat,
+    body[data-theme="pearl"] #dashboardPage .table-shell,
+    body[data-theme="pearl"] #dashboardPage .wishlist-stats,
+    body[data-theme="pearl"] #dashboardPage .wishlist-head {
+      background: rgba(255, 255, 255, var(--panel-opacity-soft)) !important;
+    }
+
+    body[data-theme="pearl"] #dashboardPage th {
+      background: rgba(255, 255, 255, var(--panel-opacity-table-head)) !important;
+    }
+
+    body[data-theme="pearl"] #dashboardPage tbody tr {
+      background: rgba(255, 255, 255, var(--panel-opacity-row)) !important;
+    }
+
+    body[data-theme="pearl"] #dashboardPage tbody tr:nth-child(even) {
+      background: rgba(17, 27, 37, var(--panel-opacity-row-even)) !important;
+    }
+
+    /* Modal pengatur opacity. */
+    .panel-opacity-modal-box { width: min(100%, 590px); }
+    .panel-opacity-header { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
+    .panel-opacity-header h3 { margin:0; }
+    .panel-opacity-header p { margin:7px 0 0; color:var(--muted); font-size:11px; line-height:1.6; }
+    .panel-opacity-value {
+      min-width:78px; min-height:48px; padding:0 13px; display:grid; place-items:center;
+      border:1px solid rgba(var(--accent-rgb),.20); border-radius:14px;
+      color:var(--cyan); background:rgba(var(--accent-rgb),.075);
+      font:800 19px/1 Orbitron,sans-serif; box-shadow:inset 0 0 18px rgba(var(--accent-rgb),.035);
+    }
+    .panel-opacity-preview {
+      position:relative; min-height:150px; margin-top:18px; padding:18px; overflow:hidden;
+      border:1px solid rgba(var(--accent-rgb),.16); border-radius:18px;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(var(--accent-rgb),.20), transparent 32%),
+        linear-gradient(135deg, #06203a, #181125 48%, #07314a);
+    }
+    .panel-opacity-preview::before {
+      content:"BACKGROUND VIDEO"; position:absolute; right:12px; bottom:10px;
+      color:rgba(255,255,255,.20); font:800 9px/1 Orbitron,sans-serif; letter-spacing:.16em;
+    }
+    .panel-opacity-preview-surface {
+      position:relative; z-index:1; min-height:112px; padding:16px; border-radius:15px;
+      border:1px solid rgba(var(--accent-rgb),.20);
+      background:rgba(8,10,16,.47); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);
+      box-shadow:0 14px 34px rgba(0,0,0,.24);
+    }
+    .panel-opacity-preview-surface span,
+    .panel-opacity-preview-surface strong,
+    .panel-opacity-preview-surface small { display:block; }
+    .panel-opacity-preview-surface span { color:var(--muted); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; }
+    .panel-opacity-preview-surface strong { margin-top:13px; color:var(--text); font-size:25px; }
+    .panel-opacity-preview-surface small { margin-top:9px; color:var(--green); font-size:10px; }
+    .panel-opacity-control { margin-top:18px; padding:16px; border:1px solid var(--line); border-radius:16px; background:rgba(255,255,255,.022); }
+    .panel-opacity-control-head { display:flex; justify-content:space-between; gap:14px; color:var(--muted); font-size:10px; }
+    .panel-opacity-control-head strong { color:var(--text); font-size:12px; }
+    .panel-opacity-range { width:100%; margin:16px 0 8px; accent-color:var(--cyan); cursor:pointer; }
+    .panel-opacity-scale { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:9px; }
+    .panel-opacity-presets { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .panel-opacity-presets button {
+      min-height:38px; padding:0 8px; border:1px solid var(--line); border-radius:11px;
+      color:var(--muted); background:rgba(255,255,255,.025); font-size:10px; font-weight:800;
+    }
+    .panel-opacity-presets button:hover,
+    .panel-opacity-presets button.active { color:var(--cyan); border-color:var(--line-strong); background:rgba(var(--accent-rgb),.09); }
+    .panel-opacity-note { margin:13px 0 0; color:var(--muted); font-size:10px; line-height:1.6; }
+    .panel-opacity-note strong { color:var(--gold); }
+
+    @media (max-width:640px) {
+      .panel-opacity-header { align-items:center; }
+      .panel-opacity-value { min-width:70px; min-height:44px; font-size:17px; }
+      .panel-opacity-preview { min-height:135px; padding:14px; }
+      .panel-opacity-preview-surface { min-height:105px; }
+      .panel-opacity-presets { grid-template-columns:repeat(2,minmax(0,1fr)); }
+
+      /* Pada mobile nilai slider tetap dihormati; hanya blur yang diringankan. */
+      body:not([data-theme="pearl"]) #dashboardPage .summary-card,
+      body:not([data-theme="pearl"]) #dashboardPage .summary-primary,
+      body:not([data-theme="pearl"]) #dashboardPage .monthly-overview,
+      body:not([data-theme="pearl"]) #dashboardPage .finance-insight,
+      body:not([data-theme="pearl"]) #dashboardPage .analytics-grid .panel,
+      body:not([data-theme="pearl"]) #dashboardPage .wishlist-hub,
+      body:not([data-theme="pearl"]) #dashboardPage .history-panel {
+        background: rgba(8, 10, 16, var(--panel-opacity-base)) !important;
+      }
+
+      body:not([data-theme="pearl"]) #dashboardPage tbody tr,
+      body:not([data-theme="pearl"]) #dashboardPage tbody tr:nth-child(even) {
+        background: rgba(8, 10, 16, var(--panel-opacity-soft)) !important;
+      }
+    }
+
+  
+
+    /* =========================================================
+       LOGIN LUFFY — KHUSUS BAGIAN HALAMAN LOGIN SAJA
+       Dashboard, data, fungsi transaksi, dan tampilan setelah login
+       tidak disentuh oleh aturan di bawah ini.
+       ========================================================= */
+    #loginPage {
+      position: relative !important;
+      width: 100%;
+      min-height: 100svh !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      isolation: isolate;
+      background: #020604 !important;
+    }
+
+    /* Tetap izinkan class .hidden menyembunyikan login sesudah berhasil masuk. */
+    #loginPage:not(.hidden) { display: block !important; }
+
+    /* Nonaktifkan background login lama hanya pada halaman login. */
+    #loginPage > .login-bg-video,
+    #loginPage > #loginFxCanvas,
+    #loginPage > .login-motion-layer,
+    #loginPage > .login-ghost-logo,
+    #loginPage::before,
+    #loginPage::after {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      animation: none !important;
+    }
+
+    #loginPage .luffy-login-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+      background: #020604;
+    }
+
+    /* Video utama halaman login tetap hidup sebelum dan sesudah tombol pembuka diklik. */
+    #loginPage > .login-page-background-video {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100vw;
+      height: 100svh;
+      object-fit: cover;
+      object-position: center center;
+      pointer-events: none;
+      user-select: none;
+      background: #010302;
+      filter: saturate(1.05) contrast(1.04) brightness(1.10);
+      transform: scale(1.01);
+    }
+
+    /* Lapisan global transparan: video tetap terlihat, teks dan form tetap mudah dibaca. */
+    #loginPage > .login-page-background-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(17,213,105,.08), transparent 42%),
+        linear-gradient(180deg, rgba(0,5,3,.18), rgba(0,3,2,.42));
+    }
+
+    /* LAYAR 1 — Ketuk untuk membuka */
+    #loginPage .login-gate {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      overflow: hidden;
+      background: transparent;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity .46s ease, visibility .46s ease, transform .56s cubic-bezier(.2,.8,.2,1);
+    }
+
+    /* Background layar penuh memakai .login-page-background-video di bawah kedua layar login. */
+
+    /* Lapisan gelap tipis agar kartu tetap menonjol di atas video. */
+    #loginPage .login-gate::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(168, 85, 247, .12), transparent 38%),
+        linear-gradient(180deg, rgba(7,2,13,.22), rgba(3,1,7,.54));
+    }
+
+    #loginPage .login-gate-card {
+      position: relative;
+      z-index: 2;
+      width: min(390px, calc(100vw - 28px));
+      height: min(650px, calc(100svh - 28px));
+      min-height: 520px;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(196,181,253,.48);
+      border-radius: 29px;
+      color: #fff;
+      background: #0d0717;
+      box-shadow: 0 34px 90px rgba(0,0,0,.62), 0 0 48px rgba(168,85,247,.22);
+      text-align: center;
+      cursor: pointer;
+      isolation: isolate;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    #loginPage .login-gate-card:hover {
+      transform: translateY(-3px) scale(1.006);
+      border-color: rgba(216,180,254,.80);
+      box-shadow: 0 38px 100px rgba(0,0,0,.68), 0 0 58px rgba(168,85,247,.32);
+    }
+
+    #loginPage .login-gate-card:focus-visible {
+      outline: 3px solid #a855f7;
+      outline-offset: 4px;
+    }
+
+    #loginPage .login-gate-video {
+      z-index: -3;
+      object-position: center center;
+      filter: saturate(1.04) contrast(1.03);
+      transform: scale(1.015);
+    }
+
+    #loginPage .login-gate-shade {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(180deg, rgba(10,3,17,.02) 0%, rgba(9,2,16,.05) 42%, rgba(9,3,16,.77) 79%, rgba(4,1,8,.95) 100%),
+        radial-gradient(circle at 50% 36%, transparent 0 30%, rgba(8,2,14,.09) 58%, rgba(3,1,6,.44) 100%);
+      pointer-events: none;
+    }
+
+    #loginPage .login-gate-shine {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(115deg, transparent 34%, rgba(255,255,255,.10) 47%, transparent 60%);
+      transform: translateX(-125%);
+      animation: luffyLoginShine 6.4s 1.2s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    #loginPage .login-gate-content {
+      position: absolute;
+      right: 24px;
+      bottom: 34px;
+      left: 24px;
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      text-shadow: 0 3px 18px rgba(0,0,0,.80);
+    }
+
+    #loginPage .luffy-cross-mark {
+      position: relative;
+      width: 42px;
+      height: 34px;
+      margin-bottom: 2px;
+    }
+
+    #loginPage .luffy-cross-mark::before,
+    #loginPage .luffy-cross-mark::after {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: 6px;
+      width: 30px;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #fff2a6, #f5b92f 62%, #bc7010);
+      box-shadow: 0 0 14px rgba(245,185,47,.38);
+    }
+    #loginPage .luffy-cross-mark::before { transform: rotate(48deg); }
+    #loginPage .luffy-cross-mark::after { transform: rotate(-48deg); }
+
+    #loginPage .login-gate-title {
+      color: #f8fffb;
+      font: 800 clamp(22px,5vw,29px)/1.05 Orbitron,Manrope,sans-serif;
+      letter-spacing: .045em;
+      text-transform: uppercase;
+    }
+
+    #loginPage .login-gate-kicker {
+      color: #f5cf61;
+      font: 800 11px/1.2 Orbitron,Manrope,sans-serif;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    #loginPage .login-gate-button-label {
+      min-width: 220px;
+      margin-top: 7px;
+      padding: 13px 20px;
+      border: 1px solid rgba(221,198,255,.58);
+      border-radius: 999px;
+      color: #ffffff;
+      background: linear-gradient(180deg,#a855f7,#7e22ce);
+      box-shadow: 0 10px 32px rgba(126,34,206,.42), inset 0 1px rgba(255,255,255,.28);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .035em;
+      text-transform: uppercase;
+      animation: luffyLoginPulse 2.4s ease-in-out infinite;
+    }
+
+    /* LAYAR 2 — Tampilan login dua kolom */
+    #loginPage .login-workspace {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      padding: clamp(14px,3vw,34px);
+      overflow: auto;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: scale(1.025);
+      background:
+        radial-gradient(circle at 26% 44%, rgba(31,207,113,.10), transparent 38%),
+        linear-gradient(135deg, rgba(6,20,13,.30), rgba(1,4,3,.52) 72%);
+      transition: opacity .48s .12s ease, visibility .48s .12s ease, transform .58s .12s cubic-bezier(.2,.8,.2,1);
+    }
+
+    #loginPage.login-opened .login-gate {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: scale(1.045);
+    }
+
+    #loginPage.login-opened .login-workspace {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    #loginPage .login-access-shell {
+      position: relative;
+      width: min(1120px,96vw);
+      height: min(650px,calc(100svh - 56px));
+      min-height: 560px;
+      display: grid;
+      grid-template-columns: minmax(0,1.04fr) minmax(390px,.96fr);
+      overflow: hidden;
+      border: 1px solid rgba(192,132,252,.46);
+      border-radius: 28px;
+      background: #07030d;
+      box-shadow: 0 34px 110px rgba(0,0,0,.72), 0 0 52px rgba(168,85,247,.20);
+    }
+
+    #loginPage .login-visual-panel {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      background: #0b0512;
+      isolation: isolate;
+    }
+
+    #loginPage .login-panel-video {
+      z-index: -3;
+      object-position: center center;
+      filter: saturate(1.03) contrast(1.03);
+      transform: scale(1.01);
+    }
+
+    #loginPage .login-visual-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(90deg,rgba(7,2,12,.03),rgba(9,3,16,.09) 66%,rgba(8,2,14,.50)),
+        linear-gradient(180deg,rgba(0,0,0,.01),rgba(12,4,21,.13) 60%,rgba(6,2,11,.82));
+      pointer-events: none;
+    }
+
+    #loginPage .login-visual-brand {
+      position: absolute;
+      right: 28px;
+      bottom: 27px;
+      left: 28px;
+      display: grid;
+      justify-items: center;
+      gap: 7px;
+      text-align: center;
+      text-shadow: 0 3px 18px rgba(0,0,0,.85);
+    }
+
+    #loginPage .login-visual-brand strong {
+      color: #f8fffb;
+      font: 800 19px/1.1 Orbitron,Manrope,sans-serif;
+      letter-spacing: .08em;
+    }
+
+    #loginPage .login-visual-brand small {
+      color: #efcd64;
+      font: 800 9px/1.2 Orbitron,Manrope,sans-serif;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    /* Form asli dipertahankan; hanya tampilannya yang diubah. */
+    #loginPage .login-access-shell > .simple-login-card {
+      position: relative !important;
+      z-index: 2 !important;
+      width: auto !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      margin: 0 !important;
+      padding: clamp(38px,5vw,66px) clamp(34px,5vw,58px) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      overflow: auto !important;
+      border: 0 !important;
+      border-left: 1px solid rgba(192,132,252,.30) !important;
+      border-radius: 0 !important;
+      color: #eef8f2 !important;
+      background:
+        radial-gradient(circle at 82% 12%,rgba(168,85,247,.14),transparent 32%),
+        linear-gradient(160deg,rgba(10,5,17,.985),rgba(2,1,5,.995)) !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      animation: none !important;
+      transform: none !important;
+    }
+
+    #loginPage .login-access-shell > .simple-login-card::before,
+    #loginPage .login-access-shell > .simple-login-card::after,
+    #loginPage .simple-login-logo::after,
+    #loginPage .login-btn::after { display: none !important; }
+
+    #loginPage .simple-login-card h1,
+    #loginPage .simple-login-card #loginTitle {
+      color: #f8fffb !important;
+      background: none !important;
+      -webkit-text-fill-color: currentColor !important;
+      animation: none !important;
+    }
+
+    #loginPage .simple-login-card > p,
+    #loginPage .simple-login-card .login-short-sub {
+      max-width: 430px;
+      color: rgba(230,240,234,.72) !important;
+      animation: none !important;
+    }
+
+    #loginPage #loginForm {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      animation: none !important;
+    }
+
+    #loginPage .simple-login-card .input {
+      color: #f2faf5 !important;
+      border-color: rgba(192,132,252,.25) !important;
+      background: rgba(255,255,255,.035) !important;
+    }
+
+    #loginPage .simple-login-card .input:focus {
+      border-color: rgba(192,132,252,.82) !important;
+      box-shadow: 0 0 0 4px rgba(168,85,247,.14) !important;
+    }
+
+    #loginPage .simple-login-card .login-btn {
+      color: #f5fff8 !important;
+      border-color: rgba(221,198,255,.58) !important;
+      background: linear-gradient(180deg,#a855f7,#7e22ce) !important;
+      box-shadow: 0 13px 32px rgba(126,34,206,.42), inset 0 1px rgba(255,255,255,.25) !important;
+    }
+
+    #loginPage .simple-login-card .login-btn:hover,
+    #loginPage .simple-login-card .login-btn:focus-visible {
+      background: linear-gradient(180deg,#b96cff,#8b2bd1) !important;
+      border-color: rgba(233,213,255,.78) !important;
+      box-shadow: 0 16px 38px rgba(147,51,234,.50), 0 0 22px rgba(168,85,247,.22), inset 0 1px rgba(255,255,255,.28) !important;
+    }
+
+    #loginPage .forgot-password-btn { color: #f2ca51 !important; }
+    #loginPage .login-trust-note > span:first-child { color: #36dc79 !important; }
+
+    @keyframes luffyLoginPulse {
+      0%,100% { transform: translateY(0); box-shadow: 0 10px 32px rgba(126,34,206,.38); }
+      50% { transform: translateY(-2px); box-shadow: 0 14px 42px rgba(168,85,247,.55); }
+    }
+
+    @keyframes luffyLoginShine {
+      0%,58% { transform: translateX(-125%); opacity: 0; }
+      68% { opacity: .75; }
+      84%,100% { transform: translateX(125%); opacity: 0; }
+    }
+
+    @media (max-width: 760px) {
+      #loginPage .login-workspace { padding: 0; }
+      #loginPage .login-access-shell {
+        width: 100%;
+        height: 100svh;
+        min-height: 100svh;
+        display: block;
+        border: 0;
+        border-radius: 0;
+      }
+      #loginPage .login-visual-panel { position: absolute; inset: 0; z-index: 0; }
+      #loginPage .login-panel-video { object-position: center center; }
+      #loginPage .login-visual-overlay {
+        background:
+          linear-gradient(180deg,rgba(12,4,21,.22),rgba(8,2,15,.58)),
+          radial-gradient(circle at 50% 35%,transparent 0 20%,rgba(8,2,14,.30) 58%,rgba(3,1,7,.74) 100%);
+      }
+      #loginPage .login-visual-brand { display: none; }
+      #loginPage .login-access-shell > .simple-login-card {
+        width: min(360px,calc(100vw - 28px)) !important;
+        height: auto !important;
+        min-height: min(520px,calc(100svh - 32px)) !important;
+        margin: 16px auto !important;
+        padding: 31px 25px 24px !important;
+        justify-content: center !important;
+        border: 1px solid rgba(192,132,252,.46) !important;
+        border-radius: 23px !important;
+        background: linear-gradient(160deg,rgba(12,5,21,.84),rgba(3,1,7,.93)) !important;
+        box-shadow: 0 28px 82px rgba(0,0,0,.58),0 0 36px rgba(168,85,247,.22) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #loginPage .login-gate { padding: 0; }
+      #loginPage .login-gate-card {
+        width: 100vw;
+        height: 100svh;
+        min-height: 100svh;
+        border: 0;
+        border-radius: 0;
+      }
+      #loginPage .login-gate-content { bottom: max(32px,calc(22px + env(safe-area-inset-bottom))); }
+      #loginPage .login-access-shell > .simple-login-card {
+        width: min(352px,calc(100vw - 22px)) !important;
+        margin: 11px auto !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #loginPage .login-gate,
+      #loginPage .login-workspace,
+      #loginPage .login-gate-card,
+      #loginPage .login-gate-shine,
+      #loginPage .login-gate-button-label {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+
   </style>
 </head>
 <body data-theme="obsidian" data-visual-mode="normal" data-high-contrast="false" data-reduce-motion="false" data-money-visible="true" data-ui-version="28">
@@ -7613,45 +8299,79 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
   </div>
 
   <main id="loginPage">
-    <video class="login-bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-      <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784346655/gojo-and-white-cat-jujutsu-kaisen-moewalls-com_rbket3.mp4" type="video/mp4">
+    <video class="login-page-background-video" id="loginGateBackgroundVideo" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+      <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784614440/luffy-moonlight-meditation.3840x2160_clvewf.mp4" type="video/mp4">
     </video>
-    <section class="simple-login-card" aria-labelledby="loginTitle">
-      <div class="simple-login-logo simple-login-logo-main" aria-hidden="true">
-        <span class="classic-login-mark"><span class="logo-letter logo-f">F</span><span class="logo-amp-inline">&amp;</span><span class="logo-letter logo-i">I</span></span>
-      </div>
-      <div class="login-kicker">DASHBOARD</div>
-      <h1 id="loginTitle">OUR SAVINGS BBY</h1>
-      <p class="login-short-sub">Don't complain just enjoy your pain.</p>
+    <div class="login-page-background-overlay" aria-hidden="true"></div>
 
-      <form id="loginForm">
-        <div class="field-group">
-          <label for="loginUser">Username</label>
-          <input class="input" id="loginUser" type="text" placeholder="Username" autocomplete="username" autocapitalize="none" required>
-        </div>
-        <div class="field-group">
-          <label for="loginPassword">Kata sandi</label>
-          <div class="password-wrap">
-            <input class="input" id="loginPassword" type="password" placeholder="Kata sandi" autocomplete="current-password" required>
-            <button class="password-toggle" id="toggleLoginPassword" type="button" aria-label="Tampilkan kata sandi" title="Tampilkan kata sandi"><svg class="ui-icon eye-open-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.7"/></svg></button>
+    <section class="login-gate" id="loginGate" aria-label="Halaman pembuka dashboard">
+      <button class="login-gate-card" id="openLoginExperience" type="button" aria-controls="loginWorkspace" aria-label="Ketuk untuk membuka halaman login">
+        <video class="luffy-login-video login-gate-video" id="loginGateVideo" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+          <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784610829/luffy-animated.3840x2160_jsq5g4.mp4" type="video/mp4">
+        </video>
+        <span class="login-gate-shade" aria-hidden="true"></span>
+        <span class="login-gate-shine" aria-hidden="true"></span>
+        <span class="login-gate-content">
+          <span class="luffy-cross-mark" aria-hidden="true"></span>
+          <span class="login-gate-title">OUR SAVINGS BBY</span>
+          <span class="login-gate-kicker">DASHBOARD ACCESS</span>
+          <span class="login-gate-button-label">KETUK UNTUK MEMBUKA</span>
+        </span>
+      </button>
+    </section>
+
+    <section class="login-workspace" id="loginWorkspace" aria-hidden="true">
+      <div class="login-access-shell">
+        <div class="login-visual-panel" aria-hidden="true">
+          <video class="luffy-login-video login-panel-video" id="loginPanelVideo" muted loop playsinline preload="metadata">
+            <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784610686/luffy-with-scar-realistic.3840x2160_sjnuoc.mp4" type="video/mp4">
+          </video>
+          <div class="login-visual-overlay"></div>
+          <div class="login-visual-brand">
+            <span class="luffy-cross-mark"></span>
+            <strong>OUR SAVINGS BBY</strong>
+            <small>DASHBOARD ACCESS</small>
           </div>
-          <div class="caps-lock-note" id="capsLockNote" aria-live="polite">Caps Lock sedang aktif</div>
         </div>
-        <button class="primary-btn login-btn" id="loginButton" type="submit">Masuk</button>
-        <button class="forgot-password-btn" id="forgotPasswordButton" type="button">Lupa password?</button>
-        <div class="login-error" id="loginError" role="alert"></div>
-        <div class="login-lock-note" id="loginLockNote"></div>
-        <div class="login-trust-note" aria-label="Informasi keamanan">
-          <span aria-hidden="true">✓</span>
-          <span>Please Confirm The Authentication.</span>
-        </div>
-      </form>
+
+        <section class="simple-login-card" aria-labelledby="loginTitle">
+          <div class="simple-login-logo simple-login-logo-main" aria-hidden="true">
+            <span class="classic-login-mark"><span class="logo-letter logo-f">F</span><span class="logo-amp-inline">&amp;</span><span class="logo-letter logo-i">I</span></span>
+          </div>
+          <div class="login-kicker">DASHBOARD</div>
+          <h1 id="loginTitle">OUR SAVINGS BBY</h1>
+          <p class="login-short-sub">Don't complain just enjoy your pain.</p>
+
+          <form id="loginForm">
+            <div class="field-group">
+              <label for="loginUser">Username</label>
+              <input class="input" id="loginUser" type="text" placeholder="Username" autocomplete="username" autocapitalize="none" required>
+            </div>
+            <div class="field-group">
+              <label for="loginPassword">Kata sandi</label>
+              <div class="password-wrap">
+                <input class="input" id="loginPassword" type="password" placeholder="Kata sandi" autocomplete="current-password" required>
+                <button class="password-toggle" id="toggleLoginPassword" type="button" aria-label="Tampilkan kata sandi" title="Tampilkan kata sandi"><svg class="ui-icon eye-open-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.7"/></svg></button>
+              </div>
+              <div class="caps-lock-note" id="capsLockNote" aria-live="polite">Caps Lock sedang aktif</div>
+            </div>
+            <button class="primary-btn login-btn" id="loginButton" type="submit">Masuk</button>
+            <button class="forgot-password-btn" id="forgotPasswordButton" type="button">Lupa password?</button>
+            <div class="login-error" id="loginError" role="alert"></div>
+            <div class="login-lock-note" id="loginLockNote"></div>
+            <div class="login-trust-note" aria-label="Informasi keamanan">
+              <span aria-hidden="true">✓</span>
+              <span>Please Confirm The Authentication.</span>
+            </div>
+          </form>
+        </section>
+      </div>
     </section>
   </main>
 
   <main id="dashboardPage" class="hidden">
     <video class="dashboard-bg-video" id="dashboardBgVideo" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-      <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784367588/anime-boy-and-cat-moewalls-com_xghjdq.mp4" type="video/mp4">
+      <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784609516/luffy-from-one-piece.3840x2160_pkyw0h.mp4" type="video/mp4">
     </video>
     <div class="dashboard-bg-overlay" aria-hidden="true"></div>
     <header class="topbar">
@@ -7784,6 +8504,11 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
                 <button class="quick-menu-item" id="themeButton" type="button" role="menuitem">
                   <span class="quick-menu-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18h1.3a1.7 1.7 0 0 0 1.2-2.9l-.2-.2a1.7 1.7 0 0 1 1.2-2.9H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8Z"/><path d="M7.5 10h.01M10 6.8h.01M14.2 7.2h.01M17 10.2h.01"/></svg></span>
                   <span class="quick-menu-copy"><strong>Tema</strong><small>Ubah warna dan suasana dashboard</small></span>
+                  <span class="quick-menu-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+                </button>
+                <button class="quick-menu-item" id="panelOpacityButton" type="button" role="menuitem">
+                  <span class="quick-menu-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M8 7h8M6 17h12"/></svg></span>
+                  <span class="quick-menu-copy"><strong>Opacity Tabel</strong><small>Atur transparansi panel agar background lebih jelas</small></span>
                   <span class="quick-menu-arrow" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
                 </button>
                 <button class="quick-menu-item install-btn" id="installAppButton" type="button" role="menuitem">
@@ -8424,6 +9149,44 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
     </div>
   </div>
 
+  <div class="modal-overlay hidden" id="panelOpacityModal" aria-hidden="true">
+    <div class="modal-box panel-opacity-modal-box" role="dialog" aria-modal="true" aria-labelledby="panelOpacityModalTitle" tabindex="-1">
+      <div class="panel-opacity-header">
+        <div>
+          <h3 id="panelOpacityModalTitle">Opacity Tabel &amp; Panel</h3>
+          <p>Kecilkan nilainya agar video background semakin jelas. Isi panel tetap tajam dan tidak ikut transparan.</p>
+        </div>
+        <output class="panel-opacity-value" id="panelOpacityValue" for="panelOpacityRange">47%</output>
+      </div>
+
+      <div class="panel-opacity-preview" aria-hidden="true">
+        <div class="panel-opacity-preview-surface" id="panelOpacityPreviewSurface">
+          <span>Contoh panel dashboard</span>
+          <strong>Rp ••••••••</strong>
+          <small>Background terlihat melalui panel</small>
+        </div>
+      </div>
+
+      <div class="panel-opacity-control">
+        <div class="panel-opacity-control-head"><strong>Tingkat kepekatan panel</strong><span>10%–95%</span></div>
+        <input class="panel-opacity-range" id="panelOpacityRange" type="range" min="10" max="95" step="1" value="47" aria-label="Opacity tabel dan panel dashboard">
+        <div class="panel-opacity-scale"><span>Lebih transparan</span><span>Lebih pekat</span></div>
+        <div class="panel-opacity-presets" role="group" aria-label="Pilihan cepat opacity">
+          <button type="button" data-panel-opacity-preset="20">Sangat Jelas</button>
+          <button type="button" data-panel-opacity-preset="35">Jelas</button>
+          <button type="button" data-panel-opacity-preset="47">Seimbang</button>
+          <button type="button" data-panel-opacity-preset="75">Pekat</button>
+        </div>
+        <p class="panel-opacity-note"><strong>Catatan:</strong> Pengaturan tersimpan otomatis di perangkat ini dan berlaku untuk seluruh kartu, grafik, serta tabel riwayat.</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="secondary-btn" id="resetPanelOpacityButton" type="button">Reset 47%</button>
+        <button class="primary-btn" id="closePanelOpacityModal" type="button">Selesai</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay hidden" id="forgotPasswordModal" aria-hidden="true">
     <div class="modal-box forgot-password-modal-box" role="dialog" aria-modal="true" aria-labelledby="forgotPasswordTitle" tabindex="-1">
       <div class="forgot-password-visual" aria-hidden="true">
@@ -8500,6 +9263,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
     const REDUCE_MOTION_KEY = "future_savings_reduce_motion_v1";
     const SYSTEM_THEME_KEY = "future_savings_system_theme_v1";
     const PRIVACY_KEY = "future_savings_privacy_v1";
+    const PANEL_OPACITY_KEY = "future_savings_panel_opacity_v1";
     const LOGIN_GUARD_KEY = "future_savings_login_guard_v1";
     const MAX_LOGIN_ATTEMPTS = 5;
     const LOCKOUT_MS = 30 * 1000;
@@ -8545,6 +9309,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       reduceMotion: false,
       useSystemTheme: false,
       moneyVisible: true,
+      panelOpacity: 47,
       chartMonths: 6,
       chartSeries: { deposit: true, expense: true, balance: true },
       chartHitAreas: [],
@@ -8756,6 +9521,57 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "pearl" : "obsidian";
     }
 
+    function normalizePanelOpacity(value = 47) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return 47;
+      return Math.min(95, Math.max(10, Math.round(numeric)));
+    }
+
+    function applyPanelOpacity(value = state.panelOpacity, { persist = true } = {}) {
+      const percent = normalizePanelOpacity(value);
+      const base = percent / 100;
+      const strong = Math.min(.98, base + .13);
+      const soft = Math.max(.06, base * .83);
+      const subtle = Math.max(.03, base * .26);
+      const tableHead = Math.min(.99, base + .19);
+      const row = Math.max(.012, base * .043);
+      const rowEven = Math.max(.02, base * .074);
+      const hover = Math.max(.05, Math.min(.24, base * .18));
+
+      state.panelOpacity = percent;
+      document.body.dataset.panelOpacity = String(percent);
+
+      const dashboard = $("#dashboardPage");
+      if (dashboard) {
+        dashboard.style.setProperty("--panel-opacity-base", base.toFixed(3));
+        dashboard.style.setProperty("--panel-opacity-strong", strong.toFixed(3));
+        dashboard.style.setProperty("--panel-opacity-soft", soft.toFixed(3));
+        dashboard.style.setProperty("--panel-opacity-subtle", subtle.toFixed(3));
+        dashboard.style.setProperty("--panel-opacity-table-head", tableHead.toFixed(3));
+        dashboard.style.setProperty("--panel-opacity-row", row.toFixed(3));
+        dashboard.style.setProperty("--panel-opacity-row-even", rowEven.toFixed(3));
+        dashboard.style.setProperty("--panel-opacity-hover", hover.toFixed(3));
+      }
+
+      const range = $("#panelOpacityRange");
+      const output = $("#panelOpacityValue");
+      const preview = $("#panelOpacityPreviewSurface");
+      if (range) {
+        range.value = String(percent);
+        range.setAttribute("aria-valuetext", `${percent}% kepekatan panel`);
+      }
+      if (output) output.textContent = `${percent}%`;
+      if (preview) preview.style.background = `rgba(8, 10, 16, ${base.toFixed(3)})`;
+
+      $$('[data-panel-opacity-preset]').forEach((button) => {
+        const active = Number(button.dataset.panelOpacityPreset) === percent;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+
+      if (persist) localStorage.setItem(PANEL_OPACITY_KEY, String(percent));
+    }
+
     function applyTheme(theme = "obsidian", { fromSystem = false } = {}) {
       const allowedThemes = ["obsidian", "pearl"];
       const requestedTheme = state.useSystemTheme && !fromSystem ? preferredSystemTheme() : theme;
@@ -8837,10 +9653,12 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       const allowedThemes = ["obsidian", "pearl"];
       const safeStoredTheme = allowedThemes.includes(stored) ? stored : "obsidian";
       const visualMode = localStorage.getItem(VISUAL_MODE_KEY) || "normal";
+      const panelOpacity = localStorage.getItem(PANEL_OPACITY_KEY) || "47";
       document.body.dataset.moneyVisible = String(state.moneyVisible);
       applyTheme(state.useSystemTheme ? preferredSystemTheme() : safeStoredTheme, { fromSystem: state.useSystemTheme });
       applyVisualMode(visualMode);
       applyAccessibilitySettings();
+      applyPanelOpacity(panelOpacity, { persist: false });
       setMoneyVisibility(state.moneyVisible, { persist: false });
     }
 
@@ -11812,6 +12630,17 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       openAccountSettings();
     });
 
+    $("#panelOpacityButton")?.addEventListener("click", () => {
+      applyPanelOpacity(state.panelOpacity, { persist: false });
+      openModal("#panelOpacityModal");
+    });
+    $("#closePanelOpacityModal")?.addEventListener("click", () => closeModal("#panelOpacityModal"));
+    $("#panelOpacityRange")?.addEventListener("input", (event) => applyPanelOpacity(event.target.value));
+    $("#resetPanelOpacityButton")?.addEventListener("click", () => applyPanelOpacity(47));
+    $$('[data-panel-opacity-preset]').forEach((button) => button.addEventListener("click", () => {
+      applyPanelOpacity(button.dataset.panelOpacityPreset);
+    }));
+
     $("#themeButton").addEventListener("click", () => openModal("#themeModal"));
     $("#closeThemeModal").addEventListener("click", () => closeModal("#themeModal"));
     $$(".theme-card").forEach((card) => card.addEventListener("click", () => {
@@ -11999,6 +12828,9 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
     window.addEventListener("storage", (event) => {
       if (event.key === SESSION_KEY && !event.newValue && state.currentUser && !state.logoutInProgress) {
         leaveDashboard(true);
+      }
+      if (event.key === PANEL_OPACITY_KEY && event.newValue) {
+        applyPanelOpacity(event.newValue, { persist: false });
       }
     });
 
@@ -12237,6 +13069,56 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       });
 
     })();
+  
+
+    /* Interaksi visual Luffy — hanya untuk halaman login. */
+    function setLuffyLoginOpen(isOpen, options = {}) {
+      const loginPage = document.getElementById("loginPage");
+      const gate = document.getElementById("loginGate");
+      const workspace = document.getElementById("loginWorkspace");
+      const gateBackgroundVideo = document.getElementById("loginGateBackgroundVideo");
+      const gateVideo = document.getElementById("loginGateVideo");
+      const panelVideo = document.getElementById("loginPanelVideo");
+      if (!loginPage) return;
+
+      loginPage.classList.toggle("login-opened", Boolean(isOpen));
+      gate?.setAttribute("aria-hidden", isOpen ? "true" : "false");
+      workspace?.setAttribute("aria-hidden", isOpen ? "false" : "true");
+
+      /* Background utama selalu diputar pada kedua layar login. */
+      gateBackgroundVideo?.play?.().catch?.(() => {});
+
+      if (isOpen) {
+        panelVideo?.play?.().catch?.(() => {});
+        window.setTimeout(() => {
+          gateVideo?.pause?.();
+        }, 520);
+        if (options.focus !== false) {
+          window.setTimeout(() => document.getElementById("loginUser")?.focus?.({ preventScroll: true }), 430);
+        }
+      } else {
+        panelVideo?.pause?.();
+        if (panelVideo) {
+          try { panelVideo.currentTime = 0; } catch (_) {}
+        }
+        gateVideo?.play?.().catch?.(() => {});
+      }
+    }
+
+    document.getElementById("openLoginExperience")?.addEventListener("click", () => setLuffyLoginOpen(true));
+
+    /* Saat kembali dari dashboard ke halaman login, tampilkan layar ketuk lagi. */
+    (() => {
+      const loginPage = document.getElementById("loginPage");
+      if (!loginPage || typeof MutationObserver === "undefined") return;
+      let previouslyHidden = loginPage.classList.contains("hidden");
+      new MutationObserver(() => {
+        const currentlyHidden = loginPage.classList.contains("hidden");
+        if (previouslyHidden && !currentlyHidden) setLuffyLoginOpen(false, { focus: false });
+        previouslyHidden = currentlyHidden;
+      }).observe(loginPage, { attributes: true, attributeFilter: ["class"] });
+    })();
+
   </script>
 
 </body>
