@@ -12498,17 +12498,17 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       const password = $("#loginPassword").value;
       const button = $("#loginButton");
       $("#loginError").textContent = "";
-      setActionButtonState(button, "loading", "Memeriksa");
+      setActionButtonState(button, "loading", "Checking");
       try {
         const valid = await validateLogin(username, password);
         if (!valid) {
           const guard = recordLoginFailure();
           const locked = Number(guard.lockedUntil || 0) > Date.now();
-          $("#loginError").textContent = locked ? `Terlalu banyak percobaan. Coba lagi dalam ${Math.ceil((guard.lockedUntil - Date.now()) / 1000)} detik.` : "Username atau kata sandi salah.";
+          $("#loginError").textContent = locked ? `Terlalu banyak percobaan. Coba lagi dalam ${Math.ceil((guard.lockedUntil - Date.now()) / 1000)} detik.` : "WRONG PASSWORD NIGGA.";
           $("#loginPassword").value = "";
           markInvalid($("#loginUser"), $("#loginPassword"));
           pulseLoginCard();
-          setActionButtonState(button, "error", locked ? "Akses Dikunci" : "Login Gagal");
+          setActionButtonState(button, "error", locked ? "Akses Dikunci" : "Login Failed");
           await wait(state.reduceMotion ? 0 : 520);
           updateLoginLockUi();
           if (!locked) setActionButtonState(button, "idle", "Masuk");
@@ -12519,12 +12519,12 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
         $("#loginUser").classList.add("input-valid-flash");
         $("#loginPassword").classList.add("input-valid-flash");
         setTimeout(() => $$("#loginUser, #loginPassword").forEach((input) => input.classList.remove("input-valid-flash")), 520);
-        setActionButtonState(button, "success", "Akses Diterima");
+        setActionButtonState(button, "success", "Access Granted");
         await wait(state.reduceMotion ? 0 : 360);
         await playLoginTransition(username, () => enterDashboard(username));
       } catch (error) {
         console.error(error);
-        $("#loginError").textContent = "Login gagal karena database tidak dapat diakses.";
+        $("#loginError").textContent = "Login Failed karena database tidak dapat diakses.";
         pulseLoginCard();
         setActionButtonState(button, "error", "Koneksi Gagal");
         toast("Database tidak dapat diakses saat ini.", "error");
