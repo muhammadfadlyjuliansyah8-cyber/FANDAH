@@ -8301,14 +8301,14 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
   </div>
 
   <main id="loginPage">
-    <video class="login-page-background-video" id="loginGateBackgroundVideo" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+    <video class="login-page-background-video" id="loginGateBackgroundVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true">
       <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784614440/luffy-moonlight-meditation.3840x2160_clvewf.mp4" type="video/mp4">
     </video>
     <div class="login-page-background-overlay" aria-hidden="true"></div>
 
     <section class="login-gate" id="loginGate" aria-label="Halaman pembuka dashboard">
       <button class="login-gate-card" id="openLoginExperience" type="button" aria-controls="loginWorkspace" aria-label="Ketuk untuk membuka halaman login">
-        <video class="luffy-login-video login-gate-video" id="loginGateVideo" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+        <video class="luffy-login-video login-gate-video" id="loginGateVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true">
           <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784610829/luffy-animated.3840x2160_jsq5g4.mp4" type="video/mp4">
         </video>
         <span class="login-gate-shade" aria-hidden="true"></span>
@@ -8325,7 +8325,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
     <section class="login-workspace" id="loginWorkspace" aria-hidden="true">
       <div class="login-access-shell">
         <div class="login-visual-panel" aria-hidden="true">
-          <video class="luffy-login-video login-panel-video" id="loginPanelVideo" muted loop playsinline preload="metadata">
+          <video class="luffy-login-video login-panel-video" id="loginPanelVideo" muted loop playsinline webkit-playsinline preload="metadata">
             <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784610686/luffy-with-scar-realistic.3840x2160_sjnuoc.mp4" type="video/mp4">
           </video>
           <div class="login-visual-overlay"></div>
@@ -8372,7 +8372,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
   </main>
 
   <main id="dashboardPage" class="hidden">
-    <video class="dashboard-bg-video" id="dashboardBgVideo" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+    <video class="dashboard-bg-video" id="dashboardBgVideo" muted loop playsinline webkit-playsinline preload="metadata" aria-hidden="true">
       <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784609516/luffy-from-one-piece.3840x2160_pkyw0h.mp4" type="video/mp4">
     </video>
     <div class="dashboard-bg-overlay" aria-hidden="true"></div>
@@ -10810,19 +10810,264 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
     }
 
 
-    function playDashboardBackground() {
-      const video = $("#dashboardBgVideo");
+    /*
+     * Sistem pemulihan video background.
+     * Hanya video yang sedang terlihat yang diputar, sehingga beberapa video 4K
+     * tidak berjalan bersamaan secara sia-sia. Video aktif akan dicoba kembali
+     * setelah pause tak terduga, buffering, perpindahan tab, atau koneksi pulih.
+     */
+    const MANAGED_VIDEO_IDS = Object.freeze([
+      "loginGateBackgroundVideo",
+      "loginGateVideo",
+      "loginPanelVideo",
+      "dashboardBgVideo"
+    ]);
+    const managedVideoRecords = new WeakMap();
+    let managedVideoRecoveryReady = false;
+    let managedVideoWatchdog = null;
+
+    function managedVideoRecord(video) {
+      if (!managedVideoRecords.has(video)) {
+        managedVideoRecords.set(video, {
+          timer: null,
+          reloadRequested: false,
+          failures: 0,
+          lastReload: 0,
+          lastTime: -1,
+          stagnantChecks: 0,
+          reloading: false
+        });
+      }
+      return managedVideoRecords.get(video);
+    }
+
+    function configureManagedVideo(video) {
       if (!video) return;
       video.muted = true;
+      video.defaultMuted = true;
       video.loop = true;
-      const playPromise = video.play();
-      if (playPromise?.catch) playPromise.catch(() => {});
+      video.autoplay = true;
+      video.playsInline = true;
+      video.setAttribute("muted", "");
+      video.setAttribute("loop", "");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
+    }
+
+    function shouldManagedVideoPlay(video) {
+      if (!video || document.hidden) return false;
+
+      const loginPage = $("#loginPage");
+      const dashboardPage = $("#dashboardPage");
+      const loginVisible = Boolean(loginPage && !loginPage.classList.contains("hidden"));
+      const dashboardVisible = Boolean(dashboardPage && !dashboardPage.classList.contains("hidden"));
+      const loginOpened = Boolean(loginPage?.classList.contains("login-opened"));
+
+      switch (video.id) {
+        case "loginGateBackgroundVideo":
+          return loginVisible;
+        case "loginGateVideo":
+          return loginVisible && !loginOpened;
+        case "loginPanelVideo":
+          return loginVisible && loginOpened;
+        case "dashboardBgVideo":
+          return dashboardVisible;
+        default:
+          return false;
+      }
+    }
+
+    function clearManagedVideoRecovery(video) {
+      const record = managedVideoRecord(video);
+      if (record.timer) clearTimeout(record.timer);
+      record.timer = null;
+      record.reloadRequested = false;
+    }
+
+    function pauseManagedVideo(video, { reset = false } = {}) {
+      if (!video) return;
+      video.dataset.intentionalPause = "true";
+      clearManagedVideoRecovery(video);
+      try { video.pause(); } catch (_) {}
+      if (reset) {
+        try { video.currentTime = 0; } catch (_) {}
+      }
+    }
+
+    function pauseAllManagedVideos() {
+      MANAGED_VIDEO_IDS.forEach((id) => pauseManagedVideo(document.getElementById(id)));
+    }
+
+    function scheduleManagedVideoRecovery(video, { delay = 360, reload = false } = {}) {
+      if (!video || !shouldManagedVideoPlay(video)) return;
+
+      const record = managedVideoRecord(video);
+      record.reloadRequested = record.reloadRequested || reload;
+      if (record.timer) return;
+
+      record.timer = window.setTimeout(() => {
+        record.timer = null;
+        const reloadRequested = record.reloadRequested;
+        record.reloadRequested = false;
+        void playManagedVideo(video, { reload: reloadRequested });
+      }, Math.max(0, delay));
+    }
+
+    async function playManagedVideo(video, { reload = false } = {}) {
+      if (!video || !shouldManagedVideoPlay(video)) return false;
+
+      configureManagedVideo(video);
+      delete video.dataset.intentionalPause;
+      const record = managedVideoRecord(video);
+      clearManagedVideoRecovery(video);
+
+      const now = Date.now();
+      if (reload && now - record.lastReload >= 10000) {
+        record.lastReload = now;
+        record.reloading = true;
+        try {
+          video.load();
+        } catch (_) {}
+        window.setTimeout(() => {
+          record.reloading = false;
+        }, 900);
+      }
+
+      try {
+        const result = video.play();
+        if (result?.then) await result;
+        record.failures = 0;
+        record.stagnantChecks = 0;
+        record.lastTime = Number.isFinite(video.currentTime) ? video.currentTime : -1;
+        return true;
+      } catch (_) {
+        record.failures += 1;
+        const retryDelay = Math.min(4200, 420 * (2 ** Math.min(record.failures, 3)));
+        scheduleManagedVideoRecovery(video, {
+          delay: retryDelay,
+          reload: record.failures >= 3
+        });
+        return false;
+      }
+    }
+
+    function syncManagedVideos({ checkStall = false } = {}) {
+      MANAGED_VIDEO_IDS.forEach((id) => {
+        const video = document.getElementById(id);
+        if (!video) return;
+
+        if (!shouldManagedVideoPlay(video)) {
+          pauseManagedVideo(video);
+          return;
+        }
+
+        configureManagedVideo(video);
+        if (video.paused || video.ended) {
+          scheduleManagedVideoRecovery(video, { delay: 0 });
+          return;
+        }
+
+        if (!checkStall || video.seeking || video.readyState < 2) return;
+
+        const record = managedVideoRecord(video);
+        const currentTime = Number.isFinite(video.currentTime) ? video.currentTime : -1;
+        if (currentTime >= 0 && record.lastTime >= 0 && Math.abs(currentTime - record.lastTime) < 0.04) {
+          record.stagnantChecks += 1;
+        } else {
+          record.stagnantChecks = 0;
+        }
+        record.lastTime = currentTime;
+
+        /* Dua pemeriksaan tanpa kemajuan berarti video kemungkinan benar-benar macet. */
+        if (record.stagnantChecks >= 2) {
+          record.stagnantChecks = 0;
+          scheduleManagedVideoRecovery(video, { delay: 80, reload: true });
+        }
+      });
+    }
+
+    function initializeManagedVideoRecovery() {
+      if (managedVideoRecoveryReady) return;
+      managedVideoRecoveryReady = true;
+
+      MANAGED_VIDEO_IDS.forEach((id) => {
+        const video = document.getElementById(id);
+        if (!video) return;
+        configureManagedVideo(video);
+
+        video.addEventListener("playing", () => {
+          const record = managedVideoRecord(video);
+          clearManagedVideoRecovery(video);
+          record.failures = 0;
+          record.stagnantChecks = 0;
+          record.lastTime = Number.isFinite(video.currentTime) ? video.currentTime : -1;
+        });
+
+        video.addEventListener("pause", () => {
+          if (video.dataset.intentionalPause === "true") return;
+          if (shouldManagedVideoPlay(video)) {
+            scheduleManagedVideoRecovery(video, { delay: 180 });
+          }
+        });
+
+        video.addEventListener("ended", () => {
+          if (shouldManagedVideoPlay(video)) {
+            try { video.currentTime = 0; } catch (_) {}
+            scheduleManagedVideoRecovery(video, { delay: 0 });
+          }
+        });
+
+        video.addEventListener("waiting", () => {
+          if (shouldManagedVideoPlay(video)) {
+            scheduleManagedVideoRecovery(video, { delay: 950 });
+          }
+        });
+
+        video.addEventListener("stalled", () => {
+          const record = managedVideoRecord(video);
+          if (!record.reloading && shouldManagedVideoPlay(video)) {
+            scheduleManagedVideoRecovery(video, { delay: 700, reload: true });
+          }
+        });
+
+        ["error", "abort", "emptied"].forEach((eventName) => {
+          video.addEventListener(eventName, () => {
+            const record = managedVideoRecord(video);
+            if (!record.reloading && shouldManagedVideoPlay(video)) {
+              scheduleManagedVideoRecovery(video, { delay: 320, reload: true });
+            }
+          });
+        });
+
+        ["loadeddata", "canplay"].forEach((eventName) => {
+          video.addEventListener(eventName, () => {
+            if (shouldManagedVideoPlay(video) && video.paused) {
+              scheduleManagedVideoRecovery(video, { delay: 0 });
+            }
+          });
+        });
+      });
+
+      window.addEventListener("pageshow", () => syncManagedVideos());
+      window.addEventListener("focus", () => syncManagedVideos());
+      window.addEventListener("online", () => syncManagedVideos());
+      window.addEventListener("pagehide", pauseAllManagedVideos);
+      document.addEventListener("pointerdown", () => syncManagedVideos(), { passive: true, once: true });
+
+      clearInterval(managedVideoWatchdog);
+      managedVideoWatchdog = window.setInterval(() => {
+        if (!document.hidden) syncManagedVideos({ checkStall: true });
+      }, 3500);
+
+      syncManagedVideos();
+    }
+
+    function playDashboardBackground() {
+      syncManagedVideos();
     }
 
     function stopDashboardBackground() {
-      const video = $("#dashboardBgVideo");
-      if (!video) return;
-      video.pause();
+      pauseManagedVideo($("#dashboardBgVideo"));
     }
 
     async function enterDashboard(username) {
@@ -12884,6 +13129,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
         stopFutureBackground();
         stopLoginBackground();
         stopChartAnimation();
+        pauseAllManagedVideos();
         return;
       }
       if (!$("#dashboardPage").classList.contains("hidden") && $("#userMenu")?.classList.contains("hidden")) {
@@ -12892,6 +13138,8 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       } else if (!$("#loginPage").classList.contains("hidden")) {
         startLoginBackground();
       }
+      /* Browser sering menghentikan video saat tab tidak aktif; jalankan kembali yang sedang terlihat. */
+      syncManagedVideos();
     });
 
     function showConnectionBanner(message, online = false) {
@@ -13004,6 +13252,8 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       if (state.currentUser) toast("Terjadi gangguan saat memproses data.", "error");
     });
 
+    initializeManagedVideoRecovery();
+
     boot().catch((error) => {
       console.error(error);
       setLoading(true);
@@ -13087,23 +13337,23 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       gate?.setAttribute("aria-hidden", isOpen ? "true" : "false");
       workspace?.setAttribute("aria-hidden", isOpen ? "false" : "true");
 
-      /* Background utama selalu diputar pada kedua layar login. */
-      gateBackgroundVideo?.play?.().catch?.(() => {});
+      /* Background utama tetap hidup pada kedua layar login. */
+      void playManagedVideo(gateBackgroundVideo);
 
       if (isOpen) {
-        panelVideo?.play?.().catch?.(() => {});
+        void playManagedVideo(panelVideo);
         window.setTimeout(() => {
-          gateVideo?.pause?.();
+          /* Setelah transisi selesai, video kartu lama dihentikan agar decoder tidak terlalu berat. */
+          pauseManagedVideo(gateVideo);
+          syncManagedVideos();
         }, 520);
         if (options.focus !== false) {
           window.setTimeout(() => document.getElementById("loginUser")?.focus?.({ preventScroll: true }), 430);
         }
       } else {
-        panelVideo?.pause?.();
-        if (panelVideo) {
-          try { panelVideo.currentTime = 0; } catch (_) {}
-        }
-        gateVideo?.play?.().catch?.(() => {});
+        pauseManagedVideo(panelVideo, { reset: true });
+        void playManagedVideo(gateVideo);
+        syncManagedVideos();
       }
     }
 
