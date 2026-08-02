@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-
+<!-- Future Savings Clean Edition
+     CSS and interactions have been consolidated without legacy override layers. -->
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -9,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Future Savings">
-  <link rel="manifest" href="./future-savings-v10.webmanifest">
+  <link rel="manifest" href="future-savings-v10.webmanifest">
 
 <title>My Lovely</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='20%25' y1='10%25' x2='80%25' y2='95%25'%3E%3Cstop offset='0%25' stop-color='%23ff7a8f'/%3E%3Cstop offset='38%25' stop-color='%23ff1744'/%3E%3Cstop offset='100%25' stop-color='%23b40023'/%3E%3C/linearGradient%3E%3CradialGradient id='s' cx='34%25' cy='24%25' r='42%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff' stop-opacity='.95'/%3E%3Cstop offset='28%25' stop-color='%23ffffff' stop-opacity='.34'/%3E%3Cstop offset='100%25' stop-color='%23ffffff' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cfilter id='d' x='-20%25' y='-20%25' width='140%25' height='150%25'%3E%3CfeDropShadow dx='0' dy='6' stdDeviation='5' flood-color='%23600016' flood-opacity='.55'/%3E%3C/filter%3E%3C/defs%3E%3Cpath filter='url(%23d)' fill='url(%23g)' d='M64 112S13 81 13 43C13 20 41 8 64 32 87 8 115 20 115 43 115 81 64 112 64 112Z'/%3E%3Cellipse fill='url(%23s)' cx='44' cy='38' rx='27' ry='22' transform='rotate(-22 44 38)'/%3E%3Cpath fill='none' stroke='%23ffb3c0' stroke-opacity='.55' stroke-width='3' d='M24 45C24 27 44 20 59 36' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -23,26 +24,77 @@
       --panel: rgba(7, 18, 35, .78);
       --panel-strong: rgba(5, 14, 29, .94);
       --panel-soft: rgba(255, 255, 255, .045);
-
-
       --cyan: #49e5ff;
       --cyan-soft: rgba(73, 229, 255, .13);
       --blue: #548dff;
       --purple: #9d6cff;
       --gold: #ffd766;
-
-
       --orange: #ffad66;
       --text: #eef8ff;
-
-
+      --green: #54f59a;
+      --red: #ff6b86;
+      --green-rgb: 84,245,154;
+      --red-rgb: 255,107,134;
+      --muted: rgba(226,239,250,.68);
+      --line: rgba(var(--accent-rgb),.14);
+      --line-strong: rgba(var(--accent-rgb),.34);
+      --radius-xs: 8px;
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --radius-xl: 24px;
+      --radius-small: 10px;
+      --radius-medium: 16px;
+      --radius-large: 22px;
+      --radius: var(--radius-lg);
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --shadow-sm: 0 12px 34px rgba(0,0,0,.24);
+      --shadow-md: 0 20px 54px rgba(0,0,0,.32);
+      --shadow-lg: 0 24px 66px rgba(0,0,0,.34);
+      --shadow-focus: 0 0 0 4px rgba(var(--accent-rgb),.10);
+      --shadow: var(--shadow-md);
+      --surface-quiet: rgba(var(--theme-panel),.88);
+      --surface-raised: rgba(var(--theme-panel),.95);
+      --text-primary: #f5f7f8;
+      --text-secondary: rgba(231,238,242,.74);
+      --text-tertiary: rgba(231,238,242,.54);
+      --luxury-glow: 0 0 28px rgba(var(--accent-rgb),.16);
+      --luxury-line: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.68), rgba(var(--gold-rgb),.58), transparent);
+      --ui-space-1: 6px;
+      --ui-space-2: 10px;
+      --ui-space-3: 14px;
+      --ui-space-4: 18px;
+      --ui-space-5: 24px;
+      --ui-space-6: 32px;
+      --ui-radius-sm: 12px;
+      --ui-radius-md: 18px;
+      --ui-radius-lg: 26px;
+      --ui-radius-xl: 34px;
+      --ui-surface: rgba(var(--theme-panel),.94);
+      --ui-surface-soft: rgba(255,255,255,.027);
+      --ui-border: rgba(var(--accent-rgb),.105);
+      --ui-border-gold: rgba(var(--gold-rgb),.19);
+      --ui-shadow-soft: 0 18px 52px rgba(0,0,0,.24);
+      --ui-shadow-deep: 0 28px 90px rgba(0,0,0,.34);
+      --ui-ease: cubic-bezier(.2,.8,.2,1);
+      --motion-fast: 180ms;
+      --motion-normal: 320ms;
+      --motion-slow: 680ms;
+      --motion-ease: cubic-bezier(.2,.82,.2,1);
     }
 
     * { box-sizing: border-box; }
     body[data-theme="ocean"] {
-          --green:#54f59a; --red:#ff6587;
-         --green-rgb:84,245,154; --red-rgb:255,101,135;
-
+      --cyan:#58dff5; --blue:#6695ff; --purple:#9275ee; --gold:#f2ca63;
+      --green:#54f59a; --red:#ff6587;
+      --accent-rgb:88,223,245; --purple-rgb:146,117,238; --gold-rgb:242,202,99;
+      --green-rgb:84,245,154; --red-rgb:255,101,135;
+      --theme-bg-1:#030812; --theme-bg-2:#071426; --theme-bg-3:#020711; --theme-panel:8,20,38;
     }
     html { scroll-behavior: smooth; }
     body {
@@ -77,7 +129,8 @@
       z-index: 9999;
       display: grid;
       place-items: center;
-
+      isolation: isolate;
+      overflow: hidden;
       transition: opacity .45s ease, visibility .45s ease;
     }
     #loadingScreen.done { opacity: 0; visibility: hidden; }
@@ -272,7 +325,7 @@
     .login-short-sub { margin: 10px 0 20px !important; }
     .copy-note-btn { min-width: 120px; }
     /* Dashboard */
-    #dashboardPage { min-height: 100vh; position: relative; z-index: 1;  overflow: hidden; }
+    #dashboardPage { min-height: 100vh; position: relative; z-index: 1; isolation: isolate; overflow: hidden; }
     #dashboardPage > *:not(.future-bg) { position: relative; z-index: 2; }
     .future-bg { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; opacity: .72; }
     #dashboardPage::before, #dashboardPage::after {
@@ -806,7 +859,7 @@
     /* Mobile performance mode: target 60 FPS with lighter compositing. */
     @media (max-width: 640px) {
       body { --shadow: 0 12px 34px rgba(0,0,0,.30); }
-      #dashboardPage::before, #dashboardPage::after {  animation:none !important; filter:none !important; }
+      #dashboardPage::before, #dashboardPage::after { display:none !important; animation:none !important; filter:none !important; }
       .summary-card, .panel, .topbar, .modal-box, .simple-login-card, .login-transition-card {
         -webkit-backdrop-filter:none !important;
         backdrop-filter:none !important;
@@ -1368,35 +1421,6 @@
 
 
     /* Calm finance visual foundation */
-    :root {
-      --radius-xs: 8px;
-
-
-      --radius-xl: 24px;
-      --space-1: 4px;
-      --space-2: 8px;
-      --space-3: 12px;
-      --space-4: 16px;
-      --space-5: 24px;
-      --space-6: 32px;
-
-
-      --shadow-lg: 0 24px 66px rgba(0,0,0,.34);
-      --green:#54f59a;
-      --red:#ff6b86;
-      --green-rgb:84,245,154;
-      --red-rgb:255,107,134;
-      --muted:rgba(226,239,250,.68);
-      --line:rgba(var(--accent-rgb),.14);
-      --line-strong:rgba(var(--accent-rgb),.34);
-      --shadow:var(--shadow-md);
-      --radius:var(--radius-lg);
-    }
-    body[data-theme="ocean"] {
-      --cyan:#58dff5; --blue:#6695ff; --purple:#9275ee; --gold:#f2ca63;
-      --accent-rgb:88,223,245; --purple-rgb:146,117,238; --gold-rgb:242,202,99;
-      --theme-bg-1:#030812; --theme-bg-2:#071426; --theme-bg-3:#020711; --theme-panel:8,20,38;
-    }
     body[data-theme="contrast"] {
       --cyan:#35d7ff; --blue:#72a1ff; --purple:#b69cff; --gold:#ffd34d;
       --accent-rgb:53,215,255; --purple-rgb:182,156,255; --gold-rgb:255,211,77;
@@ -1918,10 +1942,6 @@
 
 
     /* Luxury motion and interface foundation */
-    :root {
-      --luxury-glow: 0 0 28px rgba(var(--accent-rgb),.16);
-      --luxury-line: linear-gradient(90deg, transparent, rgba(var(--accent-rgb),.68), rgba(var(--gold-rgb),.58), transparent);
-    }
 
     body::after {
 
@@ -2193,18 +2213,6 @@
     }
 
 /* Typography, hierarchy, and calm luxury surfaces */
-:root {
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
-
-
-  --surface-quiet: rgba(var(--theme-panel),.88);
-  --surface-raised: rgba(var(--theme-panel),.95);
-  --shadow-sm: 0 12px 34px rgba(0,0,0,.24);
-  --shadow-md: 0 20px 54px rgba(0,0,0,.32);
-  --shadow-focus: 0 0 0 4px rgba(var(--accent-rgb),.10);
-}
 
 html { color-scheme: dark; }
 body {
@@ -2726,14 +2734,6 @@ textarea:focus-visible,
 
 
 /* Obsidian wealth theme */
-:root {
-  --radius-small: 10px;
-  --radius-medium: 16px;
-  --radius-large: 22px;
-  --text-primary: #f5f7f8;
-  --text-secondary: rgba(231,238,242,.74);
-  --text-tertiary: rgba(231,238,242,.54);
-}
 body[data-theme="obsidian"] {
   --cyan:#62dce9; --blue:#7197d8; --purple:#8974aa; --gold:#d9b85f;
   --accent-rgb:98,220,233; --purple-rgb:137,116,170; --gold-rgb:217,184,95;
@@ -2793,8 +2793,7 @@ body[data-reduce-motion="true"] #dashboardPage::after { display:none!important; 
 
 .loader-core-main .loader-progress-meta { font-size:11px; }
 #loadingScreen.returning-visit .loader-monogram-svg .monogram-stroke { animation-duration:.22s; animation-delay:0s; }
-#loadingScreen.returning-visit .loader-sub,
-#loadingScreen.returning-visit .loader-kicker { display:none; }
+#loadingScreen.returning-visit .loader-sub { display:block; }
 
 /* Login identity */
 .simple-login-logo-main svg { width:42px; height:42px; fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
@@ -2953,8 +2952,8 @@ body::after {
 .loader-core-main .loader-progress-shell { width:min(265px,76vw);  margin-top:15px; background:rgba(255,255,255,.055); border-color:rgba(var(--gold-rgb),.13); box-shadow:none; }
 .loader-core-main .loader-progress-bar {  box-shadow:0 0 12px rgba(var(--gold-rgb),.11); }
 .loader-core-main .loader-progress-bar::after { opacity:.34; animation-duration:1.05s; animation-iteration-count:2; }
-.loader-core-main .loader-progress-meta { width:min(265px,76vw); margin-top:8px; justify-content:flex-end; }
-.loader-stage-text { display:none; }
+.loader-core-main .loader-progress-meta { width:min(265px,76vw); margin-top:8px; justify-content:space-between; }
+.loader-stage-text { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
 .loader-progress-value { color:rgba(245,244,239,.82); font-size:10px; }
 
 /* Login: quieter, personal and finance-oriented rather than gaming-oriented. */
@@ -3068,29 +3067,12 @@ body[data-visual-mode="future"] #loginFxCanvas { opacity:.25; }
 
 @media (prefers-reduced-motion:reduce) {
   body::after,.loader-progress-bar::after { animation:none!important; }
+  .monogram-stroke { stroke-dashoffset:0!important; }
+  .loader-monogram-glow { opacity:1!important; transform:none!important; }
 }
 
 
 /* Dashboard, wishlist, and responsive interface */
-:root {
-  --ui-space-1: 6px;
-  --ui-space-2: 10px;
-  --ui-space-3: 14px;
-  --ui-space-4: 18px;
-  --ui-space-5: 24px;
-  --ui-space-6: 32px;
-  --ui-radius-sm: 12px;
-  --ui-radius-md: 18px;
-  --ui-radius-lg: 26px;
-  --ui-radius-xl: 34px;
-  --ui-surface: rgba(var(--theme-panel), .94);
-  --ui-surface-soft: rgba(255,255,255,.027);
-  --ui-border: rgba(var(--accent-rgb), .105);
-  --ui-border-gold: rgba(var(--gold-rgb), .19);
-  --ui-shadow-soft: 0 18px 52px rgba(0,0,0,.24);
-  --ui-shadow-deep: 0 28px 90px rgba(0,0,0,.34);
-  --ui-ease: cubic-bezier(.2,.8,.2,1);
-}
 
 html { scroll-padding-top: 92px; }
 body {
@@ -3982,7 +3964,6 @@ body[data-high-contrast="true"] .wishlist-hub { border-color:rgba(var(--accent-r
   place-items: center;
   padding: 24px;
 
-
   background:
     linear-gradient(180deg,
       rgba(2,10,24,.10) 0%,
@@ -4539,8 +4520,6 @@ body[data-theme="pearl"] {
   --shadow-sm:0 8px 22px rgba(42,36,25,.08);
   --shadow-md:0 18px 44px rgba(42,36,25,.11);
   --shadow-lg:0 26px 68px rgba(42,36,25,.14);
-}
-body[data-theme="pearl"] {
   background:
     radial-gradient(780px 460px at -10% -8%, rgba(11,112,133,.08), transparent 62%),
     radial-gradient(720px 430px at 108% 4%, rgba(140,104,25,.075), transparent 64%),
@@ -5589,7 +5568,7 @@ body[data-reduce-motion="true"] .dashboard-mini-orbit::before {
 #dashboardPage > .mobile-bottom-nav,
 #dashboardPage > #toastStack,
 #dashboardPage > .offline-banner {
-
+  position: relative;
   z-index: 3 !important;
 }
 .dashboard-star-field {
@@ -6925,12 +6904,6 @@ body.quick-menu-popup-open .dashboard-section-nav {
 
 
 /* Action feedback, loading, logout, and skeleton motion */
-:root {
-  --motion-fast: 180ms;
-  --motion-normal: 320ms;
-  --motion-slow: 680ms;
-  --motion-ease: cubic-bezier(.2,.82,.2,1);
-}
 
 /* Buttons: spinner, success check, error mark, press feedback and click ripple. */
 .primary-btn, .secondary-btn, .danger-btn, .icon-btn,
@@ -7056,115 +7029,6 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
 }
 
 
-    /* Video background khusus halaman sebelum login */
-    .login-bg-video {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      pointer-events: none;
-      user-select: none;
-      background: #020711;
-    }
-
-    /* Lapisan gelap agar form login tetap terbaca di atas video */
-    #loginPage::before {
-      z-index: 1;
-      background-image:
-        linear-gradient(180deg, rgba(0, 4, 12, .32), rgba(0, 7, 18, .48)),
-        radial-gradient(circle at 50% 38%, transparent 0 22%, rgba(0, 5, 14, .20) 62%, rgba(0, 3, 10, .48) 100%);
-      opacity: 1;
-    }
-
-    #loginPage::after { z-index: 1; }
-    #loginFxCanvas,
-    .login-motion-layer { z-index: 1; }
-    #loginPage .simple-login-card { z-index: 2; }
-
-
-    /* Login background tunggal: hanya video kucing. */
-    #loginFxCanvas,
-    .login-motion-layer,
-    .login-ghost-logo,
-    #loginPage::after {
-      display: none !important;
-    }
-
-    #loginPage::before {
-      animation: none !important;
-    }
-
-    .login-bg-video {
-      display: block !important;
-      animation: none !important;
-    }
-
-
-    /* Background video kucing khusus halaman dashboard setelah login. */
-    #dashboardPage {
-      background: #020711 !important;
-      isolation: isolate;
-    }
-
-    .dashboard-bg-video {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      display: block;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      object-position: center;
-      pointer-events: none;
-      user-select: none;
-      background: #020711;
-    }
-
-    .dashboard-bg-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      background:
-        linear-gradient(180deg, rgba(1, 4, 10, .28), rgba(1, 4, 10, .44)),
-        radial-gradient(circle at 50% 34%, transparent 0 25%, rgba(0, 3, 9, .16) 58%, rgba(0, 2, 7, .48) 100%);
-    }
-
-    /* Nonaktifkan seluruh background animasi dashboard lama agar tidak bertumpuk. */
-    #dashboardPage::before,
-    #dashboardPage::after,
-    #dashboardPage > .future-bg,
-    #dashboardPage > .dashboard-fx-layer,
-    #dashboardPage > .dashboard-cosmic-layer {
-
-
-    }
-
-    #dashboardPage > .topbar,
-    #dashboardPage > .dashboard-wrap,
-    #dashboardPage > .mobile-bottom-nav,
-    #dashboardPage > #toastStack,
-    #dashboardPage > .offline-banner {
-      position: relative;
-
-    }
-
-    @media (max-width: 640px) {
-      .dashboard-bg-video {
-        width: 100%;
-        height: 100%;
-        object-position: center;
-      }
-
-      .dashboard-bg-overlay {
-        background:
-          linear-gradient(180deg, rgba(1, 4, 10, .34), rgba(1, 4, 10, .50)),
-          radial-gradient(circle at 50% 30%, transparent 0 20%, rgba(0, 3, 9, .18) 58%, rgba(0, 2, 7, .52) 100%);
-      }
-    }
 
 
     /* PERBAIKAN FINAL:
@@ -7201,7 +7065,9 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       transform: none !important;
       pointer-events: none !important;
       user-select: none !important;
-
+      opacity: 1 !important;
+      filter: brightness(1.12) saturate(1.03) !important;
+      -webkit-filter: brightness(1.12) saturate(1.03) !important;
       background: #020711 !important;
     }
 
@@ -7214,9 +7080,10 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       height: 100vh !important;
       margin: 0 !important;
       pointer-events: none !important;
+      opacity: 1 !important;
       background:
-        linear-gradient(180deg, rgba(1,4,10,.13), rgba(1,4,10,.24)),
-        radial-gradient(circle at 50% 38%, transparent 0 34%, rgba(0,3,9,.09) 68%, rgba(0,2,7,.26) 100%) !important;
+        linear-gradient(180deg, rgba(1,4,10,.06), rgba(1,4,10,.14)),
+        radial-gradient(circle at 50% 38%, transparent 0 38%, rgba(0,3,9,.04) 72%, rgba(0,2,7,.15) 100%) !important;
     }
 
     /* Semua isi dashboard berada di atas video. */
@@ -7262,96 +7129,6 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       #dashboardPage > .dashboard-bg-overlay {
         width: 100vw !important;
         height: 100dvh !important;
-        background:
-          linear-gradient(180deg, rgba(1,4,10,.16), rgba(1,4,10,.29)),
-          radial-gradient(circle at 50% 34%, transparent 0 28%, rgba(0,3,9,.10) 66%, rgba(0,2,7,.30) 100%) !important;
-      }
-    }
-
-
-    /* PERBAIKAN KECERAHAN VIDEO LOGIN:
-       Menampilkan video kucing sesuai warna dan kecerahan file aslinya. */
-    #loginPage {
-      background: #020711 !important;
-    }
-
-    #loginPage > .login-bg-video {
-      position: absolute !important;
-      inset: 0 !important;
-      z-index: 0 !important;
-      display: block !important;
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      object-position: center center !important;
-      opacity: 1 !important;
-      filter: none !important;
-      -webkit-filter: none !important;
-      mix-blend-mode: normal !important;
-      transform: none !important;
-      animation: none !important;
-    }
-
-    /* Hilangkan lapisan gelap, vignette, dan dekorasi yang meredupkan video. */
-    #loginPage::before,
-    #loginPage::after,
-    #loginPage > .login-bg-overlay,
-    #loginFxCanvas,
-    .login-motion-layer,
-    .login-ghost-logo {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      background: transparent !important;
-      background-image: none !important;
-      filter: none !important;
-      animation: none !important;
-    }
-
-    /* Form login tetap berada di atas video tanpa mengubah video di belakangnya. */
-    #loginPage > .simple-login-card {
-      position: relative !important;
-      z-index: 2 !important;
-    }
-
-    @media (max-width: 640px) {
-      #loginPage > .login-bg-video {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
-        object-position: center center !important;
-        opacity: 1 !important;
-        filter: none !important;
-        -webkit-filter: none !important;
-      }
-    }
-
-
-    /* PENYESUAIAN TERANG VIDEO DASHBOARD quk1w1.mp4:
-       Sedikit lebih terang tanpa membuat warna terlihat berlebihan. */
-    #dashboardPage > .dashboard-bg-video {
-      opacity: 1 !important;
-      filter: brightness(1.12) saturate(1.03) !important;
-      -webkit-filter: brightness(1.12) saturate(1.03) !important;
-    }
-
-    /* Tipiskan lapisan gelap agar video lebih jelas, tetapi isi dashboard tetap terbaca. */
-    #dashboardPage > .dashboard-bg-overlay {
-      opacity: 1 !important;
-      background:
-        linear-gradient(180deg, rgba(1,4,10,.06), rgba(1,4,10,.14)),
-        radial-gradient(circle at 50% 38%, transparent 0 38%, rgba(0,3,9,.04) 72%, rgba(0,2,7,.15) 100%) !important;
-    }
-
-    @media (max-width: 640px) {
-      #dashboardPage > .dashboard-bg-video {
-        opacity: 1 !important;
-        filter: brightness(1.12) saturate(1.03) !important;
-        -webkit-filter: brightness(1.12) saturate(1.03) !important;
-      }
-
-      #dashboardPage > .dashboard-bg-overlay {
-        opacity: 1 !important;
         background:
           linear-gradient(180deg, rgba(1,4,10,.08), rgba(1,4,10,.17)),
           radial-gradient(circle at 50% 34%, transparent 0 32%, rgba(0,3,9,.05) 70%, rgba(0,2,7,.18) 100%) !important;
@@ -7553,6 +7330,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
         background: rgba(8, 10, 16, .44) !important;
       }
     }
+
 
 
     /* =========================================================
@@ -7766,6 +7544,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       }
     }
 
+  
 
     /* =========================================================
        LOGIN LUFFY — KHUSUS BAGIAN HALAMAN LOGIN SAJA
@@ -8240,29 +8019,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       }
     }
 
-
-    /* Canvas aktif: elemen sebelumnya dipanggil JavaScript tetapi belum tersedia di HTML. */
-    #loginPage > #loginFxCanvas {
-      display: block !important;
-      visibility: visible !important;
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      opacity: .18 !important;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-    body[data-visual-mode="minimal"] #loginPage > #loginFxCanvas,
-    body[data-reduce-motion="true"] #loginPage > #loginFxCanvas {
-      display: none !important;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      #loginPage > #loginFxCanvas { display: none !important; }
-    }
-
-</style>
+  </style>
 </head>
 <body data-theme="obsidian" data-visual-mode="normal" data-high-contrast="false" data-reduce-motion="false" data-money-visible="true" data-ui-version="28">
   <div id="loadingScreen">
@@ -8315,16 +8072,15 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
   </div>
 
   <main id="loginPage">
-    <video class="login-page-background-video" id="loginGateBackgroundVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-hidden="true">
-      <source src="https://res.cloudinary.com/p580fslf/video/upload/q_auto:eco,w_1280/v1784614440/luffy-moonlight-meditation.3840x2160_clvewf.mp4" type="video/mp4">
+    <video class="login-page-background-video" id="loginGateBackgroundVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true">
+      <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784614440/luffy-moonlight-meditation.3840x2160_clvewf.mp4" type="video/mp4">
     </video>
     <div class="login-page-background-overlay" aria-hidden="true"></div>
-    <canvas id="loginFxCanvas" aria-hidden="true"></canvas>
 
     <section class="login-gate" id="loginGate" aria-label="Halaman pembuka dashboard">
       <button class="login-gate-card" id="openLoginExperience" type="button" aria-controls="loginWorkspace" aria-label="Ketuk untuk membuka halaman login">
-        <video class="luffy-login-video login-gate-video" id="loginGateVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-hidden="true">
-          <source src="https://res.cloudinary.com/p580fslf/video/upload/q_auto:eco,w_960/v1784610829/luffy-animated.3840x2160_jsq5g4.mp4" type="video/mp4">
+        <video class="luffy-login-video login-gate-video" id="loginGateVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true">
+          <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784610829/luffy-animated.3840x2160_jsq5g4.mp4" type="video/mp4">
         </video>
         <span class="login-gate-shade" aria-hidden="true"></span>
         <span class="login-gate-shine" aria-hidden="true"></span>
@@ -8341,7 +8097,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       <div class="login-access-shell">
         <div class="login-visual-panel" aria-hidden="true">
           <video class="luffy-login-video login-panel-video" id="loginPanelVideo" muted loop playsinline webkit-playsinline preload="metadata">
-            <source src="https://res.cloudinary.com/p580fslf/video/upload/q_auto:eco,w_960/v1784610686/luffy-with-scar-realistic.3840x2160_sjnuoc.mp4" type="video/mp4">
+            <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784610686/luffy-with-scar-realistic.3840x2160_sjnuoc.mp4" type="video/mp4">
           </video>
           <div class="login-visual-overlay"></div>
           <div class="login-visual-brand">
@@ -8387,9 +8143,8 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
   </main>
 
   <main id="dashboardPage" class="hidden">
-    <canvas id="futureBackground" class="future-bg" aria-hidden="true"></canvas>
     <video class="dashboard-bg-video" id="dashboardBgVideo" muted loop playsinline webkit-playsinline preload="metadata" aria-hidden="true">
-      <source src="https://res.cloudinary.com/p580fslf/video/upload/q_auto:eco,w_1280/v1784609516/luffy-from-one-piece.3840x2160_pkyw0h.mp4" type="video/mp4">
+      <source src="https://res.cloudinary.com/p580fslf/video/upload/v1784609516/luffy-from-one-piece.3840x2160_pkyw0h.mp4" type="video/mp4">
     </video>
     <div class="dashboard-bg-overlay" aria-hidden="true"></div>
     <header class="topbar">
@@ -9247,7 +9002,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import {
       getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, writeBatch, deleteField,
-      query, orderBy, onSnapshot, serverTimestamp, enableMultiTabIndexedDbPersistence, runTransaction
+      query, orderBy, onSnapshot, serverTimestamp, enableMultiTabIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import {
       getAuth, setPersistence, browserLocalPersistence, onAuthStateChanged,
@@ -9507,8 +9262,11 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
 
     function setLoading(done) {
       if (done) updateLoadingProgress(100, "Dashboard siap", "Semua sistem siap digunakan.");
-      $("#loadingScreen").classList.toggle("done", done);
-      if (done) sessionStorage.setItem("future_savings_boot_seen_v16", "1");
+      const loadingScreen = $("#loadingScreen");
+      if (loadingScreen) loadingScreen.classList.toggle("done", done);
+      if (done) {
+        try { sessionStorage.setItem("future_savings_boot_seen_v16", "1"); } catch {}
+      }
     }
 
     function setSyncState(online, text = "SYNC ACTIVATED") {
@@ -11116,101 +10874,6 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       return collection(db, "tabungan_accounts", SHARED_SAVINGS_ID, "transactions");
     }
 
-    /*
-      Array bersama tetap berada pada dokumen akun lama agar struktur database
-      tidak perlu dimigrasikan. Setiap perubahan dilakukan melalui transaction:
-      Firestore membaca versi terbaru, mengulang transaction saat ada konflik,
-      lalu menulis hasil mutasi tanpa menimpa perubahan perangkat lain.
-    */
-    async function updateSharedArrayWithTransaction(field, updater) {
-      const allowedFields = new Set(["wishlist", "targets", "recurringTemplates"]);
-      if (!allowedFields.has(field)) throw new Error(`Field array tidak diizinkan: ${field}`);
-      if (typeof updater !== "function") throw new TypeError("Updater transaction wajib berupa fungsi.");
-
-      return runTransaction(db, async (firestoreTransaction) => {
-        const reference = accountRef();
-        const snapshot = await firestoreTransaction.get(reference);
-        const accountData = snapshot.exists() ? (snapshot.data() || {}) : {};
-        const currentItems = Array.isArray(accountData[field])
-          ? accountData[field].filter((item) => item && typeof item === "object").map((item) => ({ ...item }))
-          : [];
-        const outcome = updater(currentItems, accountData);
-        const items = Array.isArray(outcome) ? outcome : outcome?.items;
-        const extra = Array.isArray(outcome) ? {} : (outcome?.extra || {});
-
-        if (!Array.isArray(items)) throw new Error(`Updater ${field} tidak menghasilkan array.`);
-        firestoreTransaction.set(reference, {
-          [field]: items,
-          ...extra,
-          updatedAt: serverTimestamp()
-        }, { merge: true });
-        return { items, ...extra };
-      });
-    }
-
-    async function mutateWishlist(updater) {
-      const result = await updateSharedArrayWithTransaction("wishlist", updater);
-      state.wishlist = result.items.filter((item) => item?.id && item?.name);
-      renderWishlist();
-      return state.wishlist;
-    }
-
-    async function mutateRecurringTemplates(updater) {
-      const result = await updateSharedArrayWithTransaction("recurringTemplates", updater);
-      state.recurringTemplates = result.items.filter((item) => item?.id);
-      renderRecurringList();
-      return state.recurringTemplates;
-    }
-
-    async function mutateTargets(updater, resolveActiveTarget) {
-      const result = await updateSharedArrayWithTransaction("targets", (currentItems, accountData) => {
-        const items = updater(currentItems, accountData);
-        if (!Array.isArray(items)) throw new Error("Updater target tidak menghasilkan array.");
-        const currentActiveTargetId = String(accountData.activeTargetId || "");
-        const requestedActiveTargetId = typeof resolveActiveTarget === "function"
-          ? String(resolveActiveTarget(items, currentActiveTargetId, accountData) || "")
-          : String(resolveActiveTarget ?? currentActiveTargetId);
-        const activeTargetId = items.some((item) => item.id === requestedActiveTargetId && item.status !== "completed")
-          ? requestedActiveTargetId
-          : String(items.find((item) => item.status !== "completed")?.id || "");
-        return { items, extra: { activeTargetId } };
-      });
-
-      state.targets = result.items.filter((item) => item?.id && Number(item.amount || 0) > 0);
-      state.activeTargetId = String(result.activeTargetId || "");
-      syncActiveTarget();
-      renderSummary();
-      renderTargetDetail();
-      renderTargetList();
-      return result;
-    }
-
-    async function migrateLegacyTargetIfNeeded() {
-      return runTransaction(db, async (firestoreTransaction) => {
-        const reference = accountRef();
-        const snapshot = await firestoreTransaction.get(reference);
-        if (!snapshot.exists()) return false;
-        const data = snapshot.data() || {};
-        if (Array.isArray(data.targets) && data.targets.length) return false;
-        if (!(Number(data.target || 0) > 0)) return false;
-
-        const target = {
-          id: makeId("target"),
-          name: String(data.targetName || "Target utama"),
-          amount: Number(data.target),
-          date: String(data.targetDate || ""),
-          status: "active",
-          createdAt: new Date().toISOString()
-        };
-        firestoreTransaction.set(reference, {
-          targets: [target],
-          activeTargetId: target.id,
-          updatedAt: serverTimestamp()
-        }, { merge: true });
-        return true;
-      });
-    }
-
     function syncActiveTarget() {
       const active = state.targets.find((item) => item.id === state.activeTargetId && item.status !== "completed")
         || state.targets.find((item) => item.status !== "completed") || null;
@@ -11227,7 +10890,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
         let targets = Array.isArray(data.targets) ? data.targets.filter((item) => item && item.id && Number(item.amount || 0) > 0) : [];
         if (!targets.length && Number(data.target || 0) > 0) {
           targets = [{ id: makeId("target"), name: String(data.targetName || "Target utama"), amount: Number(data.target), date: String(data.targetDate || ""), status:"active", createdAt:new Date().toISOString() }];
-          migrateLegacyTargetIfNeeded().catch((error) => console.warn("Migrasi target lama gagal:", error));
+          setDoc(accountRef(), { targets, activeTargetId: targets[0].id }, { merge:true }).catch(console.error);
         }
         state.targets = targets;
         state.activeTargetId = String(data.activeTargetId || targets.find((item) => item.status !== "completed")?.id || "");
@@ -11647,8 +11310,11 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       requestAnimationFrame(() => (focusAllocated ? $("#wishlistAllocatedInput") : $("#wishlistNameInput"))?.focus());
     }
 
+    async function saveWishlistToAccount(items) {
+      await setDoc(accountRef(), { wishlist: items, updatedAt: serverTimestamp() }, { merge: true });
+    }
+
     async function saveWishlist() {
-      const editing = Boolean($("#editWishlistId").value);
       const id = $("#editWishlistId").value || makeId("wish");
       const name = $("#wishlistNameInput").value.trim();
       const price = parseMoney($("#wishlistPriceInput").value);
@@ -11665,31 +11331,24 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       if (price > 999999999999) { toast("Harga wishlist terlalu besar.", "error"); return; }
       if (linkRaw && !link) { toast("Tautan harus menggunakan http:// atau https://", "error"); $("#wishlistLinkInput").focus(); return; }
       if (date && status !== "purchased" && date < localDate()) { toast("Tanggal wishlist tidak boleh berada di masa lalu.", "error"); $("#wishlistDateInput").focus(); return; }
-
-      const now = new Date().toISOString();
+      const current = state.wishlist.find((row) => row.id === id);
       const allocated = status === "purchased" ? Math.max(price, allocatedRaw) : allocatedRaw;
-      const button = $("#saveWishlistButton");
-      button.disabled = true;
+      const item = {
+        id, name, category, price, allocated, priority, status, date, link, note,
+        createdAt: current?.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        purchasedAt: status === "purchased" ? (current?.purchasedAt || new Date().toISOString()) : ""
+      };
+      const items = current ? state.wishlist.map((row) => row.id === id ? item : row) : [...state.wishlist, item];
+      $("#saveWishlistButton").disabled = true;
       try {
-        await mutateWishlist((items) => {
-          const current = items.find((row) => row.id === id);
-          if (editing && !current) throw new Error("WISHLIST_NOT_FOUND");
-          const item = {
-            id, name, category, price, allocated, priority, status, date, link, note,
-            createdAt: current?.createdAt || now,
-            updatedAt: now,
-            purchasedAt: status === "purchased" ? (current?.purchasedAt || now) : ""
-          };
-          return current ? items.map((row) => row.id === id ? item : row) : [...items, item];
-        });
+        await saveWishlistToAccount(items);
         closeModal("#wishlistModal");
-        toast(editing ? "Wishlist berhasil diperbarui." : "Wishlist baru berhasil ditambahkan.");
+        toast(current ? "Wishlist berhasil diperbarui." : "Wishlist baru berhasil ditambahkan.");
       } catch (error) {
         console.error(error);
-        toast(error?.message === "WISHLIST_NOT_FOUND"
-          ? "Wishlist sudah diubah atau dihapus dari perangkat lain. Silakan buka ulang datanya."
-          : "Wishlist gagal disimpan. Periksa koneksi.", "error");
-      } finally { button.disabled = false; }
+        toast("Wishlist gagal disimpan. Periksa koneksi.", "error");
+      } finally { $("#saveWishlistButton").disabled = false; }
     }
 
     function renderWishlist() {
@@ -11784,20 +11443,22 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       if (action === "menu") { openWishlistActionModal(id); return; }
       if (action === "purchased") {
         if (!(await askConfirm("Tandai wishlist terbeli?", `${item.name} akan dipindahkan ke daftar terbeli.`, { confirmText: "Sudah Terbeli" }))) return;
-        const now = new Date().toISOString();
-        await mutateWishlist((items) => items.map((row) => row.id === id ? { ...row, status: "purchased", allocated: Math.max(Number(row.price || 0), Number(row.allocated || 0)), purchasedAt: now, updatedAt: now } : row));
-        showCelebration(item.name); toast("Selamat! Wishlist ditandai sudah terbeli."); return;
+        const items = state.wishlist.map((row) => row.id === id ? { ...row, status: "purchased", allocated: Math.max(Number(row.price || 0), Number(row.allocated || 0)), purchasedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } : row);
+        await saveWishlistToAccount(items); showCelebration(item.name); toast("Selamat! Wishlist ditandai sudah terbeli."); return;
       }
       if (["active", "paused"].includes(action)) {
-        const now = new Date().toISOString();
-        await mutateWishlist((items) => items.map((row) => row.id === id ? { ...row, status: action, purchasedAt: "", updatedAt: now } : row));
-        toast(action === "paused" ? "Wishlist ditunda sementara." : "Wishlist kembali aktif."); return;
+        const items = state.wishlist.map((row) => row.id === id ? { ...row, status: action, purchasedAt: "", updatedAt: new Date().toISOString() } : row);
+        await saveWishlistToAccount(items); toast(action === "paused" ? "Wishlist ditunda sementara." : "Wishlist kembali aktif."); return;
       }
       if (action === "delete") {
         if (!(await askConfirm("Hapus wishlist?", `${item.name} akan dihapus permanen dari daftar.`, { confirmText: "Hapus", danger: true }))) return;
-        await mutateWishlist((items) => items.filter((row) => row.id !== id));
+        await saveWishlistToAccount(state.wishlist.filter((row) => row.id !== id));
         toast("Wishlist berhasil dihapus.");
       }
+    }
+
+    async function saveTargetsToAccount(targets, activeTargetId = state.activeTargetId) {
+      await setDoc(accountRef(), { targets, activeTargetId, updatedAt:serverTimestamp() }, { merge:true });
     }
 
     function renderRecurringList() {
@@ -11818,60 +11479,52 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       state.recurringProcessing = true;
       const today = new Date();
       const currentMonth = monthKey(today);
+      let templates = state.recurringTemplates.map((item) => ({ ...item }));
+      let templatesChanged = false;
 
       try {
-        const result = await runTransaction(db, async (firestoreTransaction) => {
-          const accountSnapshot = await firestoreTransaction.get(accountRef());
-          const accountData = accountSnapshot.exists() ? (accountSnapshot.data() || {}) : {};
-          const templates = Array.isArray(accountData.recurringTemplates)
-            ? accountData.recurringTemplates.filter((item) => item?.id).map((item) => ({ ...item }))
-            : [];
-          const due = templates.filter((item) =>
-            item.active !== false &&
-            Number(item.day || 1) <= today.getDate() &&
-            item.lastGeneratedMonth !== currentMonth
-          );
-          if (!due.length) return { templates, generated: 0 };
+        const due = templates.filter((item) =>
+          item.active !== false &&
+          Number(item.day || 1) <= today.getDate() &&
+          item.lastGeneratedMonth !== currentMonth
+        );
 
-          const generatedAt = new Date().toISOString();
-          const dueIds = new Set(due.map((item) => item.id));
-          const nextTemplates = templates.map((item) => dueIds.has(item.id) ? {
-            ...item,
-            lastGeneratedMonth: currentMonth,
-            lastGeneratedAt: generatedAt
-          } : item);
+        for (const item of due) {
+          const templateIndex = templates.findIndex((row) => row.id === item.id);
+          const safeRecurringId = String(item.id || "routine").replace(/[^a-zA-Z0-9_-]/g, "_");
+          const recurringDocumentId = `recurring_${safeRecurringId}_${currentMonth}`;
+          const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+          const date = `${currentMonth}-${String(Math.min(Number(item.day || 1), lastDay)).padStart(2,"0")}`;
 
-          for (const item of due) {
-            const safeRecurringId = String(item.id || "routine").replace(/[^a-zA-Z0-9_-]/g, "_");
-            const recurringDocumentId = `recurring_${safeRecurringId}_${currentMonth}`;
-            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-            const date = `${currentMonth}-${String(Math.min(Number(item.day || 1), lastDay)).padStart(2,"0")}`;
-
-            // ID deterministik + transaction mencegah transaksi rutin ganda antarperangkat.
-            firestoreTransaction.set(doc(transactionsRef(), recurringDocumentId), {
-              type: item.type,
-              date,
-              amount: Number(item.amount),
-              category: item.category,
-              note: item.note || "Transaksi rutin otomatis",
-              createdBy: state.currentUser,
-              recurringId: item.id,
-              recurringMonth: currentMonth,
-              recurringDocumentId,
-              createdAt: serverTimestamp(),
-              updatedAt: serverTimestamp()
-            }, { merge: true });
-          }
-
-          firestoreTransaction.set(accountRef(), {
-            recurringTemplates: nextTemplates,
+          // ID dokumen deterministik menjamin dua perangkat tidak membuat dua transaksi rutin untuk bulan yang sama.
+          await setDoc(doc(transactionsRef(), recurringDocumentId), {
+            type: item.type,
+            date,
+            amount: Number(item.amount),
+            category: item.category,
+            note: item.note || "Transaksi rutin otomatis",
+            createdBy: state.currentUser,
+            recurringId: item.id,
+            recurringMonth: currentMonth,
+            recurringDocumentId,
+            createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
           }, { merge: true });
-          return { templates: nextTemplates, generated: due.length };
-        });
 
-        state.recurringTemplates = result.templates;
-        if (result.generated) renderRecurringList();
+          if (templateIndex >= 0) {
+            templates[templateIndex] = {
+              ...templates[templateIndex],
+              lastGeneratedMonth: currentMonth,
+              lastGeneratedAt: new Date().toISOString()
+            };
+            templatesChanged = true;
+          }
+        }
+
+        if (templatesChanged) {
+          state.recurringTemplates = templates;
+          await setDoc(accountRef(), { recurringTemplates: templates, updatedAt: serverTimestamp() }, { merge: true });
+        }
       } catch (error) {
         console.warn("Gagal memproses transaksi rutin", error);
       } finally {
@@ -12332,9 +11985,8 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
           }, 1750);
           renderTable();
           if ($("#makeRecurringInput").checked) {
-            const now = new Date().toISOString();
-            const template = { id:makeId("routine"), type, amount, category, note, day:Number(date.slice(-2)) || 1, active:true, lastGeneratedMonth:date.slice(0,7), lastGeneratedAt:now, createdAt:now };
-            await mutateRecurringTemplates((templates) => [...templates, template]);
+            const templates = [...state.recurringTemplates, { id:makeId("routine"), type, amount, category, note, day:Number(date.slice(-2)) || 1, active:true, lastGeneratedMonth:date.slice(0,7), lastGeneratedAt:new Date().toISOString(), createdAt:new Date().toISOString() }];
+            await setDoc(accountRef(), { recurringTemplates:templates, updatedAt:serverTimestamp() }, { merge:true });
           }
           toast(navigator.onLine ? "Transaksi berhasil ditambahkan." : "Transaksi disimpan offline dan menunggu sinkronisasi.", navigator.onLine ? "success" : "warning");
         }
@@ -12356,17 +12008,20 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
 
     async function markRecurringTypeProcessedForCurrentMonth(type) {
       const currentMonth = monthKey(new Date());
-      const now = new Date().toISOString();
-      if (!state.recurringTemplates.some((item) => item.type === type && item.lastGeneratedMonth !== currentMonth)) return;
-      await mutateRecurringTemplates((templates) => templates.map((item) => {
+      let changed = false;
+      const templates = state.recurringTemplates.map((item) => {
         if (item.type !== type || item.lastGeneratedMonth === currentMonth) return item;
+        changed = true;
         return {
           ...item,
           lastGeneratedMonth: currentMonth,
           lastResetMonth: currentMonth,
-          lastResetAt: now
+          lastResetAt: new Date().toISOString()
         };
-      }));
+      });
+      if (!changed) return;
+      state.recurringTemplates = templates;
+      await setDoc(accountRef(), { recurringTemplates:templates, updatedAt:serverTimestamp() }, { merge:true });
     }
 
     async function resetAllIncome() {
@@ -12495,39 +12150,23 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
 
 
     async function saveTarget() {
-      const editing = Boolean($("#editTargetId").value);
       const id = $("#editTargetId").value || makeId("target");
       const name = $("#targetNameInput").value.trim();
       const amount = parseMoney($("#targetAmountInput").value);
       const targetDate = $("#targetDateInput").value;
-      const makeActive = $("#targetActiveInput").checked;
       if (!name || !amount) { toast("Nama dan nominal target wajib diisi.", "error"); return; }
       if (targetDate && targetDate < localDate()) { toast("Tanggal target tidak boleh berada di masa lalu.", "error"); return; }
-      const now = new Date().toISOString();
-      const button = $("#saveTargetButton");
-      button.disabled = true;
+      const current = state.targets.find((item) => item.id === id);
+      const item = { id, name, amount, date:targetDate, status:current?.status || "active", createdAt:current?.createdAt || new Date().toISOString(), updatedAt:new Date().toISOString() };
+      const targets = current ? state.targets.map((row) => row.id === id ? item : row) : [...state.targets, item];
+      const activeTargetId = $("#targetActiveInput").checked ? id : (state.activeTargetId || targets.find((row) => row.status !== "completed")?.id || "");
+      const button = $("#saveTargetButton"); button.disabled = true;
       try {
-        await mutateTargets((targets) => {
-          const current = targets.find((item) => item.id === id);
-          if (editing && !current) throw new Error("TARGET_NOT_FOUND");
-          const item = {
-            id, name, amount, date: targetDate,
-            status: current?.status || "active",
-            createdAt: current?.createdAt || now,
-            updatedAt: now
-          };
-          return current ? targets.map((row) => row.id === id ? item : row) : [...targets, item];
-        }, (targets, currentActiveTargetId) => makeActive
-          ? id
-          : (currentActiveTargetId || targets.find((row) => row.status !== "completed")?.id || ""));
+        await saveTargetsToAccount(targets, activeTargetId);
         resetTargetForm();
-        toast(editing ? "Target berhasil diperbarui." : "Target baru berhasil ditambahkan.");
-      } catch (error) {
-        console.error(error);
-        toast(error?.message === "TARGET_NOT_FOUND"
-          ? "Target sudah diubah atau dihapus dari perangkat lain. Silakan buka ulang datanya."
-          : "Gagal menyimpan target.", "error");
-      } finally { button.disabled = false; }
+        toast(current ? "Target berhasil diperbarui." : "Target baru berhasil ditambahkan.");
+      } catch (error) { console.error(error); toast("Gagal menyimpan target.", "error"); }
+      finally { button.disabled = false; }
     }
 
     async function targetAction(action, id) {
@@ -12535,28 +12174,17 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       if (action === "edit") {
         $("#editTargetId").value=id; $("#targetNameInput").value=item.name; $("#targetAmountInput").value=formatMoneyInput(item.amount); $("#targetDateInput").value=item.date || ""; $("#targetActiveInput").checked=id===state.activeTargetId; $("#saveTargetButton").textContent="Simpan Perubahan"; return;
       }
-      if (action === "active") {
-        await mutateTargets((targets) => targets, () => id);
-        toast("Target aktif berhasil diganti."); return;
-      }
+      if (action === "active") { await saveTargetsToAccount(state.targets,id); toast("Target aktif berhasil diganti."); return; }
       if (action === "complete") {
         if (!(await askConfirm("Tandai target selesai?", `${item.name} akan dipindahkan ke status selesai.`, { confirmText:"Tandai Selesai" }))) return;
-        const now = new Date().toISOString();
-        await mutateTargets(
-          (targets) => targets.map((row) => row.id === id ? { ...row, status:"completed", completedAt:now, updatedAt:now } : row),
-          (targets) => targets.find((row) => row.status !== "completed")?.id || ""
-        );
-        showCelebration(item.name); return;
+        const targets=state.targets.map((row)=>row.id===id?{...row,status:"completed",completedAt:new Date().toISOString()}:row);
+        const next=targets.find((row)=>row.status!=="completed")?.id || "";
+        await saveTargetsToAccount(targets,next); showCelebration(item.name); return;
       }
       if (action === "delete") {
         if (!(await askConfirm("Hapus target?", `${item.name} akan dihapus. Transaksi tidak ikut terhapus.`, { confirmText:"Hapus", danger:true }))) return;
-        await mutateTargets(
-          (targets) => targets.filter((row) => row.id !== id),
-          (targets, currentActiveTargetId) => currentActiveTargetId === id
-            ? (targets.find((row) => row.status !== "completed")?.id || "")
-            : currentActiveTargetId
-        );
-        toast("Target berhasil dihapus.");
+        const targets=state.targets.filter((row)=>row.id!==id); const next=state.activeTargetId===id?(targets.find((row)=>row.status!=="completed")?.id||""):state.activeTargetId;
+        await saveTargetsToAccount(targets,next); toast("Target berhasil dihapus.");
       }
     }
 
@@ -12655,12 +12283,13 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
 
     async function recurringAction(action,id){
       const item=state.recurringTemplates.find((row)=>row.id===id); if(!item)return;
-      if(action==="delete" && !(await askConfirm("Hapus transaksi rutin?",`${item.category} tidak akan dibuat otomatis lagi.`,{confirmText:"Hapus",danger:true})))return;
-      await mutateRecurringTemplates((templates) => {
-        if(action==="toggle") return templates.map((row)=>row.id===id?{...row,active:row.active===false}:row);
-        if(action==="delete") return templates.filter((row)=>row.id!==id);
-        return templates;
-      });
+      let templates=state.recurringTemplates;
+      if(action==="toggle")templates=templates.map((row)=>row.id===id?{...row,active:row.active===false}:row);
+      if(action==="delete"){
+        if(!(await askConfirm("Hapus transaksi rutin?",`${item.category} tidak akan dibuat otomatis lagi.`,{confirmText:"Hapus",danger:true})))return;
+        templates=templates.filter((row)=>row.id!==id);
+      }
+      await setDoc(accountRef(),{recurringTemplates:templates,updatedAt:serverTimestamp()},{merge:true});
     }
 
     function resetFilters() {
@@ -13311,7 +12940,9 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
     }, 60 * 1000);
 
     async function boot() {
-      const returningVisit = sessionStorage.getItem("future_savings_boot_seen_v16") === "1";
+      const bootStartedAt = performance.now();
+      let returningVisit = false;
+      try { returningVisit = sessionStorage.getItem("future_savings_boot_seen_v16") === "1"; } catch {}
       if (returningVisit) $("#loadingScreen")?.classList.add("returning-visit");
       updateLoadingProgress(12, "Menyiapkan sistem", "Memuat tema dan preferensi pengguna...");
       loadTheme();
@@ -13320,7 +12951,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       await enableMultiTabIndexedDbPersistence(db).catch((error) => console.warn("Offline persistence tidak aktif:", error?.code || error));
       updateLoadingProgress(46, "Menghubungkan layanan", "Menyiapkan layanan inti dashboard...");
       if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-        navigator.serviceWorker.register("./future-savings-sw-v10.js", { scope: "./", updateViaCache: "none" })
+        navigator.serviceWorker.register("future-savings-sw-v10.js", { updateViaCache: "none" })
           .then((registration) => registration.update().catch(() => {}))
           .catch((error) => console.warn("Service worker tidak aktif:", error));
       }
@@ -13352,7 +12983,10 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
         clearSession();
         updateLoadingProgress(100, "Dashboard siap", "Silakan masuk untuk melanjutkan.");
       }
-      setTimeout(() => setLoading(true), returningVisit ? 120 : 420);
+      const minimumLoaderDuration = returningVisit ? 900 : 1500;
+      const remainingLoaderTime = Math.max(0, minimumLoaderDuration - (performance.now() - bootStartedAt));
+      await wait(remainingLoaderTime);
+      setLoading(true);
     }
 
     onAuthStateChanged(auth, (user) => {
@@ -13436,7 +13070,7 @@ tr.transaction-removing { pointer-events:none;animation:rowRemoveMotion .42s var
       });
 
     })();
-
+  
 
     /* Interaksi visual Luffy — hanya untuk halaman login. */
     function setLuffyLoginOpen(isOpen, options = {}) {
