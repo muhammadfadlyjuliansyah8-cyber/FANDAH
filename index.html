@@ -1331,7 +1331,7 @@
           </div>
 
           <div class="settings-note">
-            Pengaturan opacity tersimpan otomatis di browser ini.
+            Opacity tersimpan di browser ini. Catatan dan Broadcast tersimpan realtime di Firebase.
           </div>
         </div>
       </div>
@@ -1349,7 +1349,7 @@
       <div class="modal-head">
         <div>
           <h2 id="formTitle">Tambah Catatan</h2>
-          <p id="formSubtitle">Simpan teks agar mudah dicari dan di-copy.</p>
+          <p id="formSubtitle">Simpan teks ke cloud agar tersedia di semua perangkat.</p>
         </div>
         <button class="modal-close" type="button" data-close="formModal">
           <i data-lucide="x"></i>
@@ -1421,456 +1421,1196 @@
 
   <div class="toast-stack" id="toastStack"></div>
 
-  <script>
-    (() => {
-      "use strict";
+  <script type="module">
+    /*
+      ============================================================
+      CATATAN — FIREBASE FIRESTORE REALTIME VERSION
+      ============================================================
 
-      /* =========================================================
-         STORAGE
-         Memakai key yang sama dengan versi sebelumnya agar data lama
-         tetap bisa terbaca jika browser/origin-nya sama.
-         ========================================================= */
-      const STORAGE = {
-        notes: "catatan.notes.v1",
-        broadcasts: "catatan.broadcasts.v1",
-        settings: "catatan.settings.v1"
-      };
+      KENAPA VERSI INI BERBEDA?
+      - Catatan/Broadcast TIDAK lagi disimpan sebagai data utama
+        hanya di localStorage.
+      - Data utama disimpan di Firebase Firestore.
+      - Semua PC/browser yang membuka website ini dan memakai
+        Firebase project + WORKSPACE_ID yang sama akan melihat
+        data yang sama secara realtime.
+      - Data cloud hanya dihapus saat fungsi deleteDoc() dipanggil
+        setelah user menekan tombol Hapus.
+      - Logout hanya keluar dari tampilan workspace dan TIDAK
+        menghapus catatan.
 
-      const ACCENTS = [
-        "#4f8fc7",
-        "#4da58c",
-        "#c78a45",
-        "#9472ce",
-        "#d1606a",
-        "#5886c9",
-        "#3f9ca3",
-        "#b85f9a"
+      ============================================================
+      SETUP FIREBASE — WAJIB DILAKUKAN SATU KALI
+      ============================================================
+
+      1. Buka Firebase Console:
+         https://console.firebase.google.com/
+
+      2. Buat project -> tambahkan Web App.
+
+      3. Buka Project Settings -> General -> Your apps -> Web app.
+         Copy firebaseConfig dan tempel pada FIREBASE_CONFIG
+         di bawah.
+
+      4. Buka Build -> Firestore Database -> Create database.
+
+      5. Buka Build -> Authentication -> Sign-in method.
+         Aktifkan "Anonymous".
+
+      6. Pada Firestore -> Rules, gunakan rule berikut:
+
+         rules_version = '2';
+         service cloud.firestore {
+           match /databases/{database}/documents {
+             match /workspaces/catatan-main/{type}/{documentId} {
+               allow read, write: if request.auth != null
+                 && (type == "notes" || type == "broadcasts");
+             }
+           }
+         }
+
+         Jika WORKSPACE_ID di bawah kamu ubah, ganti juga
+         "catatan-main" pada Firestore Rules.
+
+      7. Jika Firebase Authentication meminta Authorized Domain,
+         tambahkan domain GitHub Pages kamu, contoh:
+         namakamu.github.io
+
+      PENTING:
+      firebaseConfig memang ditaruh di frontend. Keamanan data
+      Firebase ditentukan terutama oleh Firestore Security Rules.
+      Versi ini memakai Anonymous Authentication agar sederhana.
+      Jika website GitHub Pages kamu bersifat publik, siapa pun
+      yang membuka halaman dapat masuk ke workspace yang sama.
+      Untuk workspace benar-benar privat, gunakan login akun
+      Firebase (Email/Password atau Google) pada versi berikutnya.
+    */
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+
+    import {
+      getFirestore,
+      collection,
+      doc,
+      setDoc,
+      deleteDoc,
+      onSnapshot,
+      serverTimestamp,
+      getDocs,
+      enableIndexedDbPersistence
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    import {
+      getAuth,
+      signInAnonymously,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    "use strict";
+
+    /* =========================================================
+       FIREBASE CONFIG
+       CONFIG FIREBASE FANDAH SUDAH DIMASUKKAN.
+       ========================================================= */
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyCBVXAVE8_cHeM7m5k1t4zWeutdvTLVZNw",
+      authDomain: "fandah-c08fc.firebaseapp.com",
+      projectId: "fandah-c08fc",
+      storageBucket: "fandah-c08fc.firebasestorage.app",
+      messagingSenderId: "624734789171",
+      appId: "1:624734789171:web:7ba9ab16730acb5cfc8d46",
+      measurementId: "G-DN9Y49Q8QQ"
+    };
+
+    /*
+      Semua perangkat dengan WORKSPACE_ID yang sama akan berbagi
+      Catatan dan Broadcast yang sama.
+    */
+    const WORKSPACE_ID = "catatan-main";
+
+    /* =========================================================
+       LOCAL STORAGE
+       Hanya untuk:
+       - Settings opacity
+       - Migrasi data versi lama
+       Catatan utama setelah setup Firebase tersimpan di Firestore.
+       ========================================================= */
+    const STORAGE = {
+      legacyNotes: "catatan.notes.v1",
+      legacyBroadcasts: "catatan.broadcasts.v1",
+      settings: "catatan.settings.v1",
+      migration: "catatan.firebase.migrated.v1"
+    };
+
+    const ACCENTS = [
+      "#4f8fc7",
+      "#4da58c",
+      "#c78a45",
+      "#9472ce",
+      "#d1606a",
+      "#5886c9",
+      "#3f9ca3",
+      "#b85f9a"
+    ];
+
+    const state = {
+      type: "notes",
+      query: "",
+      notes: [],
+      broadcasts: [],
+      settings: { tableOpacity: 83 },
+      previewId: null,
+      deleteId: null,
+      cloudConnected: false,
+      cloudStarting: false
+    };
+
+    let firebaseApp = null;
+    let db = null;
+    let auth = null;
+    let unsubscribeNotes = null;
+    let unsubscribeBroadcasts = null;
+    let realtimeReadyPromise = null;
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+    const els = {
+      welcomeScreen: $("#welcomeScreen"),
+      welcomeVideo: $("#welcomeVideo"),
+      appBackgroundVideo: $("#appBackgroundVideo"),
+      loadingScreen: $("#loadingScreen"),
+      loginButton: $("#loginButton"),
+      settingsButton: $("#settingsButton"),
+      logoutButton: $("#logoutButton"),
+      settingsModal: $("#settingsModal"),
+      opacityRange: $("#opacityRange"),
+      opacityValue: $("#opacityValue"),
+      resetOpacityButton: $("#resetOpacityButton"),
+      loadingStatus: $("#loadingStatus"),
+      loadingBar: $("#loadingBar"),
+      loadingPercent: $("#loadingPercent"),
+      app: $("#app"),
+
+      tabs: $$(".tab-btn"),
+      notesCount: $("#notesCount"),
+      broadcastCount: $("#broadcastCount"),
+      searchInput: $("#searchInput"),
+      clearSearch: $("#clearSearch"),
+      addButton: $("#addButton"),
+      emptyAddButton: $("#emptyAddButton"),
+      workspaceName: $("#workspaceName"),
+      resultCount: $("#resultCount"),
+      cardsGrid: $("#cardsGrid"),
+      emptyState: $("#emptyState"),
+      emptyTitle: $("#emptyTitle"),
+      emptyText: $("#emptyText"),
+
+      formModal: $("#formModal"),
+      noteForm: $("#noteForm"),
+      formTitle: $("#formTitle"),
+      formSubtitle: $("#formSubtitle"),
+      editingId: $("#editingId"),
+      titleInput: $("#titleInput"),
+      contentInput: $("#contentInput"),
+
+      previewModal: $("#previewModal"),
+      previewTitle: $("#previewTitle"),
+      previewContent: $("#previewContent"),
+      previewCopyButton: $("#previewCopyButton"),
+
+      deleteModal: $("#deleteModal"),
+      deleteTitle: $("#deleteTitle"),
+      confirmDeleteButton: $("#confirmDeleteButton"),
+
+      toastStack: $("#toastStack")
+    };
+
+    /* =========================================================
+       BASIC HELPERS
+       ========================================================= */
+    function refreshIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons({
+          attrs: { "stroke-width": 1.7 }
+        });
+      }
+    }
+
+    function safeParseArray(value, fallback = []) {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function createId() {
+      if (window.crypto && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return "item-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replaceAll("`", "&#096;");
+    }
+
+    function hashString(value) {
+      let hash = 0;
+      const text = String(value || "");
+
+      for (let i = 0; i < text.length; i++) {
+        hash = ((hash << 5) - hash) + text.charCodeAt(i);
+        hash |= 0;
+      }
+
+      return Math.abs(hash);
+    }
+
+    function getAccent(item) {
+      return ACCENTS[hashString(item.id || item.title) % ACCENTS.length];
+    }
+
+    function isFirebaseConfigured() {
+      const values = [
+        FIREBASE_CONFIG.apiKey,
+        FIREBASE_CONFIG.authDomain,
+        FIREBASE_CONFIG.projectId,
+        FIREBASE_CONFIG.messagingSenderId,
+        FIREBASE_CONFIG.appId
       ];
 
-      const state = {
-        type: "notes",
-        query: "",
-        notes: [],
-        broadcasts: [],
-        settings: { tableOpacity: 83 },
-        previewId: null,
-        deleteId: null
+      return values.every(value =>
+        value &&
+        !String(value).includes("ISI_")
+      );
+    }
+
+    function normalizeLocalItem(item) {
+      return {
+        id: item?.id || createId(),
+        title: String(item?.title || "Tanpa Judul"),
+        content: String(item?.content || ""),
+        category: item?.category || "General",
+        createdAt: Number(item?.createdAt || Date.now()),
+        updatedAt: Number(item?.updatedAt || item?.createdAt || Date.now())
       };
+    }
 
-      const $ = (selector, root = document) => root.querySelector(selector);
-      const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    function timestampLikeToMillis(value, fallback = Date.now()) {
+      if (typeof value === "number" && Number.isFinite(value)) {
+        return value;
+      }
 
-      const els = {
-        welcomeScreen: $("#welcomeScreen"),
-        welcomeVideo: $("#welcomeVideo"),
-        appBackgroundVideo: $("#appBackgroundVideo"),
-        loadingScreen: $("#loadingScreen"),
-        loginButton: $("#loginButton"),
-        settingsButton: $("#settingsButton"),
-        logoutButton: $("#logoutButton"),
-        settingsModal: $("#settingsModal"),
-        opacityRange: $("#opacityRange"),
-        opacityValue: $("#opacityValue"),
-        resetOpacityButton: $("#resetOpacityButton"),
-        loadingStatus: $("#loadingStatus"),
-        loadingBar: $("#loadingBar"),
-        loadingPercent: $("#loadingPercent"),
-        app: $("#app"),
+      if (value && typeof value.toMillis === "function") {
+        return value.toMillis();
+      }
 
-        tabs: $$(".tab-btn"),
-        notesCount: $("#notesCount"),
-        broadcastCount: $("#broadcastCount"),
-        searchInput: $("#searchInput"),
-        clearSearch: $("#clearSearch"),
-        addButton: $("#addButton"),
-        emptyAddButton: $("#emptyAddButton"),
-        workspaceName: $("#workspaceName"),
-        resultCount: $("#resultCount"),
-        cardsGrid: $("#cardsGrid"),
-        emptyState: $("#emptyState"),
-        emptyTitle: $("#emptyTitle"),
-        emptyText: $("#emptyText"),
+      if (value && typeof value.seconds === "number") {
+        return (value.seconds * 1000) +
+          Math.floor((value.nanoseconds || 0) / 1000000);
+      }
 
-        formModal: $("#formModal"),
-        noteForm: $("#noteForm"),
-        formTitle: $("#formTitle"),
-        formSubtitle: $("#formSubtitle"),
-        editingId: $("#editingId"),
-        titleInput: $("#titleInput"),
-        contentInput: $("#contentInput"),
+      return fallback;
+    }
 
-        previewModal: $("#previewModal"),
-        previewTitle: $("#previewTitle"),
-        previewContent: $("#previewContent"),
-        previewCopyButton: $("#previewCopyButton"),
+    function normalizeCloudDoc(snapshot) {
+      const data = snapshot.data() || {};
+      const now = Date.now();
 
-        deleteModal: $("#deleteModal"),
-        deleteTitle: $("#deleteTitle"),
-        confirmDeleteButton: $("#confirmDeleteButton"),
+      const createdAt = timestampLikeToMillis(
+        data.createdAtMs ?? data.createdAt,
+        now
+      );
 
-        toastStack: $("#toastStack")
+      const updatedAt = timestampLikeToMillis(
+        data.updatedAtMs ?? data.updatedAt,
+        createdAt
+      );
+
+      return {
+        id: snapshot.id,
+        title: String(data.title || "Tanpa Judul"),
+        content: String(data.content || ""),
+        category: data.category || "General",
+        createdAt,
+        updatedAt
       };
+    }
 
-      function refreshIcons() {
-        if (window.lucide) {
-          window.lucide.createIcons({
-            attrs: { "stroke-width": 1.7 }
-          });
-        }
+    function currentItems() {
+      return state.type === "notes"
+        ? state.notes
+        : state.broadcasts;
+    }
+
+    function cloudCollection(type) {
+      if (!db) throw new Error("Firestore belum terhubung.");
+
+      const collectionName =
+        type === "notes" ? "notes" : "broadcasts";
+
+      return collection(
+        db,
+        "workspaces",
+        WORKSPACE_ID,
+        collectionName
+      );
+    }
+
+    function cloudDoc(type, id) {
+      if (!db) throw new Error("Firestore belum terhubung.");
+
+      const collectionName =
+        type === "notes" ? "notes" : "broadcasts";
+
+      return doc(
+        db,
+        "workspaces",
+        WORKSPACE_ID,
+        collectionName,
+        id
+      );
+    }
+
+    /* =========================================================
+       OPACITY SETTINGS
+       Tetap lokal karena ini hanya preferensi tampilan perangkat.
+       ========================================================= */
+    function loadSettings() {
+      let saved = {};
+
+      try {
+        saved = JSON.parse(
+          localStorage.getItem(STORAGE.settings) || "{}"
+        );
+      } catch {
+        saved = {};
       }
 
-      function safeParse(value, fallback = []) {
-        try {
-          const parsed = JSON.parse(value);
-          return Array.isArray(parsed) ? parsed : fallback;
-        } catch {
-          return fallback;
-        }
+      const opacity = clamp(
+        Number(saved.tableOpacity ?? 83),
+        0,
+        96
+      );
+
+      state.settings.tableOpacity = opacity;
+      applyTableOpacity(opacity, false);
+    }
+
+    function applyTableOpacity(value, persist = true) {
+      const numericValue = Number(value);
+      const safeValue = Number.isFinite(numericValue)
+        ? numericValue
+        : 83;
+
+      const percent = clamp(
+        Math.round(safeValue),
+        0,
+        96
+      );
+
+      const base = percent / 100;
+
+      /*
+        Saat 0%, background kartu benar-benar transparan.
+        Border/teks tetap ada supaya isi masih dapat dibaca.
+      */
+      const action = Math.min(.98, base * 1.08);
+      const fade = Math.min(.995, base * 1.18);
+
+      state.settings.tableOpacity = percent;
+
+      document.documentElement.style.setProperty(
+        "--table-opacity",
+        base.toFixed(2)
+      );
+
+      document.documentElement.style.setProperty(
+        "--table-action-opacity",
+        action.toFixed(3)
+      );
+
+      document.documentElement.style.setProperty(
+        "--table-fade-opacity",
+        fade.toFixed(3)
+      );
+
+      if (els.opacityRange) {
+        els.opacityRange.value = String(percent);
       }
 
-
-      function clamp(value, min, max) {
-        return Math.min(max, Math.max(min, value));
+      if (els.opacityValue) {
+        els.opacityValue.textContent = percent + "%";
       }
 
-      function loadSettings() {
-        let saved = {};
-        try {
-          saved = JSON.parse(localStorage.getItem(STORAGE.settings) || "{}");
-        } catch (_) {
-          saved = {};
-        }
+      if (persist) {
+        localStorage.setItem(
+          STORAGE.settings,
+          JSON.stringify(state.settings)
+        );
+      }
+    }
 
-        const opacity = clamp(Number(saved.tableOpacity ?? 83), 0, 96);
-        state.settings.tableOpacity = opacity;
-        applyTableOpacity(opacity, false);
+    /* =========================================================
+       FIREBASE INITIALIZATION
+       ========================================================= */
+    async function initializeFirebaseOnce() {
+      if (firebaseApp && db && auth) {
+        return;
       }
 
-      function applyTableOpacity(value, persist = true) {
-        const numericValue = Number(value);
-        const safeValue = Number.isFinite(numericValue) ? numericValue : 83;
-        const percent = clamp(Math.round(safeValue), 0, 96);
-
-        const base = percent / 100;
-
-        // Action bar dan fade mengikuti opacity utama secara proporsional.
-        // Jadi saat 0%, seluruh background kartu benar-benar transparan.
-        const action = Math.min(.98, base * 1.08);
-        const fade = Math.min(.995, base * 1.18);
-
-        state.settings.tableOpacity = percent;
-        document.documentElement.style.setProperty("--table-opacity", base.toFixed(2));
-        document.documentElement.style.setProperty("--table-action-opacity", action.toFixed(3));
-        document.documentElement.style.setProperty("--table-fade-opacity", fade.toFixed(3));
-
-        if (els.opacityRange) els.opacityRange.value = String(percent);
-        if (els.opacityValue) els.opacityValue.textContent = percent + "%";
-
-        if (persist) {
-          localStorage.setItem(STORAGE.settings, JSON.stringify(state.settings));
-        }
+      if (!isFirebaseConfigured()) {
+        throw new Error(
+          "Firebase belum dikonfigurasi. Isi FIREBASE_CONFIG pada script."
+        );
       }
 
-      function loadData() {
-        state.notes = safeParse(localStorage.getItem(STORAGE.notes), []);
-        state.broadcasts = safeParse(localStorage.getItem(STORAGE.broadcasts), []);
+      firebaseApp = initializeApp(FIREBASE_CONFIG);
+      db = getFirestore(firebaseApp);
+      auth = getAuth(firebaseApp);
 
-        // Normalisasi data versi lama agar tetap kompatibel.
-        state.notes = state.notes.map(normalizeItem);
-        state.broadcasts = state.broadcasts.map(normalizeItem);
+      /*
+        Cache Firestore di IndexedDB.
+        Jika internet sempat putus, data terakhir tetap dapat dibaca
+        dan write dapat diantrikan sampai koneksi kembali.
+      */
+      try {
+        await enableIndexedDbPersistence(db);
+      } catch (error) {
+        /*
+          failed-precondition biasanya terjadi jika website dibuka
+          pada beberapa tab. Realtime online tetap bekerja.
+          unimplemented dapat terjadi pada browser tertentu.
+        */
+        console.warn(
+          "Firestore persistence tidak aktif:",
+          error?.code || error
+        );
+      }
+    }
+
+    async function ensureAnonymousAuth() {
+      if (!auth) {
+        throw new Error("Firebase Auth belum siap.");
       }
 
-      function normalizeItem(item) {
-        return {
-          id: item?.id || createId(),
-          title: String(item?.title || "Tanpa Judul"),
-          content: String(item?.content || ""),
-          category: item?.category || "General",
-          createdAt: Number(item?.createdAt || Date.now()),
-          updatedAt: Number(item?.updatedAt || item?.createdAt || Date.now())
-        };
+      if (auth.currentUser) {
+        return auth.currentUser;
       }
 
-      function saveData() {
-        localStorage.setItem(STORAGE.notes, JSON.stringify(state.notes));
-        localStorage.setItem(STORAGE.broadcasts, JSON.stringify(state.broadcasts));
+      const credential = await signInAnonymously(auth);
+      return credential.user;
+    }
+
+    /* =========================================================
+       MIGRASI CATATAN VERSI LOCALStorage -> FIRESTORE
+       Berjalan SATU KALI pada browser lama.
+
+       Tujuan:
+       Catatan yang sebelumnya sudah dibuat pada PC pertama tidak
+       hilang saat user pindah ke sistem cloud.
+       ========================================================= */
+    async function migrateLegacyDataOnce() {
+      if (
+        localStorage.getItem(STORAGE.migration) === "done"
+      ) {
+        return;
       }
 
-      function currentItems() {
-        return state.type === "notes" ? state.notes : state.broadcasts;
+      const legacyNotes = safeParseArray(
+        localStorage.getItem(STORAGE.legacyNotes),
+        []
+      ).map(normalizeLocalItem);
+
+      const legacyBroadcasts = safeParseArray(
+        localStorage.getItem(STORAGE.legacyBroadcasts),
+        []
+      ).map(normalizeLocalItem);
+
+      await migrateOneCollection(
+        "notes",
+        legacyNotes
+      );
+
+      await migrateOneCollection(
+        "broadcasts",
+        legacyBroadcasts
+      );
+
+      /*
+        Jangan hapus localStorage lama.
+        Ia dibiarkan sebagai backup pasif.
+        Marker mencegah data lama di-upload kembali setelah catatan
+        cloud sengaja dihapus oleh user.
+      */
+      localStorage.setItem(
+        STORAGE.migration,
+        "done"
+      );
+    }
+
+    async function migrateOneCollection(type, items) {
+      if (!items.length) return;
+
+      const ref = cloudCollection(type);
+      const existingSnapshot = await getDocs(ref);
+      const existingIds = new Set(
+        existingSnapshot.docs.map(item => item.id)
+      );
+
+      const missingItems = items.filter(
+        item => !existingIds.has(item.id)
+      );
+
+      const chunkSize = 20;
+
+      for (
+        let index = 0;
+        index < missingItems.length;
+        index += chunkSize
+      ) {
+        const chunk = missingItems.slice(
+          index,
+          index + chunkSize
+        );
+
+        await Promise.all(
+          chunk.map(item =>
+            setDoc(
+              cloudDoc(type, item.id),
+              {
+                title: item.title,
+                content: item.content,
+                category: item.category || "General",
+                createdAtMs: item.createdAt,
+                updatedAtMs: item.updatedAt,
+                cloudUpdatedAt: serverTimestamp()
+              },
+              { merge: false }
+            )
+          )
+        );
+      }
+    }
+
+    /* =========================================================
+       REALTIME LISTENERS
+       onSnapshot adalah bagian yang membuat PC lain berubah
+       otomatis tanpa refresh.
+       ========================================================= */
+    function stopRealtimeSync() {
+      if (typeof unsubscribeNotes === "function") {
+        unsubscribeNotes();
       }
 
-      function setCurrentItems(items) {
-        if (state.type === "notes") state.notes = items;
-        else state.broadcasts = items;
+      if (typeof unsubscribeBroadcasts === "function") {
+        unsubscribeBroadcasts();
       }
 
-      function createId() {
-        if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-        return "item-" + Date.now() + "-" + Math.random().toString(16).slice(2);
-      }
+      unsubscribeNotes = null;
+      unsubscribeBroadcasts = null;
+      realtimeReadyPromise = null;
+      state.cloudConnected = false;
+    }
 
-      function escapeHtml(value) {
-        return String(value ?? "")
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#039;");
-      }
+    function startRealtimeSync() {
+      stopRealtimeSync();
 
-      function escapeAttr(value) {
-        return escapeHtml(value).replaceAll("`", "&#096;");
-      }
+      realtimeReadyPromise = new Promise(
+        (resolve, reject) => {
+          let notesReady = false;
+          let broadcastsReady = false;
+          let resolved = false;
 
-      function hashString(value) {
-        let hash = 0;
-        const text = String(value || "");
-        for (let i = 0; i < text.length; i++) {
-          hash = ((hash << 5) - hash) + text.charCodeAt(i);
-          hash |= 0;
-        }
-        return Math.abs(hash);
-      }
-
-      function getAccent(item) {
-        return ACCENTS[hashString(item.id || item.title) % ACCENTS.length];
-      }
-
-
-      /* =========================================================
-         VIDEO PLAYBACK GUARD
-         Menjaga video aktif tetap play/loop saat browser mengalami
-         pause, stalled, tab kembali aktif, atau media sempat buffering.
-         ========================================================= */
-      function setupResilientVideo(video, shouldPlay) {
-        if (!video) return;
-
-        video.muted = true;
-        video.defaultMuted = true;
-        video.loop = true;
-        video.playsInline = true;
-        video.setAttribute("muted", "");
-        video.setAttribute("playsinline", "");
-
-        let lastTime = -1;
-        let stagnantChecks = 0;
-        let retryTimer = null;
-
-        const tryPlay = () => {
-          if (!shouldPlay()) return;
-          const promise = video.play();
-          if (promise && typeof promise.catch === "function") {
-            promise.catch(() => {});
-          }
-        };
-
-        const scheduleRetry = (delay = 350) => {
-          clearTimeout(retryTimer);
-          retryTimer = setTimeout(tryPlay, delay);
-        };
-
-        video.addEventListener("ended", () => {
-          try { video.currentTime = 0; } catch (_) {}
-          scheduleRetry(20);
-        });
-
-        video.addEventListener("pause", () => {
-          if (shouldPlay()) scheduleRetry(180);
-        });
-
-        video.addEventListener("stalled", () => scheduleRetry(450));
-        video.addEventListener("waiting", () => scheduleRetry(450));
-        video.addEventListener("canplay", () => scheduleRetry(40));
-        video.addEventListener("loadeddata", () => scheduleRetry(40));
-
-        // Watchdog ringan: bila video aktif tiba-tiba berhenti, jalankan kembali.
-        setInterval(() => {
-          if (!shouldPlay() || document.hidden) {
-            lastTime = video.currentTime || 0;
-            stagnantChecks = 0;
-            return;
-          }
-
-          const current = Number(video.currentTime || 0);
-
-          if (video.paused || video.ended) {
-            tryPlay();
-            stagnantChecks = 0;
-          } else if (Math.abs(current - lastTime) < .01 && video.readyState >= 2) {
-            stagnantChecks += 1;
-            if (stagnantChecks >= 4) {
-              // Jangan reload normal playback; cukup dorong play kembali.
-              tryPlay();
-              stagnantChecks = 0;
+          const maybeReady = () => {
+            if (
+              !resolved &&
+              notesReady &&
+              broadcastsReady
+            ) {
+              resolved = true;
+              state.cloudConnected = true;
+              resolve();
             }
-          } else {
-            stagnantChecks = 0;
-          }
+          };
 
-          lastTime = current;
-        }, 1250);
-
-        document.addEventListener("visibilitychange", () => {
-          if (!document.hidden) scheduleRetry(80);
-        });
-
-        window.addEventListener("focus", () => scheduleRetry(80));
-        window.addEventListener("pageshow", () => scheduleRetry(80));
-
-        tryPlay();
-      }
-
-      /* =========================================================
-         LOGIN + LOADING
-         ========================================================= */
-      function startApp() {
-        els.loginButton.disabled = true;
-
-        // Tampilkan video kedua sejak proses loading dimulai.
-        els.appBackgroundVideo.classList.add("active");
-        els.appBackgroundVideo.play().catch(() => {});
-
-        els.loadingScreen.classList.add("active");
-        els.welcomeScreen.style.opacity = "0";
-        els.welcomeScreen.style.pointerEvents = "none";
-
-        const stages = [
-          [0, "INITIALIZING..."],
-          [30, "LOADING DATA..."],
-          [62, "PREPARING WORKSPACE..."],
-          [88, "FINALIZING..."],
-          [100, "WORKSPACE READY"]
-        ];
-
-        let progress = 0;
-
-        const timer = setInterval(() => {
-          progress += Math.floor(Math.random() * 8) + 3;
-          if (progress > 100) progress = 100;
-
-          const stage = [...stages].reverse().find(([min]) => progress >= min);
-          els.loadingStatus.textContent = stage ? stage[1] : "INITIALIZING...";
-          els.loadingBar.style.width = progress + "%";
-          els.loadingPercent.textContent = progress + "%";
-
-          if (progress >= 100) {
-            clearInterval(timer);
-
-            setTimeout(() => {
-              loadData();
-              render();
-              els.app.classList.add("ready");
-              els.loadingScreen.classList.remove("active");
-
-              setTimeout(() => {
-                els.welcomeScreen.classList.add("hidden");
-                els.loadingScreen.classList.add("hidden");
-                // Video welcome tetap dibiarkan loop agar saat Logout langsung hidup tanpa frame macet.
-              }, 280);
-            }, 260);
-          }
-        }, 70);
-      }
-
-      /* =========================================================
-         LOGOUT
-         Kembali ke layar Welcome tanpa menghapus Local Storage.
-         ========================================================= */
-      function logoutApp() {
-        // Tutup semua modal yang mungkin sedang terbuka.
-        $$(".modal-layer.open").forEach(layer => layer.classList.remove("open"));
-        document.body.style.overflow = "";
-
-        // Reset tampilan workspace, bukan datanya.
-        state.type = "notes";
-        state.query = "";
-        state.previewId = null;
-        state.deleteId = null;
-        els.searchInput.value = "";
-        els.clearSearch.classList.add("hidden");
-
-        // Sembunyikan aplikasi dan video background utama.
-        els.app.classList.remove("ready");
-        els.appBackgroundVideo.classList.remove("active");
-        // Video utama tetap dibiarkan loop di belakang. Saat login kembali tidak perlu mulai dari frame beku.
-        if (els.appBackgroundVideo) els.appBackgroundVideo.play().catch(() => {});
-
-        // Pastikan loading tidak terlihat saat logout.
-        els.loadingScreen.classList.remove("active");
-        els.loadingScreen.classList.add("hidden");
-        els.loadingBar.style.width = "0%";
-        els.loadingPercent.textContent = "0%";
-        els.loadingStatus.textContent = "INITIALIZING...";
-
-        // Tampilkan kembali layar Welcome + video pertama.
-        els.welcomeScreen.classList.remove("hidden");
-        els.welcomeScreen.style.opacity = "1";
-        els.welcomeScreen.style.pointerEvents = "auto";
-        els.loginButton.disabled = false;
-
-        if (els.welcomeVideo) {
-          els.welcomeVideo.play().catch(() => {});
-        }
-
-        render();
-        refreshIcons();
-      }
-
-      /* =========================================================
-         RENDER
-         ========================================================= */
-      function filteredItems() {
-        const q = state.query.trim().toLocaleLowerCase("id");
-
-        return currentItems()
-          .filter(item => {
-            if (!q) return true;
-            return (
-              item.title.toLocaleLowerCase("id").includes(q) ||
-              item.content.toLocaleLowerCase("id").includes(q)
+          const handleError = error => {
+            console.error(
+              "Firestore realtime error:",
+              error
             );
-          })
-          .sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt));
+
+            state.cloudConnected = false;
+
+            if (!resolved) {
+              resolved = true;
+              reject(error);
+            } else {
+              showToast(
+                "Koneksi realtime bermasalah.",
+                "wifi-off"
+              );
+            }
+          };
+
+          unsubscribeNotes = onSnapshot(
+            cloudCollection("notes"),
+            snapshot => {
+              state.notes = snapshot.docs
+                .map(normalizeCloudDoc)
+                .sort(
+                  (a, b) =>
+                    (b.updatedAt || b.createdAt) -
+                    (a.updatedAt || a.createdAt)
+                );
+
+              notesReady = true;
+              render();
+              maybeReady();
+            },
+            handleError
+          );
+
+          unsubscribeBroadcasts = onSnapshot(
+            cloudCollection("broadcasts"),
+            snapshot => {
+              state.broadcasts = snapshot.docs
+                .map(normalizeCloudDoc)
+                .sort(
+                  (a, b) =>
+                    (b.updatedAt || b.createdAt) -
+                    (a.updatedAt || a.createdAt)
+                );
+
+              broadcastsReady = true;
+              render();
+              maybeReady();
+            },
+            handleError
+          );
+        }
+      );
+
+      return realtimeReadyPromise;
+    }
+
+    async function connectCloudRealtime() {
+      if (state.cloudStarting) {
+        return realtimeReadyPromise;
       }
 
-      function render() {
-        els.notesCount.textContent = state.notes.length;
-        els.broadcastCount.textContent = state.broadcasts.length;
+      state.cloudStarting = true;
 
-        els.tabs.forEach(tab => {
-          tab.classList.toggle("active", tab.dataset.type === state.type);
-        });
+      try {
+        await initializeFirebaseOnce();
+        await ensureAnonymousAuth();
 
-        const isNotes = state.type === "notes";
-        els.workspaceName.textContent = isNotes ? "Catatan" : "Broadcast Information";
-        els.searchInput.placeholder = isNotes
-          ? "Cari judul atau isi catatan..."
-          : "Cari judul atau isi broadcast...";
+        /*
+          Upload catatan localStorage lama dulu.
+          Setelah itu listener realtime membaca kondisi cloud terbaru.
+        */
+        await migrateLegacyDataOnce();
+        await startRealtimeSync();
 
-        const items = filteredItems();
-        els.resultCount.textContent = `${items.length} data`;
+        state.cloudConnected = true;
+      } finally {
+        state.cloudStarting = false;
+      }
+    }
 
-        els.cardsGrid.classList.toggle("hidden", items.length === 0);
-        els.emptyState.classList.toggle("hidden", items.length !== 0);
+    /* =========================================================
+       VIDEO PLAYBACK GUARD
+       Menjaga kedua video terus bergerak / loop.
+       ========================================================= */
+    function setupResilientVideo(video, shouldPlay) {
+      if (!video) return;
 
-        if (!items.length) {
-          els.emptyTitle.textContent = state.query
-            ? "Data tidak ditemukan"
-            : (isNotes ? "Belum ada catatan" : "Belum ada broadcast");
+      video.muted = true;
+      video.defaultMuted = true;
+      video.loop = true;
+      video.playsInline = true;
 
-          els.emptyText.textContent = state.query
-            ? "Coba gunakan kata kunci lain."
-            : (isNotes
-                ? "Tambahkan catatan pertama untuk mulai menyimpan informasi."
-                : "Tambahkan template broadcast pertama.");
+      video.setAttribute("muted", "");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("loop", "");
 
-          refreshIcons();
+      let lastTime = -1;
+      let stagnantChecks = 0;
+      let retryTimer = null;
+
+      const tryPlay = () => {
+        if (!shouldPlay()) return;
+
+        const promise = video.play();
+
+        if (
+          promise &&
+          typeof promise.catch === "function"
+        ) {
+          promise.catch(() => {});
+        }
+      };
+
+      const scheduleRetry = (delay = 350) => {
+        clearTimeout(retryTimer);
+
+        retryTimer = setTimeout(
+          tryPlay,
+          delay
+        );
+      };
+
+      video.addEventListener(
+        "ended",
+        () => {
+          try {
+            video.currentTime = 0;
+          } catch {}
+
+          scheduleRetry(20);
+        }
+      );
+
+      video.addEventListener(
+        "pause",
+        () => {
+          if (shouldPlay()) {
+            scheduleRetry(160);
+          }
+        }
+      );
+
+      video.addEventListener(
+        "stalled",
+        () => scheduleRetry(400)
+      );
+
+      video.addEventListener(
+        "waiting",
+        () => scheduleRetry(400)
+      );
+
+      video.addEventListener(
+        "canplay",
+        () => scheduleRetry(40)
+      );
+
+      video.addEventListener(
+        "loadeddata",
+        () => scheduleRetry(40)
+      );
+
+      /*
+        Watchdog:
+        bila currentTime berhenti bergerak beberapa kali berturut,
+        browser didorong untuk play kembali.
+      */
+      setInterval(() => {
+        if (!shouldPlay() || document.hidden) {
+          lastTime = Number(video.currentTime || 0);
+          stagnantChecks = 0;
           return;
         }
 
-        els.cardsGrid.innerHTML = items.map(item => `
-          <article class="note-card" data-id="${escapeAttr(item.id)}" style="--card-accent:${getAccent(item)}">
+        const current = Number(
+          video.currentTime || 0
+        );
+
+        if (video.paused || video.ended) {
+          tryPlay();
+          stagnantChecks = 0;
+        } else if (
+          Math.abs(current - lastTime) < .01 &&
+          video.readyState >= 2
+        ) {
+          stagnantChecks += 1;
+
+          if (stagnantChecks >= 4) {
+            tryPlay();
+            stagnantChecks = 0;
+          }
+        } else {
+          stagnantChecks = 0;
+        }
+
+        lastTime = current;
+      }, 1250);
+
+      document.addEventListener(
+        "visibilitychange",
+        () => {
+          if (!document.hidden) {
+            scheduleRetry(60);
+          }
+        }
+      );
+
+      window.addEventListener(
+        "focus",
+        () => scheduleRetry(60)
+      );
+
+      window.addEventListener(
+        "pageshow",
+        () => scheduleRetry(60)
+      );
+
+      window.addEventListener(
+        "online",
+        () => scheduleRetry(40)
+      );
+
+      tryPlay();
+    }
+
+    /* =========================================================
+       LOGIN + LOADING
+       Loading menunggu Firebase benar-benar siap.
+       ========================================================= */
+    async function startApp() {
+      if (els.loginButton.disabled) {
+        return;
+      }
+
+      els.loginButton.disabled = true;
+
+      els.appBackgroundVideo.classList.add("active");
+      els.appBackgroundVideo
+        .play()
+        .catch(() => {});
+
+      els.loadingScreen.classList.remove("hidden");
+      els.loadingScreen.classList.add("active");
+
+      els.welcomeScreen.style.opacity = "0";
+      els.welcomeScreen.style.pointerEvents = "none";
+
+      let progress = 0;
+      let connectionFinished = false;
+
+      const setProgress = (value, status) => {
+        progress = clamp(
+          Math.round(value),
+          0,
+          100
+        );
+
+        els.loadingBar.style.width =
+          progress + "%";
+
+        els.loadingPercent.textContent =
+          progress + "%";
+
+        if (status) {
+          els.loadingStatus.textContent = status;
+        }
+      };
+
+      setProgress(
+        8,
+        "CONNECTING CLOUD..."
+      );
+
+      /*
+        Progress visual berhenti sekitar 88% sampai cloud realtime
+        benar-benar siap. Jadi halaman tidak pura-pura berhasil.
+      */
+      const progressTimer = setInterval(() => {
+        if (
+          !connectionFinished &&
+          progress < 88
+        ) {
+          setProgress(
+            Math.min(
+              88,
+              progress + Math.floor(Math.random() * 6) + 2
+            ),
+            progress < 35
+              ? "AUTHENTICATING..."
+              : progress < 65
+                ? "SYNCING DATA..."
+                : "STARTING REALTIME..."
+          );
+        }
+      }, 90);
+
+      try {
+        await connectCloudRealtime();
+        connectionFinished = true;
+        clearInterval(progressTimer);
+
+        setProgress(
+          100,
+          "REALTIME READY"
+        );
+
+        render();
+
+        setTimeout(() => {
+          els.app.classList.add("ready");
+
+          els.loadingScreen.classList.remove(
+            "active"
+          );
+
+          setTimeout(() => {
+            els.welcomeScreen.classList.add(
+              "hidden"
+            );
+
+            els.loadingScreen.classList.add(
+              "hidden"
+            );
+          }, 280);
+        }, 240);
+      } catch (error) {
+        connectionFinished = true;
+        clearInterval(progressTimer);
+
+        console.error(
+          "Cloud connection failed:",
+          error
+        );
+
+        setProgress(
+          Math.max(progress, 35),
+          isFirebaseConfigured()
+            ? "SYNC ERROR"
+            : "FIREBASE CONFIG REQUIRED"
+        );
+
+        setTimeout(() => {
+          els.loadingScreen.classList.remove(
+            "active"
+          );
+
+          els.loadingScreen.classList.add(
+            "hidden"
+          );
+
+          els.appBackgroundVideo.classList.remove(
+            "active"
+          );
+
+          els.welcomeScreen.classList.remove(
+            "hidden"
+          );
+
+          els.welcomeScreen.style.opacity = "1";
+          els.welcomeScreen.style.pointerEvents =
+            "auto";
+
+          els.loginButton.disabled = false;
+
+          showToast(
+            isFirebaseConfigured()
+              ? "Gagal terhubung Firebase. Cek Firestore/Auth/Rules."
+              : "Isi FIREBASE_CONFIG terlebih dahulu.",
+            "triangle-alert"
+          );
+        }, 950);
+      }
+    }
+
+    /* =========================================================
+       LOGOUT
+       Logout TIDAK menghapus data Firestore.
+       ========================================================= */
+    async function logoutApp() {
+      $$(".modal-layer.open").forEach(
+        layer => layer.classList.remove("open")
+      );
+
+      document.body.style.overflow = "";
+
+      state.type = "notes";
+      state.query = "";
+      state.previewId = null;
+      state.deleteId = null;
+
+      els.searchInput.value = "";
+      els.clearSearch.classList.add("hidden");
+
+      /*
+        Berhenti mendengarkan realtime saat berada di Welcome,
+        tetapi data cloud tidak disentuh.
+      */
+      stopRealtimeSync();
+
+      if (auth?.currentUser) {
+        try {
+          await signOut(auth);
+        } catch (error) {
+          console.warn(
+            "Anonymous sign out gagal:",
+            error
+          );
+        }
+      }
+
+      els.app.classList.remove("ready");
+      els.appBackgroundVideo.classList.remove(
+        "active"
+      );
+
+      /*
+        Video Kafka tetap dijaga play di background oleh watchdog,
+        sehingga saat login lagi tidak membeku di satu frame.
+      */
+      els.appBackgroundVideo
+        ?.play()
+        .catch(() => {});
+
+      els.loadingScreen.classList.remove("active");
+      els.loadingScreen.classList.add("hidden");
+
+      els.loadingBar.style.width = "0%";
+      els.loadingPercent.textContent = "0%";
+      els.loadingStatus.textContent =
+        "INITIALIZING...";
+
+      els.welcomeScreen.classList.remove(
+        "hidden"
+      );
+
+      els.welcomeScreen.style.opacity = "1";
+      els.welcomeScreen.style.pointerEvents =
+        "auto";
+
+      els.loginButton.disabled = false;
+
+      els.welcomeVideo
+        ?.play()
+        .catch(() => {});
+
+      /*
+        State visual dibersihkan.
+        Catatan di Firestore tetap ada.
+      */
+      state.notes = [];
+      state.broadcasts = [];
+
+      render();
+      refreshIcons();
+    }
+
+    /* =========================================================
+       RENDER
+       ========================================================= */
+    function filteredItems() {
+      const q = state.query
+        .trim()
+        .toLocaleLowerCase("id");
+
+      return currentItems()
+        .filter(item => {
+          if (!q) return true;
+
+          return (
+            item.title
+              .toLocaleLowerCase("id")
+              .includes(q) ||
+            item.content
+              .toLocaleLowerCase("id")
+              .includes(q)
+          );
+        })
+        .sort(
+          (a, b) =>
+            (b.updatedAt || b.createdAt) -
+            (a.updatedAt || a.createdAt)
+        );
+    }
+
+    function render() {
+      els.notesCount.textContent =
+        state.notes.length;
+
+      els.broadcastCount.textContent =
+        state.broadcasts.length;
+
+      els.tabs.forEach(tab => {
+        tab.classList.toggle(
+          "active",
+          tab.dataset.type === state.type
+        );
+      });
+
+      const isNotes =
+        state.type === "notes";
+
+      els.workspaceName.textContent =
+        isNotes
+          ? "Catatan"
+          : "Broadcast Information";
+
+      els.searchInput.placeholder =
+        isNotes
+          ? "Cari judul atau isi catatan..."
+          : "Cari judul atau isi broadcast...";
+
+      const items = filteredItems();
+
+      els.resultCount.textContent =
+        `${items.length} data`;
+
+      els.cardsGrid.classList.toggle(
+        "hidden",
+        items.length === 0
+      );
+
+      els.emptyState.classList.toggle(
+        "hidden",
+        items.length !== 0
+      );
+
+      if (!items.length) {
+        els.emptyTitle.textContent =
+          state.query
+            ? "Data tidak ditemukan"
+            : (
+                isNotes
+                  ? "Belum ada catatan"
+                  : "Belum ada broadcast"
+              );
+
+        els.emptyText.textContent =
+          state.query
+            ? "Coba gunakan kata kunci lain."
+            : (
+                isNotes
+                  ? "Tambahkan catatan pertama untuk mulai menyimpan informasi."
+                  : "Tambahkan template broadcast pertama."
+              );
+
+        els.cardsGrid.innerHTML = "";
+        refreshIcons();
+        return;
+      }
+
+      els.cardsGrid.innerHTML =
+        items.map(item => `
+          <article
+            class="note-card"
+            data-id="${escapeAttr(item.id)}"
+            style="--card-accent:${getAccent(item)}"
+          >
             <div class="card-title">
               <span>${escapeHtml(item.title)}</span>
             </div>
@@ -1878,22 +2618,42 @@
             <div class="card-body">${escapeHtml(item.content)}</div>
 
             <div class="card-actions">
-              <button class="card-action copy" type="button" data-action="copy" title="Copy">
+              <button
+                class="card-action copy"
+                type="button"
+                data-action="copy"
+                title="Copy"
+              >
                 <i data-lucide="copy"></i>
                 <span>Copy</span>
               </button>
 
-              <button class="card-action" type="button" data-action="preview" title="Preview">
+              <button
+                class="card-action"
+                type="button"
+                data-action="preview"
+                title="Preview"
+              >
                 <i data-lucide="eye"></i>
                 <span>Preview</span>
               </button>
 
-              <button class="card-action" type="button" data-action="edit" title="Edit">
+              <button
+                class="card-action"
+                type="button"
+                data-action="edit"
+                title="Edit"
+              >
                 <i data-lucide="square-pen"></i>
                 <span>Edit</span>
               </button>
 
-              <button class="card-action delete" type="button" data-action="delete" title="Hapus">
+              <button
+                class="card-action delete"
+                type="button"
+                data-action="delete"
+                title="Hapus"
+              >
                 <i data-lucide="trash-2"></i>
                 <span>Hapus</span>
               </button>
@@ -1901,317 +2661,637 @@
           </article>
         `).join("");
 
-        $$(".note-card", els.cardsGrid).forEach(card => {
-          card.addEventListener("click", async event => {
-            const button = event.target.closest("[data-action]");
-            if (!button) return;
+      $$(".note-card", els.cardsGrid)
+        .forEach(card => {
+          card.addEventListener(
+            "click",
+            async event => {
+              const button = event.target.closest(
+                "[data-action]"
+              );
 
-            const id = card.dataset.id;
-            const action = button.dataset.action;
+              if (!button) return;
 
-            if (action === "copy") await copyItem(id, button);
-            if (action === "preview") openPreview(id);
-            if (action === "edit") openForm("edit", id);
-            if (action === "delete") openDelete(id);
-          });
+              const id = card.dataset.id;
+              const action =
+                button.dataset.action;
+
+              if (action === "copy") {
+                await copyItem(id, button);
+              }
+
+              if (action === "preview") {
+                openPreview(id);
+              }
+
+              if (action === "edit") {
+                openForm("edit", id);
+              }
+
+              if (action === "delete") {
+                openDelete(id);
+              }
+            }
+          );
         });
 
-        refreshIcons();
-      }
+      refreshIcons();
+    }
 
-      /* =========================================================
-         TAB
-         ========================================================= */
-      function setType(type) {
-        state.type = type;
-        state.query = "";
-        els.searchInput.value = "";
-        els.clearSearch.classList.add("hidden");
-        render();
-      }
+    /* =========================================================
+       TAB
+       ========================================================= */
+    function setType(type) {
+      state.type = type;
+      state.query = "";
 
-      /* =========================================================
-         FORM
-         ========================================================= */
-      function openForm(mode, id = null) {
-        const isEdit = mode === "edit";
-        const item = isEdit ? currentItems().find(x => x.id === id) : null;
-        const typeLabel = state.type === "notes" ? "Catatan" : "Broadcast";
+      els.searchInput.value = "";
+      els.clearSearch.classList.add(
+        "hidden"
+      );
 
-        els.formTitle.textContent = `${isEdit ? "Edit" : "Tambah"} ${typeLabel}`;
-        els.formSubtitle.textContent = state.type === "notes"
-          ? "Simpan teks agar mudah dicari dan di-copy."
-          : "Simpan template broadcast agar siap digunakan.";
+      render();
+    }
 
-        els.editingId.value = item?.id || "";
-        els.titleInput.value = item?.title || "";
-        els.contentInput.value = item?.content || "";
-        els.contentInput.placeholder = state.type === "notes"
+    /* =========================================================
+       ADD / EDIT -> FIRESTORE
+       ========================================================= */
+    function openForm(mode, id = null) {
+      const isEdit = mode === "edit";
+
+      const item = isEdit
+        ? currentItems().find(x => x.id === id)
+        : null;
+
+      const typeLabel =
+        state.type === "notes"
+          ? "Catatan"
+          : "Broadcast";
+
+      els.formTitle.textContent =
+        `${isEdit ? "Edit" : "Tambah"} ${typeLabel}`;
+
+      els.formSubtitle.textContent =
+        state.type === "notes"
+          ? "Simpan teks ke cloud agar otomatis muncul di semua perangkat."
+          : "Simpan template broadcast ke cloud realtime.";
+
+      els.editingId.value =
+        item?.id || "";
+
+      els.titleInput.value =
+        item?.title || "";
+
+      els.contentInput.value =
+        item?.content || "";
+
+      els.contentInput.placeholder =
+        state.type === "notes"
           ? "Tulis isi catatan..."
           : "Tulis isi broadcast...";
 
-        openModal(els.formModal);
-        setTimeout(() => els.titleInput.focus(), 60);
+      openModal(els.formModal);
+
+      setTimeout(
+        () => els.titleInput.focus(),
+        60
+      );
+    }
+
+    function handleSubmit(event) {
+      event.preventDefault();
+
+      if (!db || !state.cloudConnected) {
+        showToast(
+          "Cloud belum tersambung.",
+          "wifi-off"
+        );
+        return;
       }
 
-      function handleSubmit(event) {
-        event.preventDefault();
+      const title =
+        els.titleInput.value.trim();
 
-        const title = els.titleInput.value.trim();
-        const content = els.contentInput.value.trim();
-        const id = els.editingId.value;
+      const content =
+        els.contentInput.value.trim();
 
-        if (!title || !content) {
-          showToast("Judul dan isi tidak boleh kosong.", "triangle-alert");
-          return;
-        }
+      const editingId =
+        els.editingId.value;
 
-        const now = Date.now();
-        let items = currentItems();
+      if (!title || !content) {
+        showToast(
+          "Judul dan isi tidak boleh kosong.",
+          "triangle-alert"
+        );
+        return;
+      }
 
-        if (id) {
-          items = items.map(item =>
-            item.id === id
-              ? { ...item, title, content, updatedAt: now }
-              : item
-          );
+      const type = state.type;
+      const now = Date.now();
 
-          showToast(
-            state.type === "notes"
-              ? "Catatan berhasil diperbarui."
-              : "Broadcast berhasil diperbarui.",
-            "check"
-          );
-        } else {
-          items = [{
-            id: createId(),
+      let request;
+
+      if (editingId) {
+        request = setDoc(
+          cloudDoc(type, editingId),
+          {
+            title,
+            content,
+            updatedAtMs: now,
+            cloudUpdatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+
+        showToast(
+          navigator.onLine
+            ? "Perubahan sedang disinkronkan..."
+            : "Disimpan offline. Akan sync saat internet kembali.",
+          "cloud"
+        );
+      } else {
+        const id = createId();
+
+        request = setDoc(
+          cloudDoc(type, id),
+          {
             title,
             content,
             category: "General",
-            createdAt: now,
-            updatedAt: now
-          }, ...items];
+            createdAtMs: now,
+            updatedAtMs: now,
+            cloudUpdatedAt: serverTimestamp()
+          },
+          { merge: false }
+        );
+
+        showToast(
+          navigator.onLine
+            ? "Catatan sedang disinkronkan..."
+            : "Disimpan offline. Akan sync saat internet kembali.",
+          "cloud"
+        );
+      }
+
+      /*
+        Firestore listener memberi update lokal/realtime.
+        Modal langsung ditutup agar terasa responsif.
+      */
+      closeModal(els.formModal);
+
+      request
+        .then(() => {
+          showToast(
+            type === "notes"
+              ? "Catatan tersimpan di cloud."
+              : "Broadcast tersimpan di cloud.",
+            "cloud-check"
+          );
+        })
+        .catch(error => {
+          console.error(
+            "Save Firestore failed:",
+            error
+          );
 
           showToast(
-            state.type === "notes"
-              ? "Catatan berhasil ditambahkan."
-              : "Broadcast berhasil ditambahkan.",
-            "check"
+            "Gagal menyimpan ke cloud. Cek koneksi / Firestore Rules.",
+            "triangle-alert"
           );
-        }
+        });
+    }
 
-        setCurrentItems(items);
-        saveData();
-        closeModal(els.formModal);
-        render();
+    /* =========================================================
+       COPY
+       ========================================================= */
+    async function copyText(text) {
+      if (
+        navigator.clipboard &&
+        window.isSecureContext
+      ) {
+        await navigator.clipboard.writeText(
+          text
+        );
+        return;
       }
 
-      /* =========================================================
-         COPY
-         ========================================================= */
-      async function copyText(text) {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-          return;
-        }
+      const area =
+        document.createElement("textarea");
 
-        const area = document.createElement("textarea");
-        area.value = text;
-        area.style.position = "fixed";
-        area.style.left = "-9999px";
-        area.style.top = "-9999px";
-        document.body.appendChild(area);
-        area.focus();
-        area.select();
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.left = "-9999px";
+      area.style.top = "-9999px";
 
-        const ok = document.execCommand("copy");
-        area.remove();
+      document.body.appendChild(area);
 
-        if (!ok) throw new Error("Copy failed");
+      area.focus();
+      area.select();
+
+      const ok =
+        document.execCommand("copy");
+
+      area.remove();
+
+      if (!ok) {
+        throw new Error("Copy failed");
       }
+    }
 
-      async function copyItem(id, button = null) {
-        const item = currentItems().find(x => x.id === id);
-        if (!item) return;
+    async function copyItem(
+      id,
+      button = null
+    ) {
+      const item = currentItems().find(
+        x => x.id === id
+      );
 
-        try {
-          await copyText(item.content);
+      if (!item) return;
 
-          if (button) {
-            const label = $("span", button);
-            const old = label?.textContent || "Copy";
-            if (label) label.textContent = "Copied";
-            setTimeout(() => {
-              if (label) label.textContent = old;
-            }, 1200);
+      try {
+        await copyText(item.content);
+
+        if (button) {
+          const label =
+            $("span", button);
+
+          const old =
+            label?.textContent || "Copy";
+
+          if (label) {
+            label.textContent = "Copied";
           }
 
-          showToast("Berhasil di-copy.", "copy");
-        } catch {
-          showToast("Gagal copy. Gunakan Preview lalu copy manual.", "triangle-alert");
+          setTimeout(() => {
+            if (label) {
+              label.textContent = old;
+            }
+          }, 1200);
         }
+
+        showToast(
+          "Berhasil di-copy.",
+          "copy"
+        );
+      } catch {
+        showToast(
+          "Gagal copy. Gunakan Preview lalu copy manual.",
+          "triangle-alert"
+        );
       }
+    }
 
-      /* =========================================================
-         PREVIEW
-         ========================================================= */
-      function openPreview(id) {
-        const item = currentItems().find(x => x.id === id);
-        if (!item) return;
+    /* =========================================================
+       PREVIEW
+       ========================================================= */
+    function openPreview(id) {
+      const item = currentItems().find(
+        x => x.id === id
+      );
 
-        state.previewId = id;
-        els.previewTitle.textContent = item.title;
-        els.previewContent.textContent = item.content;
-        openModal(els.previewModal);
-      }
+      if (!item) return;
 
-      async function copyPreview() {
-        if (!state.previewId) return;
-        await copyItem(state.previewId);
-      }
+      state.previewId = id;
 
-      /* =========================================================
-         DELETE
-         ========================================================= */
-      function openDelete(id) {
-        const item = currentItems().find(x => x.id === id);
-        if (!item) return;
+      els.previewTitle.textContent =
+        item.title;
 
-        state.deleteId = id;
-        els.deleteTitle.textContent = state.type === "notes"
+      els.previewContent.textContent =
+        item.content;
+
+      openModal(els.previewModal);
+    }
+
+    async function copyPreview() {
+      if (!state.previewId) return;
+      await copyItem(state.previewId);
+    }
+
+    /* =========================================================
+       DELETE -> FIRESTORE
+       Ini SATU-SATUNYA operasi aplikasi yang menghapus catatan.
+       ========================================================= */
+    function openDelete(id) {
+      const item = currentItems().find(
+        x => x.id === id
+      );
+
+      if (!item) return;
+
+      state.deleteId = id;
+
+      els.deleteTitle.textContent =
+        state.type === "notes"
           ? "Hapus catatan?"
           : "Hapus broadcast?";
 
-        openModal(els.deleteModal);
+      openModal(els.deleteModal);
+    }
+
+    function confirmDelete() {
+      if (!state.deleteId) return;
+
+      if (!db || !state.cloudConnected) {
+        showToast(
+          "Cloud belum tersambung.",
+          "wifi-off"
+        );
+        return;
       }
 
-      function confirmDelete() {
-        if (!state.deleteId) return;
+      const id = state.deleteId;
+      const type = state.type;
 
-        const oldLength = currentItems().length;
-        const items = currentItems().filter(item => item.id !== state.deleteId);
+      /*
+        Tidak ada localStorage.removeItem() untuk kumpulan Catatan.
+        Yang dihapus hanya document yang user pilih.
+      */
+      const request = deleteDoc(
+        cloudDoc(type, id)
+      );
 
-        setCurrentItems(items);
+      state.deleteId = null;
+      closeModal(els.deleteModal);
 
-        if (items.length !== oldLength) {
-          saveData();
-          showToast("Data berhasil dihapus.", "trash-2");
+      showToast(
+        navigator.onLine
+          ? "Penghapusan sedang disinkronkan..."
+          : "Penghapusan diantrikan sampai internet kembali.",
+        "trash-2"
+      );
+
+      request
+        .then(() => {
+          showToast(
+            "Data berhasil dihapus dari cloud.",
+            "trash-2"
+          );
+        })
+        .catch(error => {
+          console.error(
+            "Delete Firestore failed:",
+            error
+          );
+
+          showToast(
+            "Gagal menghapus. Cek koneksi / Firestore Rules.",
+            "triangle-alert"
+          );
+        });
+    }
+
+    /* =========================================================
+       MODAL + TOAST
+       ========================================================= */
+    function openModal(modal) {
+      modal.classList.add("open");
+      document.body.style.overflow =
+        "hidden";
+
+      refreshIcons();
+    }
+
+    function closeModal(modal) {
+      modal.classList.remove("open");
+
+      if (
+        !$$(".modal-layer.open").length
+      ) {
+        document.body.style.overflow =
+          "";
+      }
+    }
+
+    function showToast(
+      message,
+      icon = "check"
+    ) {
+      const toast =
+        document.createElement("div");
+
+      toast.className = "toast";
+
+      toast.innerHTML = `
+        <i data-lucide="${escapeAttr(icon)}"></i>
+        <span>${escapeHtml(message)}</span>
+      `;
+
+      els.toastStack.appendChild(toast);
+      refreshIcons();
+
+      setTimeout(() => {
+        toast.classList.add("out");
+
+        setTimeout(
+          () => toast.remove(),
+          180
+        );
+      }, 2100);
+    }
+
+    /* =========================================================
+       CONNECTION EVENTS
+       ========================================================= */
+    window.addEventListener(
+      "offline",
+      () => {
+        if (
+          !els.app.classList.contains("ready")
+        ) {
+          return;
         }
 
-        state.deleteId = null;
-        closeModal(els.deleteModal);
-        render();
+        showToast(
+          "Internet terputus. Perubahan akan diantrikan oleh Firestore cache.",
+          "wifi-off"
+        );
       }
+    );
 
-      /* =========================================================
-         MODAL + TOAST
-         ========================================================= */
-      function openModal(modal) {
-        modal.classList.add("open");
-        document.body.style.overflow = "hidden";
-        refreshIcons();
-      }
-
-      function closeModal(modal) {
-        modal.classList.remove("open");
-
-        if (!$$(".modal-layer.open").length) {
-          document.body.style.overflow = "";
+    window.addEventListener(
+      "online",
+      () => {
+        if (
+          !els.app.classList.contains("ready")
+        ) {
+          return;
         }
+
+        showToast(
+          "Internet kembali. Sinkronisasi dilanjutkan.",
+          "wifi"
+        );
       }
+    );
 
-      function showToast(message, icon = "check") {
-        const toast = document.createElement("div");
-        toast.className = "toast";
-        toast.innerHTML = `
-          <i data-lucide="${escapeAttr(icon)}"></i>
-          <span>${escapeHtml(message)}</span>
-        `;
+    /* =========================================================
+       EVENTS
+       ========================================================= */
+    els.loginButton.addEventListener(
+      "click",
+      startApp
+    );
 
-        els.toastStack.appendChild(toast);
-        refreshIcons();
+    els.settingsButton.addEventListener(
+      "click",
+      () => openModal(els.settingsModal)
+    );
 
-        setTimeout(() => {
-          toast.classList.add("out");
-          setTimeout(() => toast.remove(), 180);
-        }, 1900);
+    els.logoutButton.addEventListener(
+      "click",
+      logoutApp
+    );
+
+    els.opacityRange.addEventListener(
+      "input",
+      event => {
+        applyTableOpacity(
+          event.target.value,
+          true
+        );
       }
+    );
 
-      /* =========================================================
-         EVENTS
-         ========================================================= */
-      els.loginButton.addEventListener("click", startApp);
-      els.settingsButton.addEventListener("click", () => openModal(els.settingsModal));
-      els.logoutButton.addEventListener("click", logoutApp);
-
-      els.opacityRange.addEventListener("input", event => {
-        applyTableOpacity(event.target.value, true);
-      });
-
-      els.resetOpacityButton.addEventListener("click", () => {
+    els.resetOpacityButton.addEventListener(
+      "click",
+      () => {
         applyTableOpacity(83, true);
-        showToast("Opacity tabel dikembalikan ke 83%.", "settings-2");
-      });
 
-      els.tabs.forEach(tab => {
-        tab.addEventListener("click", () => setType(tab.dataset.type));
-      });
+        showToast(
+          "Opacity tabel dikembalikan ke 83%.",
+          "settings-2"
+        );
+      }
+    );
 
-      els.searchInput.addEventListener("input", event => {
+    els.tabs.forEach(tab => {
+      tab.addEventListener(
+        "click",
+        () => setType(tab.dataset.type)
+      );
+    });
+
+    els.searchInput.addEventListener(
+      "input",
+      event => {
         state.query = event.target.value;
-        els.clearSearch.classList.toggle("hidden", !state.query);
-        render();
-      });
 
-      els.clearSearch.addEventListener("click", () => {
+        els.clearSearch.classList.toggle(
+          "hidden",
+          !state.query
+        );
+
+        render();
+      }
+    );
+
+    els.clearSearch.addEventListener(
+      "click",
+      () => {
         state.query = "";
         els.searchInput.value = "";
-        els.clearSearch.classList.add("hidden");
+
+        els.clearSearch.classList.add(
+          "hidden"
+        );
+
         els.searchInput.focus();
         render();
-      });
+      }
+    );
 
-      els.addButton.addEventListener("click", () => openForm("add"));
-      els.emptyAddButton.addEventListener("click", () => openForm("add"));
-      els.noteForm.addEventListener("submit", handleSubmit);
-      els.previewCopyButton.addEventListener("click", copyPreview);
-      els.confirmDeleteButton.addEventListener("click", confirmDelete);
+    els.addButton.addEventListener(
+      "click",
+      () => openForm("add")
+    );
 
-      $$("[data-close]").forEach(button => {
-        button.addEventListener("click", () => {
-          const modal = document.getElementById(button.dataset.close);
-          if (modal) closeModal(modal);
-        });
-      });
+    els.emptyAddButton.addEventListener(
+      "click",
+      () => openForm("add")
+    );
 
-      $$(".modal-layer").forEach(layer => {
-        layer.addEventListener("mousedown", event => {
-          if (event.target === layer) closeModal(layer);
-        });
-      });
+    els.noteForm.addEventListener(
+      "submit",
+      handleSubmit
+    );
 
-      document.addEventListener("keydown", event => {
+    els.previewCopyButton.addEventListener(
+      "click",
+      copyPreview
+    );
+
+    els.confirmDeleteButton.addEventListener(
+      "click",
+      confirmDelete
+    );
+
+    $$("[data-close]").forEach(button => {
+      button.addEventListener(
+        "click",
+        () => {
+          const modal =
+            document.getElementById(
+              button.dataset.close
+            );
+
+          if (modal) {
+            closeModal(modal);
+          }
+        }
+      );
+    });
+
+    $$(".modal-layer").forEach(layer => {
+      layer.addEventListener(
+        "mousedown",
+        event => {
+          if (event.target === layer) {
+            closeModal(layer);
+          }
+        }
+      );
+    });
+
+    document.addEventListener(
+      "keydown",
+      event => {
         if (event.key === "Escape") {
-          $$(".modal-layer.open").forEach(closeModal);
+          $$(".modal-layer.open")
+            .forEach(closeModal);
         }
 
-        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          event.key.toLowerCase() === "k"
+        ) {
           event.preventDefault();
           els.searchInput.focus();
         }
-      });
+      }
+    );
 
-      // Terapkan opacity tersimpan sebelum user masuk ke workspace.
-      loadSettings();
+    /*
+      Terapkan opacity tersimpan sebelum login.
+      Catatan baru dimuat dari Firestore saat CLICK TO LOGIN.
+    */
+    loadSettings();
 
-      // Kedua video dipersiapkan sebagai loop tahan-pause/stall.
-      // Welcome selalu boleh berjalan; Kafka diputar terus agar transisi login tidak freeze.
-      setupResilientVideo(els.welcomeVideo, () => true);
-      setupResilientVideo(els.appBackgroundVideo, () => true);
+    /*
+      Kedua background tetap dipersiapkan sebagai loop tahan-pause.
+      Kafka boleh tetap berjalan di belakang sehingga tidak freeze
+      saat transisi masuk.
+    */
+    setupResilientVideo(
+      els.welcomeVideo,
+      () => true
+    );
 
-      // Icon pertama
-      refreshIcons();
-    })();
+    setupResilientVideo(
+      els.appBackgroundVideo,
+      () => true
+    );
+
+    refreshIcons();
   </script>
 </body>
 </html>
